@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Query, Args, Int } from '@nestjs/graphql';
 import { TipoUsuariosService } from './tipo-usuarios.service';
 import { TipoUsuarios } from './tipo-usuarios.entity';
 import { TipoUsuarioQueryResponse, TipoUsuariosQueryResponse } from './tipo-usuarios.model';
@@ -7,12 +7,12 @@ import { TipoUsuarioQueryResponse, TipoUsuariosQueryResponse } from './tipo-usua
 export class TipoUsuariosResolver {
   constructor(private readonly tipoUsuariosService: TipoUsuariosService) {}
 
-  @Query(() => [TipoUsuarios])
+  @Query(() => TipoUsuariosQueryResponse)
   async getAllTipoUsuarios(): Promise<TipoUsuariosQueryResponse> {
     return this.tipoUsuariosService.findAll();
   }
 
-  @Query(() => TipoUsuarios)
+  @Query(() => TipoUsuarioQueryResponse)
   async getTipoUsuarios(
     @Args('id', { type: () => Int }) id: number
   ): Promise<TipoUsuarioQueryResponse> {

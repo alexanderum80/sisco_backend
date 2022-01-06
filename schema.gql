@@ -575,6 +575,18 @@ type ContaNoUsarEnCuentaQueryResponse {
   error: String
 }
 
+type TipoUsuariosQueryResponse {
+  success: Boolean!
+  data: [TipoUsuarios!]
+  error: String
+}
+
+type TipoUsuarioQueryResponse {
+  success: Boolean!
+  data: TipoUsuarios
+  error: String
+}
+
 type Query {
   authenticateUsuario(passw: String!, usuario: String!): UsuarioQueryResponse!
   getAllUsuarios: UsuariosQueryResponse!
@@ -626,8 +638,8 @@ type Query {
   getAllOperadores: ContaOperadoresQueryResponse!
   getAllNoUsarEnCuenta: ContaNoUsarEnCuentasQueryResponse!
   getNoUsarEnCuentaById(id: Int!): ContaNoUsarEnCuentaQueryResponse!
-  getAllTipoUsuarios: [TipoUsuarios!]!
-  getTipoUsuarios(id: Int!): TipoUsuarios!
+  getAllTipoUsuarios: TipoUsuariosQueryResponse!
+  getTipoUsuarios(id: Int!): TipoUsuarioQueryResponse!
 }
 
 input ConciliaDWHInput {
