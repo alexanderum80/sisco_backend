@@ -14,9 +14,9 @@ export class EmpleadosResolver {
     ) {}
 
     @Query(() => EmpleadosQueryResponse)
-    // @UseGuards(new AuthGuard())
+    @UseGuards(new AuthGuard())
     async getAllEmpleados(@Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios): Promise<EmpleadosQueryResponse> {
-        return this._empleadosService.getAllEmpleados(user);
+        return this._empleadosService.findAll(user);
     }
 
     @Query(() => EmpleadoQueryResponse)
@@ -24,22 +24,30 @@ export class EmpleadosResolver {
     async getEmpleadoById(
         @Args({ name: 'id', type: () => Int }) _id: number
     ): Promise<EmpleadoQueryResponse> {
-        return this._empleadosService.getEmpleadoById(_id);
+        return this._empleadosService.findOne(_id);
     }
 
     @Mutation(() => MutationResponse)
     @UseGuards(new AuthGuard())
-    async saveEmpleado(
+    async createEmpleado(
         @Args({ name: 'empleadoInfo', type: () => EmpleadoInput }) empleadoInfo: EmpleadoInput
     ): Promise<MutationResponse> {
-        return this._empleadosService.saveEmpleado(empleadoInfo);
+        return this._empleadosService.create(empleadoInfo);
+    }
+
+    @Mutation(() => MutationResponse)
+    @UseGuards(new AuthGuard())
+    async updateEmpleado(
+        @Args({ name: 'empleadoInfo', type: () => EmpleadoInput }) empleadoInfo: EmpleadoInput
+    ): Promise<MutationResponse> {
+        return this._empleadosService.update(empleadoInfo);
     }
 
     @Mutation(() => MutationResponse)
     @UseGuards(new AuthGuard())
     async deleteEmpleado(
-        @Args({ name: 'id', type: () => Int }) _id: number
+        @Args({ name: 'IDs', type: () => [Int] }) IDs: number[]
     ): Promise<MutationResponse> {
-        return this._empleadosService.deleteEmpleado(_id);
+        return this._empleadosService.delete(IDs);
     }
 }

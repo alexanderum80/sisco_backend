@@ -263,7 +263,9 @@ type DatosIdGAMQueryResponse {
 type Empleado {
   IdEmpleado: Float!
   Empleado: String!
+  IdCargo: Float!
   Cargo: Cargos!
+  IdDivision: Float!
   Division: Divisiones!
 }
 
@@ -682,8 +684,9 @@ type Mutation {
   iniciarSaldos(iniciarSaldosInput: IniciarSaldosInput!): ConciliaContabilidadQueryResponse!
   saveClasificadorCuenta(clasificadorInfo: ClasificadorCuentaRealInput!): MutationResponse!
   deleteClasificadorCuenta(tipo: Int!, subcuenta: String!, cuenta: String!): MutationResponse!
-  saveEmpleado(empleadoInfo: EmpleadoInput!): MutationResponse!
-  deleteEmpleado(id: Int!): MutationResponse!
+  createEmpleado(empleadoInfo: EmpleadoInput!): MutationResponse!
+  updateEmpleado(empleadoInfo: EmpleadoInput!): MutationResponse!
+  deleteEmpleado(IDs: [Int!]!): MutationResponse!
   saveSupervisor(supervisorInfo: SupervisorInput!): SupervisorQueryResponse!
   deleteSupervisor(id: Int!): SupervisorQueryResponse!
   conciliacionNacionalVsAsiento(unidadOD: Int!, divisionOD: Int!, unidad: Int!, division: Int!, mes: Int!, annio: Int!): MutationResponse!

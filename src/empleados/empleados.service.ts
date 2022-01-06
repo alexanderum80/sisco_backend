@@ -2,7 +2,7 @@ import { Usuarios } from './../usuarios/usuarios.entity';
 import { UsuariosService } from './../usuarios/usuarios.service';
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { Empleado } from './empleados.entity';
-import { EmpleadosQueryResponse, EmpleadoQueryResponse } from './empleados.model';
+import { EmpleadosQueryResponse, EmpleadoQueryResponse, EmpleadoInput } from './empleados.model';
 import { Injectable } from '@nestjs/common';
 import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
@@ -15,7 +15,7 @@ export class EmpleadosService {
         private _usuariosSvc: UsuariosService
     ) {}
 
-    async getAllEmpleados(user: Usuarios): Promise<EmpleadosQueryResponse> {
+    async findAll(user: Usuarios): Promise<EmpleadosQueryResponse> {
         try {
             const { IdDivision, IdTipoUsuario } = user;
 
@@ -26,7 +26,6 @@ export class EmpleadosService {
             }
 
             return new Promise<EmpleadosQueryResponse>(resolve => {
-                // this.connection.query(query).then(res => {
                 this.empleadoRepository.find({ where: _condition, relations: ['Cargo', 'Division'] }).then(res => {
                     resolve({ success: true, data: res });
                 }).catch(err => {
@@ -38,7 +37,7 @@ export class EmpleadosService {
         }
     }
 
-    async getEmpleadoById(_id): Promise<EmpleadoQueryResponse> {
+    async findOne(_id): Promise<EmpleadoQueryResponse> {
         try {
             return new Promise<EmpleadoQueryResponse>(resolve => {
                 this.empleadoRepository.findOne(_id, { relations: ['Cargo', 'Division']}).then(res => {
@@ -52,7 +51,23 @@ export class EmpleadosService {
         }
     }
 
-    async saveEmpleado(empleadoInfo): Promise<MutationResponse> {
+    async create(empleadoInfo: EmpleadoInput): Promise<MutationResponse> {
+        try {
+            delete empleadoInfo.IdEmpleado;
+            
+            return new Promise<MutationResponse>(resolve => {
+                this.empleadoRepository.save(empleadoInfo).then(res => {
+                    resolve({ success: true });
+                }).catch(err => {
+                    resolve({ success: false, error: err.message ? err.message : err });
+                });
+            });
+        } catch (err) {
+            return { success: false, error: err.message ? err.message : err };
+        }
+    }
+
+    async update(empleadoInfo: EmpleadoInput): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
                 this.empleadoRepository.save(empleadoInfo).then(res => {
@@ -66,10 +81,14 @@ export class EmpleadosService {
         }
     }
 
-    async deleteEmpleado(_id): Promise<MutationResponse> {
+    async delete(_id: number[]): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.empleadoRepository.delete(_id).then(res => {
+                this.empleadoRepository.createQueryBuilder()
+                    .delete()
+                    .whereInIds(_id)
+                    .execute()
+                .then(res => {
                     resolve({ success: true });
                 }).catch(err => {
                     resolve({ success: false, error: err.message ? err.message : err });

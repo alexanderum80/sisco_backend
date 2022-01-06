@@ -17,13 +17,13 @@ export class UsuariosResolver {
         @Args('usuario') usuario: string,
         @Args('passw') passw: string
     ): Promise<UsuarioQueryResponse> {
-        return this._usuariosService.authenticateUsuario(usuario, passw);
+        return this._usuariosService.authenticate(usuario, passw);
     }
 
     @Query(() => UsuariosQueryResponse)
-    // @UseGuards(new AuthGuard())
+    @UseGuards(new AuthGuard())
     async getAllUsuarios(@Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios): Promise<UsuariosQueryResponse> {
-        return this._usuariosService.getAllUsuarios(user);
+        return this._usuariosService.findAll(user);
     }
 
     @Query(() => UsuariosQueryResponse)
@@ -31,7 +31,7 @@ export class UsuariosResolver {
     async getUsuariosByDivision(
         @Args({ name: 'idDivision', type: () => Int }) idDivision: number
     ): Promise<UsuariosQueryResponse> {
-        return this._usuariosService.getUsuariosByDivision(idDivision);
+        return this._usuariosService.findByDivision(idDivision);
     }
 
     @Query(() => UsuarioQueryResponse)
@@ -39,7 +39,7 @@ export class UsuariosResolver {
     async getUsuarioById(
         @Args({ name: 'id', type: () => Int }) id: number
     ): Promise<UsuarioQueryResponse> {
-        return this._usuariosService.getUsuarioById(id);
+        return this._usuariosService.findOne(id);
     }
 
     @Query(() => UsuarioQueryResponse)
@@ -47,7 +47,7 @@ export class UsuariosResolver {
     async getUsuarioByName(
         @Args('name') name: string
     ): Promise<UsuarioQueryResponse> {
-        return this._usuariosService.getUsuarioByName(name);
+        return this._usuariosService.findByName(name);
     }
 
     @Mutation(() => MutationResponse)
@@ -64,7 +64,7 @@ export class UsuariosResolver {
     async createUsuario(
         @Args('usuarioInfo') usuarioInfo: UsuarioInput
     ): Promise<MutationResponse> {
-        return this._usuariosService.createUsuario(usuarioInfo);
+        return this._usuariosService.create(usuarioInfo);
     }
 
     @Mutation(() => MutationResponse)
@@ -72,7 +72,7 @@ export class UsuariosResolver {
     async updateUsuario(
         @Args('usuarioInfo') usuarioInfo: UsuarioInput
     ): Promise<MutationResponse> {
-        return this._usuariosService.updateUsuario(usuarioInfo);
+        return this._usuariosService.update(usuarioInfo);
     }
 
     @Mutation(() => MutationResponse)
@@ -80,7 +80,7 @@ export class UsuariosResolver {
     async deleteUsuario(
         @Args({ name: 'IDs', type: () => [Int] }) IDs: number[]
     ): Promise<MutationResponse> {
-        return this._usuariosService.deleteUsuario(IDs);
+        return this._usuariosService.delete(IDs);
     }
 
 }

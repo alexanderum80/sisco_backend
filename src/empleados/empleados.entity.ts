@@ -14,10 +14,18 @@ export class Empleado {
     @Column()
     Empleado: string;
 
+    @Field()
+    @Column()
+    IdCargo: number;
+
     @Field(() => Cargos)
     @ManyToOne(() => Cargos, cargos => cargos.IdCargo)
     @JoinColumn({ name: 'IdCargo', referencedColumnName: 'IdCargo' })
     Cargo: Cargos;
+
+    @Field()
+    @Column()
+    IdDivision: number;
 
     @Field(() => Divisiones)
     @ManyToOne(() => Divisiones, divisiones => divisiones.IdDivision)

@@ -15,7 +15,7 @@ export class UsuariosService {
         @InjectRepository(Usuarios) private readonly usuariosRepository: Repository<Usuarios>
     ) {}
 
-    async authenticateUsuario(usuario, passw): Promise<UsuarioQueryResponse> {
+    async authenticate(usuario, passw): Promise<UsuarioQueryResponse> {
         try {
             const usuarioInfo: Usuarios = {
                 IdUsuario: 0,
@@ -102,15 +102,15 @@ export class UsuariosService {
         return jwt.sign(userInfo, SECRET_KEY);
     }
 
-    async getAllUsuarios(user: Usuarios): Promise<UsuariosQueryResponse> {
+    async findAll(user: Usuarios): Promise<UsuariosQueryResponse> {
         try {
-            // const { IdDivision, IdTipoUsuario } = user;
+            const { IdDivision, IdTipoUsuario } = user;
 
             let _condition = { };
 
-            // if (!this.isSuperAdmin(IdDivision, IdTipoUsuario)) {
-            //     _condition = { IdDivision: IdDivision };
-            // }
+            if (!this.isSuperAdmin(IdDivision, IdTipoUsuario)) {
+                _condition = { IdDivision: IdDivision };
+            }
 
             return new Promise<UsuariosQueryResponse>((resolve, reject) => {
                 this.usuariosRepository.find({ where: _condition, relations: ['TipoUsuario', 'Division'] }).then(result => {
@@ -127,7 +127,7 @@ export class UsuariosService {
         }
     }
 
-    async getUsuariosByDivision(idDivision: number): Promise<UsuariosQueryResponse> {
+    async findByDivision(idDivision: number): Promise<UsuariosQueryResponse> {
         try {
             return new Promise<UsuariosQueryResponse>((resolve, reject) => {
                 this.usuariosRepository.find({ where: { IdDivision: idDivision }, relations: ['TipoUsuario', 'Division'] }).then(result => {
@@ -144,7 +144,7 @@ export class UsuariosService {
         }
     }
 
-    async getUsuarioById(id: number): Promise<UsuarioQueryResponse> {
+    async findOne(id: number): Promise<UsuarioQueryResponse> {
         try {
             return new Promise<UsuarioQueryResponse>((resolve, reject) => {
                 this.usuariosRepository.findOne(id, { relations: ['TipoUsuario', 'Division'] }).then(result => {
@@ -161,7 +161,7 @@ export class UsuariosService {
         }
     }
 
-    async getUsuarioByName(name: string): Promise<UsuarioQueryResponse> {
+    async findByName(name: string): Promise<UsuarioQueryResponse> {
         try {
             return new Promise<UsuarioQueryResponse>((resolve, reject) => {
                 this.usuariosRepository.findOne({ Usuario: name }).then(result => {
@@ -211,7 +211,7 @@ export class UsuariosService {
         }
     }
 
-    async createUsuario(UsuarioInfo: UsuarioInput): Promise<MutationResponse> {
+    async create(UsuarioInfo: UsuarioInput): Promise<MutationResponse> {
         try {
             delete UsuarioInfo.IdUsuario;
             
@@ -245,7 +245,7 @@ export class UsuariosService {
         }
     }
 
-    async updateUsuario(UsuarioInfo: UsuarioInput): Promise<MutationResponse> {
+    async update(UsuarioInfo: UsuarioInput): Promise<MutationResponse> {
         try {
             const encryptedPassw: string = await bcrypt.genSalt(12).then(salt => {
                 return bcrypt.hash(UsuarioInfo.Contrasena, salt);
@@ -277,7 +277,7 @@ export class UsuariosService {
         }
     }
 
-    async deleteUsuario(IDs: number[]): Promise<MutationResponse> {
+    async delete(IDs: number[]): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>((resolve, reject) => {
                 this.usuariosRepository.createQueryBuilder()
