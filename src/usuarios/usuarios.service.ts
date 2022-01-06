@@ -213,6 +213,8 @@ export class UsuariosService {
 
     async createUsuario(UsuarioInfo: UsuarioInput): Promise<MutationResponse> {
         try {
+            delete UsuarioInfo.IdUsuario;
+            
             const encryptedPassw = await bcrypt.genSalt(12).then(salt => {
                 return bcrypt.hash(UsuarioInfo.Contrasena, salt);
             });
