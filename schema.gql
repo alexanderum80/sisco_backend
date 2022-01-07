@@ -284,7 +284,9 @@ type EmpleadoQueryResponse {
 type Supervisor {
   IdSupervisor: Float!
   Supervisor: String!
+  IdCargo: Float!
   Cargo: Cargos!
+  IdDivision: Float!
   Division: Divisiones!
 }
 
@@ -687,8 +689,9 @@ type Mutation {
   createEmpleado(empleadoInfo: EmpleadoInput!): MutationResponse!
   updateEmpleado(empleadoInfo: EmpleadoInput!): MutationResponse!
   deleteEmpleado(IDs: [Int!]!): MutationResponse!
-  saveSupervisor(supervisorInfo: SupervisorInput!): SupervisorQueryResponse!
-  deleteSupervisor(id: Int!): SupervisorQueryResponse!
+  createSupervisor(supervisorInfo: SupervisorInput!): SupervisorQueryResponse!
+  updateSupervisor(supervisorInfo: SupervisorInput!): SupervisorQueryResponse!
+  deleteSupervisor(IDs: [Int!]!): SupervisorQueryResponse!
   conciliacionNacionalVsAsiento(unidadOD: Int!, divisionOD: Int!, unidad: Int!, division: Int!, mes: Int!, annio: Int!): MutationResponse!
   updateConciliaContab(data: [ConciliaNacContabilidadInput!]!): MutationResponse!
   saveTipoEntidad(tipoEntidadInfo: TipoEntidadInput!): MutationResponse!

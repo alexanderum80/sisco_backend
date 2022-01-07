@@ -1,7 +1,7 @@
 import { Usuarios } from './../usuarios/usuarios.entity';
 import { UsuariosService } from './../usuarios/usuarios.service';
 import { MutationResponse } from './../shared/models/mutation.response.model';
-import { SupervisoresQueryResponse, SupervisorQueryResponse } from './supervisores.model';
+import { SupervisoresQueryResponse, SupervisorQueryResponse, SupervisorInput } from './supervisores.model';
 import { Repository, Connection } from 'typeorm';
 import { Supervisor } from './supervisores.entity';
 import { Injectable } from '@nestjs/common';
@@ -15,7 +15,7 @@ export class SupervisoresService {
         private _usuariosSvc: UsuariosService
     ) {}
 
-    async getAllSupervisores(user: Usuarios): Promise<SupervisoresQueryResponse> {
+    async findAll(user: Usuarios): Promise<SupervisoresQueryResponse> {
         try {
             const { IdDivision, IdTipoUsuario } = user;
 
@@ -37,7 +37,7 @@ export class SupervisoresService {
         }
     }
 
-    async getSupervisoresByDivision(idDivision: number): Promise<SupervisoresQueryResponse> {
+    async findByDivision(idDivision: number): Promise<SupervisoresQueryResponse> {
         try {
             return new Promise<SupervisoresQueryResponse>(resolve => {
                 this.supervisorRepository.find({ where: { IdDivision: idDivision }, relations: ['Cargo', 'Division'] }).then(res => {
@@ -51,7 +51,7 @@ export class SupervisoresService {
         }
     }
 
-    async getSupervisorById(_id): Promise<SupervisorQueryResponse> {
+    async findOne(_id): Promise<SupervisorQueryResponse> {
         try {
             return new Promise<SupervisorQueryResponse>(resolve => {
                 this.supervisorRepository.findOne(_id, { relations: ['Cargo', 'Division'] }).then(res => {
@@ -65,7 +65,23 @@ export class SupervisoresService {
         }
     }
 
-    async saveSupervisor(SupervisorInfo): Promise<MutationResponse> {
+    async create(SupervisorInfo: SupervisorInput): Promise<MutationResponse> {
+        try {
+            delete SupervisorInfo.IdSupervisor;
+
+            return new Promise<MutationResponse>(resolve => {
+                this.supervisorRepository.save(SupervisorInfo).then(res => {
+                    resolve({ success: true });
+                }).catch(err => {
+                    resolve({ success: false, error: err.message ? err.message : err });
+                });
+            });
+        } catch (err) {
+            return { success: false, error: err.message ? err.message : err };
+        }
+    }
+
+    async update(SupervisorInfo: SupervisorInput): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
                 this.supervisorRepository.save(SupervisorInfo).then(res => {
@@ -79,7 +95,7 @@ export class SupervisoresService {
         }
     }
 
-    async deleteSupervisor(_id): Promise<MutationResponse> {
+    async delete(_id: number[]): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
                 this.supervisorRepository.delete(_id).then(res => {

@@ -54,7 +54,7 @@ export class EmpleadosService {
     async create(empleadoInfo: EmpleadoInput): Promise<MutationResponse> {
         try {
             delete empleadoInfo.IdEmpleado;
-            
+
             return new Promise<MutationResponse>(resolve => {
                 this.empleadoRepository.save(empleadoInfo).then(res => {
                     resolve({ success: true });
@@ -81,14 +81,10 @@ export class EmpleadosService {
         }
     }
 
-    async delete(_id: number[]): Promise<MutationResponse> {
+    async delete(IDs: number[]): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.empleadoRepository.createQueryBuilder()
-                    .delete()
-                    .whereInIds(_id)
-                    .execute()
-                .then(res => {
+                this.empleadoRepository.delete(IDs).then(res => {
                     resolve({ success: true });
                 }).catch(err => {
                     resolve({ success: false, error: err.message ? err.message : err });

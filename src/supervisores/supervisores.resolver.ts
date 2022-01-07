@@ -15,30 +15,38 @@ export class SupervisoresResolver {
     @Query(() => SupervisoresQueryResponse)
     @UseGuards(new AuthGuard())
     async getAllSupervisores(@Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios): Promise<SupervisoresQueryResponse> {
-        return this._supervisorService.getAllSupervisores(user);
+        return this._supervisorService.findAll(user);
     }
 
     @Query(() => SupervisorQueryResponse)
-    // @UseGuards(new AuthGuard())
+    @UseGuards(new AuthGuard())
     async getSupervisorById(
         @Args({ name: 'id', type: () => Int }) id: number
     ): Promise<SupervisorQueryResponse> {
-        return this._supervisorService.getSupervisorById(id);
+        return this._supervisorService.findOne(id);
     }
 
     @Mutation(() => SupervisorQueryResponse)
     @UseGuards(new AuthGuard())
-    async saveSupervisor(
+    async createSupervisor(
         @Args({ name: 'supervisorInfo', type: () => SupervisorInput }) supervisorInfo: SupervisorInput
     ): Promise<SupervisorQueryResponse> {
-        return this._supervisorService.saveSupervisor(supervisorInfo);
+        return this._supervisorService.create(supervisorInfo);
+    }
+
+    @Mutation(() => SupervisorQueryResponse)
+    @UseGuards(new AuthGuard())
+    async updateSupervisor(
+        @Args({ name: 'supervisorInfo', type: () => SupervisorInput }) supervisorInfo: SupervisorInput
+    ): Promise<SupervisorQueryResponse> {
+        return this._supervisorService.update(supervisorInfo);
     }
 
     @Mutation(() => SupervisorQueryResponse)
     @UseGuards(new AuthGuard())
     async deleteSupervisor(
-        @Args({ name: 'id', type: () => Int }) id: number
+        @Args({ name: 'IDs', type: () => [Int] }) id: number[]
     ): Promise<SupervisorQueryResponse> {
-        return this._supervisorService.deleteSupervisor(id);
+        return this._supervisorService.delete(id);
     }
 }

@@ -280,11 +280,7 @@ export class UsuariosService {
     async delete(IDs: number[]): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>((resolve, reject) => {
-                this.usuariosRepository.createQueryBuilder()
-                    .delete()
-                    .whereInIds(IDs)
-                    .execute()
-                .then(() => {
+                this.usuariosRepository.delete(IDs).then(() => {
                     resolve({
                         success: true
                     });

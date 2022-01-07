@@ -14,10 +14,18 @@ export class Supervisor {
     @Column()
     Supervisor: string;
 
+    @Field()
+    @Column()
+    IdCargo: number;
+
     @Field(() => Cargos)
     @ManyToOne(() => Cargos, cargos => cargos.IdCargo)
     @JoinColumn({ name: 'IdCargo', referencedColumnName: 'IdCargo'})
     Cargo: Cargos;
+
+    @Field()
+    @Column()
+    IdDivision: number;
 
     @Field()
     @ManyToOne(() => Divisiones, divisiones => divisiones.IdDivision)
