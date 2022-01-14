@@ -22,7 +22,7 @@ export class UnidadesService {
                 query += ` where IdDivision = ${ IdDivision }`;
             }
 
-            return new Promise<AllUnidadesQueryResponse>((resolve, reject) => {
+            return new Promise<AllUnidadesQueryResponse>(resolve => {
                 this.connection.query(query).then(result => {
                     resolve({
                         success: true,
@@ -42,7 +42,7 @@ export class UnidadesService {
 
     async getUnidadById(id: number): Promise<AllUnidadQueryResponse> {
         try {
-            return new Promise<AllUnidadQueryResponse>((resolve, reject) => {
+            return new Promise<AllUnidadQueryResponse>(resolve => {
                 this.connection.query(`select * from vCentros where IdUnidad = ${ id }`).then(result => {
                     resolve({
                         success: true,
@@ -62,7 +62,7 @@ export class UnidadesService {
 
     async getUnidadesByIdDivision(idDivision: number): Promise<AllUnidadesQueryResponse> {
         try {
-            return new Promise<AllUnidadesQueryResponse>((resolve, reject) => {
+            return new Promise<AllUnidadesQueryResponse>(resolve => {
                 this.connection.query(`select * from vCentros where IdDivision = ${ idDivision }`).then(result => {
                     resolve({
                         success: true,
@@ -82,7 +82,7 @@ export class UnidadesService {
 
     async getUnidadesAbiertasByIdSubdivision(idSubdivision: number): Promise<any> {
         try {
-            return new Promise<any>((resolve, reject) => {
+            return new Promise<any>(resolve => {
                 this.connection.query(`Select U.*, D.Division from Unidades AS U INNER JOIN dbo.Divisiones AS D ON D.IdDivision = U.IdDivision
                         WHERE (case isnull(IdComplejo,0) when 0 THEN IdUnidad else IdComplejo end) = ${ idSubdivision }
                         AND Abierta = 1 order by Idunidad`).then(result => {
@@ -104,7 +104,7 @@ export class UnidadesService {
 
     async getUnidadesAbiertasByIdDivision(idDivision: number): Promise<any> {
         try {
-            return new Promise<any>((resolve, reject) => {
+            return new Promise<any>(resolve => {
                 this.connection.query(`Select U.*, D.Division from Unidades AS U INNER JOIN dbo.Divisiones AS D ON D.IdDivision = U.IdDivision
                         WHERE U.IdDivision = ${ idDivision }
                         AND Abierta = 1 order by Idunidad`).then(result => {

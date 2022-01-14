@@ -33,7 +33,7 @@ export class ConciliaContaService {
             const consolidado = tipoCentro === 2 ? '1' : '0';
 
             // verificar si se ha definido la conexión al Rodas
-            const _conexionRodasQuery = await this._contaConexionesService.getConexionByIdUnidad(idCentro, tipoCentro === 2);
+            const _conexionRodasQuery = await this._contaConexionesService.findByIdUnidad(idCentro, tipoCentro === 2);
             // if (!_conexionRodasQuery.success) {
             //     throw new Error(_conexionRodasQuery.error + ' No se pudo obtener la Conexión al Rodas del Centro ' + idCentro);
             // }
@@ -113,7 +113,7 @@ export class ConciliaContaService {
             const _queryReporteExpresiones = this._reporteExpresiones(idCentro, consolidado, periodo);
             const _queryReporteValores = this._reporteValores(idCentro, consolidado, periodo);
 
-            return new Promise<ConciliaContabilidadQueryResponse>((resolve, reject) => {
+            return new Promise<ConciliaContabilidadQueryResponse>(resolve => {
                 Promise.all([_queryReporteConsultas, _queryReporteExpresiones, _queryReporteValores]).then(result => {
                     resolve({
                         success: true,
@@ -848,7 +848,7 @@ export class ConciliaContaService {
     async arreglaClasificadorCuenta(idUnidad: number, tipoUnidad: string, annio: string): Promise<MutationResponse> {
         try {
             // verificar si se ha definido la conexión al Rodas
-            const _conexionRodasQuery = await this._contaConexionesService.getConexionByIdUnidad(idUnidad, tipoUnidad === '2');
+            const _conexionRodasQuery = await this._contaConexionesService.findByIdUnidad(idUnidad, tipoUnidad === '2');
             const _conexionConta = _conexionRodasQuery.data;
             _conexionConta.BaseDatos = _conexionConta.BaseDatos.substring(0, _conexionConta.BaseDatos.length - 4) + annio.toString();
 

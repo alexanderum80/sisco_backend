@@ -70,7 +70,7 @@ export class ConciliaDwhService {
                 }
 
                 // verificar si se ha definido la conexión al Rodas
-                const _conexionRodasQuery = await this._contaConexionesService.getConexionByIdUnidad(tipoCentro === 0 ? idCentro : divisionInfo.IdDivision, tipoCentro === 1);
+                const _conexionRodasQuery = await this._contaConexionesService.findByIdUnidad(tipoCentro === 0 ? idCentro : divisionInfo.IdDivision, tipoCentro === 1);
                 const _conexionRodas = _conexionRodasQuery.data;
                 _conexionRodas.BaseDatos = _conexionRodas.BaseDatos.substring(0, _conexionRodas.BaseDatos.length - 4) + annio.toString();
 

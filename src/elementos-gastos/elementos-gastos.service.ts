@@ -16,7 +16,7 @@ export class ElementosGastosService {
 
     async getAllElementoGastos(): Promise<ElementosGastosQueryResponse> {
         try {
-            return new Promise<ElementosGastosQueryResponse>((resolve, reject) => {
+            return new Promise<ElementosGastosQueryResponse>(resolve => {
                 this.elementosGastosRepository.find().then(result => {
                     resolve({
                         success: true,
@@ -34,7 +34,7 @@ export class ElementosGastosService {
 
     async getElementoGastoById(id: string): Promise<ElementoGastoQueryResponse> {
         try {
-            return new Promise<ElementoGastoQueryResponse>((resolve, reject) => {
+            return new Promise<ElementoGastoQueryResponse>(resolve => {
                 this.elementosGastosRepository.findOne({ Egasto : id }).then(result => {
                     resolve({
                         success: true,
@@ -52,7 +52,7 @@ export class ElementosGastosService {
 
     async saveElementoGasto(elementoGastoInfo: ElementoGastoInput): Promise<MutationResponse> {
         try {
-            return new Promise<MutationResponse>((resolve, reject) => {
+            return new Promise<MutationResponse>(resolve => {
                 this.elementosGastosRepository.save(elementoGastoInfo).then(result => {
                     this.elementoGastoCuentaSvc.actualizaElementoGastoCuenta(result).then(() => {
                         resolve({ success: true });
@@ -69,7 +69,7 @@ export class ElementosGastosService {
 
     async deleteElementoGasto(id: string): Promise<MutationResponse> {
         try {
-            return new Promise<MutationResponse>((resolve, reject) => {
+            return new Promise<MutationResponse>(resolve => {
                 this.elementosGastosRepository.delete(id).then(() => {
                     this.elementoGastoCuentaSvc.deleteElementoGastoCuenta(id).then(result => {
                         if (!result.success) {

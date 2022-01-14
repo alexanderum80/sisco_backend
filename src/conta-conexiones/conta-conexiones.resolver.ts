@@ -16,7 +16,7 @@ export class ContaConexionesResolver {
     @Query(() => ViewContaConexionesQueryResponse)
     @UseGuards(new AuthGuard())
     async getAllContaConexiones(@Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios): Promise<ViewContaConexionesQueryResponse> {
-        return this._contaConexionesService.getAllConexiones(user);
+        return this._contaConexionesService.findAll(user);
     }
 
     @Query(() => ContaConexionQueryResponse)
@@ -24,7 +24,7 @@ export class ContaConexionesResolver {
     async getContaConexionById(
         @Args({ name: 'id', type: () => Int }) id: number
     ): Promise<ContaConexionQueryResponse> {
-        return this._contaConexionesService.getConexionById(id);
+        return this._contaConexionesService.findOne(id);
     }
 
     @Query(() => ViewContaConexionesQueryResponse)
@@ -32,7 +32,7 @@ export class ContaConexionesResolver {
     async getContaConexionesByDivision(
         @Args({ name: 'idDivision', type: () => Int }) idDivision: number
     ): Promise<ViewContaConexionesQueryResponse> {
-        return this._contaConexionesService.getConexionesByDivision(idDivision);
+        return this._contaConexionesService.findByDivision(idDivision);
     }
 
     @Query(() => EstadoConexionesRodasQueryResponse)
@@ -45,17 +45,25 @@ export class ContaConexionesResolver {
 
     @Mutation(() => MutationResponse)
     @UseGuards(new AuthGuard())
-    async saveContaConexion(
+    async createContaConexion(
         @Args({ name: 'conexionInfo', type: () => ContaConexionInput }) conexionInfo: ContaConexionInput
     ): Promise<MutationResponse> {
-        return this._contaConexionesService.saveConexion(conexionInfo);
+        return this._contaConexionesService.create(conexionInfo);
+    }
+    
+    @Mutation(() => MutationResponse)
+    @UseGuards(new AuthGuard())
+    async updateContaConexion(
+        @Args({ name: 'conexionInfo', type: () => ContaConexionInput }) conexionInfo: ContaConexionInput
+    ): Promise<MutationResponse> {
+        return this._contaConexionesService.update(conexionInfo);
     }
 
     @Mutation(() => MutationResponse)
     @UseGuards(new AuthGuard())
     async deleteContaConexion(
-        @Args({ name: 'id', type: () => Int }) id: number
+        @Args({ name: 'IDs', type: () => [Int] }) IDs: number[]
     ): Promise<MutationResponse> {
-        return this._contaConexionesService.deleteConexion(id);
+        return this._contaConexionesService.delete(IDs);
     }
 }

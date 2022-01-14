@@ -23,7 +23,7 @@ export class DivisionesService {
                 criteria = { IdDivision: IdDivision };
             }
 
-            return new Promise<DivisionesQueryResponse>((resolve, reject) => {
+            return new Promise<DivisionesQueryResponse>(resolve => {
                 this.divisionesRepository.find(criteria).then(result => {
                     resolve({
                         success: true,
@@ -41,7 +41,7 @@ export class DivisionesService {
 
     async getDivisionesActivas(): Promise<DivisionesQueryResponse> {
         try {
-            return new Promise<DivisionesQueryResponse>((resolve, reject) => {
+            return new Promise<DivisionesQueryResponse>(resolve => {
                 this.divisionesRepository.createQueryBuilder()
                     .where('IdDivision NOT IN (100, 120, 124)')
                     .getMany()
@@ -62,7 +62,7 @@ export class DivisionesService {
 
     async getDivisionById(_id): Promise<DivisionesQueryResponse> {
         try {
-            return new Promise<DivisionesQueryResponse>((resolve, reject) => {
+            return new Promise<DivisionesQueryResponse>(resolve => {
                 this.divisionesRepository.find({ IdDivision : _id }).then(result => {
                     resolve({
                         success: true,

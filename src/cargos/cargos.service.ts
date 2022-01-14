@@ -12,11 +12,11 @@ export class CargosService {
 
     async getAllCargos(): Promise<CargosQueryResponse> {
         try {
-            return new Promise<CargosQueryResponse>((resolve, reject) => {
+            return new Promise<CargosQueryResponse>(resolve => {
                 this.cargosRepository.find().then(result => {
                     resolve({ success: true, data: result });
                 }).catch(err => {
-                    reject({ success: false, error: err.message ? err.message : err });
+                    resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
         } catch (err) {

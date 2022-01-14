@@ -22,7 +22,7 @@ export class ContaConexionesService {
         private _usuariosSvc: UsuariosService
     ) {}
 
-    async getAllConexiones(user: Usuarios): Promise<ViewContaConexionesQueryResponse> {
+    async findAll(user: Usuarios): Promise<ViewContaConexionesQueryResponse> {
         try {
             const { IdDivision, IdTipoUsuario } = user;
 
@@ -32,14 +32,14 @@ export class ContaConexionesService {
                 query += ` where IdDivision = ${ IdDivision }`;
             }
 
-            return new Promise<ViewContaConexionesQueryResponse>((resolve, reject) => {
+            return new Promise<ViewContaConexionesQueryResponse>(resolve => {
                 this.connection.query(query).then(result => {
                     resolve({
                         success: true,
                         data: result
                     });
                 }).catch(err => {
-                    reject({ success: false, error: err.message ? err.message : err });
+                    resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
         } catch (err) {
@@ -47,16 +47,16 @@ export class ContaConexionesService {
         }
     }
 
-    async getConexionesByDivision(idDivision: number): Promise<ViewContaConexionesQueryResponse> {
+    async findByDivision(idDivision: number): Promise<ViewContaConexionesQueryResponse> {
         try {
-            return new Promise<ViewContaConexionesQueryResponse>((resolve, reject) => {
+            return new Promise<ViewContaConexionesQueryResponse>(resolve => {
                 this.connection.query(`SELECT * FROM dbo.vConta_Conexiones WHERE IdDivision = ${ idDivision }`).then(result => {
                     resolve({
                         success: true,
                         data: result
                     });
                 }).catch(err => {
-                    reject({ success: false, error: err.message ? err.message : err });
+                    resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
         } catch (err) {
@@ -64,9 +64,9 @@ export class ContaConexionesService {
         }
     }
 
-    async getConexionById(id: number): Promise<ContaConexionQueryResponse> {
+    async findOne(id: number): Promise<ContaConexionQueryResponse> {
         try {
-            return new Promise<ContaConexionQueryResponse>((resolve, reject) => {
+            return new Promise<ContaConexionQueryResponse>(resolve => {
                 this.conexionesRespository.findOne(id).then(result => {
                     this._cryptoService.decrypt(result.Contrasena).then(res => {
                         result.Contrasena = res;
@@ -76,10 +76,10 @@ export class ContaConexionesService {
                             data: result
                         });
                     }).catch(err => {
-                        reject({ success: false, error: err.message ? err.message : err });
+                        resolve({ success: false, error: err.message ? err.message : err });
                     });
                 }).catch(err => {
-                    reject({ success: false, error: err.message ? err.message : err });
+                    resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
         } catch (err) {
@@ -87,7 +87,7 @@ export class ContaConexionesService {
         }
     }
 
-    async getConexionByIdUnidad(idUnidad: number, consolidado: boolean): Promise<ContaConexionQueryResponse> {
+    async findByIdUnidad(idUnidad: number, consolidado: boolean): Promise<ContaConexionQueryResponse> {
         // try {
             return new Promise<ContaConexionQueryResponse>((resolve, reject) => {
                 this.conexionesRespository.findOne({ IdUnidad: idUnidad, Consolidado: consolidado }).then(result => {
@@ -100,7 +100,7 @@ export class ContaConexionesService {
                         reject(`No se ha definido la conexión al Rodas del Centro: ${ idUnidad }`);
                     }
                 }).catch(err => {
-                    reject(err.message ? err.message : err);
+                    resolve(err.message ? err.message : err);
                 });
             });
         // } catch (err) {
@@ -108,18 +108,20 @@ export class ContaConexionesService {
         // }
     }
 
-    async saveConexion(conexion: ContaConexiones): Promise<MutationResponse> {
+    async create(conexion: ContaConexiones): Promise<MutationResponse> {
         try {
+            // delete conexion.Id;
+
             const encryptedPassword = await this._cryptoService.encrypt(conexion.Contrasena);
             conexion.Contrasena = encryptedPassword;
 
-            return new Promise<MutationResponse>((resolve, reject) => {
+            return new Promise<MutationResponse>(resolve => {
                 this.conexionesRespository.save(conexion).then(result => {
                     resolve({
                         success: true
                     });
                 }).catch(err => {
-                    reject({ success: false, error: err.message ? err.message : err });
+                    resolve(err.message ? err.message : err);
                 });
             });
         } catch (err) {
@@ -127,15 +129,35 @@ export class ContaConexionesService {
         }
     }
 
-    async deleteConexion(id: number): Promise<MutationResponse> {
+    
+    async update(conexion: ContaConexiones): Promise<MutationResponse> {
         try {
-            return new Promise<MutationResponse>((resolve, reject) => {
-                this.conexionesRespository.delete(id).then(result => {
+            const encryptedPassword = await this._cryptoService.encrypt(conexion.Contrasena);
+            conexion.Contrasena = encryptedPassword;
+
+            return new Promise<MutationResponse>(resolve => {
+                this.conexionesRespository.save(conexion).then(result => {
                     resolve({
                         success: true
                     });
                 }).catch(err => {
-                    reject({ success: false, error: err.message ? err.message : err });
+                    resolve(err.message ? err.message : err);
+                });
+            });
+        } catch (err) {
+            return { success: false, error: err.message ? err.message : err };
+        }
+    }
+
+    async delete(IDs: number[]): Promise<MutationResponse> {
+        try {
+            return new Promise<MutationResponse>(resolve => {
+                this.conexionesRespository.delete(IDs).then(result => {
+                    resolve({
+                        success: true
+                    });
+                }).catch(err => {
+                    resolve(err.message ? err.message : err);
                 });
             });
         } catch (err) {
@@ -151,7 +173,7 @@ export class ContaConexionesService {
             _conexionOptions.password = await this._cryptoService.decrypt(contaConexion.Contrasena);
             _conexionOptions.database = contaConexion.BaseDatos;
 
-            return new Promise<Connection>((resolve, reject) => {
+            return new Promise<Connection>(resolve => {
                 resolve(new Connection(_conexionOptions));
             });
         // } catch (err) {
@@ -161,7 +183,7 @@ export class ContaConexionesService {
 
     async estadoContaConexiones(idDivision: number): Promise<EstadoConexionesRodasQueryResponse> {
         try {
-            const _conexionDivisionQuery = await this.getConexionByIdUnidad(idDivision, true);
+            const _conexionDivisionQuery = await this.findByIdUnidad(idDivision, true);
 
             const _conexionDivision = await (await this.conexionRodas(_conexionDivisionQuery.data)).connect();
             const _unidades = await _conexionDivision.query(queryCentrosByConsolidado);
@@ -170,7 +192,7 @@ export class ContaConexionesService {
 
             for (let _unidad of _unidades) {
                 const unidad = _unidad.Centro;
-                const _conexionUnidadQuery = await this.getConexionByIdUnidad(unidad, false);
+                const _conexionUnidadQuery = await this.findByIdUnidad(unidad, false);
 
                 const datoUnidad =  await (await this._unidadesSvc.getUnidadById(unidad)).data[0];
 

@@ -13,7 +13,7 @@ export class EpigrafesService {
 
     async getAllEpigrafes(): Promise<EpigrafesQueryResponse> {
         try {
-            return new Promise<EpigrafesQueryResponse>((resolve, reject) => {
+            return new Promise<EpigrafesQueryResponse>(resolve => {
                 this.epigrafeRepository.find().then(result => {
                     resolve({
                         success: true,
@@ -31,7 +31,7 @@ export class EpigrafesService {
 
     async getEpigrafeById(id: number): Promise<EpigrafeQueryResponse> {
         try {
-            return new Promise<EpigrafeQueryResponse>((resolve, reject) => {
+            return new Promise<EpigrafeQueryResponse>(resolve => {
                 this.epigrafeRepository.findOne({ IdEpigafre: id }).then(result => {
                     resolve({
                         success: true,
@@ -49,7 +49,7 @@ export class EpigrafesService {
 
     async saveEpigrafe(epigrafeInfo: EpigrafeInput): Promise<MutationResponse> {
         try {
-            return new Promise<MutationResponse>((resolve, reject) => {
+            return new Promise<MutationResponse>(resolve => {
                 this.epigrafeRepository.save(epigrafeInfo).then(result => {
                     resolve({ success: true });
                 })
@@ -64,7 +64,7 @@ export class EpigrafesService {
 
     async deleteEpigrafe(id: number): Promise<MutationResponse> {
         try {
-            return new Promise<MutationResponse>((resolve, reject) => {
+            return new Promise<MutationResponse>(resolve => {
                 this.epigrafeRepository.delete(id).then(result => {
                     resolve({ success: true });
                 })
