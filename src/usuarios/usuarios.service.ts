@@ -120,9 +120,9 @@ export class UsuariosService {
         }
     }
 
-    async findOne(id: number): Promise<UsuariosQueryResponse> {
+    async findOne(id: number): Promise<UsuarioQueryResponse> {
         try {
-            return new Promise<UsuariosQueryResponse>(resolve => {
+            return new Promise<UsuarioQueryResponse>(resolve => {
                 this.usuariosRepository.findOne(id, { relations: ['TipoUsuario', 'Division'] }).then(result => {
                     resolve({
                         success: true,

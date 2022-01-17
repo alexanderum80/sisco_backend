@@ -27,11 +27,11 @@ export class UsuariosResolver {
         return this._usuariosService.findAll(user);
     }
 
-    @Query(() => UsuariosQueryResponse)
+    @Query(() => UsuarioQueryResponse)
     @UseGuards(new AuthGuard())
     async getUsuarioById(
         @Args({ name: 'id', type: () => Int }) id: number
-    ): Promise<UsuariosQueryResponse> {
+    ): Promise<UsuarioQueryResponse> {
         return this._usuariosService.findOne(id);
     }
 
