@@ -1,53 +1,12 @@
-import { Unidades } from './unidades.entity';
+import { MultipleQueryResponse, SingleQueryResponse } from 'src/shared/models/query.response.model';
+import { CentrosView, Unidades } from './unidades.entity';
 import { ObjectType, Field } from '@nestjs/graphql';
 
 @ObjectType()
-export class AllUnidades {
-    @Field()
-    IdUnidad: number;
-
-    @Field()
-    Nombre: string;
-
-    @Field()
-    IdSubdivision: number;
-
-    @Field()
-    Subdivision: string;
-
-    @Field()
-    IdDivision: number;
-
-    @Field()
-    Division: string;
-
-    @Field()
-    Abierta: boolean;
-}
+export class AllUnidadesQueryResponse extends MultipleQueryResponse(CentrosView) {}
 
 @ObjectType()
-export class AllUnidadesQueryResponse {
-    @Field()
-    success: Boolean;
-
-    @Field(type => [AllUnidades], { nullable: true })
-    data?: AllUnidades[];
-
-    @Field(type => String, { nullable: true })
-    error?: String;
-}
-
-@ObjectType()
-export class AllUnidadQueryResponse {
-    @Field()
-    success: Boolean;
-
-    @Field(type => AllUnidades, { nullable: true })
-    data?: AllUnidades;
-
-    @Field(type => String, { nullable: true })
-    error?: String;
-}
+export class AllUnidadQueryResponse extends SingleQueryResponse(CentrosView) {}
 
 @ObjectType()
 export class UnidadesQueryResponse {

@@ -1,5 +1,5 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn, ViewColumn, ViewEntity } from 'typeorm';
 
 @ObjectType()
 @Entity()
@@ -34,5 +34,37 @@ export class Unidades {
 
     @Field({ nullable: true })
     @Column()
+    Abierta: boolean;
+}
+
+@ObjectType()
+@ViewEntity('vCentros')
+export class CentrosView {
+    @Field()
+    @ViewColumn()
+    IdUnidad: number;
+
+    @Field()
+    @ViewColumn()
+    Nombre: string;
+
+    @Field()
+    @ViewColumn()
+    IdSubdivision: number;
+
+    @Field()
+    @ViewColumn()
+    Subdivision: string;
+
+    @Field()
+    @ViewColumn()
+    IdDivision: number;
+
+    @Field()
+    @ViewColumn()
+    Division: string;
+
+    @Field()
+    @ViewColumn()
     Abierta: boolean;
 }

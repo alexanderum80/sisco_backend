@@ -3,7 +3,8 @@ import { UsuariosService } from './../usuarios/usuarios.service';
 import { AllUnidadesQueryResponse, AllUnidadQueryResponse } from './unidades.model';
 import { Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
-import { Connection } from 'typeorm';
+import { Connection, getManager } from 'typeorm';
+import { CentrosView } from './unidades.entity';
 
 @Injectable()
 export class UnidadesService {
@@ -16,14 +17,16 @@ export class UnidadesService {
         try {
             const { IdDivision, IdTipoUsuario } = user;
 
-            let query = 'select * from vCentros';
+            let _condition = { };
 
             if (!this._usuariosSvc.isSuperAdmin(IdDivision, IdTipoUsuario)) {
-                query += ` where IdDivision = ${ IdDivision }`;
+                _condition = { IdDivision: IdDivision };
             }
 
+            const entityManager = getManager();
+
             return new Promise<AllUnidadesQueryResponse>(resolve => {
-                this.connection.query(query).then(result => {
+                entityManager.find(CentrosView, { where: _condition }).then(result => {
                     resolve({
                         success: true,
                         data: result
@@ -40,10 +43,12 @@ export class UnidadesService {
         }
     }
 
-    async getUnidadById(id: number): Promise<AllUnidadQueryResponse> {
+    async getUnidadById(IdUnidad: number): Promise<AllUnidadQueryResponse> {
         try {
+            const entityManager = getManager();
+
             return new Promise<AllUnidadQueryResponse>(resolve => {
-                this.connection.query(`select * from vCentros where IdUnidad = ${ id }`).then(result => {
+                entityManager.findOne(CentrosView, { where: { IdUnidad } }).then(result => {
                     resolve({
                         success: true,
                         data: result
@@ -60,10 +65,12 @@ export class UnidadesService {
         }
     }
 
-    async getUnidadesByIdDivision(idDivision: number): Promise<AllUnidadesQueryResponse> {
+    async getUnidadesByIdDivision(IdDivision: number): Promise<AllUnidadesQueryResponse> {
         try {
+            const entityManager = getManager();
+
             return new Promise<AllUnidadesQueryResponse>(resolve => {
-                this.connection.query(`select * from vCentros where IdDivision = ${ idDivision }`).then(result => {
+                entityManager.findOne(CentrosView, { where: { IdDivision } }).then(result => {
                     resolve({
                         success: true,
                         data: result
