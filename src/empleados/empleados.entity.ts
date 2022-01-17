@@ -30,5 +30,5 @@ export class Empleado {
     @Field(() => Divisiones)
     @ManyToOne(() => Divisiones, divisiones => divisiones.IdDivision)
     @JoinColumn({ name: 'IdDivision', referencedColumnName: 'IdDivision'})
-    Division: number;
+    Division: Divisiones;
 }

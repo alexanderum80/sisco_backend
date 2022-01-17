@@ -1,50 +1,15 @@
+import { MultipleQueryResponse, SingleQueryResponse } from '../shared/models/query.response.model';
 import { Empleado } from './empleados.entity';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
-export class VEmpleados {
-    @Field()
-    IdEmpleado: number;
-
-    @Field()
-    Empleado: string;
-
-    @Field()
-    Cargo: string;
-
-    @Field()
-    IdDivision: number;
-
-    @Field()
-    Division: string;
-}
+export class EmpleadoQueryResponse extends SingleQueryResponse(Empleado) {}
 
 @ObjectType()
-export class EmpleadosQueryResponse {
-    @Field()
-    success: Boolean;
-
-    @Field(type => [Empleado], { nullable: true })
-    data?: Empleado[];
-
-    @Field(type => String, { nullable: true })
-    error?: String;
-}
-
-@ObjectType()
-export class EmpleadoQueryResponse {
-    @Field()
-    success: Boolean;
-
-    @Field(type => Empleado, { nullable: true })
-    data?: Empleado;
-
-    @Field(type => String, { nullable: true })
-    error?: String;
-}
+export class EmpleadosQueryResponse extends MultipleQueryResponse(Empleado) {}
 
 @InputType()
-export class EmpleadoInput {
+export class EmpleadoDTO {
     @Field()
     IdEmpleado: number;
 
