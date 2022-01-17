@@ -58,7 +58,7 @@ type Unidades {
   Abierta: Boolean
 }
 
-type AllUnidades {
+type CentrosView {
   IdUnidad: Float!
   Nombre: String!
   IdSubdivision: Float!
@@ -70,7 +70,7 @@ type AllUnidades {
 
 type AllUnidadesQueryResponse {
   success: Boolean!
-  data: [AllUnidades!]
+  data: [CentrosView!]
   error: String
 }
 
@@ -82,6 +82,18 @@ type ContaConexiones {
   IpRodas: String
   Usuario: String
   Contrasena: String
+  BaseDatos: String
+}
+
+type ContaConexionesView {
+  Id: Float!
+  IdUnidad: Float!
+  Unidad: String!
+  Consolidado: Boolean!
+  IdDivision: Float!
+  Division: String!
+  IpRodas: String
+  Usuario: String
   BaseDatos: String
 }
 
@@ -120,23 +132,10 @@ type ContaConexionQueryResponse {
   error: String
 }
 
-type ViewContaConexionesQueryResponse {
+type ContaConexionesQueryResponse {
   success: Boolean!
-  data: [ViewContaConexiones!]
+  data: [ContaConexionesView!]
   error: String
-}
-
-type ViewContaConexiones {
-  Id: Float
-  IdUnidad: Float!
-  Unidad: String!
-  Consolidado: String!
-  IdDivision: Float!
-  Division: String!
-  IpRodas: String
-  Usuario: String
-  Contrasena: String
-  BaseDatos: String
 }
 
 type EstadoConexionesRodas {
@@ -179,16 +178,16 @@ type ClasificadorCuentaReal {
   SubCuenta: String!
   Descripcion: String!
   Naturaleza: String!
-  Crit1: String!
-  Crit2: String!
-  Crit3: String!
+  Crit1: String
+  Crit2: String
+  Crit3: String
   Obligacion: Boolean!
   TipoClasificador: Float!
-  SeUtiliza: String!
+  SeUtiliza: String
   Terminal: Boolean!
-  Crit1Consolidacion: String!
-  Crit2Consolidacion: String!
-  Crit3Consolidacion: String!
+  Crit1Consolidacion: String
+  Crit2Consolidacion: String
+  Crit3Consolidacion: String
 }
 
 type ClasificadorCuentaQueryResponse {
@@ -197,26 +196,9 @@ type ClasificadorCuentaQueryResponse {
   error: String
 }
 
-type VClasificadorCuentaReal {
-  Cuenta: String!
-  SubCuenta: String!
-  Descripcion: String!
-  Naturaleza: String!
-  Crit1: String
-  Crit2: String
-  Crit3: String
-  Obligacion: String!
-  TipoClasificador: Float!
-  SeUtiliza: String
-  Terminal: String!
-  Crit1Consolidacion: String
-  Crit2Consolidacion: String
-  Crit3Consolidacion: String
-}
-
-type VClasificadorCuentasQueryResponse {
+type ClasificadorCuentasQueryResponse {
   success: Boolean!
-  data: [VClasificadorCuentaReal!]
+  data: [ClasificadorCuentaReal!]
   error: String
 }
 
@@ -269,15 +251,15 @@ type Empleado {
   Division: Divisiones!
 }
 
-type EmpleadosQueryResponse {
-  success: Boolean!
-  data: [Empleado!]
-  error: String
-}
-
 type EmpleadoQueryResponse {
   success: Boolean!
   data: Empleado
+  error: String
+}
+
+type EmpleadosQueryResponse {
+  success: Boolean!
+  data: [Empleado!]
   error: String
 }
 
@@ -290,15 +272,15 @@ type Supervisor {
   Division: Divisiones!
 }
 
-type SupervisoresQueryResponse {
-  success: Boolean!
-  data: [Supervisor!]
-  error: String
-}
-
 type SupervisorQueryResponse {
   success: Boolean!
   data: Supervisor
+  error: String
+}
+
+type SupervisoresQueryResponse {
+  success: Boolean!
+  data: [Supervisor!]
   error: String
 }
 
@@ -594,14 +576,12 @@ type TipoUsuarioQueryResponse {
 type Query {
   authenticateUsuario(passw: String!, usuario: String!): UsuarioQueryResponse!
   getAllUsuarios: UsuariosQueryResponse!
-  getUsuariosByDivision(idDivision: Int!): UsuariosQueryResponse!
   getUsuarioById(id: Int!): UsuarioQueryResponse!
-  getUsuarioByName(name: String!): UsuarioQueryResponse!
+  getUsuarioByName(name: String!): UsuariosQueryResponse!
   getAllDivisiones: DivisionesQueryResponse!
   getDivisionById(id: Int!): DivisionesQueryResponse!
-  getAllContaConexiones: ViewContaConexionesQueryResponse!
+  getAllContaConexiones: ContaConexionesQueryResponse!
   getContaConexionById(id: Int!): ContaConexionQueryResponse!
-  getContaConexionesByDivision(idDivision: Int!): ViewContaConexionesQueryResponse!
   estadoContaConexiones(idDivision: Int!): EstadoConexionesRodasQueryResponse!
   getAllUnidades: AllUnidadesQueryResponse!
   getUnidadesByIdDivision(idDivision: Int!): AllUnidadesQueryResponse!
@@ -609,7 +589,7 @@ type Query {
   getAllCargos: CargosQueryResponse!
   conciliaDWH(conciliaDWHInput: ConciliaDWHInput!): ConciliaDWHQueryResponse!
   conciliaContabilidad(conciliaContaInput: ConciliaContaInput!): ConciliaContabilidadQueryResponse!
-  getAllClasificadorCuentas: VClasificadorCuentasQueryResponse!
+  getAllClasificadorCuentas: ClasificadorCuentasQueryResponse!
   getClasificadorCuenta(tipo: Int!, subcuenta: String!, cuenta: String!): ClasificadorCuentaQueryResponse!
   getCuentasAgrupadas: CuentasAgrupadasQueryResponse!
   getAllEmpleados: EmpleadosQueryResponse!
@@ -677,20 +657,21 @@ input ConciliaInternaDWHInput {
 
 type Mutation {
   changePassword(password: String!, idUsuario: Int!): MutationResponse!
-  createUsuario(usuarioInfo: UsuarioInput!): MutationResponse!
-  updateUsuario(usuarioInfo: UsuarioInput!): MutationResponse!
+  createUsuario(usuarioInfo: UsuarioDTO!): MutationResponse!
+  updateUsuario(usuarioInfo: UsuarioDTO!): MutationResponse!
   deleteUsuario(IDs: [Int!]!): MutationResponse!
-  saveContaConexion(conexionInfo: ContaConexionInput!): MutationResponse!
-  deleteContaConexion(id: Int!): MutationResponse!
+  createContaConexion(conexionInfo: ContaConexionDTO!): MutationResponse!
+  updateContaConexion(conexionInfo: ContaConexionDTO!): MutationResponse!
+  deleteContaConexion(IDs: [Int!]!): MutationResponse!
   updateDWhConexion(dwhConexionInput: DWHConexionesInput!): MutationResponse!
   iniciarSaldos(iniciarSaldosInput: IniciarSaldosInput!): ConciliaContabilidadQueryResponse!
-  saveClasificadorCuenta(clasificadorInfo: ClasificadorCuentaRealInput!): MutationResponse!
+  saveClasificadorCuenta(clasificadorInfo: ClasificadorCuentaRealDTO!): MutationResponse!
   deleteClasificadorCuenta(tipo: Int!, subcuenta: String!, cuenta: String!): MutationResponse!
-  createEmpleado(empleadoInfo: EmpleadoInput!): MutationResponse!
-  updateEmpleado(empleadoInfo: EmpleadoInput!): MutationResponse!
+  createEmpleado(empleadoInfo: EmpleadoDTO!): MutationResponse!
+  updateEmpleado(empleadoInfo: EmpleadoDTO!): MutationResponse!
   deleteEmpleado(IDs: [Int!]!): MutationResponse!
-  createSupervisor(supervisorInfo: SupervisorInput!): SupervisorQueryResponse!
-  updateSupervisor(supervisorInfo: SupervisorInput!): SupervisorQueryResponse!
+  createSupervisor(supervisorInfo: SupervisorDTO!): SupervisorQueryResponse!
+  updateSupervisor(supervisorInfo: SupervisorDTO!): SupervisorQueryResponse!
   deleteSupervisor(IDs: [Int!]!): SupervisorQueryResponse!
   conciliacionNacionalVsAsiento(unidadOD: Int!, divisionOD: Int!, unidad: Int!, division: Int!, mes: Int!, annio: Int!): MutationResponse!
   updateConciliaContab(data: [ConciliaNacContabilidadInput!]!): MutationResponse!
@@ -711,7 +692,7 @@ type Mutation {
   deleteNoUsarEnCuenta(id: Int!): MutationResponse!
 }
 
-input UsuarioInput {
+input UsuarioDTO {
   IdUsuario: Float!
   Usuario: String!
   Contrasena: String!
@@ -721,7 +702,7 @@ input UsuarioInput {
   IdDivision: Float!
 }
 
-input ContaConexionInput {
+input ContaConexionDTO {
   Id: Float
   IdUnidad: Float!
   Consolidado: Boolean!
@@ -750,7 +731,7 @@ input IniciarSaldosInput {
   annio: Float!
 }
 
-input ClasificadorCuentaRealInput {
+input ClasificadorCuentaRealDTO {
   Cuenta: String!
   SubCuenta: String!
   Descripcion: String!
@@ -767,14 +748,14 @@ input ClasificadorCuentaRealInput {
   Crit3Consolidacion: String!
 }
 
-input EmpleadoInput {
+input EmpleadoDTO {
   IdEmpleado: Float!
   Empleado: String!
   IdCargo: Float!
   IdDivision: Float!
 }
 
-input SupervisorInput {
+input SupervisorDTO {
   IdSupervisor: Float!
   Supervisor: String!
   IdCargo: Float!

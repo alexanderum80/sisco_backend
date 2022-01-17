@@ -1,5 +1,7 @@
+import { Divisiones } from './../divisiones/divisiones.entity';
+import { Unidades } from './../unidades/unidades.entity';
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, JoinColumn, ViewEntity, ViewColumn, Connection } from 'typeorm';
 
 @ObjectType()
 @Entity()
@@ -34,5 +36,45 @@ export class ContaConexiones {
 
     @Field({ nullable: true })
     @Column()
+    BaseDatos: string;
+}
+
+@ObjectType()
+@ViewEntity('vConta_Conexiones')
+export class ContaConexionesView {
+    @Field()
+    @ViewColumn()
+    Id: number;
+
+    @Field()
+    @ViewColumn()
+    IdUnidad: number;
+
+    @Field()
+    @ViewColumn()
+    Unidad: string;
+
+    @Field()
+    @ViewColumn()
+    Consolidado: boolean;
+
+    @Field()
+    @ViewColumn()
+    IdDivision: number;
+
+    @Field()
+    @ViewColumn()
+    Division: string;
+
+    @Field({ nullable: true })
+    @ViewColumn()
+    IpRodas: string;
+
+    @Field({ nullable: true })
+    @ViewColumn()
+    Usuario: string;
+
+    @Field({ nullable: true })
+    @ViewColumn()
     BaseDatos: string;
 }

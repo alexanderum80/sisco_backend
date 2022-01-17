@@ -6,11 +6,11 @@ import { DEFAULT_CONNECTION_STRING } from '../conexiones/conexiones.model';
 import { cloneDeep } from 'lodash';
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { CryptoService } from '../shared/services/crypto/crypto.service';
-import { ContaConexionQueryResponse, ViewContaConexionesQueryResponse, EstadoConexionesRodasQueryResponse, EstadoConexionesRodas } from './conta-conexiones.model';
-import { ContaConexiones } from './conta-conexiones.entity';
-import { Injectable, Next } from '@nestjs/common';
+import { ContaConexionQueryResponse, EstadoConexionesRodasQueryResponse, EstadoConexionesRodas, ContaConexionesQueryResponse, ContaConexionDTO } from './conta-conexiones.model';
+import { ContaConexiones, ContaConexionesView } from './conta-conexiones.entity';
+import { Injectable } from '@nestjs/common';
 import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
-import { Connection, Repository } from 'typeorm';
+import { Connection, getManager, Repository } from 'typeorm';
 
 @Injectable()
 export class ContaConexionesService {
@@ -22,35 +22,20 @@ export class ContaConexionesService {
         private _usuariosSvc: UsuariosService
     ) {}
 
-    async findAll(user: Usuarios): Promise<ViewContaConexionesQueryResponse> {
+    async findAll(user: Usuarios): Promise<ContaConexionesQueryResponse> {
         try {
             const { IdDivision, IdTipoUsuario } = user;
 
-            let query = 'SELECT * FROM dbo.vConta_Conexiones';
+            let _condition = { };
 
             if (!this._usuariosSvc.isSuperAdmin(IdDivision, IdTipoUsuario)) {
-                query += ` where IdDivision = ${ IdDivision }`;
+                _condition = { IdDivision: IdDivision };
             }
 
-            return new Promise<ViewContaConexionesQueryResponse>(resolve => {
-                this.connection.query(query).then(result => {
-                    resolve({
-                        success: true,
-                        data: result
-                    });
-                }).catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
-                });
-            });
-        } catch (err) {
-            return { success: false, error: err.message ? err.message : err };
-        }
-    }
+            const entityManager = getManager();
 
-    async findByDivision(idDivision: number): Promise<ViewContaConexionesQueryResponse> {
-        try {
-            return new Promise<ViewContaConexionesQueryResponse>(resolve => {
-                this.connection.query(`SELECT * FROM dbo.vConta_Conexiones WHERE IdDivision = ${ idDivision }`).then(result => {
+            return new Promise<ContaConexionesQueryResponse>(resolve => {
+                entityManager.find(ContaConexionesView, { where: _condition }).then(result => {
                     resolve({
                         success: true,
                         data: result
@@ -108,9 +93,9 @@ export class ContaConexionesService {
         // }
     }
 
-    async create(conexion: ContaConexiones): Promise<MutationResponse> {
+    async create(conexion: ContaConexionDTO): Promise<MutationResponse> {
         try {
-            // delete conexion.Id;
+            delete conexion.Id;
 
             const encryptedPassword = await this._cryptoService.encrypt(conexion.Contrasena);
             conexion.Contrasena = encryptedPassword;
@@ -128,9 +113,8 @@ export class ContaConexionesService {
             return { success: false, error: err.message ? err.message : err };
         }
     }
-
     
-    async update(conexion: ContaConexiones): Promise<MutationResponse> {
+    async update(conexion: ContaConexionDTO): Promise<MutationResponse> {
         try {
             const encryptedPassword = await this._cryptoService.encrypt(conexion.Contrasena);
             conexion.Contrasena = encryptedPassword;

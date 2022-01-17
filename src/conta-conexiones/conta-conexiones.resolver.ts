@@ -3,7 +3,7 @@ import { MutationResponse } from './../shared/models/mutation.response.model';
 import { ContaConexionesService } from './conta-conexiones.service';
 import { ContaConexiones } from './conta-conexiones.entity';
 import { Args, Mutation, Query, Resolver, Int, Context } from '@nestjs/graphql';
-import { ContaConexionInput, ViewContaConexionesQueryResponse, EstadoConexionesRodasQueryResponse, ContaConexionQueryResponse } from './conta-conexiones.model';
+import { EstadoConexionesRodasQueryResponse, ContaConexionQueryResponse, ContaConexionesQueryResponse, ContaConexionDTO } from './conta-conexiones.model';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard, DEFAULT_GRAPHQL_CONTEXT } from '../shared/helpers/auth.guard';
 
@@ -13,9 +13,9 @@ export class ContaConexionesResolver {
         private _contaConexionesService: ContaConexionesService
     ) {}
 
-    @Query(() => ViewContaConexionesQueryResponse)
+    @Query(() => ContaConexionesQueryResponse)
     @UseGuards(new AuthGuard())
-    async getAllContaConexiones(@Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios): Promise<ViewContaConexionesQueryResponse> {
+    async getAllContaConexiones(@Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios): Promise<ContaConexionesQueryResponse> {
         return this._contaConexionesService.findAll(user);
     }
 
@@ -25,14 +25,6 @@ export class ContaConexionesResolver {
         @Args({ name: 'id', type: () => Int }) id: number
     ): Promise<ContaConexionQueryResponse> {
         return this._contaConexionesService.findOne(id);
-    }
-
-    @Query(() => ViewContaConexionesQueryResponse)
-    @UseGuards(new AuthGuard())
-    async getContaConexionesByDivision(
-        @Args({ name: 'idDivision', type: () => Int }) idDivision: number
-    ): Promise<ViewContaConexionesQueryResponse> {
-        return this._contaConexionesService.findByDivision(idDivision);
     }
 
     @Query(() => EstadoConexionesRodasQueryResponse)
@@ -46,7 +38,7 @@ export class ContaConexionesResolver {
     @Mutation(() => MutationResponse)
     @UseGuards(new AuthGuard())
     async createContaConexion(
-        @Args({ name: 'conexionInfo', type: () => ContaConexionInput }) conexionInfo: ContaConexionInput
+        @Args({ name: 'conexionInfo', type: () => ContaConexionDTO }) conexionInfo: ContaConexionDTO
     ): Promise<MutationResponse> {
         return this._contaConexionesService.create(conexionInfo);
     }
@@ -54,7 +46,7 @@ export class ContaConexionesResolver {
     @Mutation(() => MutationResponse)
     @UseGuards(new AuthGuard())
     async updateContaConexion(
-        @Args({ name: 'conexionInfo', type: () => ContaConexionInput }) conexionInfo: ContaConexionInput
+        @Args({ name: 'conexionInfo', type: () => ContaConexionDTO }) conexionInfo: ContaConexionDTO
     ): Promise<MutationResponse> {
         return this._contaConexionesService.update(conexionInfo);
     }

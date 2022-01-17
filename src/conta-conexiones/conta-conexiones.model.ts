@@ -1,77 +1,15 @@
-import { ContaConexiones } from './conta-conexiones.entity';
+import { MultipleQueryResponse, SingleQueryResponse } from '../shared/models/query.response.model';
+import { ContaConexiones, ContaConexionesView } from './conta-conexiones.entity';
 import { ObjectType, Field, InputType } from '@nestjs/graphql';
 
 @ObjectType()
-export class ContaConexionQueryResponse {
-    @Field()
-    success: Boolean;
-
-    @Field(type => ContaConexiones, { nullable: true })
-    data?: ContaConexiones;
-
-    @Field(type => String, { nullable: true })
-    error?: String;
-}
+export class ContaConexionQueryResponse extends SingleQueryResponse(ContaConexiones) {}
 
 @ObjectType()
-export class ContaConexionesQueryResponse {
-    @Field()
-    success: Boolean;
-
-    @Field(type => [ContaConexiones], { nullable: true })
-    data?: ContaConexiones[];
-
-    @Field(type => String, { nullable: true })
-    error?: String;
-}
-
-@ObjectType()
-export class ViewContaConexionesQueryResponse {
-    @Field()
-    success: Boolean;
-
-    @Field(type => [ViewContaConexiones], { nullable: true })
-    data?: ViewContaConexiones[];
-
-    @Field(type => String, { nullable: true })
-    error?: String;
-}
-
-@ObjectType()
-export class ViewContaConexiones {
-    @Field({ nullable: true })
-    Id: number;
-
-    @Field()
-    IdUnidad: number;
-
-    @Field()
-    Unidad: string;
-
-    @Field()
-    Consolidado: string;
-
-    @Field()
-    IdDivision: number;
-
-    @Field()
-    Division: string;
-
-    @Field({ nullable: true })
-    IpRodas: string;
-
-    @Field({ nullable: true })
-    Usuario: string;
-
-    @Field({ nullable: true })
-    Contrasena: string;
-
-    @Field({ nullable: true })
-    BaseDatos: string;
-}
+export class ContaConexionesQueryResponse extends MultipleQueryResponse(ContaConexionesView) {}
 
 @InputType()
-export class ContaConexionInput {
+export class ContaConexionDTO {
     @Field({ nullable: true })
     Id: number;
 
@@ -107,13 +45,4 @@ export class EstadoConexionesRodas {
 }
 
 @ObjectType()
-export class EstadoConexionesRodasQueryResponse {
-    @Field()
-    success: Boolean;
-
-    @Field(type => [EstadoConexionesRodas], { nullable: true })
-    data?: EstadoConexionesRodas[];
-
-    @Field(type => String, { nullable: true })
-    error?: String;
-}
+export class EstadoConexionesRodasQueryResponse extends MultipleQueryResponse(EstadoConexionesRodas) {}
