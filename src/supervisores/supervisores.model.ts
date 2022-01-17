@@ -1,32 +1,15 @@
+import { MultipleQueryResponse, SingleQueryResponse } from '../shared/models/query.response.model';
 import { Supervisor } from './supervisores.entity';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
-export class SupervisoresQueryResponse {
-    @Field()
-    success: Boolean;
-
-    @Field(type => [Supervisor], { nullable: true })
-    data?: Supervisor[];
-
-    @Field(type => String, { nullable: true })
-    error?: String;
-}
+export class SupervisorQueryResponse extends SingleQueryResponse(Supervisor) {}
 
 @ObjectType()
-export class SupervisorQueryResponse {
-    @Field()
-    success: Boolean;
-
-    @Field(type => Supervisor, { nullable: true })
-    data?: Supervisor;
-
-    @Field(type => String, { nullable: true })
-    error?: String;
-}
+export class SupervisoresQueryResponse extends MultipleQueryResponse(Supervisor) {}
 
 @InputType()
-export class SupervisorInput {
+export class SupervisorDTO {
     @Field()
     IdSupervisor: number;
 

@@ -1,5 +1,5 @@
 import { Usuarios } from './../usuarios/usuarios.entity';
-import { SupervisoresQueryResponse, SupervisorQueryResponse, SupervisorInput } from './supervisores.model';
+import { SupervisoresQueryResponse, SupervisorQueryResponse, SupervisorDTO } from './supervisores.model';
 import { SupervisoresService } from './supervisores.service';
 import { Supervisor } from './supervisores.entity';
 import { Args, Context, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
@@ -29,7 +29,7 @@ export class SupervisoresResolver {
     @Mutation(() => SupervisorQueryResponse)
     @UseGuards(new AuthGuard())
     async createSupervisor(
-        @Args({ name: 'supervisorInfo', type: () => SupervisorInput }) supervisorInfo: SupervisorInput
+        @Args({ name: 'supervisorInfo', type: () => SupervisorDTO }) supervisorInfo: SupervisorDTO
     ): Promise<SupervisorQueryResponse> {
         return this._supervisorService.create(supervisorInfo);
     }
@@ -37,7 +37,7 @@ export class SupervisoresResolver {
     @Mutation(() => SupervisorQueryResponse)
     @UseGuards(new AuthGuard())
     async updateSupervisor(
-        @Args({ name: 'supervisorInfo', type: () => SupervisorInput }) supervisorInfo: SupervisorInput
+        @Args({ name: 'supervisorInfo', type: () => SupervisorDTO }) supervisorInfo: SupervisorDTO
     ): Promise<SupervisorQueryResponse> {
         return this._supervisorService.update(supervisorInfo);
     }
@@ -45,8 +45,8 @@ export class SupervisoresResolver {
     @Mutation(() => SupervisorQueryResponse)
     @UseGuards(new AuthGuard())
     async deleteSupervisor(
-        @Args({ name: 'IDs', type: () => [Int] }) id: number[]
+        @Args({ name: 'IDs', type: () => [Int] }) IDs: number[]
     ): Promise<SupervisorQueryResponse> {
-        return this._supervisorService.delete(id);
+        return this._supervisorService.delete(IDs);
     }
 }

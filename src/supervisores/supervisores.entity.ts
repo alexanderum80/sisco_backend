@@ -27,7 +27,7 @@ export class Supervisor {
     @Column()
     IdDivision: number;
 
-    @Field()
+    @Field(() => Divisiones)
     @ManyToOne(() => Divisiones, divisiones => divisiones.IdDivision)
     @JoinColumn({ name: 'IdDivision', referencedColumnName: 'IdDivision' })
     Division: Divisiones;
