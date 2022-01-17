@@ -1,10 +1,11 @@
 import { MutationResponse } from './../shared/models/mutation.response.model';
-import { UsuariosQueryResponse, UsuarioQueryResponse, UsuarioInput } from './usuarios.model';
+import { UsuariosQueryResponse, UsuarioDTO, UsuarioQueryResponse } from './usuarios.model';
 import { UsuariosService } from './usuarios.service';
 import { Resolver, Query, Args, Int, Mutation, Context } from '@nestjs/graphql';
 import { Usuarios } from './usuarios.entity';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard, DEFAULT_GRAPHQL_CONTEXT } from '../shared/helpers/auth.guard';
+
 
 @Resolver(of => Usuarios)
 export class UsuariosResolver {
@@ -28,25 +29,17 @@ export class UsuariosResolver {
 
     @Query(() => UsuariosQueryResponse)
     @UseGuards(new AuthGuard())
-    async getUsuariosByDivision(
-        @Args({ name: 'idDivision', type: () => Int }) idDivision: number
-    ): Promise<UsuariosQueryResponse> {
-        return this._usuariosService.findByDivision(idDivision);
-    }
-
-    @Query(() => UsuarioQueryResponse)
-    @UseGuards(new AuthGuard())
     async getUsuarioById(
         @Args({ name: 'id', type: () => Int }) id: number
-    ): Promise<UsuarioQueryResponse> {
+    ): Promise<UsuariosQueryResponse> {
         return this._usuariosService.findOne(id);
     }
 
-    @Query(() => UsuarioQueryResponse)
+    @Query(() => UsuariosQueryResponse)
     @UseGuards(new AuthGuard())
     async getUsuarioByName(
         @Args('name') name: string
-    ): Promise<UsuarioQueryResponse> {
+    ): Promise<UsuariosQueryResponse> {
         return this._usuariosService.findByName(name);
     }
 
@@ -62,7 +55,7 @@ export class UsuariosResolver {
     @Mutation(() => MutationResponse)
     @UseGuards(new AuthGuard())
     async createUsuario(
-        @Args('usuarioInfo') usuarioInfo: UsuarioInput
+        @Args('usuarioInfo') usuarioInfo: UsuarioDTO
     ): Promise<MutationResponse> {
         return this._usuariosService.create(usuarioInfo);
     }
@@ -70,7 +63,7 @@ export class UsuariosResolver {
     @Mutation(() => MutationResponse)
     @UseGuards(new AuthGuard())
     async updateUsuario(
-        @Args('usuarioInfo') usuarioInfo: UsuarioInput
+        @Args('usuarioInfo') usuarioInfo: UsuarioDTO
     ): Promise<MutationResponse> {
         return this._usuariosService.update(usuarioInfo);
     }

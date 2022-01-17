@@ -1,5 +1,7 @@
 import { Usuarios } from './usuarios.entity';
 import { ObjectType, Field, InputType } from '@nestjs/graphql';
+import { MultipleQueryResponse } from '../shared/models/query.response.model';
+import { SingleQueryResponse } from '../shared/models/query.response.model';
 
 export enum ETipoUsuarios {
     'Administrador' = 1,
@@ -7,34 +9,17 @@ export enum ETipoUsuarios {
     'Usuario Avanzado' = 3
 }
 
-
 @ObjectType()
-export class UsuarioQueryResponse {
-    @Field()
-    success: Boolean;
-
-    @Field(type => Usuarios, { nullable: true })
-    data?: Usuarios;
-
-    @Field(type => String, { nullable: true })
-    error?: String;
+export class UsuarioQueryResponse extends SingleQueryResponse(Usuarios) {
 }
 
 @ObjectType()
-export class UsuariosQueryResponse {
-    @Field()
-    success: Boolean;
-
-    @Field(type => [Usuarios], { nullable: true })
-    data?: Usuarios[];
-
-    @Field(type => String, { nullable: true })
-    error?: String;
+export class UsuariosQueryResponse extends MultipleQueryResponse(Usuarios) {
 }
 
 // Input Type
 @InputType()
-export class UsuarioInput {
+export class UsuarioDTO {
     @Field()
     IdUsuario: number;
 
