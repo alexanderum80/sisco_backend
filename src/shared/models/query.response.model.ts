@@ -1,14 +1,36 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import graphqlTypeJson, { GraphQLJSONObject } from 'graphql-type-json';
+import { ClassType } from 'graphql-composer';
 
-@ObjectType()
-export class QueryResponse {
-    @Field()
-    success: Boolean;
+export function SingleQueryResponse<TItem>(TItemClass: ClassType<TItem>) {
+    // `isAbstract` decorator option is mandatory to prevent registering in schema
+    @ObjectType({ isAbstract: true })
+    abstract class QueryResponseClass {
+      @Field(type => Boolean)
+      success: boolean;
+      
+      @Field(type => TItemClass, { nullable: true })
+      data?: TItem;
+  
+      @Field(type => String, { nullable: true })
+      error?: string;
+    }
 
-    @Field(type => GraphQLJSONObject, { nullable: true })
-    data?: object
+    return QueryResponseClass as ClassType;
+}
 
-    @Field(type => String, { nullable: true })
-    error?: string;
+export function MultipleQueryResponse<TItem>(TItemClass: ClassType<TItem>) {
+    // `isAbstract` decorator option is mandatory to prevent registering in schema
+    @ObjectType({ isAbstract: true })
+    abstract class QueryResponseClass {
+      @Field(type => Boolean)
+      success: boolean;
+      
+      @Field(type => [TItemClass], { nullable: true })
+      data?: TItem[];
+  
+      @Field(type => String, { nullable: true })
+      error?: string;
+    }
+
+    return QueryResponseClass as ClassType;
 }
