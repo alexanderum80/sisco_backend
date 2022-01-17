@@ -1,5 +1,5 @@
 import { MutationResponse } from './../shared/models/mutation.response.model';
-import { ClasificadorCuentasQueryResponse, VClasificadorCuentasQueryResponse, ClasificadorCuentaQueryResponse, ClasificadorCuentaRealInput, CuentasAgrupadasQueryResponse } from './clasificador-cuenta.model';
+import { ClasificadorCuentasQueryResponse, ClasificadorCuentaQueryResponse, ClasificadorCuentaRealDTO, CuentasAgrupadasQueryResponse } from './clasificador-cuenta.model';
 import { ClasificadorCuentaService } from './clasificador-cuenta.service';
 import { Resolver, Query, Args, Int, Mutation } from '@nestjs/graphql';
 import { ClasificadorCuentaReal } from './clasificador-cuenta.entity';
@@ -10,8 +10,8 @@ export class ClasificadorCuentaResolver {
         private clasificadorCuentaSvc: ClasificadorCuentaService
     ) {}
 
-    @Query(() => VClasificadorCuentasQueryResponse)
-    async getAllClasificadorCuentas(): Promise<VClasificadorCuentasQueryResponse> {
+    @Query(() => ClasificadorCuentasQueryResponse)
+    async getAllClasificadorCuentas(): Promise<ClasificadorCuentasQueryResponse> {
         return this.clasificadorCuentaSvc.getAllClasificadorCuentas();
     }
 
@@ -31,7 +31,7 @@ export class ClasificadorCuentaResolver {
 
     @Mutation(() => MutationResponse)
     async saveClasificadorCuenta(
-        @Args({ name: 'clasificadorInfo', type: () => ClasificadorCuentaRealInput }) clasificadorInfo: ClasificadorCuentaRealInput
+        @Args({ name: 'clasificadorInfo', type: () => ClasificadorCuentaRealDTO }) clasificadorInfo: ClasificadorCuentaRealDTO
     ): Promise<ClasificadorCuentasQueryResponse> {
         return this.clasificadorCuentaSvc.saveClasificadorCuenta(clasificadorInfo);
     }

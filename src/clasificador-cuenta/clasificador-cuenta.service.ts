@@ -1,7 +1,7 @@
 import { ContaCuentaentidad } from './../cuenta-entidad/cuenta-entidad.entity';
 import { CuentaEntidadService } from './../cuenta-entidad/cuenta-entidad.service';
 import { MutationResponse } from './../shared/models/mutation.response.model';
-import { ClasificadorCuentasQueryResponse, VClasificadorCuentasQueryResponse, ClasificadorCuentaQueryResponse, ClasificadorCuentaRealInput, CuentasAgrupadasQueryResponse } from './clasificador-cuenta.model';
+import { ClasificadorCuentasQueryResponse, ClasificadorCuentaQueryResponse, ClasificadorCuentaRealDTO, CuentasAgrupadasQueryResponse } from './clasificador-cuenta.model';
 import { Injectable } from '@nestjs/common';
 import { ClasificadorCuentaReal } from './clasificador-cuenta.entity';
 import { Repository, Connection } from 'typeorm';
@@ -15,9 +15,10 @@ export class ClasificadorCuentaService {
         private cuentaEntidadSvc: CuentaEntidadService
     ) {}
 
-    async getAllClasificadorCuentas(): Promise<VClasificadorCuentasQueryResponse> {
-        return new Promise<VClasificadorCuentasQueryResponse>((resolve) => {
-            this.connection.query('Select * from vClasificadorCuentasReal').then(res => {
+    async getAllClasificadorCuentas(): Promise<ClasificadorCuentasQueryResponse> {
+        return new Promise<ClasificadorCuentasQueryResponse>((resolve) => {
+            this.clasificadorCuentaRepository.find().then(res => {
+            // this.connection.query('Select * from vClasificadorCuentasReal').then(res => {
                 resolve({ success: true, data: res });
             }).catch(err => {
                 resolve({ success: false, error: err.message ? err.message : err });
@@ -55,8 +56,8 @@ export class ClasificadorCuentaService {
         });
     }
 
-    async saveClasificadorCuenta(clasificadorInfo: ClasificadorCuentaRealInput): Promise<MutationResponse> {
-        return new Promise<ClasificadorCuentasQueryResponse>((resolve) => {
+    async saveClasificadorCuenta(clasificadorInfo: ClasificadorCuentaRealDTO): Promise<MutationResponse> {
+        return new Promise<MutationResponse>((resolve) => {
             this.clasificadorCuentaRepository.save(clasificadorInfo).then(res => {
                 this.cuentaEntidadSvc.actualizaCuentaEntidad(res).then(() => {
                     resolve({ success: true });
@@ -68,7 +69,7 @@ export class ClasificadorCuentaService {
     }
 
     async deleteClasificadorCuenta(cuenta: string, subcuenta: string, tipo: number): Promise<MutationResponse> {
-        return new Promise<ClasificadorCuentasQueryResponse>((resolve) => {
+        return new Promise<MutationResponse>((resolve) => {
             this.clasificadorCuentaRepository.delete({ Cuenta: cuenta, SubCuenta: subcuenta, TipoClasificador: tipo }).then(() => {
                 this.cuentaEntidadSvc.deleteCuentaEntidad(cuenta, subcuenta, tipo).then(res => {
                     if (!res.success) {

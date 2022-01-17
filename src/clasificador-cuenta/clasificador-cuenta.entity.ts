@@ -20,19 +20,19 @@ export class ClasificadorCuentaReal {
     @Column({ length: 1 })
     Naturaleza: string;
 
-    @Field()
+    @Field({ nullable: true })
     @Column({ length: 10, nullable: true })
-    Crit1: string;
+    Crit1?: string;
 
-    @Field()
+    @Field({ nullable: true })
     @Column({ length: 10, nullable: true })
-    Crit2: string;
+    Crit2?: string;
 
-    @Field()
+    @Field({ nullable: true })
     @Column({ length: 10, nullable: true })
-    Crit3: string;
+    Crit3?: string;
 
-    @Field()
+    @Field({ defaultValue: false })
     @Column({ default: false})
     Obligacion: boolean;
 
@@ -40,23 +40,23 @@ export class ClasificadorCuentaReal {
     @PrimaryColumn()
     TipoClasificador: number;
 
-    @Field()
+    @Field({ nullable: true })
     @Column()
-    SeUtiliza: string;
+    SeUtiliza?: string;
 
     @Field()
     @Column()
     Terminal: boolean;
 
-    @Field()
+    @Field({ nullable: true })
     @Column({ length: 10, nullable: true })
-    Crit1Consolidacion: string;
+    Crit1Consolidacion?: string;
 
-    @Field()
+    @Field({ nullable: true })
     @Column({ length: 10, nullable: true })
-    Crit2Consolidacion: string;
+    Crit2Consolidacion?: string;
 
-    @Field()
+    @Field({ nullable: true })
     @Column({ length: 10, nullable: true })
-    Crit3Consolidacion: string;
+    Crit3Consolidacion?: string;
 }
