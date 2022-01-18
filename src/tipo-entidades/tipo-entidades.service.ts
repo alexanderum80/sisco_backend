@@ -45,7 +45,23 @@ export class TipoEntidadesService {
         }
     }
 
-    async saveTipoEntidad(tipoEntidadInfo: TipoEntidadInput): Promise<MutationResponse> {
+    async createTipoEntidad(tipoEntidadInfo: TipoEntidadInput): Promise<MutationResponse> {
+        try {
+            delete tipoEntidadInfo.Id;
+
+            return new Promise<MutationResponse>(resolve => {
+                this.tipoEntidadesRepository.save(tipoEntidadInfo).then(() => {
+                    resolve({ success: true });
+                }).catch(err => {
+                    return { success: false, error: err.message ? err.message : err };
+                });
+            });
+        } catch (err) {
+            return { success: false, error: err.message ? err.message : err };
+        }
+    }
+
+    async updateTipoEntidad(tipoEntidadInfo: TipoEntidadInput): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
                 this.tipoEntidadesRepository.save(tipoEntidadInfo).then(() => {
@@ -59,10 +75,10 @@ export class TipoEntidadesService {
         }
     }
 
-    async deleteTipoEntidad(id: number): Promise<MutationResponse> {
+    async deleteTipoEntidad(IDs: number[]): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.tipoEntidadesRepository.delete(id).then(result => {
+                this.tipoEntidadesRepository.delete(IDs).then(result => {
                     resolve({ success: true });
                 }).catch(err => {
                     return { success: false, error: err.message ? err.message : err };

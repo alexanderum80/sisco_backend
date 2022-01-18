@@ -665,8 +665,9 @@ type Mutation {
   deleteSupervisor(IDs: [Int!]!): SupervisorQueryResponse!
   conciliacionNacionalVsAsiento(unidadOD: Int!, divisionOD: Int!, unidad: Int!, division: Int!, mes: Int!, annio: Int!): MutationResponse!
   updateConciliaContab(data: [ConciliaNacContabilidadInput!]!): MutationResponse!
-  saveTipoEntidad(tipoEntidadInfo: TipoEntidadInput!): MutationResponse!
-  deleteTipoEntidad(id: Int!): MutationResponse!
+  createTipoEntidad(tipoEntidadInfo: TipoEntidadInput!): MutationResponse!
+  updateTipoEntidad(tipoEntidadInfo: TipoEntidadInput!): MutationResponse!
+  deleteTipoEntidad(IDs: [Int!]!): MutationResponse!
   createEpigrafe(epigrafeInfo: EpigrafeInput!): EpigrafeQueryResponse!
   updateEpigrafe(epigrafeInfo: EpigrafeInput!): EpigrafeQueryResponse!
   deleteEpigrafe(IDs: [Int!]!): EpigrafeQueryResponse!

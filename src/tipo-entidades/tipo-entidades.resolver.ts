@@ -23,16 +23,23 @@ export class TipoEntidadesResolver {
     }
 
     @Mutation(() => MutationResponse)
-    async saveTipoEntidad(
+    async createTipoEntidad(
         @Args({ name: 'tipoEntidadInfo', type: () => TipoEntidadInput }) tipoEntidadInfo: TipoEntidadInput
     ): Promise<MutationResponse> {
-        return this.tipoEntidadesSvc.saveTipoEntidad(tipoEntidadInfo);
+        return this.tipoEntidadesSvc.createTipoEntidad(tipoEntidadInfo);
+    }
+    
+    @Mutation(() => MutationResponse)
+    async updateTipoEntidad(
+        @Args({ name: 'tipoEntidadInfo', type: () => TipoEntidadInput }) tipoEntidadInfo: TipoEntidadInput
+    ): Promise<MutationResponse> {
+        return this.tipoEntidadesSvc.updateTipoEntidad(tipoEntidadInfo);
     }
 
     @Mutation(() => MutationResponse)
     async deleteTipoEntidad(
-        @Args({ name: 'id', type: () => Int }) id: number
+        @Args({ name: 'IDs', type: () => [Int] }) IDs: number[]
     ): Promise<MutationResponse> {
-        return this.tipoEntidadesSvc.deleteTipoEntidad(id);
+        return this.tipoEntidadesSvc.deleteTipoEntidad(IDs);
     }
 }
