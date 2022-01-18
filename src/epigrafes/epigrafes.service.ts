@@ -47,8 +47,10 @@ export class EpigrafesService {
         }
     }
 
-    async saveEpigrafe(epigrafeInfo: EpigrafeInput): Promise<MutationResponse> {
+    async createEpigrafe(epigrafeInfo: EpigrafeInput): Promise<MutationResponse> {
         try {
+            delete epigrafeInfo.IdEpigafre;
+
             return new Promise<MutationResponse>(resolve => {
                 this.epigrafeRepository.save(epigrafeInfo).then(result => {
                     resolve({ success: true });
@@ -62,10 +64,25 @@ export class EpigrafesService {
         }
     }
 
-    async deleteEpigrafe(id: number): Promise<MutationResponse> {
+    async updateEpigrafe(epigrafeInfo: EpigrafeInput): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.epigrafeRepository.delete(id).then(result => {
+                this.epigrafeRepository.save(epigrafeInfo).then(result => {
+                    resolve({ success: true });
+                })
+                .catch(err => {
+                    resolve({ success: false, error: err.message ? err.message : err });
+                });
+            });
+        } catch (err) {
+            return { success: false, error: err.message ? err.message : err };
+        }
+    }
+    
+    async deleteEpigrafe(IDs: number[]): Promise<MutationResponse> {
+        try {
+            return new Promise<MutationResponse>(resolve => {
+                this.epigrafeRepository.delete(IDs).then(result => {
                     resolve({ success: true });
                 })
                 .catch(err => {

@@ -667,8 +667,9 @@ type Mutation {
   updateConciliaContab(data: [ConciliaNacContabilidadInput!]!): MutationResponse!
   saveTipoEntidad(tipoEntidadInfo: TipoEntidadInput!): MutationResponse!
   deleteTipoEntidad(id: Int!): MutationResponse!
-  saveEpigrafe(epigrafeInfo: EpigrafeInput!): EpigrafeQueryResponse!
-  deleteEpigrafe(id: Int!): EpigrafeQueryResponse!
+  createEpigrafe(epigrafeInfo: EpigrafeInput!): EpigrafeQueryResponse!
+  updateEpigrafe(epigrafeInfo: EpigrafeInput!): EpigrafeQueryResponse!
+  deleteEpigrafe(IDs: [Int!]!): EpigrafeQueryResponse!
   saveElementoGasto(elementoGastoInfo: ElementoGastoInput!): MutationResponse!
   deleteElementoGasto(id: String!): MutationResponse!
   saveClasificadorEntidad(clasificadorEntidadInfo: ClasificadorEntidadInput!): MutationResponse!

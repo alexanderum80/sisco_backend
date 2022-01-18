@@ -21,17 +21,24 @@ export class EpigrafesResolver {
     }
 
     @Mutation(() => EpigrafeQueryResponse)
-    async saveEpigrafe(
+    async createEpigrafe(
         @Args({ name: 'epigrafeInfo', type: () => EpigrafeInput }) epigrafeInfo: EpigrafeInput
     ): Promise<EpigrafeQueryResponse> {
-        return this.epigrafesSvc.saveEpigrafe(epigrafeInfo);
+        return this.epigrafesSvc.createEpigrafe(epigrafeInfo);
+    }
+
+    @Mutation(() => EpigrafeQueryResponse)
+    async updateEpigrafe(
+        @Args({ name: 'epigrafeInfo', type: () => EpigrafeInput }) epigrafeInfo: EpigrafeInput
+    ): Promise<EpigrafeQueryResponse> {
+        return this.epigrafesSvc.updateEpigrafe(epigrafeInfo);
     }
 
     @Mutation(() => EpigrafeQueryResponse)
     async deleteEpigrafe(
-        @Args({ name: 'id', type: () => Int }) id: number
+        @Args({ name: 'IDs', type: () => [Int] }) IDs: number[]
     ): Promise<EpigrafeQueryResponse> {
-        return this.epigrafesSvc.deleteEpigrafe(id);
+        return this.epigrafesSvc.deleteEpigrafe(IDs);
     }
 
 }
