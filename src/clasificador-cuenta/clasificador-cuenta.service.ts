@@ -1,4 +1,3 @@
-import { ContaCuentaentidad } from './../cuenta-entidad/cuenta-entidad.entity';
 import { CuentaEntidadService } from './../cuenta-entidad/cuenta-entidad.service';
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { ClasificadorCuentasQueryResponse, ClasificadorCuentaQueryResponse, ClasificadorCuentaRealDTO, CuentasAgrupadasQueryResponse } from './clasificador-cuenta.model';
@@ -18,7 +17,6 @@ export class ClasificadorCuentaService {
     async getAllClasificadorCuentas(): Promise<ClasificadorCuentasQueryResponse> {
         return new Promise<ClasificadorCuentasQueryResponse>((resolve) => {
             this.clasificadorCuentaRepository.find().then(res => {
-            // this.connection.query('Select * from vClasificadorCuentasReal').then(res => {
                 resolve({ success: true, data: res });
             }).catch(err => {
                 resolve({ success: false, error: err.message ? err.message : err });
@@ -48,7 +46,11 @@ export class ClasificadorCuentaService {
 
     async getCuentasAgrupadas(): Promise<CuentasAgrupadasQueryResponse> {
         return new Promise<CuentasAgrupadasQueryResponse>((resolve) => {
-            this.clasificadorCuentaRepository.query('Select Cuenta from vClasificadorCuentasReal GROUP BY Cuenta ORDER BY Cuenta').then(res => {
+            this.clasificadorCuentaRepository.createQueryBuilder('Clas')
+                .select('Clas.Cuenta', 'Cuenta')
+                .groupBy('Clas.Cuenta')
+                .execute()
+            .then(res => {
                 resolve({ success: true, data: res });
             }).catch(err => {
                 resolve({ success: false, error: err.message ? err.message : err });

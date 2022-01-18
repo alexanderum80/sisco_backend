@@ -1,12 +1,12 @@
 import { MultipleQueryResponse, SingleQueryResponse } from '../shared/models/query.response.model';
-import { ContaConexiones, ContaConexionesView } from './conta-conexiones.entity';
+import { ContaConexiones } from './conta-conexiones.entity';
 import { ObjectType, Field, InputType } from '@nestjs/graphql';
 
 @ObjectType()
 export class ContaConexionQueryResponse extends SingleQueryResponse(ContaConexiones) {}
 
 @ObjectType()
-export class ContaConexionesQueryResponse extends MultipleQueryResponse(ContaConexionesView) {}
+export class ContaConexionesQueryResponse extends MultipleQueryResponse(ContaConexiones) {}
 
 @InputType()
 export class ContaConexionDTO {

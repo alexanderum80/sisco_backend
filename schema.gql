@@ -77,23 +77,13 @@ type AllUnidadesQueryResponse {
 type ContaConexiones {
   Id: Float!
   IdUnidad: Float!
+  Unidad: CentrosView!
   Consolidado: Boolean!
   IdDivision: Float!
+  Division: Divisiones!
   IpRodas: String
   Usuario: String
   Contrasena: String
-  BaseDatos: String
-}
-
-type ContaConexionesView {
-  Id: Float!
-  IdUnidad: Float!
-  Unidad: String!
-  Consolidado: Boolean!
-  IdDivision: Float!
-  Division: String!
-  IpRodas: String
-  Usuario: String
   BaseDatos: String
 }
 
@@ -134,7 +124,7 @@ type ContaConexionQueryResponse {
 
 type ContaConexionesQueryResponse {
   success: Boolean!
-  data: [ContaConexionesView!]
+  data: [ContaConexiones!]
   error: String
 }
 

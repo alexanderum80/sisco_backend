@@ -7,15 +7,14 @@ import { cloneDeep } from 'lodash';
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { CryptoService } from '../shared/services/crypto/crypto.service';
 import { ContaConexionQueryResponse, EstadoConexionesRodasQueryResponse, EstadoConexionesRodas, ContaConexionesQueryResponse, ContaConexionDTO } from './conta-conexiones.model';
-import { ContaConexiones, ContaConexionesView } from './conta-conexiones.entity';
+import { ContaConexiones } from './conta-conexiones.entity';
 import { Injectable } from '@nestjs/common';
-import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
-import { Connection, getManager, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Connection, Repository } from 'typeorm';
 
 @Injectable()
 export class ContaConexionesService {
     constructor(
-        @InjectConnection() private readonly connection: Connection,
         @InjectRepository(ContaConexiones) private readonly conexionesRespository: Repository<ContaConexiones>,
         private _cryptoService: CryptoService,
         private _unidadesSvc: UnidadesService,
@@ -32,10 +31,8 @@ export class ContaConexionesService {
                 _condition = { IdDivision: IdDivision };
             }
 
-            const entityManager = getManager();
-
             return new Promise<ContaConexionesQueryResponse>(resolve => {
-                entityManager.find(ContaConexionesView, { where: _condition }).then(result => {
+                this.conexionesRespository.find({ where: _condition, relations: ['Division'] }).then(result => {
                     resolve({
                         success: true,
                         data: result
