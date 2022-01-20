@@ -1,4 +1,4 @@
-import { ContaTipoentidades } from './tipo-entidades.entity';
+import { TipoEntidades } from './tipo-entidades.entity';
 import { ObjectType, Field, InputType } from '@nestjs/graphql';
 
 @ObjectType()
@@ -6,8 +6,8 @@ export class ContaTipoentidadesQueryResponse {
     @Field()
     success: boolean;
 
-    @Field(type => [ContaTipoentidades], { nullable: true })
-    data?: ContaTipoentidades[];
+    @Field(type => [TipoEntidades], { nullable: true })
+    data?: TipoEntidades[];
 
     @Field({ nullable: true })
     error?: string;
@@ -18,8 +18,8 @@ export class ContaTipoentidadQueryResponse {
     @Field()
     success: boolean;
 
-    @Field(type => ContaTipoentidades, { nullable: true })
-    data?: ContaTipoentidades;
+    @Field(type => TipoEntidades, { nullable: true })
+    data?: TipoEntidades;
 
     @Field({ nullable: true })
     error?: string;

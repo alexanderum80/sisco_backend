@@ -63,8 +63,4 @@ export class CentrosView {
     @Field()
     @ViewColumn()
     Division: string;
-
-    @Field()
-    @ViewColumn()
-    Abierta: boolean;
 }

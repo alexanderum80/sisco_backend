@@ -1,56 +1,12 @@
-import { ContaClasificarunidades } from './clasificador-entidades.entity';
+import { MultipleQueryResponse, SingleQueryResponse } from 'src/shared/models/query.response.model';
+import { ClasificarEntidades } from './clasificador-entidades.entity';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
-export class VClasificadorEntidades {
-    @Field()
-    IdUnidad: number;
-
-    @Field()
-    Unidad: string;
-
-    @Field()
-    IdTipoEntidad: number;
-
-    @Field()
-    TipoEntidad: string;
-}
+export class ClasificadorEntidadesQueryResponse extends MultipleQueryResponse(ClasificarEntidades) {}
 
 @ObjectType()
-export class VClasificadorEntidadesQueryResponse {
-    @Field()
-    success: Boolean;
-
-    @Field(type => [VClasificadorEntidades], { nullable: true })
-    data?: VClasificadorEntidades[];
-
-    @Field(type => String, { nullable: true })
-    error?: String;
-}
-
-@ObjectType()
-export class ClasificadorEntidadesQueryResponse {
-    @Field()
-    success: Boolean;
-
-    @Field(type => [ContaClasificarunidades], { nullable: true })
-    data?: ContaClasificarunidades[];
-
-    @Field(type => String, { nullable: true })
-    error?: String;
-}
-
-@ObjectType()
-export class ClasificadorEntidadQueryResponse {
-    @Field()
-    success: Boolean;
-
-    @Field(type => ContaClasificarunidades, { nullable: true })
-    data?: ContaClasificarunidades;
-
-    @Field(type => String, { nullable: true })
-    error?: String;
-}
+export class ClasificadorEntidadQueryResponse extends SingleQueryResponse(ClasificarEntidades) {}
 
 @InputType()
 export class ClasificadorEntidadInput {

@@ -1,6 +1,6 @@
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { ContaTipoentidadesQueryResponse, ContaTipoentidadQueryResponse, TipoEntidadInput } from './tipo-entidades.model';
-import { ContaTipoentidades } from './tipo-entidades.entity';
+import { TipoEntidades } from './tipo-entidades.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -8,7 +8,7 @@ import { Repository } from 'typeorm';
 @Injectable()
 export class TipoEntidadesService {
     constructor(
-        @InjectRepository(ContaTipoentidades) private readonly tipoEntidadesRepository: Repository<ContaTipoentidades>
+        @InjectRepository(TipoEntidades) private readonly tipoEntidadesRepository: Repository<TipoEntidades>
     ) { }
 
     async getAllTipoEntidades(): Promise<ContaTipoentidadesQueryResponse> {

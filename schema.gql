@@ -65,7 +65,6 @@ type CentrosView {
   Subdivision: String!
   IdDivision: Float!
   Division: String!
-  Abierta: Boolean!
 }
 
 type AllUnidadesQueryResponse {
@@ -354,7 +353,7 @@ type ActaConciliacion {
   Diferencia: Float!
 }
 
-type ContaTipoentidades {
+type TipoEntidades {
   Id: Float!
   Entidades: String!
   Descripcion: String!
@@ -362,13 +361,13 @@ type ContaTipoentidades {
 
 type ContaTipoentidadesQueryResponse {
   success: Boolean!
-  data: [ContaTipoentidades!]
+  data: [TipoEntidades!]
   error: String
 }
 
 type ContaTipoentidadQueryResponse {
   success: Boolean!
-  data: ContaTipoentidades
+  data: TipoEntidades
   error: String
 }
 
@@ -410,27 +409,22 @@ type ElementoGastoQueryResponse {
   error: String
 }
 
-type ContaClasificarunidades {
+type ClasificarEntidades {
   IdUnidad: Float!
-  IdTipoEntidad: Float!
-}
-
-type VClasificadorEntidades {
-  IdUnidad: Float!
-  Unidad: String!
+  Unidad: String
   IdTipoEntidad: Float!
   TipoEntidad: String!
 }
 
-type VClasificadorEntidadesQueryResponse {
+type ClasificadorEntidadesQueryResponse {
   success: Boolean!
-  data: [VClasificadorEntidades!]
+  data: [ClasificarEntidades!]
   error: String
 }
 
 type ClasificadorEntidadQueryResponse {
   success: Boolean!
-  data: ContaClasificarunidades
+  data: ClasificarEntidades
   error: String
 }
 
@@ -599,7 +593,7 @@ type Query {
   getEpigrafeById(id: Int!): EpigrafeQueryResponse!
   getAllElementosGastos: ElementosGastosQueryResponse!
   getElementoGastoById(id: String!): ElementoGastoQueryResponse!
-  getAllClasificadorEntidades: VClasificadorEntidadesQueryResponse!
+  getAllClasificadorEntidades: ClasificadorEntidadesQueryResponse!
   getClasificadorEntidad(idUnidad: Int!): ClasificadorEntidadQueryResponse!
   getAllExpresionesResumen: ContaExpresionesResumenQueryResponse!
   getExpresionResumenById(id: Int!): ContaExpresionResumenQueryResponse!
@@ -673,8 +667,9 @@ type Mutation {
   deleteEpigrafe(IDs: [Int!]!): EpigrafeQueryResponse!
   saveElementoGasto(elementoGastoInfo: ElementoGastoInput!): MutationResponse!
   deleteElementoGasto(id: String!): MutationResponse!
-  saveClasificadorEntidad(clasificadorEntidadInfo: ClasificadorEntidadInput!): MutationResponse!
-  deleteClasificadorEntidad(idUnidad: Int!): MutationResponse!
+  createClasificadorEntidad(clasificadorEntidadInfo: ClasificadorEntidadInput!): MutationResponse!
+  updateClasificadorEntidad(clasificadorEntidadInfo: ClasificadorEntidadInput!): MutationResponse!
+  deleteClasificadorEntidad(IDs: [Int!]!): MutationResponse!
   saveExpresion(expresionInput: ContaExpresionInput!): MutationResponse!
   deleteExpresionResumen(id: Int!): MutationResponse!
   deleteExpresionDetalle(id: [Int!]!): MutationResponse!
