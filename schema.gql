@@ -486,17 +486,22 @@ type ContaTipoValorExpresionesQueryResponse {
   error: String
 }
 
+type ContaOperadoresEntity {
+  Id: String!
+  Operador: String!
+}
+
 type ContaComprobarExpresionesEntity {
   Id: Float!
-  Expresion: Float!
-  Operador: String!
-  ExpresionC: Float!
+  IdExpresion: Float!
+  IdOperador: String!
+  IdExpresionC: Float!
   Centro: Boolean!
   Complejo: Boolean!
   Con: Boolean!
-  ExpresionDesc: String
-  ExpresionDesc_C: String
-  OperadorDesc: String
+  Expresion: ContaExpresionesResumen!
+  ExpresionC: ContaExpresionesResumen!
+  Operador: ContaOperadoresEntity!
 }
 
 type ContaComprobarExpresionesQueryResponse {
@@ -509,11 +514,6 @@ type ContaComprobarExpresionQueryResponse {
   success: Boolean!
   data: ContaComprobarExpresionesEntity
   error: String
-}
-
-type ContaOperadoresEntity {
-  Id: String!
-  Operador: String!
 }
 
 type ContaOperadoresQueryResponse {
@@ -674,8 +674,9 @@ type Mutation {
   updateExpresion(expresionInput: ContaExpresionInput!): MutationResponse!
   deleteExpresionResumen(IDs: [Int!]!): MutationResponse!
   deleteExpresionDetalle(id: [Int!]!): MutationResponse!
-  saveComprobarExpresion(comprobarExpresionInput: ContaComprobarExpresionesInput!): MutationResponse!
-  deleteComprobarExpresion(id: Int!): MutationResponse!
+  createComprobarExpresion(comprobarExpresionInput: ContaComprobarExpresionesInput!): MutationResponse!
+  updateComprobarExpresion(comprobarExpresionInput: ContaComprobarExpresionesInput!): MutationResponse!
+  deleteComprobarExpresion(IDs: [Int!]!): MutationResponse!
   saveNoUsarEnCuenta(noUsarEnCuentaInput: ContaNoUsarEnCuentaInput!): MutationResponse!
   deleteNoUsarEnCuenta(id: Int!): MutationResponse!
 }
@@ -810,9 +811,9 @@ input ContaExpresionDetalleInput {
 
 input ContaComprobarExpresionesInput {
   Id: Float!
-  Expresion: Float!
-  Operador: String!
-  ExpresionC: Float!
+  IdExpresion: Float!
+  IdOperador: String!
+  IdExpresionC: Float!
   Centro: Boolean!
   Complejo: Boolean!
   Con: Boolean!

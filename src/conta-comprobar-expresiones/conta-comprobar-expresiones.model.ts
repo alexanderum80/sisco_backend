@@ -31,13 +31,13 @@ export class ContaComprobarExpresionesInput {
     Id: number;
 
     @Field()
-    Expresion: number;
+    IdExpresion: number;
 
     @Field()
-    Operador: string;
+    IdOperador: string;
 
     @Field()
-    ExpresionC: number;
+    IdExpresionC: number;
 
     @Field()
     Centro: boolean;

@@ -1,5 +1,7 @@
+import { ContaOperadoresEntity } from './../conta-operadores/conta-operadores.entity';
+import { ContaExpresionesResumen } from './../conta-expresiones/conta-expresiones.entity';
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @ObjectType()
 @Entity('Conta_ComprobarExpresiones')
@@ -10,15 +12,15 @@ export class ContaComprobarExpresionesEntity {
 
     @Field()
     @Column()
-    Expresion: number;
+    IdExpresion: number;
 
     @Field()
     @Column({ length: 3 })
-    Operador: string;
+    IdOperador: string;
 
     @Field()
     @Column()
-    ExpresionC: number;
+    IdExpresionC: number;
 
     @Field()
     @Column()
@@ -32,12 +34,18 @@ export class ContaComprobarExpresionesEntity {
     @Column()
     Con: boolean;
 
-    @Field({ nullable: true })
-    ExpresionDesc: string;
+    @Field(() => ContaExpresionesResumen)
+    @ManyToOne(() => ContaExpresionesResumen, expresion => expresion.IdExpresion)
+    @JoinColumn({ name: 'IdExpresion', referencedColumnName: 'IdExpresion'})    
+    Expresion: ContaExpresionesResumen;
 
-    @Field({ nullable: true })
-    ExpresionDesc_C: string;
+    @Field(() => ContaExpresionesResumen)
+    @ManyToOne(() => ContaExpresionesResumen, expresion => expresion.IdExpresion)
+    @JoinColumn({ name: 'IdExpresionC', referencedColumnName: 'IdExpresion'})    
+    ExpresionC: ContaExpresionesResumen;
 
-    @Field({ nullable: true })
-    OperadorDesc: string;
+    @Field(() => ContaOperadoresEntity)
+    @ManyToOne(() => ContaOperadoresEntity, operador => operador.Id)
+    @JoinColumn({ name: 'IdOperador', referencedColumnName: 'Id'})    
+    Operador: ContaOperadoresEntity;
 }

@@ -12,28 +12,35 @@ export class ContaComprobarExpresionesResolver {
 
     @Query(() => ContaComprobarExpresionesQueryResponse)
     async getAllComprobarExpresiones(): Promise<ContaComprobarExpresionesQueryResponse> {
-        return this._comprobarExpresionesSvc.getAllComprobarExpresiones();
+        return this._comprobarExpresionesSvc.findAll();
     }
 
     @Query(() => ContaComprobarExpresionQueryResponse)
     async getComprobarExpresionById(
         @Args({ name: 'id', type: () => Int}) id: number
     ): Promise<ContaComprobarExpresionQueryResponse> {
-        return this._comprobarExpresionesSvc.getComprobarExpresionById(id);
+        return this._comprobarExpresionesSvc.findOne(id);
     }
 
     @Mutation(() => MutationResponse)
-    async saveComprobarExpresion(
+    async createComprobarExpresion(
         @Args({ 'name': 'comprobarExpresionInput', type: () => ContaComprobarExpresionesInput }) comprobarExpresionInput: ContaComprobarExpresionesInput
     ): Promise<MutationResponse> {
-        return this._comprobarExpresionesSvc.saveComprobarExpresion(comprobarExpresionInput);
+        return this._comprobarExpresionesSvc.create(comprobarExpresionInput);
+    }
+
+    @Mutation(() => MutationResponse)
+    async updateComprobarExpresion(
+        @Args({ 'name': 'comprobarExpresionInput', type: () => ContaComprobarExpresionesInput }) comprobarExpresionInput: ContaComprobarExpresionesInput
+    ): Promise<MutationResponse> {
+        return this._comprobarExpresionesSvc.update(comprobarExpresionInput);
     }
 
     @Mutation(() => MutationResponse)
     async deleteComprobarExpresion(
-        @Args({ name: 'id', type: () => Int}) id: number
+        @Args({ name: 'IDs', type: () => [Int]}) IDs: number[]
     ): Promise<MutationResponse> {
-        return this._comprobarExpresionesSvc.deleteComprobarExpresion(id);
+        return this._comprobarExpresionesSvc.delete(IDs);
     }
 
 }
