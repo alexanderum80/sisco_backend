@@ -1,53 +1,18 @@
+import { SingleQueryResponse, MultipleQueryResponse } from '../shared/models/query.response.model';
 import { ContaExpresionesResumen, ContaExpresionesDetalle } from './conta-expresiones.entity';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
-export class ContaExpresionResumenQueryResponse {
-    @Field()
-    success: Boolean;
-
-    @Field(type => ContaExpresionesResumen, { nullable: true })
-    data?: ContaExpresionesResumen;
-
-    @Field(type => String, { nullable: true })
-    error?: String;
-}
+export class ContaExpresionResumenQueryResponse extends SingleQueryResponse(ContaExpresionesResumen) {}
 
 @ObjectType()
-export class ContaExpresionDetalleQueryResponse {
-    @Field()
-    success: Boolean;
-
-    @Field(type => ContaExpresionesDetalle, { nullable: true })
-    data?: ContaExpresionesDetalle;
-
-    @Field(type => String, { nullable: true })
-    error?: String;
-}
+export class ContaExpresionDetalleQueryResponse extends SingleQueryResponse(ContaExpresionesDetalle) {}
 
 @ObjectType()
-export class ContaExpresionesResumenQueryResponse {
-    @Field()
-    success: Boolean;
-
-    @Field(type => [ContaExpresionesResumen], { nullable: true })
-    data?: ContaExpresionesResumen[];
-
-    @Field(type => String, { nullable: true })
-    error?: String;
-}
+export class ContaExpresionesResumenQueryResponse extends MultipleQueryResponse(ContaExpresionesResumen) {}
 
 @ObjectType()
-export class ContaExpresionesDetalleQueryResponse {
-    @Field()
-    success: Boolean;
-
-    @Field(type => [ContaExpresionesDetalle], { nullable: true })
-    data?: ContaExpresionesDetalle[];
-
-    @Field(type => String, { nullable: true })
-    error?: String;
-}
+export class ContaExpresionesDetalleQueryResponse extends MultipleQueryResponse(ContaExpresionesDetalle) {}
 
 @InputType()
 export class ContaExpresionResumenInput {
@@ -66,8 +31,8 @@ export class ContaExpresionResumenInput {
     @Field()
     OperacionesInternas: boolean;
 
-    @Field({ nullable: true})
-    Centralizada?: boolean;
+    @Field()
+    Centralizada: boolean;
 }
 
 @InputType()

@@ -670,8 +670,9 @@ type Mutation {
   createClasificadorEntidad(clasificadorEntidadInfo: ClasificadorEntidadInput!): MutationResponse!
   updateClasificadorEntidad(clasificadorEntidadInfo: ClasificadorEntidadInput!): MutationResponse!
   deleteClasificadorEntidad(IDs: [Int!]!): MutationResponse!
-  saveExpresion(expresionInput: ContaExpresionInput!): MutationResponse!
-  deleteExpresionResumen(id: Int!): MutationResponse!
+  createExpresion(expresionInput: ContaExpresionInput!): MutationResponse!
+  updateExpresion(expresionInput: ContaExpresionInput!): MutationResponse!
+  deleteExpresionResumen(IDs: [Int!]!): MutationResponse!
   deleteExpresionDetalle(id: [Int!]!): MutationResponse!
   saveComprobarExpresion(comprobarExpresionInput: ContaComprobarExpresionesInput!): MutationResponse!
   deleteComprobarExpresion(id: Int!): MutationResponse!
@@ -790,7 +791,7 @@ input ContaExpresionResumenInput {
   Descripcion: String
   Acumulado: Boolean!
   OperacionesInternas: Boolean!
-  Centralizada: Boolean
+  Centralizada: Boolean!
 }
 
 input ContaExpresionDetalleInput {

@@ -5,7 +5,6 @@ import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
 import { ContaExpresionesResumenQueryResponse, ContaExpresionResumenInput, ContaExpresionesDetalleQueryResponse, ContaExpresionDetalleQueryResponse, ContaExpresionDetalleInput, ContaExpresionResumenQueryResponse, ContaExpresionInput } from './conta-expresiones.model';
 import { differenceBy } from 'lodash';
-import { Usuarios } from 'src/usuarios/usuarios.entity';
 
 @Injectable()
 export class ContaExpresionesService {
@@ -15,18 +14,41 @@ export class ContaExpresionesService {
         @InjectRepository(ContaExpresionesDetalle) private readonly contaExpresionDetalleRepository: Repository<ContaExpresionesDetalle>
     ) {}
 
-    async saveExpresion(usuario: Usuarios,  expresionInput: ContaExpresionInput): Promise<MutationResponse> {
+    async create(expresionInput: ContaExpresionInput): Promise<MutationResponse> {
         try {
             const { ExpresionResumen, ExpresionesDetalle } = expresionInput;
 
-            ExpresionResumen.Centralizada = usuario.IdDivision === 100 && (usuario.IdTipoUsuario === 1 || usuario.IdTipoUsuario === 3);
+            delete ExpresionResumen.IdExpresion;
 
             return new Promise<MutationResponse>(async resolve => {
-                const saveExpresionResumen = await this.saveExpresionResumen(ExpresionResumen).catch(err => {
+                const saveExpresionResumen = await this.createResumen(ExpresionResumen).catch(err => {
                     throw new Error(err);
                 });
 
-                const originalExpresionDetalle = await this.getExpresionesDetalleByIdResumen(saveExpresionResumen.data.IdExpresion).catch(err => {
+                ExpresionesDetalle.forEach(expr => {
+                    expr.IdExpresion = saveExpresionResumen.IdExpresion;
+                    this.createDetalle(expr).catch(err => {
+                        throw new Error(err);
+                    });
+                });
+
+                resolve({ success: true });
+            });
+        } catch (err) {
+            return { success: false, error: err.message ? err.message : err };
+        }
+    }
+    
+    async update(expresionInput: ContaExpresionInput): Promise<MutationResponse> {
+        try {
+            const { ExpresionResumen, ExpresionesDetalle } = expresionInput;
+
+            return new Promise<MutationResponse>(async resolve => {
+                const saveExpresionResumen = await this.updateResumen(ExpresionResumen).catch(err => {
+                    throw new Error(err);
+                });
+
+                const originalExpresionDetalle = await this.findOneDetalleByResumen(saveExpresionResumen.data.IdExpresion).catch(err => {
                     throw new Error(err);
                 });
 
@@ -35,14 +57,14 @@ export class ContaExpresionesService {
                 if (borrarExpresionDetalle.length) {
                     const IDs = borrarExpresionDetalle.map(e => e.id);
 
-                    await this.deleteExpresionDetalle(IDs).catch(err => {
+                    await this.deleteDetalle(IDs).catch(err => {
                         throw new Error(err);
                     });
                 }
 
                 ExpresionesDetalle.forEach(expr => {
                     expr.IdExpresion = saveExpresionResumen.data.IdExpresion;
-                    this.saveExpresionDetalle(expr).catch(err => {
+                    this.updateDetalle(expr).catch(err => {
                         throw new Error(err);
                     });
                 });
@@ -55,7 +77,7 @@ export class ContaExpresionesService {
     }
 
     // Expresiones Resumen
-    async getAllExpresionesResumen(): Promise<ContaExpresionesResumenQueryResponse> {
+    async findAllResumen(): Promise<ContaExpresionesResumenQueryResponse> {
         try {
             return new Promise<ContaExpresionesResumenQueryResponse>(resolve => {
                 this.contaExpresionesResumenRepository.find().then(result => {
@@ -72,7 +94,7 @@ export class ContaExpresionesService {
         }
     }
 
-    async getExpresionResumenById(idExpresion: number): Promise<ContaExpresionResumenQueryResponse> {
+    async findOneResumen(idExpresion: number): Promise<ContaExpresionResumenQueryResponse> {
         try {
             return new Promise<ContaExpresionResumenQueryResponse>(resolve => {
                 this.contaExpresionesResumenRepository.findOne(idExpresion).then(result => {
@@ -89,7 +111,17 @@ export class ContaExpresionesService {
         }
     }
 
-    async saveExpresionResumen(ExpresionesResumenInput: ContaExpresionResumenInput): Promise<ContaExpresionResumenQueryResponse> {
+    async createResumen(ExpresionesResumenInput: ContaExpresionResumenInput): Promise<ContaExpresionesResumen> {
+        return new Promise<ContaExpresionesResumen>((resolve, reject) => {
+            this.contaExpresionesResumenRepository.save(ExpresionesResumenInput).then(result => {
+                resolve(result);
+            }).catch(err => {
+                reject(err.message ? err.message : err);
+            });
+        });
+    }
+
+    async updateResumen(ExpresionesResumenInput: ContaExpresionResumenInput): Promise<ContaExpresionResumenQueryResponse> {
         try {
             return new Promise<ContaExpresionResumenQueryResponse>(resolve => {
                 this.contaExpresionesResumenRepository.save(ExpresionesResumenInput).then(result => {
@@ -103,10 +135,10 @@ export class ContaExpresionesService {
         }
     }
 
-    async deleteExpresionResumen(idExpresion: number): Promise<MutationResponse> {
+    async deleteResumen(IDs: number[]): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.contaExpresionesResumenRepository.delete(idExpresion).then(result => {
+                this.contaExpresionesResumenRepository.delete(IDs).then(result => {
                     resolve({ success: true });
                 }).catch(err => {
                     throw new Error(err.message ? err.message : err);
@@ -118,7 +150,7 @@ export class ContaExpresionesService {
     }
 
     // Expresiones Detalle
-    async getAllExpresionesDetalle(): Promise<ContaExpresionesDetalleQueryResponse> {
+    async findAllDetalle(): Promise<ContaExpresionesDetalleQueryResponse> {
         try {
             return new Promise<ContaExpresionesDetalleQueryResponse>(resolve => {
                 this.contaExpresionDetalleRepository.find().then(result => {
@@ -135,10 +167,9 @@ export class ContaExpresionesService {
         }
     }
 
-    async getExpresionesDetalleByIdResumen(idExpresion: number): Promise<ContaExpresionesDetalleQueryResponse> {
+    async findOneDetalleByResumen(idExpresion: number): Promise<ContaExpresionesDetalleQueryResponse> {
         try {
             return new Promise<ContaExpresionesDetalleQueryResponse>(resolve => {
-                // this.connection.query(`select * from vConta_ExpresionesDetalle where IdExpresion = ${ idExpresion }`).then(result => {
                 this.contaExpresionDetalleRepository.find({ IdExpresion: idExpresion }).then(result => {
                     resolve({
                         success: true,
@@ -153,7 +184,7 @@ export class ContaExpresionesService {
         }
     }
 
-    async getExpresionDetalleById(idExpresion: number): Promise<ContaExpresionDetalleQueryResponse> {
+    async findOneDetalle(idExpresion: number): Promise<ContaExpresionDetalleQueryResponse> {
         try {
             return new Promise<ContaExpresionDetalleQueryResponse>(resolve => {
                 this.contaExpresionDetalleRepository.findOne(idExpresion).then(result => {
@@ -170,7 +201,23 @@ export class ContaExpresionesService {
         }
     }
 
-    async saveExpresionDetalle(expresionDetalleInput: ContaExpresionDetalleInput): Promise<MutationResponse> {
+    async createDetalle(expresionDetalleInput: ContaExpresionDetalleInput): Promise<MutationResponse> {
+        try {
+            delete expresionDetalleInput.id;
+
+            return new Promise<MutationResponse>(resolve => {
+                this.contaExpresionDetalleRepository.save(expresionDetalleInput).then(result => {
+                    resolve({ success: true });
+                }).catch(err => {
+                    throw new Error(err.message ? err.message : err);
+                });
+            });
+        } catch (err) {
+            return { success: false, error: err.message ? err.message : err };
+        }
+    }
+
+    async updateDetalle(expresionDetalleInput: ContaExpresionDetalleInput): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
                 this.contaExpresionDetalleRepository.save(expresionDetalleInput).then(result => {
@@ -184,7 +231,7 @@ export class ContaExpresionesService {
         }
     }
 
-    async deleteExpresionDetalle(idExpresion: number[]): Promise<MutationResponse> {
+    async deleteDetalle(idExpresion: number[]): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
                 this.contaExpresionDetalleRepository.delete(idExpresion).then(result => {
