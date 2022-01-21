@@ -1,29 +1,13 @@
 import { ContaNoUsarEnCuentaEntity } from './conta-no-usar-en-cuenta.entity';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
+import { MultipleQueryResponse, SingleQueryResponse } from '../shared/models/query.response.model';
 
 @ObjectType()
-export class ContaNoUsarEnCuentasQueryResponse {
-    @Field()
-    success: Boolean;
-
-    @Field(type => [ContaNoUsarEnCuentaEntity], { nullable: true })
-    data?: ContaNoUsarEnCuentaEntity[];
-
-    @Field(type => String, { nullable: true })
-    error?: String;
+export class ContaNoUsarEnCuentasQueryResponse extends MultipleQueryResponse(ContaNoUsarEnCuentaEntity) {
 }
 
 @ObjectType()
-export class ContaNoUsarEnCuentaQueryResponse {
-    @Field()
-    success: Boolean;
-
-    @Field(type => ContaNoUsarEnCuentaEntity, { nullable: true })
-    data?: ContaNoUsarEnCuentaEntity;
-
-    @Field(type => String, { nullable: true })
-    error?: String;
-}
+export class ContaNoUsarEnCuentaQueryResponse extends SingleQueryResponse(ContaNoUsarEnCuentaEntity) {}
 
 @InputType()
 export class ContaNoUsarEnCuentaInput {

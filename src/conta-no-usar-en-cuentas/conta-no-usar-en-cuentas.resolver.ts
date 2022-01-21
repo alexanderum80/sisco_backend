@@ -11,27 +11,34 @@ export class ContaNoUsarEnCuentasResolver {
 
     @Query(() => ContaNoUsarEnCuentasQueryResponse)
     async getAllNoUsarEnCuenta(): Promise<ContaNoUsarEnCuentasQueryResponse> {
-        return this._noUsarEnCuentaSvc.getAllNoUsarEnCuenta();
+        return this._noUsarEnCuentaSvc.findAll();
     }
 
     @Query(() => ContaNoUsarEnCuentaQueryResponse)
     async getNoUsarEnCuentaById(
         @Args({ name: 'id', type: () => Int }) id: number
     ): Promise<ContaNoUsarEnCuentaQueryResponse> {
-        return this._noUsarEnCuentaSvc.getNoUsarEnCuentaById(id);
+        return this._noUsarEnCuentaSvc.findOne(id);
     }
 
     @Mutation(() => MutationResponse)
-    async saveNoUsarEnCuenta(
+    async createNoUsarEnCuenta(
         @Args({ name: 'noUsarEnCuentaInput', type: () => ContaNoUsarEnCuentaInput }) noUsarEnCuentaInput: ContaNoUsarEnCuentaInput
     ): Promise<MutationResponse> {
-        return this._noUsarEnCuentaSvc.saveNoUsarEnCuenta(noUsarEnCuentaInput);
+        return this._noUsarEnCuentaSvc.create(noUsarEnCuentaInput);
+    }
+
+    @Mutation(() => MutationResponse)
+    async updateNoUsarEnCuenta(
+        @Args({ name: 'noUsarEnCuentaInput', type: () => ContaNoUsarEnCuentaInput }) noUsarEnCuentaInput: ContaNoUsarEnCuentaInput
+    ): Promise<MutationResponse> {
+        return this._noUsarEnCuentaSvc.update(noUsarEnCuentaInput);
     }
 
     @Mutation(() => MutationResponse)
     async deleteNoUsarEnCuenta(
-        @Args({ name: 'id', type: () => Int }) id: number
+        @Args({ name: 'IDs', type: () => [Int] }) IDs: number[]
     ): Promise<MutationResponse> {
-        return this._noUsarEnCuentaSvc.deleteNoUsarEnCuenta(id);
+        return this._noUsarEnCuentaSvc.delete(IDs);
     }
 }

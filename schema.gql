@@ -677,8 +677,9 @@ type Mutation {
   createComprobarExpresion(comprobarExpresionInput: ContaComprobarExpresionesInput!): MutationResponse!
   updateComprobarExpresion(comprobarExpresionInput: ContaComprobarExpresionesInput!): MutationResponse!
   deleteComprobarExpresion(IDs: [Int!]!): MutationResponse!
-  saveNoUsarEnCuenta(noUsarEnCuentaInput: ContaNoUsarEnCuentaInput!): MutationResponse!
-  deleteNoUsarEnCuenta(id: Int!): MutationResponse!
+  createNoUsarEnCuenta(noUsarEnCuentaInput: ContaNoUsarEnCuentaInput!): MutationResponse!
+  updateNoUsarEnCuenta(noUsarEnCuentaInput: ContaNoUsarEnCuentaInput!): MutationResponse!
+  deleteNoUsarEnCuenta(IDs: [Int!]!): MutationResponse!
 }
 
 input UsuarioDTO {

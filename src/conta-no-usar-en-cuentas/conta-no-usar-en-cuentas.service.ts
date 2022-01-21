@@ -11,7 +11,7 @@ export class ContaNoUsarEnCuentasService {
         @InjectRepository(ContaNoUsarEnCuentaEntity) private readonly noUsarEnCuentaEntity: Repository<ContaNoUsarEnCuentaEntity>
     ) {}
 
-    async getAllNoUsarEnCuenta(): Promise<ContaNoUsarEnCuentasQueryResponse> {
+    async findAll(): Promise<ContaNoUsarEnCuentasQueryResponse> {
         try {
             return new Promise<ContaNoUsarEnCuentasQueryResponse>(resolve => {
                 this.noUsarEnCuentaEntity.find().then(result => {
@@ -28,7 +28,7 @@ export class ContaNoUsarEnCuentasService {
         }
     }
 
-    async getNoUsarEnCuentaById(id: number): Promise<ContaNoUsarEnCuentaQueryResponse> {
+    async findOne(id: number): Promise<ContaNoUsarEnCuentaQueryResponse> {
         try {
             return new Promise<ContaNoUsarEnCuentaQueryResponse>(resolve => {
                 this.noUsarEnCuentaEntity.findOne(id).then(result => {
@@ -45,7 +45,23 @@ export class ContaNoUsarEnCuentasService {
         }
     }
 
-    async saveNoUsarEnCuenta(noUsarEnCuentaInput: ContaNoUsarEnCuentaInput): Promise<MutationResponse> {
+    async create(noUsarEnCuentaInput: ContaNoUsarEnCuentaInput): Promise<MutationResponse> {
+        try {
+            delete noUsarEnCuentaInput.Id;
+
+            return new Promise<MutationResponse>(resolve => {
+                this.noUsarEnCuentaEntity.save(noUsarEnCuentaInput).then(result => {
+                    resolve({ success: true });
+                }).catch(err => {
+                    throw new Error(err);
+                });
+            });
+        } catch (err) {
+            return { success: false, error: err.message ? err.message : err };
+        }
+    }
+
+    async update(noUsarEnCuentaInput: ContaNoUsarEnCuentaInput): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
                 this.noUsarEnCuentaEntity.save(noUsarEnCuentaInput).then(result => {
@@ -59,10 +75,10 @@ export class ContaNoUsarEnCuentasService {
         }
     }
 
-    async deleteNoUsarEnCuenta(id: number): Promise<MutationResponse> {
+    async delete(IDs: number[]): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.noUsarEnCuentaEntity.delete(id).then(result => {
+                this.noUsarEnCuentaEntity.delete(IDs).then(result => {
                     resolve({ success: true });
                 }).catch(err => {
                     throw new Error(err);

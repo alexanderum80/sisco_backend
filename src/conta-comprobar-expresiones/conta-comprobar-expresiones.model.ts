@@ -1,29 +1,12 @@
+import { MultipleQueryResponse, SingleQueryResponse } from '../shared/models/query.response.model';
 import { ObjectType, Field, InputType } from '@nestjs/graphql';
 import { ContaComprobarExpresionesEntity } from './conta-comprobar-expresiones.entity';
 
 @ObjectType()
-export class ContaComprobarExpresionesQueryResponse {
-    @Field()
-    success: Boolean;
-
-    @Field(type => [ContaComprobarExpresionesEntity], { nullable: true })
-    data?: ContaComprobarExpresionesEntity[];
-
-    @Field(type => String, { nullable: true })
-    error?: String;
-}
+export class ContaComprobarExpresionesQueryResponse extends MultipleQueryResponse(ContaComprobarExpresionesEntity) {}
 
 @ObjectType()
-export class ContaComprobarExpresionQueryResponse {
-    @Field()
-    success: Boolean;
-
-    @Field(type => ContaComprobarExpresionesEntity, { nullable: true })
-    data?: ContaComprobarExpresionesEntity;
-
-    @Field(type => String, { nullable: true })
-    error?: String;
-}
+export class ContaComprobarExpresionQueryResponse extends SingleQueryResponse(ContaComprobarExpresionesEntity) {}
 
 @InputType()
 export class ContaComprobarExpresionesInput {
