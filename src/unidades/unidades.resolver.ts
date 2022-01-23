@@ -19,7 +19,7 @@ export class UnidadesResolver {
     }
 
     @Query(() => AllUnidadesQueryResponse)
-    @UseGuards(new AuthGuard())
+    // @UseGuards(new AuthGuard())
     async getUnidadesByIdDivision(
         @Args({ name: 'idDivision', type: () => Int }) idDivision: number
     ): Promise<AllUnidadesQueryResponse> {

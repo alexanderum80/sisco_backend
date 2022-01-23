@@ -15,7 +15,7 @@ export class ContaConexiones {
     IdUnidad: number;
 
     @Field()
-    Unidad: CentrosView;
+    Unidad: string;
 
     @Field()
     @Column()
@@ -25,10 +25,8 @@ export class ContaConexiones {
     @Column()
     IdDivision: number;
 
-    @Field(() => Divisiones)
-    @ManyToOne(() => Divisiones, divisiones => divisiones.IdDivision)
-    @JoinColumn({ name: 'IdDivision', referencedColumnName: 'IdDivision'})
-    Division: Divisiones;
+    @Field()
+    Division: string;
 
     @Field({ nullable: true })
     @Column()

@@ -76,10 +76,10 @@ type AllUnidadesQueryResponse {
 type ContaConexiones {
   Id: Float!
   IdUnidad: Float!
-  Unidad: CentrosView!
+  Unidad: String!
   Consolidado: Boolean!
   IdDivision: Float!
-  Division: Divisiones!
+  Division: String!
   IpRodas: String
   Usuario: String
   Contrasena: String
@@ -726,16 +726,16 @@ input ClasificadorCuentaRealDTO {
   SubCuenta: String!
   Descripcion: String!
   Naturaleza: String!
-  Crit1: String!
-  Crit2: String!
-  Crit3: String!
+  Crit1: String
+  Crit2: String
+  Crit3: String
   Obligacion: Boolean!
   TipoClasificador: Float!
-  SeUtiliza: String!
+  SeUtiliza: String
   Terminal: Boolean!
-  Crit1Consolidacion: String!
-  Crit2Consolidacion: String!
-  Crit3Consolidacion: String!
+  Crit1Consolidacion: String
+  Crit2Consolidacion: String
+  Crit3Consolidacion: String
 }
 
 input EmpleadoDTO {

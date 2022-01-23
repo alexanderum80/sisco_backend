@@ -23,11 +23,6 @@ export class ContaConexionesResolver {
         return this._contaConexionesService.findAll(user);
     }
 
-    @ResolveField('Unidad', () => CentrosView)
-    async getDatosUnidad(@Parent() contaConexiones: ContaConexiones): Promise<CentrosView> {
-        return getManager().findOne(CentrosView, { where: { IdUnidad: contaConexiones.IdUnidad }});
-    }
-
     @Query(() => ContaConexionQueryResponse)
     @UseGuards(new AuthGuard())
     async getContaConexionById(

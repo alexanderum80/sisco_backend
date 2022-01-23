@@ -1,6 +1,6 @@
 import { MultipleQueryResponse, SingleQueryResponse } from 'src/shared/models/query.response.model';
 import { CentrosView, Unidades } from './unidades.entity';
-import { ObjectType, Field } from '@nestjs/graphql';
+import { ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
 export class AllUnidadesQueryResponse extends MultipleQueryResponse(CentrosView) {}
@@ -9,25 +9,7 @@ export class AllUnidadesQueryResponse extends MultipleQueryResponse(CentrosView)
 export class AllUnidadQueryResponse extends SingleQueryResponse(CentrosView) {}
 
 @ObjectType()
-export class UnidadesQueryResponse {
-    @Field()
-    success: Boolean;
-
-    @Field(type => [Unidades], { nullable: true })
-    data?: Unidades[];
-
-    @Field(type => String, { nullable: true })
-    error?: String;
-}
+export class UnidadesQueryResponse extends MultipleQueryResponse(Unidades) {}
 
 @ObjectType()
-export class UnidadQueryResponse {
-    @Field()
-    success: Boolean;
-
-    @Field(type => Unidades, { nullable: true })
-    data?: Unidades;
-
-    @Field(type => String, { nullable: true })
-    error?: String;
-}
+export class UnidadQueryResponse extends SingleQueryResponse(Unidades) {}

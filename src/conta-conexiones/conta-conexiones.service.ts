@@ -1,3 +1,5 @@
+import { CentrosView } from './../unidades/unidades.entity';
+import { Divisiones } from './../divisiones/divisiones.entity';
 import { Usuarios } from './../usuarios/usuarios.entity';
 import { UsuariosService } from './../usuarios/usuarios.service';
 import { UnidadesService } from './../unidades/unidades.service';
@@ -32,7 +34,20 @@ export class ContaConexionesService {
             }
 
             return new Promise<ContaConexionesQueryResponse>(resolve => {
-                this.conexionesRespository.find({ where: _condition, relations: ['Division'] }).then(result => {
+                this.conexionesRespository.createQueryBuilder('con')
+                    .select('con.Id', 'Id')
+                    .addSelect('con.IdUnidad', 'IdUnidad')
+                    .addSelect('con.IdDivision', 'IdDivision')
+                    .addSelect('con.Consolidado', 'Consolidado')
+                    .addSelect('con.IpRodas', 'IpRodas')
+                    .addSelect('con.Usuario', 'Usuario')
+                    .addSelect('con.BaseDatos', 'BaseDatos')
+                    .addSelect('Concat(centros.IdUnidad, \'-\', centros.Nombre)', 'Unidad')
+                    .addSelect('Concat(div.IdDivision, \'-\', div.Division)', 'Division')
+                    .innerJoin(CentrosView, 'centros', 'centros.IdUnidad = con.IdUnidad')
+                    .innerJoin(Divisiones, 'div', 'div.IdDivision = centros.IdDivision')
+                    .where(_condition)
+                .execute().then(result => {
                     resolve({
                         success: true,
                         data: result

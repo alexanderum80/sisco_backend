@@ -22,13 +22,13 @@ export class ClasificadorCuentaRealDTO {
     @Field()
     Naturaleza: string;
 
-    @Field()
+    @Field({ nullable: true })
     Crit1: string;
 
-    @Field()
+    @Field({ nullable: true })
     Crit2: string;
 
-    @Field()
+    @Field({ nullable: true })
     Crit3: string;
 
     @Field()
@@ -37,19 +37,19 @@ export class ClasificadorCuentaRealDTO {
     @Field()
     TipoClasificador: number;
 
-    @Field()
+    @Field({ nullable: true })
     SeUtiliza: string;
 
     @Field()
     Terminal: boolean;
 
-    @Field()
+    @Field({ nullable: true })
     Crit1Consolidacion: string;
 
-    @Field()
+    @Field({ nullable: true })
     Crit2Consolidacion: string;
 
-    @Field()
+    @Field({ nullable: true })
     Crit3Consolidacion: string;
 }
 

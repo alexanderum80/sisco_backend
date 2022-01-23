@@ -70,7 +70,7 @@ export class UnidadesService {
             const entityManager = getManager();
 
             return new Promise<AllUnidadesQueryResponse>(resolve => {
-                entityManager.findOne(CentrosView, { where: { IdDivision } }).then(result => {
+                entityManager.find(CentrosView, { where: { IdDivision } }).then(result => {
                     resolve({
                         success: true,
                         data: result
