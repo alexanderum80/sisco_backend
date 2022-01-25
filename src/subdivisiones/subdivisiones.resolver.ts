@@ -1,7 +1,7 @@
 import { SubdivisionesQueryResponse } from './subdivisiones.model';
 import { SubdivisionesService } from './subdivisiones.service';
 import { Subdivisiones } from './subdivisiones.entity';
-import { Resolver, Query } from '@nestjs/graphql';
+import { Resolver, Query, Args, Int } from '@nestjs/graphql';
 
 @Resolver(of => Subdivisiones)
 export class SubdivisionesResolver {
@@ -11,6 +11,13 @@ export class SubdivisionesResolver {
 
     @Query(() => SubdivisionesQueryResponse)
     async getAllSubdivisiones(): Promise<SubdivisionesQueryResponse> {
-        return this._subdivisionesSvc.getAllSubdivisiones();
+        return this._subdivisionesSvc.findAll();
+    }
+
+    @Query(() => SubdivisionesQueryResponse)
+    async getSubdivisionesByIdDivision(
+        @Args({ name: 'idDivision', type: () => Int }) idDivision: number
+    ): Promise<SubdivisionesQueryResponse> {
+        return this._subdivisionesSvc.findAllByIdDivision(idDivision);
     }
 }

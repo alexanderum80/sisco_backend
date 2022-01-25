@@ -10,10 +10,27 @@ export class SubdivisionesService {
         @InjectRepository(Subdivisiones) private readonly subdivisionesRepository: Repository<Subdivisiones>
     ) {}
 
-    async getAllSubdivisiones(): Promise<SubdivisionesQueryResponse> {
+    async findAll(): Promise<SubdivisionesQueryResponse> {
         try {
             return new Promise<SubdivisionesQueryResponse>(resolve => {
                 this.subdivisionesRepository.find().then(result => {
+                    resolve({
+                        success: true,
+                        data: result
+                    });
+                }).catch(err => {
+                    return { success: false, error: err.message ? err.message : err };
+                });
+            });
+        } catch (err) {
+            return { success: false, error: err.message ? err.message : err };
+        }
+    }
+
+    async findAllByIdDivision(idDivision: number): Promise<SubdivisionesQueryResponse> {
+        try {
+            return new Promise<SubdivisionesQueryResponse>(resolve => {
+                this.subdivisionesRepository.find({ IdDivision: idDivision }).then(result => {
                     resolve({
                         success: true,
                         data: result

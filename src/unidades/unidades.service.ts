@@ -65,6 +65,28 @@ export class UnidadesService {
         }
     }
 
+    async getUnidadesByIdSubdivision(IdSubdivision: number): Promise<AllUnidadesQueryResponse> {
+        try {
+            const entityManager = getManager();
+
+            return new Promise<AllUnidadesQueryResponse>(resolve => {
+                entityManager.find(CentrosView, { where: { IdSubdivision } }).then(result => {
+                    resolve({
+                        success: true,
+                        data: result
+                    });
+                }).catch(err => {
+                    resolve({ success: false, error: err.message ? err.message : err });
+                });
+            });
+        } catch (err) {
+            return {
+                success: false,
+                error: err
+            };
+        }
+    }
+
     async getUnidadesByIdDivision(IdDivision: number): Promise<AllUnidadesQueryResponse> {
         try {
             const entityManager = getManager();

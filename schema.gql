@@ -568,6 +568,7 @@ type Query {
   getContaConexionById(id: Int!): ContaConexionQueryResponse!
   estadoContaConexiones(idDivision: Int!): EstadoConexionesRodasQueryResponse!
   getAllUnidades: AllUnidadesQueryResponse!
+  getUnidadesByIdSubdivision(idSubdivision: Int!): AllUnidadesQueryResponse!
   getUnidadesByIdDivision(idDivision: Int!): AllUnidadesQueryResponse!
   getDWHConexion(idDivision: Int!): DWHConexionQueryResponse!
   getAllCargos: CargosQueryResponse!
@@ -585,6 +586,7 @@ type Query {
   getDataBases(password: String!, ususario: String!, ip: String!): ConexionesQueryResponse!
   conciliaInternaDWH(conciliaInternaDWHInput: ConciliaInternaDWHInput!): ConciliacionInternaDWHQueryResponse!
   getAllSubdivisiones: SubdivisionesQueryResponse!
+  getSubdivisionesByIdDivision(idDivision: Int!): SubdivisionesQueryResponse!
   conciliacionContab(unidadOD: Int!, divisionOD: Int!, unidad: Int!, division: Int!, mes: Int!, annio: Int!): ViewConciliaNacContabilidadQueryResponse!
   actaConciliacion(unidadOD: Int!, unidad: Int!, mes: Int!, annio: Int!): ActaConciliacionQueryResponse!
   getAllTipoEntidades: ContaTipoentidadesQueryResponse!
