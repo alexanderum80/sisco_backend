@@ -52,10 +52,10 @@ import 'dotenv/config';
     }),
     TypeOrmModule.forRoot({
       type: 'mssql',
-      host: process.env.HOST_NAME,
+      host: 'localhost',
       username: 'sa',
       password: 'sqladmin*123',
-      database: process.env.DATABASE_NAME,
+      database: 'SISCO_Web',
       connectionTimeout: 60000,
       requestTimeout: 0,
       entities: ['**/*.entity.js'],
