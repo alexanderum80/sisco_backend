@@ -1,24 +1,28 @@
+import { Usuarios } from './../usuarios/usuarios.entity';
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { ContaExpresionesResumen, ContaExpresionesDetalle } from './conta-expresiones.entity';
 import { Injectable } from '@nestjs/common';
-import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
-import { Connection, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { ContaExpresionesResumenQueryResponse, ContaExpresionResumenInput, ContaExpresionesDetalleQueryResponse, ContaExpresionDetalleQueryResponse, ContaExpresionDetalleInput, ContaExpresionResumenQueryResponse, ContaExpresionInput } from './conta-expresiones.model';
 import { differenceBy } from 'lodash';
+import { ETipoUsuarios } from 'src/usuarios/usuarios.model';
 
 @Injectable()
 export class ContaExpresionesService {
     constructor(
-        @InjectConnection() private readonly connection: Connection,
         @InjectRepository(ContaExpresionesResumen) private readonly contaExpresionesResumenRepository: Repository<ContaExpresionesResumen>,
         @InjectRepository(ContaExpresionesDetalle) private readonly contaExpresionDetalleRepository: Repository<ContaExpresionesDetalle>
     ) {}
 
-    async create(expresionInput: ContaExpresionInput): Promise<MutationResponse> {
+    async create(user: Usuarios, expresionInput: ContaExpresionInput): Promise<MutationResponse> {
         try {
+            const { IdDivision, IdTipoUsuario } = user;
             const { ExpresionResumen, ExpresionesDetalle } = expresionInput;
 
             delete ExpresionResumen.IdExpresion;
+
+            ExpresionResumen.Centralizada = IdDivision === 100 && IdTipoUsuario === ETipoUsuarios['Usuario Avanzado'];
 
             return new Promise<MutationResponse>(async resolve => {
                 const saveExpresionResumen = await this.createResumen(ExpresionResumen).catch(err => {
@@ -77,10 +81,14 @@ export class ContaExpresionesService {
     }
 
     // Expresiones Resumen
-    async findAllResumen(): Promise<ContaExpresionesResumenQueryResponse> {
+    async findAllResumen(user: Usuarios): Promise<ContaExpresionesResumenQueryResponse> {
         try {
+            const { IdDivision } = user;
+
+            const criteria = [{ IdDivision: IdDivision }, { Centralizada: true }];
+
             return new Promise<ContaExpresionesResumenQueryResponse>(resolve => {
-                this.contaExpresionesResumenRepository.find().then(result => {
+                this.contaExpresionesResumenRepository.find({ where: criteria }).then(result => {
                     resolve({
                         success: true,
                         data: result

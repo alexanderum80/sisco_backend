@@ -33,6 +33,9 @@ export class ContaExpresionResumenInput {
 
     @Field()
     Centralizada: boolean;
+
+    @Field()
+    IdDivision: number;
 }
 
 @InputType()

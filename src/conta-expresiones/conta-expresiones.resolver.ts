@@ -1,8 +1,11 @@
+import { Usuarios } from './../usuarios/usuarios.entity';
+import { AuthGuard, DEFAULT_GRAPHQL_CONTEXT } from './../shared/helpers/auth.guard';
 import { ContaExpresionesResumen, ContaExpresionesDetalle } from './conta-expresiones.entity';
-import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Int, Mutation, Query, Resolver, Context } from '@nestjs/graphql';
 import { ContaExpresionDetalleQueryResponse, ContaExpresionesDetalleQueryResponse, ContaExpresionesResumenQueryResponse, ContaExpresionInput, ContaExpresionResumenQueryResponse } from './conta-expresiones.model';
 import { ContaExpresionesService } from './conta-expresiones.service';
 import { MutationResponse } from '../shared/models/mutation.response.model';
+import { UseGuards } from '@nestjs/common';
 
 @Resolver(of => ContaExpresionesResumen)
 export class ContaExpresionesResumenResolver {
@@ -11,8 +14,9 @@ export class ContaExpresionesResumenResolver {
     ) {}
 
     @Query(() => ContaExpresionesResumenQueryResponse)
-    async getAllExpresionesResumen(): Promise<ContaExpresionesResumenQueryResponse> {
-        return this.expresionesSvc.findAllResumen();
+    @UseGuards(new AuthGuard())
+    async getAllExpresionesResumen(@Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios): Promise<ContaExpresionesResumenQueryResponse> {
+        return this.expresionesSvc.findAllResumen(user);
     }
 
     @Query(() => ContaExpresionResumenQueryResponse)
@@ -23,10 +27,12 @@ export class ContaExpresionesResumenResolver {
     }
 
     @Mutation(() => MutationResponse)
+    @UseGuards(new AuthGuard())
     async createExpresion(
+        @Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios,
         @Args({ name: 'expresionInput', type: () => ContaExpresionInput }) expresionInput: ContaExpresionInput
     ): Promise<MutationResponse> {
-        return this.expresionesSvc.create(expresionInput);
+        return this.expresionesSvc.create(user, expresionInput);
     }
 
     @Mutation(() => MutationResponse)

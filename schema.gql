@@ -435,6 +435,7 @@ type ContaExpresionesResumen {
   Acumulado: Boolean!
   OperacionesInternas: Boolean!
   Centralizada: Boolean!
+  IdDivision: Float!
 }
 
 type ContaExpresionesDetalle {
@@ -796,6 +797,7 @@ input ContaExpresionResumenInput {
   Acumulado: Boolean!
   OperacionesInternas: Boolean!
   Centralizada: Boolean!
+  IdDivision: Float!
 }
 
 input ContaExpresionDetalleInput {

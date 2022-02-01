@@ -27,6 +27,10 @@ export class ContaExpresionesResumen {
     @Field()
     @Column()
     Centralizada: boolean;
+    
+    @Field()
+    @Column()
+    IdDivision: number;
 }
 
 @ObjectType()
