@@ -1,4 +1,7 @@
-import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Usuarios } from './../usuarios/usuarios.entity';
+import { AuthGuard, DEFAULT_GRAPHQL_CONTEXT } from 'src/shared/helpers/auth.guard';
+import { UseGuards } from '@nestjs/common';
+import { Args, Context, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { MutationResponse } from 'src/shared/models/mutation.response.model';
 import { ContaComprobarExpresionesEntity } from './conta-comprobar-expresiones.entity';
 import { ContaComprobarExpresionesInput, ContaComprobarExpresionesQueryResponse, ContaComprobarExpresionQueryResponse } from './conta-comprobar-expresiones.model';
@@ -11,8 +14,9 @@ export class ContaComprobarExpresionesResolver {
     ) {}
 
     @Query(() => ContaComprobarExpresionesQueryResponse)
-    async getAllComprobarExpresiones(): Promise<ContaComprobarExpresionesQueryResponse> {
-        return this._comprobarExpresionesSvc.findAll();
+    @UseGuards(new AuthGuard())
+    async getAllComprobarExpresiones(@Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios): Promise<ContaComprobarExpresionesQueryResponse> {
+        return this._comprobarExpresionesSvc.findAll(user);
     }
 
     @Query(() => ContaComprobarExpresionQueryResponse)
@@ -23,10 +27,12 @@ export class ContaComprobarExpresionesResolver {
     }
 
     @Mutation(() => MutationResponse)
+    @UseGuards(new AuthGuard())
     async createComprobarExpresion(
+        @Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios,
         @Args({ 'name': 'comprobarExpresionInput', type: () => ContaComprobarExpresionesInput }) comprobarExpresionInput: ContaComprobarExpresionesInput
     ): Promise<MutationResponse> {
-        return this._comprobarExpresionesSvc.create(comprobarExpresionInput);
+        return this._comprobarExpresionesSvc.create(user, comprobarExpresionInput);
     }
 
     @Mutation(() => MutationResponse)

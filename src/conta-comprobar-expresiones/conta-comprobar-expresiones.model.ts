@@ -30,4 +30,10 @@ export class ContaComprobarExpresionesInput {
 
     @Field()
     Con: boolean;
+
+    @Field()
+    Centralizada: boolean;
+
+    @Field()
+    IdDivision: number;
 }

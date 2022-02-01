@@ -34,6 +34,14 @@ export class ContaComprobarExpresionesEntity {
     @Column()
     Con: boolean;
 
+    @Field()
+    @Column()
+    Centralizada: boolean;
+
+    @Field()
+    @Column()
+    IdDivision: number;
+
     @Field(() => ContaExpresionesResumen)
     @ManyToOne(() => ContaExpresionesResumen, expresion => expresion.IdExpresion)
     @JoinColumn({ name: 'IdExpresion', referencedColumnName: 'IdExpresion'})    

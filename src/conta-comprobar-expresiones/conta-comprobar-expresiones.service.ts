@@ -1,5 +1,7 @@
+import { ETipoUsuarios } from './../usuarios/usuarios.model';
+import { Usuarios } from './../usuarios/usuarios.entity';
 import { Injectable } from '@nestjs/common';
-import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 import { MutationResponse } from 'src/shared/models/mutation.response.model';
 import { Repository } from 'typeorm';
 import { ContaComprobarExpresionesEntity } from './conta-comprobar-expresiones.entity';
@@ -11,10 +13,14 @@ export class ContaComprobarExpresionesService {
         @InjectRepository(ContaComprobarExpresionesEntity) private readonly comprobarExpresionesRepository: Repository<ContaComprobarExpresionesEntity>
     ) {}
 
-    async findAll(): Promise<ContaComprobarExpresionesQueryResponse> {
+    async findAll(user: Usuarios): Promise<ContaComprobarExpresionesQueryResponse> {
         try {
+            const { IdDivision } = user;
+
+            const criteria = [{ IdDivision: IdDivision }, { Centralizada: true }];
+
             return new Promise<ContaComprobarExpresionesQueryResponse>(resolve => {
-                this.comprobarExpresionesRepository.find({ relations: ['Expresion', 'ExpresionC', 'Operador'] }).then(result => {
+                this.comprobarExpresionesRepository.find({ where: criteria, relations: ['Expresion', 'ExpresionC', 'Operador'] }).then(result => {
                     resolve({
                         success: true,
                         data: result
@@ -45,9 +51,13 @@ export class ContaComprobarExpresionesService {
         }
     }
 
-    async create(comprobarExpresionInput: ContaComprobarExpresionesInput): Promise<MutationResponse> {
+    async create(user: Usuarios, comprobarExpresionInput: ContaComprobarExpresionesInput): Promise<MutationResponse> {
         try {
+            const { IdDivision, IdTipoUsuario } = user;
+
             delete comprobarExpresionInput.Id;
+
+            comprobarExpresionInput.Centralizada = IdDivision === 100 && IdTipoUsuario === ETipoUsuarios['Usuario Avanzado'];
 
             return new Promise<MutationResponse>(resolve => {
                 this.comprobarExpresionesRepository.save(comprobarExpresionInput).then(result => {
