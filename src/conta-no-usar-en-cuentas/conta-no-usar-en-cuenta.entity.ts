@@ -35,4 +35,12 @@ export class ContaNoUsarEnCuentaEntity {
     @Field({ nullable: true })
     @Column({ nullable: true })
     TextoInicio: string;
+
+    @Field()
+    @Column()
+    Centralizada: boolean;
+    
+    @Field()
+    @Column()
+    IdDivision: number;
 }

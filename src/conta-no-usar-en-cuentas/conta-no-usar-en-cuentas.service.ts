@@ -1,3 +1,5 @@
+import { ETipoUsuarios } from './../usuarios/usuarios.model';
+import { Usuarios } from './../usuarios/usuarios.entity';
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { ContaNoUsarEnCuentasQueryResponse, ContaNoUsarEnCuentaQueryResponse, ContaNoUsarEnCuentaInput } from './conta-no-usar-en-cuenta.model';
 import { ContaNoUsarEnCuentaEntity } from './conta-no-usar-en-cuenta.entity';
@@ -11,10 +13,14 @@ export class ContaNoUsarEnCuentasService {
         @InjectRepository(ContaNoUsarEnCuentaEntity) private readonly noUsarEnCuentaEntity: Repository<ContaNoUsarEnCuentaEntity>
     ) {}
 
-    async findAll(): Promise<ContaNoUsarEnCuentasQueryResponse> {
+    async findAll(user: Usuarios): Promise<ContaNoUsarEnCuentasQueryResponse> {
         try {
+            const { IdDivision } = user;
+
+            const criteria = [{ IdDivision: IdDivision }, { Centralizada: true }];
+
             return new Promise<ContaNoUsarEnCuentasQueryResponse>(resolve => {
-                this.noUsarEnCuentaEntity.find().then(result => {
+                this.noUsarEnCuentaEntity.find({ where: criteria }).then(result => {
                     resolve({
                         success: true,
                         data: result
@@ -45,9 +51,12 @@ export class ContaNoUsarEnCuentasService {
         }
     }
 
-    async create(noUsarEnCuentaInput: ContaNoUsarEnCuentaInput): Promise<MutationResponse> {
+    async create(user: Usuarios, noUsarEnCuentaInput: ContaNoUsarEnCuentaInput): Promise<MutationResponse> {
         try {
             delete noUsarEnCuentaInput.Id;
+
+            const { IdDivision, IdTipoUsuario } = user;
+            noUsarEnCuentaInput.Centralizada = IdDivision === 100 && IdTipoUsuario === ETipoUsuarios['Usuario Avanzado'];
 
             return new Promise<MutationResponse>(resolve => {
                 this.noUsarEnCuentaEntity.save(noUsarEnCuentaInput).then(result => {

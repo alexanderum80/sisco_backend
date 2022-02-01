@@ -34,4 +34,10 @@ export class ContaNoUsarEnCuentaInput {
 
     @Field({ nullable: true })
     TextoInicio?: string;
+    
+    @Field()
+    Centralizada: boolean;
+
+    @Field()
+    IdDivision: number;
 }
