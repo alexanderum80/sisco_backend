@@ -1,5 +1,5 @@
 import { MutationResponse } from './../shared/models/mutation.response.model';
-import { UsuariosQueryResponse, UsuarioDTO, ETipoUsuarios, UsuarioQueryResponse } from './usuarios.model';
+import { UsuariosQueryResponse, UsuarioInput, ETipoUsuarios, UsuarioQueryResponse } from './usuarios.model';
 import { Usuarios } from './usuarios.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
@@ -187,7 +187,7 @@ export class UsuariosService {
         }
     }
 
-    async create(UsuarioInfo: UsuarioDTO): Promise<MutationResponse> {
+    async create(UsuarioInfo: UsuarioInput): Promise<MutationResponse> {
         try {
             delete UsuarioInfo.IdUsuario;
             
@@ -221,7 +221,7 @@ export class UsuariosService {
         }
     }
 
-    async update(UsuarioInfo: UsuarioDTO): Promise<MutationResponse> {
+    async update(UsuarioInfo: UsuarioInput): Promise<MutationResponse> {
         try {
             const encryptedPassw: string = await bcrypt.genSalt(12).then(salt => {
                 return bcrypt.hash(UsuarioInfo.Contrasena, salt);
@@ -271,6 +271,10 @@ export class UsuariosService {
 
     isSuperAdmin(idDivision: number, tipoUsuario: number): boolean {
         return idDivision === 100 && tipoUsuario === ETipoUsuarios.Administrador;
+    }
+
+    isAdvancedUser(idDivision: number, tipoUsuario: number): boolean {
+        return idDivision === 100 && tipoUsuario === ETipoUsuarios['Usuario Avanzado'];
     }
 
 }

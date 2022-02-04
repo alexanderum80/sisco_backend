@@ -9,7 +9,7 @@ export class ContaConexionQueryResponse extends SingleQueryResponse(ContaConexio
 export class ContaConexionesQueryResponse extends MultipleQueryResponse(ContaConexiones) {}
 
 @InputType()
-export class ContaConexionDTO {
+export class ContaConexionInput {
     @Field({ nullable: true })
     Id: number;
 

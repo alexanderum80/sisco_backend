@@ -9,7 +9,7 @@ export class SupervisorQueryResponse extends SingleQueryResponse(Supervisor) {}
 export class SupervisoresQueryResponse extends MultipleQueryResponse(Supervisor) {}
 
 @InputType()
-export class SupervisorDTO {
+export class SupervisorInput {
     @Field()
     IdSupervisor: number;
 

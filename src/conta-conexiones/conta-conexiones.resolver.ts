@@ -4,7 +4,7 @@ import { MutationResponse } from './../shared/models/mutation.response.model';
 import { ContaConexionesService } from './conta-conexiones.service';
 import { ContaConexiones } from './conta-conexiones.entity';
 import { Args, Mutation, Query, Resolver, Int, Context, ResolveField, Parent } from '@nestjs/graphql';
-import { EstadoConexionesRodasQueryResponse, ContaConexionQueryResponse, ContaConexionesQueryResponse, ContaConexionDTO } from './conta-conexiones.model';
+import { EstadoConexionesRodasQueryResponse, ContaConexionQueryResponse, ContaConexionesQueryResponse, ContaConexionInput } from './conta-conexiones.model';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard, DEFAULT_GRAPHQL_CONTEXT } from '../shared/helpers/auth.guard';
 import { CentrosView } from 'src/unidades/unidades.entity';
@@ -42,7 +42,7 @@ export class ContaConexionesResolver {
     @Mutation(() => MutationResponse)
     @UseGuards(new AuthGuard())
     async createContaConexion(
-        @Args({ name: 'conexionInfo', type: () => ContaConexionDTO }) conexionInfo: ContaConexionDTO
+        @Args({ name: 'conexionInfo', type: () => ContaConexionInput }) conexionInfo: ContaConexionInput
     ): Promise<MutationResponse> {
         return this._contaConexionesService.create(conexionInfo);
     }
@@ -50,7 +50,7 @@ export class ContaConexionesResolver {
     @Mutation(() => MutationResponse)
     @UseGuards(new AuthGuard())
     async updateContaConexion(
-        @Args({ name: 'conexionInfo', type: () => ContaConexionDTO }) conexionInfo: ContaConexionDTO
+        @Args({ name: 'conexionInfo', type: () => ContaConexionInput }) conexionInfo: ContaConexionInput
     ): Promise<MutationResponse> {
         return this._contaConexionesService.update(conexionInfo);
     }

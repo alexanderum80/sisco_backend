@@ -17,11 +17,10 @@ export class ContaExpresionesService {
 
     async create(user: Usuarios, expresionInput: ContaExpresionInput): Promise<MutationResponse> {
         try {
-            const { IdDivision, IdTipoUsuario } = user;
             const { ExpresionResumen, ExpresionesDetalle } = expresionInput;
-
             delete ExpresionResumen.IdExpresion;
-
+            
+            const { IdDivision, IdTipoUsuario } = user;
             ExpresionResumen.Centralizada = IdDivision === 100 && IdTipoUsuario === ETipoUsuarios['Usuario Avanzado'];
 
             return new Promise<MutationResponse>(async resolve => {

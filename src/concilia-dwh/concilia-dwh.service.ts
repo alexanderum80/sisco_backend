@@ -75,11 +75,8 @@ export class ConciliaDwhService {
                 _conexionRodas.BaseDatos = _conexionRodas.BaseDatos.substring(0, _conexionRodas.BaseDatos.length - 4) + annio.toString();
 
                 // borrar datos
-                const _deletedValues = await this._deleteValues(idCentro, periodo);
-                if (!_deletedValues.success) {
-                    return { success: false, error: _deletedValues.error };
-                }
-
+                await this._deleteValues(idCentro, periodo);
+                
                 // obtener listados de las unidades subordinadas
                 let _unidadesQuery: UnidadesQueryResponse;
                 switch (tipoCentro) {
@@ -132,33 +129,25 @@ export class ConciliaDwhService {
         }
     }
 
-    private async _deleteValues(idCentro: number, periodo: number, ): Promise<MutationResponse> {
-        try {
-            // borrar datos
-            const deletedDWHInventario = this._dwhInventarioService.deleteDWHInventario(idCentro, periodo);
-            const deletedDWHVentas = this._dwhVentasService.deleteDWHVentas(idCentro, periodo);
-            const deletedRodasInventario = this._rodasInventarioService.deleteRodasInventario(idCentro, periodo);
-            const deletedRodasVentas = this._rodasVentasService.deleteRodasVentas(idCentro, periodo);
+    private async _deleteValues(idCentro: number, periodo: number, ): Promise<void> {
+        // borrar datos
+        const deletedDWHInventario = this._dwhInventarioService.deleteDWHInventario(idCentro, periodo);
+        const deletedDWHVentas = this._dwhVentasService.deleteDWHVentas(idCentro, periodo);
+        const deletedRodasInventario = this._rodasInventarioService.deleteRodasInventario(idCentro, periodo);
+        const deletedRodasVentas = this._rodasVentasService.deleteRodasVentas(idCentro, periodo);
 
-            let errorOnDelete = '';
+        let errorOnDelete = '';
 
-            await Promise.all([deletedDWHInventario, deletedDWHVentas, deletedRodasInventario, deletedRodasVentas]).then(response => {
-                response.map(res => {
-                    if (!res.success) {
-                        errorOnDelete = res.error.toString();
-                    }
-                });
+        await Promise.all([deletedDWHInventario, deletedDWHVentas, deletedRodasInventario, deletedRodasVentas]).then(response => {
+            response.map(res => {
+                if (!res.success) {
+                    errorOnDelete = res.error.toString();
+                }
             });
+        });
 
-            if (errorOnDelete !== '') {
-                return { success: false, error: errorOnDelete };
-            }
-
-            return new Promise<MutationResponse>((resolve) => {
-                resolve({ success: true });
-            });
-        } catch (err) {
-            return { success: false, error: err.message ? err.message : err };
+        if (errorOnDelete !== '') {
+            throw new Error(errorOnDelete);
         }
     }
 
@@ -225,11 +214,11 @@ export class ConciliaDwhService {
                 }
             }
 
-            if (dwhConnectionDivision.isConnected)
+            if (dwhConnectionDivision && dwhConnectionDivision.isConnected)
                 dwhConnectionDivision.close();
-            if (dwhConnectionRestaurador.isConnected)
+            if (dwhConnectionDivision && dwhConnectionRestaurador.isConnected)
                 dwhConnectionRestaurador.close();
-            if (dwhConnectionEmpresa.isConnected)
+            if (dwhConnectionDivision && dwhConnectionEmpresa.isConnected)
                 dwhConnectionEmpresa.close();
 
             return new Promise<MutationResponse>(resolve => {
@@ -380,7 +369,7 @@ export class ConciliaDwhService {
         try {
             const cons = tipoCentro === 1 ? '1' : '0';
             // importo los asientos del rodas
-            const _importarAsientoRodas = await this._conciliaContaService.importarContabilidad(idUnidad, annio, periodo, cons, rodasConexion);
+            await this._conciliaContaService.importarContabilidad(idUnidad, annio, periodo, cons, rodasConexion);
             // if (!_importarAsientoRodas.success) {
             //     return { success: false, error: _importarAsientoRodas.error + ' No se pudo importar Asientos del Rodas de la Unidad ' + idUnidad };
             // }

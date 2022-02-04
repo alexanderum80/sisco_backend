@@ -1,7 +1,7 @@
 import { Usuarios } from './../usuarios/usuarios.entity';
 import { UsuariosService } from './../usuarios/usuarios.service';
 import { MutationResponse } from './../shared/models/mutation.response.model';
-import { SupervisoresQueryResponse, SupervisorQueryResponse, SupervisorDTO } from './supervisores.model';
+import { SupervisoresQueryResponse, SupervisorQueryResponse, SupervisorInput } from './supervisores.model';
 import { Repository, Connection } from 'typeorm';
 import { Supervisor } from './supervisores.entity';
 import { Injectable } from '@nestjs/common';
@@ -50,7 +50,7 @@ export class SupervisoresService {
         }
     }
 
-    async create(SupervisorInfo: SupervisorDTO): Promise<MutationResponse> {
+    async create(SupervisorInfo: SupervisorInput): Promise<MutationResponse> {
         try {
             delete SupervisorInfo.IdSupervisor;
 
@@ -66,7 +66,7 @@ export class SupervisoresService {
         }
     }
 
-    async update(SupervisorInfo: SupervisorDTO): Promise<MutationResponse> {
+    async update(SupervisorInfo: SupervisorInput): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
                 this.supervisorRepository.save(SupervisorInfo).then(res => {

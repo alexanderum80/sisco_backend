@@ -40,8 +40,8 @@ export class ConciliaContaService {
             const _conexionConta = _conexionRodasQuery.data;
             _conexionConta.BaseDatos = _conexionConta.BaseDatos.substring(0, _conexionConta.BaseDatos.length - 4) + annio.toString();
 
-            const _conexionCodif = cloneDeep(_conexionConta);
-            _conexionCodif.BaseDatos = _conexionCodif.BaseDatos.substring(0, _conexionCodif.BaseDatos.length - 4).replace(/Conta/gi, 'Codif');
+            // const _conexionCodif = cloneDeep(_conexionConta);
+            // _conexionCodif.BaseDatos = _conexionCodif.BaseDatos.substring(0, _conexionCodif.BaseDatos.length - 4).replace(/Conta/gi, 'Codif');
 
             // borrar datos de los reportes
             await this._borrarReportes(idCentro, consolidado, periodo);
@@ -50,7 +50,7 @@ export class ConciliaContaService {
             // }
 
             // importar el clasificador de cuentas
-            await this._importarClasificador(idCentro, annio, consolidado, _conexionCodif);
+            await this._importarClasificador(idCentro, annio, consolidado, _conexionConta);
             // if (!_importarClasifCuentasRes.success) {
             //     throw new Error(_importarClasifCuentasRes.error.toString());
             // }
@@ -162,45 +162,79 @@ export class ConciliaContaService {
     }
 
     private async _borrarReportes(idUnidad: number, cons: string, periodo: number): Promise<void> {
-        // try {
-            const _queryDeleteCentrosAConsolidar = `DELETE dbo.Conta_CentrosAConsolidar
-                WHERE (Centro = ${ idUnidad }) AND (Periodo = ${ periodo })`;
-            const _queryDeleteReporteChequeoCentro = `DELETE dbo.Conta_ReporteChequeoCentro
-                WHERE (Centro = ${ idUnidad }) AND (Periodo >= ${ periodo })`;
-            const _queryDeleteReporteClasificador = `DELETE dbo.Conta_ReporteClasificador
-                WHERE (Centro = ${ idUnidad }) AND (Consolidado = ${ cons })`;
-            const _queryDeleteReporteConsultas = `DELETE dbo.Conta_ReporteConsultas
-                WHERE (Centro = ${ idUnidad }) AND (Consolidado = ${ cons }) AND (Periodo = ${ periodo }) and IdConsulta = 1`;
-            const _queryDeleteReporteExpresiones = `DELETE dbo.Conta_ReporteExpersiones
-                WHERE (Centro = ${ idUnidad }) AND (Consolidado = ${ cons }) AND (Periodo = ${ periodo })`;
-            const _queryDeleteReporteValor = `DELETE dbo.Conta_ReporteValor
-                WHERE (Centro = ${ idUnidad }) AND (Consolidado = ${ cons }) AND (Periodo = ${ periodo })`;
-            // const _queryDeleteReporteEncabezado = `DELETE dbo.Conta_ReporteEncabezado
-            //     WHERE (IdCentro = ${ idUnidad }) AND (Consolidado = ${ tipoCentro })`;
+        const _queryDeleteCentrosAConsolidar = `DELETE dbo.Conta_CentrosAConsolidar
+            WHERE (Centro = ${ idUnidad }) AND (Periodo = ${ periodo })`;
+        const _queryDeleteReporteChequeoCentro = `DELETE dbo.Conta_ReporteChequeoCentro
+            WHERE (Centro = ${ idUnidad }) AND (Periodo >= ${ periodo })`;
+        const _queryDeleteReporteClasificador = `DELETE dbo.Conta_ReporteClasificador
+            WHERE (Centro = ${ idUnidad }) AND (Consolidado = ${ cons })`;
+        const _queryDeleteReporteConsultas = `DELETE dbo.Conta_ReporteConsultas
+            WHERE (Centro = ${ idUnidad }) AND (Consolidado = ${ cons }) AND (Periodo = ${ periodo }) and IdConsulta = 1`;
+        const _queryDeleteReporteExpresiones = `DELETE dbo.Conta_ReporteExpersiones
+            WHERE (Centro = ${ idUnidad }) AND (Consolidado = ${ cons }) AND (Periodo = ${ periodo })`;
+        const _queryDeleteReporteValor = `DELETE dbo.Conta_ReporteValor
+            WHERE (Centro = ${ idUnidad }) AND (Consolidado = ${ cons }) AND (Periodo = ${ periodo })`;
+        // const _queryDeleteReporteEncabezado = `DELETE dbo.Conta_ReporteEncabezado
+        //     WHERE (IdCentro = ${ idUnidad }) AND (Consolidado = ${ tipoCentro })`;
 
-            const _querysDelete = [
-                _queryDeleteCentrosAConsolidar,
-                _queryDeleteReporteChequeoCentro,
-                _queryDeleteReporteClasificador,
-                _queryDeleteReporteConsultas,
-                _queryDeleteReporteExpresiones,
-                _queryDeleteReporteValor,
-                // _queryDeleteReporteEncabezado
-            ];
-            for (let i = 0; i < _querysDelete.length; i++) {
-                const _query = _querysDelete[i];
+        const _querysDelete = [
+            _queryDeleteCentrosAConsolidar,
+            _queryDeleteReporteChequeoCentro,
+            _queryDeleteReporteClasificador,
+            _queryDeleteReporteConsultas,
+            _queryDeleteReporteExpresiones,
+            _queryDeleteReporteValor,
+            // _queryDeleteReporteEncabezado
+        ];
+        for (let i = 0; i < _querysDelete.length; i++) {
+            const _query = _querysDelete[i];
 
-                await this.connection.query(_query).catch(err => {
-                    throw new Error(err.message ? err.message : err);
-                });
-            }
-        // } catch (err) {
-        //     return { success: false, error: err.message ? err.message : err };
-        // }
+            await this.connection.query(_query).catch(err => {
+                throw new Error(err.message ? err.message : err);
+            });
+        }
     }
 
-    async _importarClasificador(idUnidad: number, annio: number, cons: string, codifConexion: ContaConexiones): Promise<void> {
-        let _codifConexionCentro: Connection;
+    private async _borrarDatosConciliacionCentro(idUnidad: number): Promise<void> {
+        const _queryDeleteClanaCNMB = `DELETE dbo.ActFijos_ClanaCNMB WHERE (IdCentro = ${ idUnidad })`;
+        const _queryDeleteMB = `DELETE dbo.ActFijos_MB WHERE (IdCentro = ${ idUnidad })`;
+        const _queryDeleteNotaAFT = `DELETE dbo.ActFijos_Nota WHERE (IdCentro = ${ idUnidad })`;
+        const _queryDeleteInventarioAFT = `DELETE dbo.Rodas_InventarioAF WHERE (IdCentro = ${ idUnidad })`;
+        const _queryDeleteDepreciacionAFT = `DELETE dbo.Rodas_DepreciacionAF WHERE (IdCentro = ${ idUnidad })`;
+        const _queryDeleteInventarioDWH = `DELETE dbo.DWH_Inventario WHERE (IdCentro = ${ idUnidad })`;
+        const _queryDeleteVentasDWH = `DELETE dbo.DWH_Ventas WHERE (IdCentro = ${ idUnidad })`;
+        const _queryDeleteNotaDWH = `DELETE dbo.DWH_Nota WHERE (IdCentro = ${ idUnidad })`;
+        const _queryDeleteInventarioGolden = `DELETE dbo.Golden_Inventario WHERE (IdCentro = ${ idUnidad })`;
+        const _queryDeleteVentasGolden = `DELETE dbo.Golden_Ventas WHERE (IdCentro = ${ idUnidad })`;
+        const _queryDeleteNotaGolden = `DELETE dbo.Golden_Nota WHERE (IdCentro = ${ idUnidad })`;
+        const _queryDeleteInventario = `DELETE dbo.Rodas_Inventario WHERE (IdCentro = ${ idUnidad })`;
+        const _queryDeleteVentas = `DELETE dbo.Rodas_Ventas WHERE (IdCentro = ${ idUnidad })`;
+        const _queryDeleteCategorias = `DELETE dbo.Utiles_Categoria WHERE (IdCentro = ${ idUnidad })`;
+        const _queryDeleteInventarioUH = `DELETE dbo.Utiles_Inventario WHERE (IdCentro = ${ idUnidad })`;
+        const _queryDeleteProductosUH = `DELETE dbo.Utiles_Producto WHERE (IdCentro = ${ idUnidad })`;
+        const _queryDeleteNotaUH = `DELETE dbo.Utiles_Nota WHERE (IdCentro = ${ idUnidad })`;
+        const _queryDeleteRodasInventarioUH = `DELETE dbo.Rodas_InventarioUH WHERE (IdCentro = ${ idUnidad })`;
+        const _queryDeleteRodasDesgasteUH = `DELETE dbo.Rodas_DesgasteUH WHERE (IdCentro = ${ idUnidad })`;
+
+        const _querysDelete = [
+            _queryDeleteClanaCNMB,
+            _queryDeleteMB,
+            _queryDeleteNotaAFT,
+            _queryDeleteInventarioAFT,
+            _queryDeleteDepreciacionAFT,
+            _queryDeleteInventarioDWH,
+        ];
+        for (let i = 0; i < _querysDelete.length; i++) {
+            const _query = _querysDelete[i];
+
+            await this.connection.query(_query).catch(err => {
+                throw new Error(err.message ? err.message : err);
+            });
+        }
+    }
+
+    async _importarClasificador(idUnidad: number, annio: number, cons: string, contaConexion: ContaConexiones): Promise<void> {
+        let _contaConexionCentro: Connection;
 
         try {
             // borro el clasificador existente en el SISCO
@@ -212,15 +246,14 @@ export class ConciliaContaService {
             });
 
             // inserto el clasificador del Rodas
-            _codifConexionCentro = await (await this._contaConexionesService.conexionRodas(codifConexion)).connect();
+            _contaConexionCentro = await (await this._contaConexionesService.conexionRodas(contaConexion)).connect();
 
-            const _queryClasifCuentas = queryClasificadorCuentas.replace(/@Anio/g, annio.toString());
-            const _queryClasifCuentasRes = await _codifConexionCentro.query(_queryClasifCuentas).catch(err => {
+            const _queryClasifCuentasRes = await _contaConexionCentro.query(queryClasificadorCuentas).catch(err => {
                 throw new Error(err.message ? err.message : err);
             });
 
-            if (_codifConexionCentro.isConnected)
-                _codifConexionCentro.close();
+            if (_contaConexionCentro && _contaConexionCentro.isConnected)
+                _contaConexionCentro.close();
 
             let _clasifCuentasArray = [];
             for (let i = 0; i < _queryClasifCuentasRes.length; i++) {
@@ -230,23 +263,22 @@ export class ConciliaContaService {
                 });
             }
 
-            const _clasifCuentas = this._xmlJsService.jsonToXML(_clasifCuentasArray);
+            const _clasifCuentasXML = this._xmlJsService.jsonToXML(_clasifCuentasArray);
 
             if (_clasifCuentasArray.length) {
-                await this.connection.query(`EXEC dbo.pConta_ImportClasifCuentaXML @0, @1, @2, @3`, [_clasifCuentas, idUnidad, cons, annio]).catch(err => {
+                await this.connection.query(`EXEC dbo.pConta_ImportClasifCuentaXML @0, @1, @2, @3`, [_clasifCuentasXML, idUnidad, cons, annio]).catch(err => {
                     throw new Error(err.message ? err.message : err);
                 });
             }
         } catch (err) {
-            if (_codifConexionCentro.isConnected)
-                _codifConexionCentro.close();
+            if (_contaConexionCentro && _contaConexionCentro.isConnected)
+                _contaConexionCentro.close();
 
             throw new Error(err.message ? err.message : err);
         }
     }
 
     private async _chequearClasificador(idUnidad: number, tipoCentro: number, annio: number): Promise<any> {
-        // try {
         const cons = tipoCentro === 2 ? '1' : '0';
 
         let tipoClasif = '';
@@ -274,25 +306,6 @@ export class ConciliaContaService {
                 throw new Error(err.message ? err.message : err);
             });
         });
-
-            // if (!_queryChequeaClasifRes.success) {
-            //     throw new Error(_queryChequeaClasifRes.error);
-            // }
-
-            // return new Promise<any>(resolve => {
-            //     if (_queryChequeaClasifRes.data) {
-            //         resolve({
-            //             success: false,
-            //             data: _queryChequeaClasifRes.data,
-            //             error: 'Usted tiene errores en el Clasificador, lo que conlleva a que no pueda terminar el análisis, ni entregar el balance a nivel superior. Vaya a la pestaña Análisis del Clasificador y Corrija estos errores.'
-            //         });
-            //     } else {
-            //         resolve({ success: true });
-            //     }
-            // });
-        // } catch (err) {
-        //     return { success: false, error: err.message ? err.message : err };
-        // }
     }
 
     async importarContabilidad(idUnidad: number, annio: number, periodo: number, cons: string, contaConexion: ContaConexiones): Promise<void> {
@@ -350,10 +363,10 @@ export class ConciliaContaService {
             //     throw new Error(_importarMayorRes.error.toString());
             // }
 
-            if (_contaConexionCentro.isConnected)
+            if (_contaConexionCentro && _contaConexionCentro.isConnected)
                 _contaConexionCentro.close();
         } catch (err) {
-            if (_contaConexionCentro.isConnected)
+            if (_contaConexionCentro && _contaConexionCentro.isConnected)
                 _contaConexionCentro.close();
 
             throw new Error(err.message ? err.message : err);
@@ -808,10 +821,10 @@ export class ConciliaContaService {
                 .where('Centro = :centro', { centro: idCentro })
                 .andWhere('Consolidado = :cons', { cons: consolidado })
                 .andWhere('Año = :annio', { annio: annio })
-                .execute()
-                .catch(err => {
-                    throw new Error(err);
-                });
+            .execute()
+            .catch(err => {
+                throw new Error(err);
+            });
 
             // borrar asientos
             this.connection.createQueryBuilder()
@@ -820,10 +833,10 @@ export class ConciliaContaService {
                 .where('Centro = :centro', { centro: idCentro })
                 .andWhere('Consolidado = :cons', { cons: consolidado })
                 .andWhere('Año = :annio', { annio: annio })
-                .execute()
-                .catch(err => {
-                    throw new Error(err);
-                });
+            .execute()
+            .catch(err => {
+                throw new Error(err);
+            });
 
             // borrar mayor
             this.connection.createQueryBuilder()
@@ -832,10 +845,37 @@ export class ConciliaContaService {
                 .where('Centro = :centro', { centro: idCentro })
                 .andWhere('Consolidado = :cons', { cons: consolidado })
                 .andWhere('Año = :annio', { annio: annio })
+            .execute()
+            .catch(err => {
+                throw new Error(err);
+            });
+
+            // borrar Chequeo Centro
+            if (consolidado) {
+                this.connection.createQueryBuilder()
+                    .delete()
+                    .from('Conta_ReporteChequeoCentro')
+                    .where('IdCentro = :centro', { centro: idCentro })
+                    .andWhere('Consolidado = :cons', { cons: consolidado })
+                    .andWhere('Año = :annio', { annio: annio })
                 .execute()
                 .catch(err => {
                     throw new Error(err);
                 });
+            } else {
+                this.connection.createQueryBuilder()
+                    .delete()
+                    .from('Conta_ReporteChequeoCentro')
+                    .where('IdUnidad = :centro', { centro: idCentro })
+                    .andWhere('Consolidado = :cons', { cons: consolidado })
+                    .andWhere('Año = :annio', { annio: annio })
+                .execute()
+                .catch(err => {
+                    throw new Error(err);
+                });
+            }
+
+            this._borrarDatosConciliacionCentro(idCentro);
 
             return new Promise<MutationResponse>(resolve => {
                 resolve({ success: true });

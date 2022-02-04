@@ -9,7 +9,7 @@ export class ClasificadorCuentaQueryResponse extends SingleQueryResponse(Clasifi
 export class ClasificadorCuentasQueryResponse extends MultipleQueryResponse(ClasificadorCuentaReal) {}
 
 @InputType()
-export class ClasificadorCuentaRealDTO {
+export class ClasificadorCuentaRealInput {
     @Field()
     Cuenta: string;
 

@@ -9,7 +9,7 @@ export class EmpleadoQueryResponse extends SingleQueryResponse(Empleado) {}
 export class EmpleadosQueryResponse extends MultipleQueryResponse(Empleado) {}
 
 @InputType()
-export class EmpleadoDTO {
+export class EmpleadoInput {
     @Field()
     IdEmpleado: number;
 

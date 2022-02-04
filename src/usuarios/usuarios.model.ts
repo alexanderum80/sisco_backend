@@ -19,7 +19,7 @@ export class UsuariosQueryResponse extends MultipleQueryResponse(Usuarios) {
 
 // Input Type
 @InputType()
-export class UsuarioDTO {
+export class UsuarioInput {
     @Field()
     IdUsuario: number;
 

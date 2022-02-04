@@ -19,7 +19,7 @@ export class UnidadesService {
 
             let _condition = { };
 
-            if (!this._usuariosSvc.isSuperAdmin(IdDivision, IdTipoUsuario)) {
+            if (!this._usuariosSvc.isSuperAdmin(IdDivision, IdTipoUsuario) && !this._usuariosSvc.isAdvancedUser(IdDivision, IdTipoUsuario)) {
                 _condition = { IdDivision: IdDivision };
             }
 

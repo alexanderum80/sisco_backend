@@ -109,7 +109,7 @@ export const queryClasificadorCuentas = `SELECT Año, Cuenta, SubCuenta, Descrip
     [SubCuenta Conversión] AS SubCuenta_Conversión, [Tipo de Análisis 1 Conversión] AS Tipo_de_Análisis_1_Conversión, [Tipo de Análisis 2 Conversión] AS  Tipo_de_Análisis_2_Conversión, [Tipo de Análisis 3 Conversión]  AS Tipo_de_Análisis_3_Conversión, [Obligación Conversión] AS Obligación_Conversión, [Descripción Conversión] AS Descripción_Conversión, [Naturaleza Conversión] AS Naturaleza_Conversión,
     [Terminal Conversión] AS Terminal_Conversión, [Moneda Extranjera Conversión] AS Moneda_Extranjera_Conversión, [Análisis 1 Consolidación] AS Análisis_1_Consolidación, [Análisis 2 Consolidación] AS Análisis_2_Consolidación, [Análisis 3 Consolidación] AS Análisis_3_Consolidación, aporta_presupuesto, gasto_presupuesto, ingreso_presupuesto,
     Resultados_presupuesto, Capital_presupuesto, MEMO
-    FROM [Clasificador de Cuentas] as [Clasificador_de_Cuentas]  where Año = @Anio`;
+    FROM [Clasificador de Cuentas] as [Clasificador_de_Cuentas]`;
 
 export const queryConsultaReporteClasificador = `SELECT Id, Centro, Consolidado, Cta as Cuenta, SubCta as SubCuenta, Descripcion, Crt1Calsif as Crt1Clasif, Crt1Rodas, Crt2Calsif as Crt2Clasif, Crt2Rodas, Crt3Calsif as Crt3Clasif, Crt3Rodas, NatClasif, NatRodas, CASE WHEN OblClasif = 1 THEN 'X' ELSE '' END AS OblClasif, CASE WHEN OblRodas = 1 THEN 'X' ELSE '' END AS OblRodas, CASE WHEN TermClasf = 1 THEN 'X' ELSE '' END AS TermClasf, CASE WHEN TermRodas = 1 THEN 'X' ELSE '' END AS TermRodas,
     Crit1ConsClasif, Crit1ConsRodas, Crit2ConsClasif, Crit2ConsRodas, Crit3ConsClasif, Crit3ConsRodas

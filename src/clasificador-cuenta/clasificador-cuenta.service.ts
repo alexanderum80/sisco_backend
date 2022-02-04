@@ -1,15 +1,14 @@
 import { CuentaEntidadService } from './../cuenta-entidad/cuenta-entidad.service';
 import { MutationResponse } from './../shared/models/mutation.response.model';
-import { ClasificadorCuentasQueryResponse, ClasificadorCuentaQueryResponse, ClasificadorCuentaRealDTO, CuentasAgrupadasQueryResponse } from './clasificador-cuenta.model';
+import { ClasificadorCuentasQueryResponse, ClasificadorCuentaQueryResponse, ClasificadorCuentaRealInput, CuentasAgrupadasQueryResponse } from './clasificador-cuenta.model';
 import { Injectable } from '@nestjs/common';
 import { ClasificadorCuentaReal } from './clasificador-cuenta.entity';
-import { Repository, Connection } from 'typeorm';
-import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class ClasificadorCuentaService {
     constructor(
-        @InjectConnection() private connection: Connection,
         @InjectRepository(ClasificadorCuentaReal) private clasificadorCuentaRepository: Repository<ClasificadorCuentaReal>,
         private cuentaEntidadSvc: CuentaEntidadService
     ) {}
@@ -58,7 +57,7 @@ export class ClasificadorCuentaService {
         });
     }
 
-    async saveClasificadorCuenta(clasificadorInfo: ClasificadorCuentaRealDTO): Promise<MutationResponse> {
+    async saveClasificadorCuenta(clasificadorInfo: ClasificadorCuentaRealInput): Promise<MutationResponse> {
         return new Promise<MutationResponse>((resolve) => {
             this.clasificadorCuentaRepository.save(clasificadorInfo).then(res => {
                 this.cuentaEntidadSvc.actualizaCuentaEntidad(res).then(() => {

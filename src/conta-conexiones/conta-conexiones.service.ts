@@ -8,7 +8,7 @@ import { DEFAULT_CONNECTION_STRING } from '../conexiones/conexiones.model';
 import { cloneDeep } from 'lodash';
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { CryptoService } from '../shared/services/crypto/crypto.service';
-import { ContaConexionQueryResponse, EstadoConexionesRodasQueryResponse, EstadoConexionesRodas, ContaConexionesQueryResponse, ContaConexionDTO } from './conta-conexiones.model';
+import { ContaConexionQueryResponse, EstadoConexionesRodasQueryResponse, EstadoConexionesRodas, ContaConexionesQueryResponse, ContaConexionInput } from './conta-conexiones.model';
 import { ContaConexiones } from './conta-conexiones.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -105,7 +105,7 @@ export class ContaConexionesService {
         // }
     }
 
-    async create(conexion: ContaConexionDTO): Promise<MutationResponse> {
+    async create(conexion: ContaConexionInput): Promise<MutationResponse> {
         try {
             delete conexion.Id;
 
@@ -126,7 +126,7 @@ export class ContaConexionesService {
         }
     }
     
-    async update(conexion: ContaConexionDTO): Promise<MutationResponse> {
+    async update(conexion: ContaConexionInput): Promise<MutationResponse> {
         try {
             const encryptedPassword = await this._cryptoService.encrypt(conexion.Contrasena);
             conexion.Contrasena = encryptedPassword;

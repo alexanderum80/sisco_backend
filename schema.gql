@@ -500,6 +500,8 @@ type ContaComprobarExpresionesEntity {
   Centro: Boolean!
   Complejo: Boolean!
   Con: Boolean!
+  Centralizada: Boolean!
+  IdDivision: Float!
   Expresion: ContaExpresionesResumen!
   ExpresionC: ContaExpresionesResumen!
   Operador: ContaOperadoresEntity!
@@ -532,6 +534,8 @@ type ContaNoUsarEnCuentaEntity {
   Crit2: String
   Crit3: String
   TextoInicio: String
+  Centralizada: Boolean!
+  IdDivision: Float!
 }
 
 type ContaNoUsarEnCuentasQueryResponse {
@@ -644,21 +648,21 @@ input ConciliaInternaDWHInput {
 
 type Mutation {
   changePassword(password: String!, idUsuario: Int!): MutationResponse!
-  createUsuario(usuarioInfo: UsuarioDTO!): MutationResponse!
-  updateUsuario(usuarioInfo: UsuarioDTO!): MutationResponse!
+  createUsuario(usuarioInfo: UsuarioInput!): MutationResponse!
+  updateUsuario(usuarioInfo: UsuarioInput!): MutationResponse!
   deleteUsuario(IDs: [Int!]!): MutationResponse!
-  createContaConexion(conexionInfo: ContaConexionDTO!): MutationResponse!
-  updateContaConexion(conexionInfo: ContaConexionDTO!): MutationResponse!
+  createContaConexion(conexionInfo: ContaConexionInput!): MutationResponse!
+  updateContaConexion(conexionInfo: ContaConexionInput!): MutationResponse!
   deleteContaConexion(IDs: [Int!]!): MutationResponse!
   updateDWhConexion(dwhConexionInput: DWHConexionesInput!): MutationResponse!
   iniciarSaldos(iniciarSaldosInput: IniciarSaldosInput!): ConciliaContabilidadQueryResponse!
-  saveClasificadorCuenta(clasificadorInfo: ClasificadorCuentaRealDTO!): MutationResponse!
+  saveClasificadorCuenta(clasificadorInfo: ClasificadorCuentaRealInput!): MutationResponse!
   deleteClasificadorCuenta(tipo: Int!, subcuenta: String!, cuenta: String!): MutationResponse!
-  createEmpleado(empleadoInfo: EmpleadoDTO!): MutationResponse!
-  updateEmpleado(empleadoInfo: EmpleadoDTO!): MutationResponse!
+  createEmpleado(empleadoInfo: EmpleadoInput!): MutationResponse!
+  updateEmpleado(empleadoInfo: EmpleadoInput!): MutationResponse!
   deleteEmpleado(IDs: [Int!]!): MutationResponse!
-  createSupervisor(supervisorInfo: SupervisorDTO!): SupervisorQueryResponse!
-  updateSupervisor(supervisorInfo: SupervisorDTO!): SupervisorQueryResponse!
+  createSupervisor(supervisorInfo: SupervisorInput!): SupervisorQueryResponse!
+  updateSupervisor(supervisorInfo: SupervisorInput!): SupervisorQueryResponse!
   deleteSupervisor(IDs: [Int!]!): SupervisorQueryResponse!
   conciliacionNacionalVsAsiento(unidadOD: Int!, divisionOD: Int!, unidad: Int!, division: Int!, mes: Int!, annio: Int!): MutationResponse!
   updateConciliaContab(data: [ConciliaNacContabilidadInput!]!): MutationResponse!
@@ -685,7 +689,7 @@ type Mutation {
   deleteNoUsarEnCuenta(IDs: [Int!]!): MutationResponse!
 }
 
-input UsuarioDTO {
+input UsuarioInput {
   IdUsuario: Float!
   Usuario: String!
   Contrasena: String!
@@ -695,7 +699,7 @@ input UsuarioDTO {
   IdDivision: Float!
 }
 
-input ContaConexionDTO {
+input ContaConexionInput {
   Id: Float
   IdUnidad: Float!
   Consolidado: Boolean!
@@ -724,7 +728,7 @@ input IniciarSaldosInput {
   annio: Float!
 }
 
-input ClasificadorCuentaRealDTO {
+input ClasificadorCuentaRealInput {
   Cuenta: String!
   SubCuenta: String!
   Descripcion: String!
@@ -741,14 +745,14 @@ input ClasificadorCuentaRealDTO {
   Crit3Consolidacion: String
 }
 
-input EmpleadoDTO {
+input EmpleadoInput {
   IdEmpleado: Float!
   Empleado: String!
   IdCargo: Float!
   IdDivision: Float!
 }
 
-input SupervisorDTO {
+input SupervisorInput {
   IdSupervisor: Float!
   Supervisor: String!
   IdCargo: Float!
@@ -822,6 +826,8 @@ input ContaComprobarExpresionesInput {
   Centro: Boolean!
   Complejo: Boolean!
   Con: Boolean!
+  Centralizada: Boolean!
+  IdDivision: Float!
 }
 
 input ContaNoUsarEnCuentaInput {
@@ -833,4 +839,6 @@ input ContaNoUsarEnCuentaInput {
   Crit2: String
   Crit3: String
   TextoInicio: String
+  Centralizada: Boolean!
+  IdDivision: Float!
 }

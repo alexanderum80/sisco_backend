@@ -1,5 +1,5 @@
 import { MutationResponse } from './../shared/models/mutation.response.model';
-import { UsuariosQueryResponse, UsuarioDTO, UsuarioQueryResponse } from './usuarios.model';
+import { UsuariosQueryResponse, UsuarioInput, UsuarioQueryResponse } from './usuarios.model';
 import { UsuariosService } from './usuarios.service';
 import { Resolver, Query, Args, Int, Mutation, Context } from '@nestjs/graphql';
 import { Usuarios } from './usuarios.entity';
@@ -55,7 +55,7 @@ export class UsuariosResolver {
     @Mutation(() => MutationResponse)
     @UseGuards(new AuthGuard())
     async createUsuario(
-        @Args('usuarioInfo') usuarioInfo: UsuarioDTO
+        @Args('usuarioInfo') usuarioInfo: UsuarioInput
     ): Promise<MutationResponse> {
         return this._usuariosService.create(usuarioInfo);
     }
@@ -63,7 +63,7 @@ export class UsuariosResolver {
     @Mutation(() => MutationResponse)
     @UseGuards(new AuthGuard())
     async updateUsuario(
-        @Args('usuarioInfo') usuarioInfo: UsuarioDTO
+        @Args('usuarioInfo') usuarioInfo: UsuarioInput
     ): Promise<MutationResponse> {
         return this._usuariosService.update(usuarioInfo);
     }

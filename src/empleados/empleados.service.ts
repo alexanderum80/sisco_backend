@@ -2,7 +2,7 @@ import { Usuarios } from './../usuarios/usuarios.entity';
 import { UsuariosService } from './../usuarios/usuarios.service';
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { Empleado } from './empleados.entity';
-import { EmpleadosQueryResponse, EmpleadoQueryResponse, EmpleadoDTO } from './empleados.model';
+import { EmpleadosQueryResponse, EmpleadoQueryResponse, EmpleadoInput } from './empleados.model';
 import { Injectable } from '@nestjs/common';
 import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
@@ -51,7 +51,7 @@ export class EmpleadosService {
         }
     }
 
-    async create(empleadoInfo: EmpleadoDTO): Promise<MutationResponse> {
+    async create(empleadoInfo: EmpleadoInput): Promise<MutationResponse> {
         try {
             delete empleadoInfo.IdEmpleado;
 
@@ -67,7 +67,7 @@ export class EmpleadosService {
         }
     }
 
-    async update(empleadoInfo: EmpleadoDTO): Promise<MutationResponse> {
+    async update(empleadoInfo: EmpleadoInput): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
                 this.empleadoRepository.save(empleadoInfo).then(res => {

@@ -1,6 +1,6 @@
 import { Usuarios } from './../usuarios/usuarios.entity';
 import { MutationResponse } from './../shared/models/mutation.response.model';
-import { EmpleadosQueryResponse, EmpleadoQueryResponse, EmpleadoDTO } from './empleados.model';
+import { EmpleadosQueryResponse, EmpleadoQueryResponse, EmpleadoInput } from './empleados.model';
 import { EmpleadosService } from './empleados.service';
 import { Empleado } from './empleados.entity';
 import { Args, Query, Resolver, Int, Mutation, Context } from '@nestjs/graphql';
@@ -30,7 +30,7 @@ export class EmpleadosResolver {
     @Mutation(() => MutationResponse)
     @UseGuards(new AuthGuard())
     async createEmpleado(
-        @Args({ name: 'empleadoInfo', type: () => EmpleadoDTO }) empleadoInfo: EmpleadoDTO
+        @Args({ name: 'empleadoInfo', type: () => EmpleadoInput }) empleadoInfo: EmpleadoInput
     ): Promise<MutationResponse> {
         return this._empleadosService.create(empleadoInfo);
     }
@@ -38,7 +38,7 @@ export class EmpleadosResolver {
     @Mutation(() => MutationResponse)
     @UseGuards(new AuthGuard())
     async updateEmpleado(
-        @Args({ name: 'empleadoInfo', type: () => EmpleadoDTO }) empleadoInfo: EmpleadoDTO
+        @Args({ name: 'empleadoInfo', type: () => EmpleadoInput }) empleadoInfo: EmpleadoInput
     ): Promise<MutationResponse> {
         return this._empleadosService.update(empleadoInfo);
     }
