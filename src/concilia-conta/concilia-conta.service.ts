@@ -1,3 +1,4 @@
+import { Usuarios } from './../usuarios/usuarios.entity';
 import { ETipoClasificadorCuenta } from './../clasificador-cuenta/clasificador-cuenta.model';
 import { ClasificadorCuentaService } from './../clasificador-cuenta/clasificador-cuenta.service';
 import { XmlJsService } from './../shared/services/xml-js/xml-js.service';
@@ -9,9 +10,8 @@ import { RodasInventario } from './../rodas-inventario/rodas-inventario.entity';
 import { toNumber, cloneDeep } from 'lodash';
 import { ContaConexionesService } from './../conta-conexiones/conta-conexiones.service';
 import { MutationResponse } from './../shared/models/mutation.response.model';
-import { ContaConexiones } from './../conta-conexiones/conta-conexiones.entity';
 import { Injectable } from '@nestjs/common';
-import { queryUltimoPeriodo, queryInventarioRodas, queryVentasRodas, queryInventarioRodasCons, queryVentasRodasCons, queryComprobantesRodas, queryAsientoRodas, queryMayorRodas, queryRangoAsientosMes, querySaldosAcumuladosRodas, ConciliaContaInput, queryClasificadorCuentas, queryConsultaReporteClasificador, ConciliaContabilidadQueryResponse, queryReporteConsultas, ConciliaContaQueryResponse, queryReporteExpresiones, queryReporteValores, IniciarSaldosInput } from './concilia-conta.model';
+import { queryUltimoPeriodo, queryInventarioRodas, queryVentasRodas, queryInventarioRodasCons, queryVentasRodasCons, queryComprobantesRodas, queryAsientoRodas, queryMayorRodas, queryRangoAsientosMes, querySaldosAcumuladosRodas, ConciliaContaInput, queryClasificadorCuentasRodas, ConciliaContabilidadQueryResponse, queryReporteConsultas, ConciliaContaQueryResponse, queryReporteExpresiones, queryReporteValores, IniciarSaldosInput, ChequearCentrosInput } from './concilia-conta.model';
 import { InjectConnection } from '@nestjs/typeorm';
 import { Connection } from 'typeorm';
 
@@ -27,8 +27,9 @@ export class ConciliaContaService {
         private _clasificadorCuentaSvc: ClasificadorCuentaService
     ) {}
 
-    async conciliaContabilidad(conciliaContaInput: ConciliaContaInput): Promise<ConciliaContabilidadQueryResponse> {
+    async conciliaContabilidad(user: Usuarios, conciliaContaInput: ConciliaContaInput): Promise<ConciliaContabilidadQueryResponse> {
         try {
+            const { IdDivision } = user;
             const { idCentro, periodo, annio, tipoCentro, tipoEntidad } = conciliaContaInput;
             const consolidado = tipoCentro === 2 ? '1' : '0';
 
@@ -43,20 +44,17 @@ export class ConciliaContaService {
             // const _conexionCodif = cloneDeep(_conexionConta);
             // _conexionCodif.BaseDatos = _conexionCodif.BaseDatos.substring(0, _conexionCodif.BaseDatos.length - 4).replace(/Conta/gi, 'Codif');
 
-            // borrar datos de los reportes
-            await this._borrarReportes(idCentro, consolidado, periodo);
-            // if (!_queryBorrarReportes.success) {
-            //     throw new Error(_queryBorrarReportes.error.toString());
-            // }
-
             // importar el clasificador de cuentas
-            await this._importarClasificador(idCentro, annio, consolidado, _conexionConta);
+            // await this._importarClasificador(idCentro, tipoCentro, annio, consolidado, periodo, _conexionConta);
             // if (!_importarClasifCuentasRes.success) {
             //     throw new Error(_importarClasifCuentasRes.error.toString());
             // }
 
-            // chequea clasificador
-            const _chequeaClasifRes = await this._chequearClasificador(idCentro, tipoCentro, annio);
+            // conecto al Conta del Centro
+            let _contaConexionCentro: Connection = await this._contaConexionesService.conexionRodas(_conexionConta);
+
+            // importar y chequear el clasificador de cuentas
+            const _chequeaClasifRes = await this._importarClasificador(idCentro, tipoCentro, annio, consolidado, periodo, _contaConexionCentro);
             if (_chequeaClasifRes.data.length) {
                 return ({
                     success: false,
@@ -79,63 +77,51 @@ export class ConciliaContaService {
             }
 
             // importar los comprobantes, asientos, etc.
-            await this.importarContabilidad(idCentro, annio, periodo, consolidado, _conexionConta);
+            await this.importarContabilidad(idCentro, annio, periodo, consolidado, _contaConexionCentro);
             // if (!_importarAsientosRes.success) {
             //     throw new Error(_importarAsientosRes.error.toString());
             // }
 
+            // cierro la conexión al Rodas del Centro
+            if (_contaConexionCentro && _contaConexionCentro.isConnected)
+            _contaConexionCentro.close();
+
             // calcular la conciliación
-            await this._calculaConciliacion(idCentro, tipoCentro, annio, periodo, tipoEntidad);
+            let _error = '';
+            await this._calculaConciliacion(idCentro, tipoCentro, annio, periodo, tipoEntidad, IdDivision).catch(err => {
+                _error = err.message;
+            });
             // if (!_calculaConciliacionRes.success) {
             //     throw new Error(_calculaConciliacionRes.error.toString());
             // }
 
             // validando información
-            if (tipoCentro === 2 && idCentro !== 100) {
-                await this._centrosNoConciliados(annio, periodo, idCentro);
-                // if (!_queryCentrosNoConciliados.success) {
-                //     throw new Error(_queryCentrosNoConciliados.error.toString());
-                // }
+            // if (tipoCentro === 2 && idCentro !== 100) {
+            //     await this._centrosNoConciliados(annio, periodo, idCentro);
+            //     // if (!_queryCentrosNoConciliados.success) {
+            //     //     throw new Error(_queryCentrosNoConciliados.error.toString());
+            //     // }
 
-                await this._centrosNoChequeadosVsConsolidado(annio, periodo, idCentro);
-                // if (!_queryCentrosNoChequeados.success) {
-                //     throw new Error(_queryCentrosNoChequeados.error.toString());
-                // }
+            //     await this._centrosNoChequeadosVsConsolidado(annio, periodo, idCentro);
+            //     // if (!_queryCentrosNoChequeados.success) {
+            //     //     throw new Error(_queryCentrosNoChequeados.error.toString());
+            //     // }
 
-                await this._centrosDiferenciasVsConsolidado(idCentro, periodo);
-                // if (!_queryCentrosDiferenciasVsCons.success) {
-                //     throw new Error(_queryCentrosDiferenciasVsCons.error.toString());
-                // }
-            }
+            //     await this._centrosDiferenciasVsConsolidado(idCentro, periodo);
+            //     // if (!_queryCentrosDiferenciasVsCons.success) {
+            //     //     throw new Error(_queryCentrosDiferenciasVsCons.error.toString());
+            //     // }
+            // }
 
             // devuelvo el resultado de la conciliación
-            const _queryReporteConsultas = this._reporteConsultas(idCentro, consolidado, periodo, 1);
-            const _queryReporteExpresiones = this._reporteExpresiones(idCentro, consolidado, periodo);
-            const _queryReporteValores = this._reporteValores(idCentro, consolidado, periodo);
-
             return new Promise<ConciliaContabilidadQueryResponse>(resolve => {
-                Promise.all([_queryReporteConsultas, _queryReporteExpresiones, _queryReporteValores]).then(result => {
-                    resolve({
-                        success: true,
-                        data: {
-                            ReporteClasificador: {
-                                success: true,
-                                data: JSON.stringify('')
-                            },
-                            ReporteConsultas: {
-                                success: true,
-                                data: result[0].data
-                            },
-                            ReporteExpresiones: {
-                                success: true,
-                                data: result[1].data
-                            },
-                            ReporteValores: {
-                                success: true,
-                                data: result[2].data
-                            }
-                        }
-                    });
+                this._getReportesConciliacion(idCentro, consolidado, periodo).then(result => {
+                    if (_error) {
+                        result.success = false;
+                        result.error = _error;
+                    }
+
+                    resolve(result);
                 }).catch(err => {
                     throw new Error(err);
                 });
@@ -161,163 +147,53 @@ export class ConciliaContaService {
         }
     }
 
-    private async _borrarReportes(idUnidad: number, cons: string, periodo: number): Promise<void> {
-        const _queryDeleteCentrosAConsolidar = `DELETE dbo.Conta_CentrosAConsolidar
-            WHERE (Centro = ${ idUnidad }) AND (Periodo = ${ periodo })`;
-        const _queryDeleteReporteChequeoCentro = `DELETE dbo.Conta_ReporteChequeoCentro
-            WHERE (Centro = ${ idUnidad }) AND (Periodo >= ${ periodo })`;
-        const _queryDeleteReporteClasificador = `DELETE dbo.Conta_ReporteClasificador
-            WHERE (Centro = ${ idUnidad }) AND (Consolidado = ${ cons })`;
-        const _queryDeleteReporteConsultas = `DELETE dbo.Conta_ReporteConsultas
-            WHERE (Centro = ${ idUnidad }) AND (Consolidado = ${ cons }) AND (Periodo = ${ periodo }) and IdConsulta = 1`;
-        const _queryDeleteReporteExpresiones = `DELETE dbo.Conta_ReporteExpersiones
-            WHERE (Centro = ${ idUnidad }) AND (Consolidado = ${ cons }) AND (Periodo = ${ periodo })`;
-        const _queryDeleteReporteValor = `DELETE dbo.Conta_ReporteValor
-            WHERE (Centro = ${ idUnidad }) AND (Consolidado = ${ cons }) AND (Periodo = ${ periodo })`;
-        // const _queryDeleteReporteEncabezado = `DELETE dbo.Conta_ReporteEncabezado
-        //     WHERE (IdCentro = ${ idUnidad }) AND (Consolidado = ${ tipoCentro })`;
-
-        const _querysDelete = [
-            _queryDeleteCentrosAConsolidar,
-            _queryDeleteReporteChequeoCentro,
-            _queryDeleteReporteClasificador,
-            _queryDeleteReporteConsultas,
-            _queryDeleteReporteExpresiones,
-            _queryDeleteReporteValor,
-            // _queryDeleteReporteEncabezado
-        ];
-        for (let i = 0; i < _querysDelete.length; i++) {
-            const _query = _querysDelete[i];
-
-            await this.connection.query(_query).catch(err => {
-                throw new Error(err.message ? err.message : err);
-            });
-        }
-    }
-
-    private async _borrarDatosConciliacionCentro(idUnidad: number): Promise<void> {
-        const _queryDeleteClanaCNMB = `DELETE dbo.ActFijos_ClanaCNMB WHERE (IdCentro = ${ idUnidad })`;
-        const _queryDeleteMB = `DELETE dbo.ActFijos_MB WHERE (IdCentro = ${ idUnidad })`;
-        const _queryDeleteNotaAFT = `DELETE dbo.ActFijos_Nota WHERE (IdCentro = ${ idUnidad })`;
-        const _queryDeleteInventarioAFT = `DELETE dbo.Rodas_InventarioAF WHERE (IdCentro = ${ idUnidad })`;
-        const _queryDeleteDepreciacionAFT = `DELETE dbo.Rodas_DepreciacionAF WHERE (IdCentro = ${ idUnidad })`;
-        const _queryDeleteInventarioDWH = `DELETE dbo.DWH_Inventario WHERE (IdCentro = ${ idUnidad })`;
-        const _queryDeleteVentasDWH = `DELETE dbo.DWH_Ventas WHERE (IdCentro = ${ idUnidad })`;
-        const _queryDeleteNotaDWH = `DELETE dbo.DWH_Nota WHERE (IdCentro = ${ idUnidad })`;
-        const _queryDeleteInventarioGolden = `DELETE dbo.Golden_Inventario WHERE (IdCentro = ${ idUnidad })`;
-        const _queryDeleteVentasGolden = `DELETE dbo.Golden_Ventas WHERE (IdCentro = ${ idUnidad })`;
-        const _queryDeleteNotaGolden = `DELETE dbo.Golden_Nota WHERE (IdCentro = ${ idUnidad })`;
-        const _queryDeleteInventario = `DELETE dbo.Rodas_Inventario WHERE (IdCentro = ${ idUnidad })`;
-        const _queryDeleteVentas = `DELETE dbo.Rodas_Ventas WHERE (IdCentro = ${ idUnidad })`;
-        const _queryDeleteCategorias = `DELETE dbo.Utiles_Categoria WHERE (IdCentro = ${ idUnidad })`;
-        const _queryDeleteInventarioUH = `DELETE dbo.Utiles_Inventario WHERE (IdCentro = ${ idUnidad })`;
-        const _queryDeleteProductosUH = `DELETE dbo.Utiles_Producto WHERE (IdCentro = ${ idUnidad })`;
-        const _queryDeleteNotaUH = `DELETE dbo.Utiles_Nota WHERE (IdCentro = ${ idUnidad })`;
-        const _queryDeleteRodasInventarioUH = `DELETE dbo.Rodas_InventarioUH WHERE (IdCentro = ${ idUnidad })`;
-        const _queryDeleteRodasDesgasteUH = `DELETE dbo.Rodas_DesgasteUH WHERE (IdCentro = ${ idUnidad })`;
-
-        const _querysDelete = [
-            _queryDeleteClanaCNMB,
-            _queryDeleteMB,
-            _queryDeleteNotaAFT,
-            _queryDeleteInventarioAFT,
-            _queryDeleteDepreciacionAFT,
-            _queryDeleteInventarioDWH,
-        ];
-        for (let i = 0; i < _querysDelete.length; i++) {
-            const _query = _querysDelete[i];
-
-            await this.connection.query(_query).catch(err => {
-                throw new Error(err.message ? err.message : err);
-            });
-        }
-    }
-
-    async _importarClasificador(idUnidad: number, annio: number, cons: string, contaConexion: ContaConexiones): Promise<void> {
-        let _contaConexionCentro: Connection;
-
+    async _importarClasificador(idUnidad: number, tipoCentro: number, annio: number, cons: string, periodo: number, contaConexion: Connection): Promise<any> {
         try {
-            // borro el clasificador existente en el SISCO
-            const _queryDeleteClasif = `DELETE FROM Clasificador_de_Cuentas
-            WHERE (Centro = ${ idUnidad }) AND (Consolidado = ${ cons }) AND (Año = ${ annio })`;
-
-            await this.connection.query(_queryDeleteClasif).catch(err => {
-                throw new Error(err.message ? err.message : err);
-            });
-
             // inserto el clasificador del Rodas
-            _contaConexionCentro = await (await this._contaConexionesService.conexionRodas(contaConexion)).connect();
-
-            const _queryClasifCuentasRes = await _contaConexionCentro.query(queryClasificadorCuentas).catch(err => {
+            const _queryClasifCuentasRes = await contaConexion.query(queryClasificadorCuentasRodas).catch(err => {
                 throw new Error(err.message ? err.message : err);
             });
 
-            if (_contaConexionCentro && _contaConexionCentro.isConnected)
-                _contaConexionCentro.close();
-
-            let _clasifCuentasArray = [];
-            for (let i = 0; i < _queryClasifCuentasRes.length; i++) {
-                const element = _queryClasifCuentasRes[i];
-                _clasifCuentasArray.push({
-                    Clasificador_de_Cuentas: element
-                });
+            let _clasifCuentasXML = this._xmlJsService.jsonToXML('Clasificador_de_Cuentas', {});
+                
+            if (_queryClasifCuentasRes.length) {
+                _clasifCuentasXML = this._xmlJsService.jsonToXML('Clasificador_de_Cuentas', _queryClasifCuentasRes);
             }
 
-            const _clasifCuentasXML = this._xmlJsService.jsonToXML(_clasifCuentasArray);
+            let tipoClasif = '';
+            switch (tipoCentro) {
+                case 0:
+                    tipoClasif = '2';
+                    break;
+                case 1:
+                    tipoClasif = '3';
+                    break;
+                case 2:
+                    tipoClasif = '1';
+                    break;
+            }
 
-            if (_clasifCuentasArray.length) {
-                await this.connection.query(`EXEC dbo.pConta_ImportClasifCuentaXML @0, @1, @2, @3`, [_clasifCuentasXML, idUnidad, cons, annio]).catch(err => {
+            return new Promise<any>(resolve => {
+                this.connection.query(`EXEC dbo.pConta_ImportClasifCuentaXML @0, @1, @2, @3, @4, @5`, [_clasifCuentasXML, idUnidad, tipoClasif, cons, annio, periodo]).then(result => {
+                    resolve({ data: result });
+                }).catch(err => {
                     throw new Error(err.message ? err.message : err);
                 });
-            }
-        } catch (err) {
-            if (_contaConexionCentro && _contaConexionCentro.isConnected)
-                _contaConexionCentro.close();
-
-            throw new Error(err.message ? err.message : err);
-        }
-    }
-
-    private async _chequearClasificador(idUnidad: number, tipoCentro: number, annio: number): Promise<any> {
-        const cons = tipoCentro === 2 ? '1' : '0';
-
-        let tipoClasif = '';
-        switch (tipoCentro) {
-            case 0:
-                tipoClasif = '2';
-                break;
-            case 1:
-                tipoClasif = '3';
-                break;
-            case 2:
-                tipoClasif = '1';
-                break;
-        }
-        await this.connection.query(`EXEC InsertDiferenciasClasificador @0, @1, @2, @3`, [idUnidad, tipoClasif, cons, annio]).catch(err => {
-            throw new Error(err.message ? err.message : err);
-        });
-
-        const _queryChequeaClasifRodas = queryConsultaReporteClasificador.replace(/@Centro/g, idUnidad.toString()).replace(/@Consolidado/g, cons);
-
-        return new Promise<any>(resolve => {
-            this.connection.query(_queryChequeaClasifRodas).then(result => {
-                resolve({ data: result });
-            }).catch(err => {
-                throw new Error(err.message ? err.message : err);
             });
-        });
+        } catch (err) {
+            if (contaConexion && contaConexion.isConnected)
+                contaConexion.close();
+
+            throw new Error(err.message ? err.message : err);
+        }
     }
 
-    async importarContabilidad(idUnidad: number, annio: number, periodo: number, cons: string, contaConexion: ContaConexiones): Promise<void> {
-        let _contaConexionCentro: Connection;
-
+    async importarContabilidad(idUnidad: number, annio: number, periodo: number, cons: string, contaConexion: Connection): Promise<void> {
         try {
-            _contaConexionCentro = await (await this._contaConexionesService.conexionRodas(contaConexion)).connect();
-
             // obtener el ultimo periodo importado en el SISCO
             let _queryUltimoPeriodo = queryUltimoPeriodo.replace(/@Anio/g, annio.toString())
                                                         .replace(/@Cons/g, cons.toString())
-                                                        .replace(/@Centro/g, contaConexion.IdUnidad.toString());
+                                                        .replace(/@Centro/g, idUnidad.toString());
             const _ultimoPeriodoRes = await this.connection.query(_queryUltimoPeriodo).then(result => {
                 return result;
             });
@@ -328,46 +204,39 @@ export class ConciliaContaService {
             }
 
             // chequear los datos adulterados
-            await this._chequeaDatosAdulterados(idUnidad, _contaConexionCentro);
+            await this._chequeaDatosAdulterados(idUnidad, contaConexion);
             // if (!_datosAdulteradosRes.success) {
             //     throw new Error(_datosAdulteradosRes.error.toString());
             // }
 
             // chequear saldos acumulados hasta el periodo anterior
-            await this._chequearSaldoAcumulados(idUnidad, annio, _ultimoPeriodo, cons, _contaConexionCentro);
+            await this._chequearSaldoAcumulados(idUnidad, annio, _ultimoPeriodo, cons, contaConexion);
 
             const _periodoInicial = _ultimoPeriodo < periodo ? _ultimoPeriodo : periodo;
-            // borro los comprobantes y los asientos
-            await this._borrarDatos(idUnidad, annio, cons, _periodoInicial);
-            // if (!_borraCompAsientoRes.success) {
-            //     throw new Error(_borraCompAsientoRes.error.toString());
-            // }
 
             for (let per = _periodoInicial; per <= periodo; per++) {
                 // importar los comprobantes
-                await this._importarComprobantes(idUnidad, annio, per, cons, _contaConexionCentro);
+                await this._importarComprobantes(idUnidad, annio, per, cons, contaConexion);
                 // if (!_importarCompRes.success) {
                 //     throw new Error(_importarCompRes.error.toString());
                 // }
 
                 // importar los asientos
-                await this._importarAsientos(idUnidad, annio, per, cons, _contaConexionCentro);
+                await this._importarAsientos(idUnidad, annio, per, cons, contaConexion);
                 // if (!_importarAsientoRes.success) {
                 //     throw new Error(_importarAsientoRes.error.toString());
                 // }
+
+                // importar mayor
+                await this._importarMayor(idUnidad, annio, periodo, cons, contaConexion);
+                // if (!_importarMayorRes.success) {
+                //     throw new Error(_importarMayorRes.error.toString());
+                // }
             }
 
-            // importar mayor
-            await this._importarMayor(idUnidad, annio, periodo, cons, _contaConexionCentro);
-            // if (!_importarMayorRes.success) {
-            //     throw new Error(_importarMayorRes.error.toString());
-            // }
-
-            if (_contaConexionCentro && _contaConexionCentro.isConnected)
-                _contaConexionCentro.close();
         } catch (err) {
-            if (_contaConexionCentro && _contaConexionCentro.isConnected)
-                _contaConexionCentro.close();
+            if (contaConexion && contaConexion.isConnected)
+                contaConexion.close();
 
             throw new Error(err.message ? err.message : err);
         }
@@ -464,52 +333,19 @@ export class ConciliaContaService {
         // }
     }
 
-    private async _borrarDatos(idUnidad: number, annio: number, cons: string, periodo: number): Promise<void> {
-        // try {
-            const _queryDeleteComprobante = `DELETE FROM Conta_Comprobantes
-                WHERE (Centro = ${ idUnidad }) AND (Consolidado = ${ cons }) AND (Año = ${ annio }) AND (Período >= ${ periodo })`;
-            const _queryDeleteAsientos = `DELETE FROM Conta_Asiento
-                WHERE (Centro = ${ idUnidad }) AND (Consolidado = ${ cons }) AND (Año = ${ annio }) AND (Período >= ${ periodo })`;
-            const _queryDeleteMayor = `DELETE FROM Conta_Mayor
-                WHERE (Centro = ${ idUnidad }) AND (Consolidado = ${ cons }) AND (Año = ${ annio })`;
-
-            const _querysDelete = [
-                _queryDeleteComprobante,
-                _queryDeleteAsientos,
-                _queryDeleteMayor
-            ];
-            for (let i = 0; i < _querysDelete.length; i++) {
-                const _query = _querysDelete[i];
-
-                await this.connection.query(_query).catch(err => {
-                    throw new Error(err.message ? err.message : err);
-                });
-            }
-        // } catch (err) {
-        //     return { success: false, error: err.message ? err.message : err };
-        // }
-    }
-
     private async _importarComprobantes(idUnidad: number, annio: number, periodo: number, cons: string, rodasConexion: Connection): Promise<void> {
         // try {
             const _queryComprobantes = queryComprobantesRodas.replace(/@Periodo/g, periodo.toString());
             const _queryCompRes = await rodasConexion.query(_queryComprobantes).then(result => {
-                return { data: result };
+                return result;
             }).catch(err => {
                 throw new Error(err.message ? err.message : err);
             });
 
-            let _comprobantesArray = [];
-            for (let i = 0; i < _queryCompRes.data.length; i++) {
-                const element = _queryCompRes.data[i];
-                _comprobantesArray.push({
-                    Comprobantes: element
-                });
-            }
-            const _comprobantes = this._xmlJsService.jsonToXML(_comprobantesArray);
-
-            if (_comprobantesArray.length) {
-                await this.connection.query(`EXEC dbo.pConta_ImportComprobanteXML @0, @1, @2, @3`, [_comprobantes, idUnidad, cons, annio]).catch(err => {
+            if (_queryCompRes.length) {
+                const _comprobantes = this._xmlJsService.jsonToXML('Comprobantes', _queryCompRes);
+                
+                await this.connection.query(`EXEC dbo.pConta_ImportComprobanteXML @0, @1, @2, @3, @4`, [_comprobantes, idUnidad, cons, annio, periodo]).catch(err => {
                     throw new Error(err.message ? err.message : err);
                 });
             }
@@ -521,23 +357,25 @@ export class ConciliaContaService {
     private async _importarAsientos(idUnidad: number, annio: number, periodo: number, cons: string, rodasConexion: Connection): Promise<void> {
         // try {
             const _queryAsientos = queryAsientoRodas.replace(/@Periodo/g, periodo.toString());
+            
             const _queryAsientosRes = await rodasConexion.query(_queryAsientos).then(result => {
-                return {data: result };
+                return result;
             }).catch(err => {
                 throw new Error(err.message ? err.message : err);
             });
 
-            let _asientosArray = [];
-            for (let i = 0; i < _queryAsientosRes.data.length; i++) {
-                const element = _queryAsientosRes.data[i];
-                _asientosArray.push({
-                    Asiento: element
-                });
-            }
-            const _asientos = this._xmlJsService.jsonToXML(_asientosArray);
+            // let _asientosArray = [];
+            // for (let i = 0; i < _queryAsientosRes.data.length; i++) {
+            //     const element = _queryAsientosRes.data[i];
+            //     _asientosArray.push({
+            //         Asiento: element
+            //     });
+            // }
+            
+            if (_queryAsientosRes.length) {
+                const _asientos = this._xmlJsService.jsonToXML('Asiento', _queryAsientosRes);
 
-            if (_asientosArray.length) {
-                await this.connection.query(`EXEC dbo.pConta_ImportAsientoXML @0, @1, @2, @3`, [_asientos, idUnidad, cons, annio]).catch(err => {
+                await this.connection.query(`EXEC dbo.pConta_ImportAsientoXML @0, @1, @2, @3, @4`, [_asientos, idUnidad, cons, annio, periodo]).catch(err => {
                     throw new Error(err.message ? err.message : err);
                 });
             }
@@ -550,22 +388,15 @@ export class ConciliaContaService {
         // try {
             const _queryMayor = queryMayorRodas.replace(/@Periodo/g, periodo.toString());
             const _queryMayorRes = await rodasConexion.query(_queryMayor).then(result => {
-                return { data: result };
+                return result;
             }).catch(err => {
                 throw new Error(err.message ? err.message : err);
             });
+            
+            if (_queryMayorRes.length) {
+                const _mayor = this._xmlJsService.jsonToXML('Mayor', _queryMayorRes);
 
-            let _mayorArray = [];
-            for (let i = 0; i < _queryMayorRes.data.length; i++) {
-                const element = _queryMayorRes.data[i];
-                _mayorArray.push({
-                    Mayor: element
-                });
-            }
-            const _mayor = this._xmlJsService.jsonToXML(_mayorArray);
-
-            if (_mayorArray.length) {
-                await this.connection.query(`EXEC dbo.pConta_ImportMayorXML @0, @1, @2, @3`, [_mayor, idUnidad, cons, annio]).catch(err => {
+                await this.connection.query(`EXEC dbo.pConta_ImportMayorXML @0, @1, @2, @3, @4`, [_mayor, idUnidad, cons, annio, periodo]).catch(err => {
                     throw new Error(err.message ? err.message : err);
                 });
             }
@@ -574,101 +405,61 @@ export class ConciliaContaService {
         // }
     }
 
-    private async _calculaConciliacion(idUnidad: number, tipoClasificador: number, anio: number, periodo: number, tipoEntidad: number): Promise<void> {
-        // try {
-            let cla = '0';
+    private async _calculaConciliacion(idUnidad: number, tipoClasificador: number, anio: number, periodo: number, tipoEntidad: number, idDivision: number): Promise<void> {
+        let cons = '0';
 
-            switch (tipoClasificador) {
-                case 0:
-                    tipoClasificador = 2;
-                    break;
-                case 1:
-                    tipoClasificador = 3;
-                    break;
-                case 2:
-                    cla = '1';
-                    tipoClasificador = 1;
-                    tipoEntidad = 1;
-                    break;
-            }
+        switch (tipoClasificador) {
+            case 0:
+                tipoClasificador = 2;
+                break;
+            case 1:
+                tipoClasificador = 3;
+                break;
+            case 2:
+                cons = '1';
+                tipoClasificador = 1;
+                tipoEntidad = 1;
+                break;
+        }
 
-            const _queryInsertAnalisiAsiento = this.connection.query(`EXEC dbo.InsertAnalisisAsiento @0, @1, @2, @3, @4, @5`, [tipoClasificador, tipoEntidad, cla, anio, periodo, idUnidad]);
-            const _queryChequeoExpresiones = this.connection.query(`EXEC dbo.InsertChequeoExpresiones @0, @1, @2, @3, @4`, [tipoClasificador, cla, anio, periodo, idUnidad]);
-            // const _queryReporteEncabezado = this.connection.query(`INSERT INTO dbo.Conta_ReporteEncabezado(Consolidado, Periodo, Centro, TipoContabilidad, FechaActualizacionClasificador, Version, PeriodoAnterior, FechaImportacion, idcentro) SELECT " + Consolidado + ",  A.Periodo, A.Centro, A.TipoContabilidad, A.Fechaclasificador, A.Version,A.PeriodoAnterior, A.Fecha, A.IdCentro FROM
-            //     (SELECT ${ periodo } / ${ anio } AS Periodo, (SELECT MIN(RTRIM(IdUnidad) + '-' + Nombre) FROM dbo.vCentros where IdUnidad = ${ idUnidad } ) AS Centro, ${ cons } AS TipoContabilidad, (SELECT FechaClasificador FROM dbo.Log) AS Fechaclasificador, RTRIM('" + AssemblyConta + "')  AS Version, '" + sPeriodo + "/" + this.dePeriodo.DateTime.Year.ToString() + "' AS PeriodoAnterior, getdate() AS Fecha, " + this.lkUnidad.EditValue.ToString() + " as IdCentro) AS A`);
-
-            await Promise.all([_queryInsertAnalisiAsiento, _queryChequeoExpresiones]).catch(err => {
-                throw new Error(err.message ? err.message : err);
-            });
-        // } catch (err) {
-        //     return { success: false, error: err.message ? err.message : err };
-        // }
+        await this.connection.query(`EXEC dbo.pConta_CalculaConciliacion @0, @1, @2, @3, @4, @5, @6`, [idUnidad, tipoClasificador, tipoEntidad, cons, anio, periodo, idDivision]).catch(err => {
+            throw new Error(err.message ? err.message : err);
+        });
     }
 
-    private async _centrosNoConciliados(anio: number, periodo: number, idDivision: number): Promise<void> {
-        // try {
-            await this.connection.query(`EXEC p_CentrosNoConciliados @0, @1, @2`, [anio, periodo, idDivision]).then(res => {
-                if (res.length) {
-                    const _centros: any[] = [];
-                    res.forEach(row => {
-                        _centros.push(row.Unidad);
-                    });
+    private async _getReportesConciliacion(idCentro: number, consolidado: string, periodo: number): Promise<ConciliaContabilidadQueryResponse> {
+        // devuelvo el resultado de la conciliación
+        const _queryReporteConsultas = this._reporteConsultas(idCentro, consolidado, periodo, 1);
+        const _queryReporteExpresiones = this._reporteExpresiones(idCentro, consolidado, periodo);
+        const _queryReporteValores = this._reporteValores(idCentro, consolidado, periodo);
 
-                    // enviar email ****
-
-                    throw new Error(`Los siguientes Centros no han Conciliado la Contabilidad en el SISCO a nivel de División ${ idDivision }.
-                        Centros: ${ _centros.join(', ')}`);
-                }
+        return new Promise<ConciliaContabilidadQueryResponse>(resolve => {
+            Promise.all([_queryReporteConsultas, _queryReporteExpresiones, _queryReporteValores]).then(result => {
+                resolve({
+                    success: true,
+                    data: {
+                        ReporteClasificador: {
+                            success: true,
+                            data: JSON.stringify('')
+                        },
+                        ReporteConsultas: {
+                            success: true,
+                            data: result[0].data
+                        },
+                        ReporteExpresiones: {
+                            success: true,
+                            data: result[1].data
+                        },
+                        ReporteValores: {
+                            success: true,
+                            data: result[2].data
+                        }
+                    }
+                });
             }).catch(err => {
-                throw new Error(err.message ? err.message : err);
+                throw new Error(err);
             });
-        // } catch (err) {
-        //     return { success: false, error: err.message ? err.message : err };
-        // }
-    }
-
-    private async _centrosNoChequeadosVsConsolidado(anio: number, periodo: number, idDivision: number): Promise<void> {
-        // try {
-            await this.connection.query(`EXEC p_CentrosNoChequeadosVsConsolidado @0, @1, @2`, [anio, periodo, idDivision]).then(res => {
-                if (res.length) {
-                    const _centros: any[] = [];
-                    res.forEach(row => {
-                        _centros.push(row.Unidad);
-                    });
-
-                    // enviar email ****
-
-                    throw new Error(`Los siguientes Centros no han sido chequeados contra el Consolidado de la División ${ idDivision }.
-                        Centros: ${ _centros.join(', ')}`);
-                }
-            }).catch(err => {
-                throw new Error(err.message ? err.message : err);
-            });
-        // } catch (err) {
-        //     return { success: false, error: err.message ? err.message : err };
-        // }
-    }
-
-    private async _centrosDiferenciasVsConsolidado(idDivision: number, periodo: number): Promise<void> {
-        // try {
-            await this.connection.query(`EXEC p_CentrosDiferenciasVsConsolidado @0, @1`, [idDivision, periodo]).then(res => {
-                if (res.length) {
-                    const _centros: any[] = [];
-                    res.forEach(row => {
-                        _centros.push(row.Unidad);
-                    });
-
-                    // enviar email ****
-
-                    throw new Error(`Centros que tienen diferencias contra el Consolidado de la División ${ idDivision } en el Período ${ periodo }.
-                        Centros: ${ _centros.join(', ')}`);
-                }
-            }).catch(err => {
-                throw new Error(err.message ? err.message : err);
-            });
-        // } catch (err) {
-        //     return { success: false, error: err.message ? err.message : err };
-        // }
+        });
     }
 
     private async _reporteConsultas(idUnidad: number, cons: string, periodo: number, idConsulta: number): Promise<ConciliaContaQueryResponse> {
@@ -814,71 +605,13 @@ export class ConciliaContaService {
         try {
             const { idCentro, consolidado, annio } = iniciarSaldosInput;
 
-            // borrar clasificador de cuentas
-            this.connection.createQueryBuilder()
-                .delete()
-                .from('Clasificador_de_Cuentas')
-                .where('Centro = :centro', { centro: idCentro })
-                .andWhere('Consolidado = :cons', { cons: consolidado })
-                .andWhere('Año = :annio', { annio: annio })
-            .execute()
-            .catch(err => {
-                throw new Error(err);
-            });
-
-            // borrar asientos
-            this.connection.createQueryBuilder()
-                .delete()
-                .from('Conta_Asiento')
-                .where('Centro = :centro', { centro: idCentro })
-                .andWhere('Consolidado = :cons', { cons: consolidado })
-                .andWhere('Año = :annio', { annio: annio })
-            .execute()
-            .catch(err => {
-                throw new Error(err);
-            });
-
-            // borrar mayor
-            this.connection.createQueryBuilder()
-                .delete()
-                .from('Conta_Mayor')
-                .where('Centro = :centro', { centro: idCentro })
-                .andWhere('Consolidado = :cons', { cons: consolidado })
-                .andWhere('Año = :annio', { annio: annio })
-            .execute()
-            .catch(err => {
-                throw new Error(err);
-            });
-
-            // borrar Chequeo Centro
-            if (consolidado) {
-                this.connection.createQueryBuilder()
-                    .delete()
-                    .from('Conta_ReporteChequeoCentro')
-                    .where('IdCentro = :centro', { centro: idCentro })
-                    .andWhere('Consolidado = :cons', { cons: consolidado })
-                    .andWhere('Año = :annio', { annio: annio })
-                .execute()
-                .catch(err => {
-                    throw new Error(err);
-                });
-            } else {
-                this.connection.createQueryBuilder()
-                    .delete()
-                    .from('Conta_ReporteChequeoCentro')
-                    .where('IdUnidad = :centro', { centro: idCentro })
-                    .andWhere('Consolidado = :cons', { cons: consolidado })
-                    .andWhere('Año = :annio', { annio: annio })
-                .execute()
-                .catch(err => {
-                    throw new Error(err);
-                });
-            }
-
-            this._borrarDatosConciliacionCentro(idCentro);
-
             return new Promise<MutationResponse>(resolve => {
-                resolve({ success: true });
+                this.connection.query(`EXEC dbo.pConta_InicializarDatos @0, @1, @2`, [idCentro, consolidado, annio]).then(() => {
+                    resolve({ success: true })
+                })
+                .catch(err => {
+                    return { success: false, error: err.message ? err.message : err };
+                });
             });
         } catch (err) {
             return { success: false, error: err.message ? err.message : err };
@@ -894,9 +627,6 @@ export class ConciliaContaService {
 
             const _conexionCodif = cloneDeep(_conexionConta);
             _conexionCodif.BaseDatos = _conexionCodif.BaseDatos.substring(0, _conexionCodif.BaseDatos.length - 4).replace(/Conta/gi, 'Codif');
-
-            const _codifConexion: Connection = await (await this._contaConexionesService.conexionRodas(_conexionCodif)).connect();
-            const _contaConexion: Connection = await (await this._contaConexionesService.conexionRodas(_conexionConta)).connect();
 
             let tipoClasificador;
 
@@ -914,30 +644,43 @@ export class ConciliaContaService {
 
             const _clasifCuentasRealQuery = await this._clasificadorCuentaSvc.getClasificadorCuentaByTipo(tipoClasificador);
             if (!_clasifCuentasRealQuery.success) {
-                throw new Error(_clasifCuentasRealQuery.error);                
+                throw new Error(_clasifCuentasRealQuery.error);
             }
 
             const _clasifCuentasReal = _clasifCuentasRealQuery.data;
 
 
-            
+
         } catch (err) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
 
-    private async _getClasificadorCuentaUnidad(): Promise<any> {
+    async chequearCentro(chequearCentrosInput: ChequearCentrosInput): Promise<ConciliaContaQueryResponse> {
+        try {
+            const { idCentro, annio, periodo, centrosAChequear } = chequearCentrosInput;
 
-    }
+            const cons = idCentro === 100 ? 1 : 0;
 
+            for (let index = 0; index < centrosAChequear.length; index++) {
+                const centroChe = centrosAChequear[index];
+                
+                await this.connection.query(`EXEC dbo.InsertChequeoCentroVsConsolidado @0, @1, @2, @3, @4`, [idCentro, cons, annio, periodo, centroChe])
+                .catch(err => {
+                    throw new Error(err.message ? err.message : err);
+                });
+            }
 
-
-    private async _arreglaClasificadorUnidad(): Promise<MutationResponse> {
-
-        return new Promise<MutationResponse>(resolve => {
-            resolve({ success: true })
-        })
-
+            return new Promise<ConciliaContaQueryResponse>(resolve => {
+                this.connection.query(`EXEC dbo.p_ChequeoCentro @0`, [`Centro = ${ idCentro } AND Periodo = ${ periodo } AND Unidad IN (${ centrosAChequear.join(', ') })`]).then(result => {
+                    resolve({ success: true, data: JSON.stringify(result) });
+                }).catch(err => {
+                    resolve({ success: false, error: err.message ? err.message : err });
+                });
+            });
+        } catch (err) {
+            return { success: false, error: err.message ? err.message : err };
+        }
     }
 
 }

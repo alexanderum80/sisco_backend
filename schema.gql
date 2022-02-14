@@ -656,6 +656,7 @@ type Mutation {
   deleteContaConexion(IDs: [Int!]!): MutationResponse!
   updateDWhConexion(dwhConexionInput: DWHConexionesInput!): MutationResponse!
   iniciarSaldos(iniciarSaldosInput: IniciarSaldosInput!): ConciliaContabilidadQueryResponse!
+  chequearCentros(chequearCentrosInput: ChequearCentrosInput!): ConciliaContaQueryResponse!
   saveClasificadorCuenta(clasificadorInfo: ClasificadorCuentaRealInput!): MutationResponse!
   deleteClasificadorCuenta(tipo: Int!, subcuenta: String!, cuenta: String!): MutationResponse!
   createEmpleado(empleadoInfo: EmpleadoInput!): MutationResponse!
@@ -726,6 +727,13 @@ input IniciarSaldosInput {
   idCentro: Float!
   consolidado: Boolean!
   annio: Float!
+}
+
+input ChequearCentrosInput {
+  idCentro: Float!
+  annio: Float!
+  periodo: Float!
+  centrosAChequear: [Int!]!
 }
 
 input ClasificadorCuentaRealInput {

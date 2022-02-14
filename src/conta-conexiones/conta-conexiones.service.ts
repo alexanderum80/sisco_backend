@@ -169,8 +169,10 @@ export class ContaConexionesService {
             _conexionOptions.password = await this._cryptoService.decrypt(contaConexion.Contrasena);
             _conexionOptions.database = contaConexion.BaseDatos;
 
+            const _rodasConnection = await new Connection(_conexionOptions).connect();
+
             return new Promise<Connection>(resolve => {
-                resolve(new Connection(_conexionOptions));
+                resolve(_rodasConnection);
             });
         // } catch (err) {
         //     return null;

@@ -1,4 +1,4 @@
-import { Field, InputType, ObjectType } from '@nestjs/graphql';
+import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
 export class ConciliaContaQueryResponse {
@@ -56,6 +56,7 @@ export class ConciliaContaInput {
     @Field()
     tipoEntidad: number;
 }
+
 @InputType()
 export class IniciarSaldosInput {
     @Field()
@@ -66,6 +67,21 @@ export class IniciarSaldosInput {
 
     @Field()
     annio: number;
+}
+
+@InputType()
+export class ChequearCentrosInput {
+    @Field()
+    idCentro: number;
+
+    @Field()
+    annio: number;
+
+    @Field()
+    periodo: number;
+
+    @Field(() => [Int])
+    centrosAChequear: number[];
 }
 
 export const queryInventarioRodasCons = `SELECT @Centro AS IdCentro, CASE WHEN [Tipo de Análisis 1] = 'X' THEN [Análisis 1] ELSE Centro END AS IdUnidad, '000' AS IdPiso, @Periodo AS Periodo, Cuenta, SubCuenta, SUM(Débito) - SUM(Crédito) AS Saldo, N'' as Crt1, N'' as Crt2, N'' as Crt3
@@ -97,13 +113,7 @@ export const queryUltimoPeriodo = `SELECT ISNULL(MAX(Período), -1) as Periodo F
 
 export const queryRangoAsientosMes = `SELECT Período, MIN(Asiento) AS Ini, MAX(Asiento) AS Fin FROM dbo.Asiento GROUP BY Período ORDER BY Período`;
 
-export const queryComprobantesRodas = `SELECT Tipo, Número, Período, RTRIM(YEAR(Fecha)) + '/' + RIGHT('00' + RTRIM(MONTH(Fecha)), 2) + '/' + RIGHT('00' + RTRIM(DAY(Fecha)), 2) AS Fecha, Descripción,
-    Estado, Usuario, RTRIM(YEAR([Ultima Actualización])) + '/' + RIGHT('00' + RTRIM(MONTH([Ultima Actualización])), 2) + '/' + RIGHT('00' + RTRIM(DAY([Ultima Actualización])), 2) AS Ultima_Actualización,
-    [Traspasado por] AS Traspasado_por, RTRIM(YEAR([Fecha Traspaso])) + '/' + RIGHT('00' + RTRIM(MONTH([Fecha Traspaso])), 2) + '/' + RIGHT('00' + RTRIM(DAY([Fecha Traspaso])), 2) AS Fecha_Traspaso,
-    Débito, Crédito, IsNull([Usuario Red], '') AS Usuario_Red, IsNull(subsistema, '') as subsistema, IsNull(siglas, '') as siglas
-    FROM Comprobantes WHERE Período = @Periodo`;
-
-export const queryClasificadorCuentas = `SELECT Año, Cuenta, SubCuenta, Descripción, Naturaleza, [Grupo Clase] AS Grupo_Clase, SubMayor, [Tipo de Análisis 1] AS Tipo_de_Análisis_1, [Tipo de Análisis 2] AS Tipo_de_Análisis_2, [Tipo de Análisis 3] AS Tipo_de_Análisis_3, Obligación, Terminal, Real, [Cuenta Contrapartida] AS Cuenta_Contrapartida,
+export const queryClasificadorCuentasRodas = `SELECT Año, Cuenta, SubCuenta, Descripción, Naturaleza, [Grupo Clase] AS Grupo_Clase, SubMayor, [Tipo de Análisis 1] AS Tipo_de_Análisis_1, [Tipo de Análisis 2] AS Tipo_de_Análisis_2, [Tipo de Análisis 3] AS Tipo_de_Análisis_3, Obligación, Terminal, Real, [Cuenta Contrapartida] AS Cuenta_Contrapartida,
     [SubCuenta Contrapartida] AS SubCuenta_Contrapartida, [Cuenta Consolidación] AS Cuenta_Consolidación, [SubCuenta Consolidación] AS SubCuenta_Consolidación, [Tipo de Análisis 1 Consolidación] AS Tipo_de_Análisis_1_Consolidación, [Tipo de Análisis 2 Consolidación] AS Tipo_de_Análisis_2_Consolidación, [Tipo de Análisis 3 Consolidación] AS Tipo_de_Análisis_3_Consolidación,
     [Obligación Consolidación] AS Obligación_Consolidación, [Condición Consolidación] AS Condición_Consolidación, [Cuenta Ganancia] AS Cuenta_Ganancia, [SubCuenta Ganancia] AS SubCuenta_Ganancia, [Cuenta Pérdida] AS Cuenta_Pérdida, [SubCuenta Pérdida] AS SubCuenta_Pérdida, [Moneda Extranjera] AS Moneda_Extranjera, Estado, [Cuenta Conversión] AS Cuenta_Conversión,
     [SubCuenta Conversión] AS SubCuenta_Conversión, [Tipo de Análisis 1 Conversión] AS Tipo_de_Análisis_1_Conversión, [Tipo de Análisis 2 Conversión] AS  Tipo_de_Análisis_2_Conversión, [Tipo de Análisis 3 Conversión]  AS Tipo_de_Análisis_3_Conversión, [Obligación Conversión] AS Obligación_Conversión, [Descripción Conversión] AS Descripción_Conversión, [Naturaleza Conversión] AS Naturaleza_Conversión,
@@ -111,10 +121,23 @@ export const queryClasificadorCuentas = `SELECT Año, Cuenta, SubCuenta, Descrip
     Resultados_presupuesto, Capital_presupuesto, MEMO
     FROM [Clasificador de Cuentas] as [Clasificador_de_Cuentas]`;
 
-export const queryConsultaReporteClasificador = `SELECT Id, Centro, Consolidado, Cta as Cuenta, SubCta as SubCuenta, Descripcion, Crt1Calsif as Crt1Clasif, Crt1Rodas, Crt2Calsif as Crt2Clasif, Crt2Rodas, Crt3Calsif as Crt3Clasif, Crt3Rodas, NatClasif, NatRodas, CASE WHEN OblClasif = 1 THEN 'X' ELSE '' END AS OblClasif, CASE WHEN OblRodas = 1 THEN 'X' ELSE '' END AS OblRodas, CASE WHEN TermClasf = 1 THEN 'X' ELSE '' END AS TermClasf, CASE WHEN TermRodas = 1 THEN 'X' ELSE '' END AS TermRodas,
-    Crit1ConsClasif, Crit1ConsRodas, Crit2ConsClasif, Crit2ConsRodas, Crit3ConsClasif, Crit3ConsRodas
-    FROM Conta_ReporteClasificador
-    WHERE (Centro = @Centro) AND (CAST(ISNULL(Consolidado, 0) AS int) = @Consolidado) AND (Cta >= N'100')`;
+export const queryComprobantesRodas = `SELECT Tipo, Número, Período, RTRIM(YEAR(Fecha)) + '/' + RIGHT('00' + RTRIM(MONTH(Fecha)), 2) + '/' + RIGHT('00' + RTRIM(DAY(Fecha)), 2) AS Fecha, Descripción,
+    Estado, Usuario, RTRIM(YEAR([Ultima Actualización])) + '/' + RIGHT('00' + RTRIM(MONTH([Ultima Actualización])), 2) + '/' + RIGHT('00' + RTRIM(DAY([Ultima Actualización])), 2) AS Ultima_Actualización,
+    [Traspasado por] AS Traspasado_por, RTRIM(YEAR([Fecha Traspaso])) + '/' + RIGHT('00' + RTRIM(MONTH([Fecha Traspaso])), 2) + '/' + RIGHT('00' + RTRIM(DAY([Fecha Traspaso])), 2) AS Fecha_Traspaso,
+    Débito, Crédito, IsNull([Usuario Red], '') AS Usuario_Red, IsNull(subsistema, '') as subsistema, IsNull(siglas, '') as siglas
+    FROM Comprobantes WHERE Período = @Periodo`;
+
+export const queryAsientoRodas = `SELECT [Tipo de Comprobante] AS Tipo_de_Comprobante, [Número de Comprobante] AS Número_de_Comprobante, [Número de Documento] AS Número_de_Documento, [Período], [Asiento],
+    [Tipo de Asiento] AS Tipo_de_Asiento, [Cuenta], [SubCuenta],[Tipo de Análisis 1] AS Tipo_de_Análisis_1, [Análisis 1] AS Análisis_1, [Tipo de Análisis 2] AS Tipo_de_Análisis_2, [Análisis 2] AS Análisis_2, [Tipo de Análisis 3] AS Tipo_de_Análisis_3, [Análisis 3] AS Análisis_3,
+    [Detalle], [Naturaleza], [Débito], [Crédito], [Moneda Extranjera] AS Moneda_Extranjera, [Tipo de Moneda] AS Tipo_de_Moneda, [Tasa], [Estado], [Documento de Obligación] AS Documento_de_Obligación,
+	ISNULL(RTRIM(YEAR([Fecha])) + '/' + RIGHT('00' + RTRIM(MONTH(Fecha)), 2) + '/' + RIGHT('00' + RTRIM(DAY(Fecha)), 2), '') AS Fecha, [Saldo]
+    FROM Asiento WHERE Período = @Periodo ORDER BY Asiento`;
+
+export const queryMayorRodas = `SELECT Cuenta, SubCuenta, Período, Débito, Crédito, [Débito Acumulado] as Débito_Acumulado, [Crédito Acumulado] as Crédito_Acumulado
+    FROM Mayor where Período = @Periodo ORDER BY Período, Cuenta, SubCuenta`;
+
+export const querySaldosAcumuladosRodas = `SELECT ISNULL(ROUND(SUM(Débito), 2), 0) AS Debito, ISNULL(ROUND(SUM(Crédito), 2), 0) AS Credito
+    FROM dbo.Asiento WHERE Período < @Periodo`;
 
 export const queryReporteConsultas = `SELECT Periodo, Centro, IdConsulta, Consulta, Cuenta, SubCuenta, [Análisis 1] as Analisis1, [Análisis 2] as Analisis2, [Análisis 3] as Analisis3, SUM(Total) AS Total, Consolidado
     FROM Conta_ReporteConsultas
@@ -128,17 +151,6 @@ export const queryReporteExpresiones = `SELECT Consolidado, Periodo, Tipo, Expre
 export const queryReporteValores = `SELECT Centro, Periodo, Consolidado, Codigo, Expresion, Valor, Operador, ValorRodas, Estado
     FROM Conta_ReporteValor WHERE (Centro = @Centro) AND (ISNULL(Consolidado, 0) = @Consolidado) AND (Periodo = @Periodo)`;
 
-export const queryAsientoRodas = `SELECT [Tipo de Comprobante] AS Tipo_de_Comprobante, [Número de Comprobante] AS Número_de_Comprobante, [Número de Documento] AS Número_de_Documento, [Período], [Asiento],
-    [Tipo de Asiento] AS Tipo_de_Asiento, [Cuenta], [SubCuenta],[Tipo de Análisis 1] AS Tipo_de_Análisis_1, [Análisis 1] AS Análisis_1, [Tipo de Análisis 2] AS Tipo_de_Análisis_2, [Análisis 2] AS Análisis_2, [Tipo de Análisis 3] AS Tipo_de_Análisis_3, [Análisis 3] AS Análisis_3,
-    [Detalle], [Naturaleza], [Débito], [Crédito], [Moneda Extranjera] AS Moneda_Extranjera, [Tipo de Moneda] AS Tipo_de_Moneda, [Tasa], [Estado], [Documento de Obligación] AS Documento_de_Obligación,
-	ISNULL(RTRIM(YEAR([Fecha])) + '/' + RIGHT('00' + RTRIM(MONTH(Fecha)), 2) + '/' + RIGHT('00' + RTRIM(DAY(Fecha)), 2), '') AS Fecha, [Saldo]
-    FROM Asiento WHERE Período = @Periodo ORDER BY Asiento`;
-
-export const queryMayorRodas = `SELECT Cuenta, SubCuenta, Período, Débito, Crédito, [Débito Acumulado] as Débito_Acumulado, [Crédito Acumulado] as Crédito_Acumulado
-    FROM Mayor where Período <= @Periodo ORDER BY Período, Cuenta, SubCuenta`;
-
-export const querySaldosAcumuladosRodas = `SELECT ISNULL(ROUND(SUM(Débito), 2), 0) AS Debito, ISNULL(ROUND(SUM(Crédito), 2), 0) AS Credito
-    FROM dbo.Asiento WHERE Período < @Periodo`;
 
 export const queryCentrosByConsolidado = `SELECT T.Centro FROM (
 	SELECT CASE WHEN [Tipo de Análisis 1] = 'X' THEN [Análisis 1]

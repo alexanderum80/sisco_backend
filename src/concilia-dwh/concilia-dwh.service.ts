@@ -365,11 +365,15 @@ export class ConciliaDwhService {
         }
     }
 
-    private async _importarDatosRodas(annio: number, periodo: number, idUnidad: number, tipoCentro: number, rodasConexion: ContaConexiones, ventasAcumuladas: boolean): Promise<MutationResponse> {
+    private async _importarDatosRodas(annio: number, periodo: number, idUnidad: number, tipoCentro: number, contaConexion: ContaConexiones, ventasAcumuladas: boolean): Promise<MutationResponse> {
         try {
             const cons = tipoCentro === 1 ? '1' : '0';
+
+            // me conecto al Rodas del Centro
+            const rodasConnection = await this._contaConexionesService.conexionRodas(contaConexion);
+
             // importo los asientos del rodas
-            await this._conciliaContaService.importarContabilidad(idUnidad, annio, periodo, cons, rodasConexion);
+            await this._conciliaContaService.importarContabilidad(idUnidad, annio, periodo, cons, rodasConnection);
             // if (!_importarAsientoRodas.success) {
             //     return { success: false, error: _importarAsientoRodas.error + ' No se pudo importar Asientos del Rodas de la Unidad ' + idUnidad };
             // }
