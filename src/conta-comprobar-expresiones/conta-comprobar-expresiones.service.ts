@@ -1,8 +1,8 @@
+import { MutationResponse } from './../shared/models/mutation.response.model';
 import { ETipoUsuarios } from './../usuarios/usuarios.model';
 import { Usuarios } from './../usuarios/usuarios.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MutationResponse } from 'src/shared/models/mutation.response.model';
 import { Repository } from 'typeorm';
 import { ContaComprobarExpresionesEntity } from './conta-comprobar-expresiones.entity';
 import { ContaComprobarExpresionesInput, ContaComprobarExpresionesQueryResponse, ContaComprobarExpresionQueryResponse } from './conta-comprobar-expresiones.model';

@@ -2,7 +2,7 @@ import { ElementosGastosService } from './elementos-gastos.service';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { ContaElementosGastos } from './elementos-gastos.entity';
 import { ElementosGastosQueryResponse, ElementoGastoQueryResponse, ElementoGastoInput } from './elementos-gastos.model';
-import { MutationResponse } from 'src/shared/models/mutation.response.model';
+import { MutationResponse } from './../shared/models/mutation.response.model';
 
 @Resolver(of => ContaElementosGastos)
 export class ElementosGastosResolver {

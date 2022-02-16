@@ -1,18 +1,18 @@
 import { SingleQueryResponse, MultipleQueryResponse } from '../shared/models/query.response.model';
-import { ContaExpresionesResumen, ContaExpresionesDetalle } from './conta-expresiones.entity';
+import { ExpresionesResumenEntity, ExpresionesDetalleEntity } from './conta-expresiones.entity';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
-export class ContaExpresionResumenQueryResponse extends SingleQueryResponse(ContaExpresionesResumen) {}
+export class ContaExpresionResumenQueryResponse extends SingleQueryResponse(ExpresionesResumenEntity) {}
 
 @ObjectType()
-export class ContaExpresionDetalleQueryResponse extends SingleQueryResponse(ContaExpresionesDetalle) {}
+export class ContaExpresionDetalleQueryResponse extends SingleQueryResponse(ExpresionesDetalleEntity) {}
 
 @ObjectType()
-export class ContaExpresionesResumenQueryResponse extends MultipleQueryResponse(ContaExpresionesResumen) {}
+export class ContaExpresionesResumenQueryResponse extends MultipleQueryResponse(ExpresionesResumenEntity) {}
 
 @ObjectType()
-export class ContaExpresionesDetalleQueryResponse extends MultipleQueryResponse(ContaExpresionesDetalle) {}
+export class ContaExpresionesDetalleQueryResponse extends MultipleQueryResponse(ExpresionesDetalleEntity) {}
 
 @InputType()
 export class ContaExpresionResumenInput {

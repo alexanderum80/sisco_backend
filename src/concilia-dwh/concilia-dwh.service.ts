@@ -15,10 +15,10 @@ import { ConciliaDWHInput, queryInventarioDWH, queryRodasDWHInventarioVentas, qu
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { DwhInventarioService } from './../dwh-inventario/dwh-inventario.service';
 import { Injectable } from '@nestjs/common';
-import { RodasInventarioService } from 'src/rodas-inventario/rodas-inventario.service';
-import { UnidadesQueryResponse } from 'src/unidades/unidades.model';
+import { RodasInventarioService } from './../rodas-inventario/rodas-inventario.service';
+import { UnidadesQueryResponse } from './../unidades/unidades.model';
 import { Connection } from 'typeorm';
-import { ContaConexiones } from 'src/conta-conexiones/conta-conexiones.entity';
+import { ContaConexiones } from './../conta-conexiones/conta-conexiones.entity';
 import { InjectConnection } from '@nestjs/typeorm';
 
 @Injectable()

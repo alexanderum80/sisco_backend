@@ -148,9 +148,8 @@ export const queryReporteExpresiones = `SELECT Consolidado, Periodo, Tipo, Expre
     FROM Conta_ReporteExpersiones
     WHERE (Centro = @Centro) AND (ISNULL(Consolidado, 0) = @Consolidado) AND (Periodo = @Periodo)`;
 
-export const queryReporteValores = `SELECT Centro, Periodo, Consolidado, Codigo, Expresion, Valor, Operador, ValorRodas, Estado
-    FROM Conta_ReporteValor WHERE (Centro = @Centro) AND (ISNULL(Consolidado, 0) = @Consolidado) AND (Periodo = @Periodo)`;
-
+export const queryReporteValores = `SELECT Centro, Periodo, Consolidado, Expresion, Valor, Operador, ValorRodas, Estado, IdDivision
+    FROM Conta_ReporteValor WHERE (Centro = @Centro) AND (ISNULL(Consolidado, 0) = @Consolidado) AND (Periodo = @Periodo) AND (IdDivision = @IdDivision)`;
 
 export const queryCentrosByConsolidado = `SELECT T.Centro FROM (
 	SELECT CASE WHEN [Tipo de Análisis 1] = 'X' THEN [Análisis 1]

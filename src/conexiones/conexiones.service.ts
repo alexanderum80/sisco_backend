@@ -2,7 +2,7 @@ import { ConexionesQueryResponse } from './conexiones.model';
 import { Connection } from 'typeorm';
 import { cloneDeep } from 'lodash';
 import { Injectable } from '@nestjs/common';
-import { dataBasesQuery, DEFAULT_CONNECTION_STRING } from 'src/conexiones/conexiones.model';
+import { dataBasesQuery, DEFAULT_CONNECTION_STRING } from './../conexiones/conexiones.model';
 
 @Injectable()
 export class ConexionesService {

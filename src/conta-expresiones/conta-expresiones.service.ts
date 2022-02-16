@@ -1,18 +1,18 @@
 import { Usuarios } from './../usuarios/usuarios.entity';
 import { MutationResponse } from './../shared/models/mutation.response.model';
-import { ContaExpresionesResumen, ContaExpresionesDetalle } from './conta-expresiones.entity';
+import { ExpresionesResumenEntity, ExpresionesDetalleEntity } from './conta-expresiones.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ContaExpresionesResumenQueryResponse, ContaExpresionResumenInput, ContaExpresionesDetalleQueryResponse, ContaExpresionDetalleQueryResponse, ContaExpresionDetalleInput, ContaExpresionResumenQueryResponse, ContaExpresionInput } from './conta-expresiones.model';
 import { differenceBy } from 'lodash';
-import { ETipoUsuarios } from 'src/usuarios/usuarios.model';
+import { ETipoUsuarios } from './../usuarios/usuarios.model';
 
 @Injectable()
 export class ContaExpresionesService {
     constructor(
-        @InjectRepository(ContaExpresionesResumen) private readonly contaExpresionesResumenRepository: Repository<ContaExpresionesResumen>,
-        @InjectRepository(ContaExpresionesDetalle) private readonly contaExpresionDetalleRepository: Repository<ContaExpresionesDetalle>
+        @InjectRepository(ExpresionesResumenEntity) private readonly contaExpresionesResumenRepository: Repository<ExpresionesResumenEntity>,
+        @InjectRepository(ExpresionesDetalleEntity) private readonly contaExpresionDetalleRepository: Repository<ExpresionesDetalleEntity>
     ) {}
 
     async create(user: Usuarios, expresionInput: ContaExpresionInput): Promise<MutationResponse> {
@@ -118,8 +118,8 @@ export class ContaExpresionesService {
         }
     }
 
-    async createResumen(ExpresionesResumenInput: ContaExpresionResumenInput): Promise<ContaExpresionesResumen> {
-        return new Promise<ContaExpresionesResumen>((resolve, reject) => {
+    async createResumen(ExpresionesResumenInput: ContaExpresionResumenInput): Promise<ExpresionesResumenEntity> {
+        return new Promise<ExpresionesResumenEntity>((resolve, reject) => {
             this.contaExpresionesResumenRepository.save(ExpresionesResumenInput).then(result => {
                 resolve(result);
             }).catch(err => {

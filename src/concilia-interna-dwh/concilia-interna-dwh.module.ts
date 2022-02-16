@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { DwhConexionesModule } from 'src/dwh-conexiones/dwh-conexiones.module';
+import { DwhConexionesModule } from './../dwh-conexiones/dwh-conexiones.module';
 import { ConciliaInternaDwhResolver } from './concilia-interna-dwh.resolver';
 import { ConciliaInternaDwhService } from './concilia-interna-dwh.service';
 

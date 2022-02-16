@@ -1,5 +1,5 @@
 import { ContaOperadoresEntity } from './../conta-operadores/conta-operadores.entity';
-import { ContaExpresionesResumen } from './../conta-expresiones/conta-expresiones.entity';
+import { ExpresionesResumenEntity } from './../conta-expresiones/conta-expresiones.entity';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -42,15 +42,15 @@ export class ContaComprobarExpresionesEntity {
     @Column()
     IdDivision: number;
 
-    @Field(() => ContaExpresionesResumen)
-    @ManyToOne(() => ContaExpresionesResumen, expresion => expresion.IdExpresion)
+    @Field(() => ExpresionesResumenEntity)
+    @ManyToOne(() => ExpresionesResumenEntity, expresion => expresion.IdExpresion)
     @JoinColumn({ name: 'IdExpresion', referencedColumnName: 'IdExpresion'})    
-    Expresion: ContaExpresionesResumen;
+    Expresion: ExpresionesResumenEntity;
 
-    @Field(() => ContaExpresionesResumen)
-    @ManyToOne(() => ContaExpresionesResumen, expresion => expresion.IdExpresion)
+    @Field(() => ExpresionesResumenEntity)
+    @ManyToOne(() => ExpresionesResumenEntity, expresion => expresion.IdExpresion)
     @JoinColumn({ name: 'IdExpresionC', referencedColumnName: 'IdExpresion'})    
-    ExpresionC: ContaExpresionesResumen;
+    ExpresionC: ExpresionesResumenEntity;
 
     @Field(() => ContaOperadoresEntity)
     @ManyToOne(() => ContaOperadoresEntity, operador => operador.Id)

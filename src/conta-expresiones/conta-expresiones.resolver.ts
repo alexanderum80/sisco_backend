@@ -1,13 +1,13 @@
 import { Usuarios } from './../usuarios/usuarios.entity';
 import { AuthGuard, DEFAULT_GRAPHQL_CONTEXT } from './../shared/helpers/auth.guard';
-import { ContaExpresionesResumen, ContaExpresionesDetalle } from './conta-expresiones.entity';
+import { ExpresionesResumenEntity, ExpresionesDetalleEntity } from './conta-expresiones.entity';
 import { Args, Int, Mutation, Query, Resolver, Context } from '@nestjs/graphql';
 import { ContaExpresionDetalleQueryResponse, ContaExpresionesDetalleQueryResponse, ContaExpresionesResumenQueryResponse, ContaExpresionInput, ContaExpresionResumenQueryResponse } from './conta-expresiones.model';
 import { ContaExpresionesService } from './conta-expresiones.service';
 import { MutationResponse } from '../shared/models/mutation.response.model';
 import { UseGuards } from '@nestjs/common';
 
-@Resolver(of => ContaExpresionesResumen)
+@Resolver(of => ExpresionesResumenEntity)
 export class ContaExpresionesResumenResolver {
     constructor(
         private expresionesSvc: ContaExpresionesService
@@ -50,7 +50,7 @@ export class ContaExpresionesResumenResolver {
     }
 }
 
-@Resolver(of => ContaExpresionesDetalle)
+@Resolver(of => ExpresionesDetalleEntity)
 export class ContaExpresionesDetalleResolver {
     constructor(
         private expresionesSvc: ContaExpresionesService

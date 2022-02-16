@@ -3,7 +3,7 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @ObjectType()
 @Entity('Conta_ExpresionesResumen')
-export class ContaExpresionesResumen {
+export class ExpresionesResumenEntity {
     @Field()
     @PrimaryGeneratedColumn()
     IdExpresion: number;
@@ -35,7 +35,7 @@ export class ContaExpresionesResumen {
 
 @ObjectType()
 @Entity('Conta_ExpresionesDetalle')
-export class ContaExpresionesDetalle {
+export class ExpresionesDetalleEntity {
     @Field()
     @PrimaryGeneratedColumn()
     id: number;

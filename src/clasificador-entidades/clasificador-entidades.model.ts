@@ -1,4 +1,4 @@
-import { MultipleQueryResponse, SingleQueryResponse } from 'src/shared/models/query.response.model';
+import { MultipleQueryResponse, SingleQueryResponse } from './../shared/models/query.response.model';
 import { ClasificarEntidades } from './clasificador-entidades.entity';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 

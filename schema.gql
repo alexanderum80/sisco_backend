@@ -428,7 +428,7 @@ type ClasificadorEntidadQueryResponse {
   error: String
 }
 
-type ContaExpresionesResumen {
+type ExpresionesResumenEntity {
   IdExpresion: Float!
   Expresion: String!
   Descripcion: String
@@ -438,7 +438,7 @@ type ContaExpresionesResumen {
   IdDivision: Float!
 }
 
-type ContaExpresionesDetalle {
+type ExpresionesDetalleEntity {
   id: Float!
   IdExpresion: Float!
   Centro: String
@@ -454,25 +454,25 @@ type ContaExpresionesDetalle {
 
 type ContaExpresionResumenQueryResponse {
   success: Boolean!
-  data: ContaExpresionesResumen
+  data: ExpresionesResumenEntity
   error: String
 }
 
 type ContaExpresionDetalleQueryResponse {
   success: Boolean!
-  data: ContaExpresionesDetalle
+  data: ExpresionesDetalleEntity
   error: String
 }
 
 type ContaExpresionesResumenQueryResponse {
   success: Boolean!
-  data: [ContaExpresionesResumen!]
+  data: [ExpresionesResumenEntity!]
   error: String
 }
 
 type ContaExpresionesDetalleQueryResponse {
   success: Boolean!
-  data: [ContaExpresionesDetalle!]
+  data: [ExpresionesDetalleEntity!]
   error: String
 }
 
@@ -502,8 +502,8 @@ type ContaComprobarExpresionesEntity {
   Con: Boolean!
   Centralizada: Boolean!
   IdDivision: Float!
-  Expresion: ContaExpresionesResumen!
-  ExpresionC: ContaExpresionesResumen!
+  Expresion: ExpresionesResumenEntity!
+  ExpresionC: ExpresionesResumenEntity!
   Operador: ContaOperadoresEntity!
 }
 
@@ -562,6 +562,30 @@ type TipoUsuarioQueryResponse {
   error: String
 }
 
+type ComprobarValoresEntity {
+  Id: Float!
+  IdCentro: Float!
+  Centro: String!
+  IdExpresion: Float!
+  Expresion: String!
+  IdOperador: String!
+  Operador: String!
+  Valor: Float!
+  IdDivision: Float!
+}
+
+type ComprobarValoresQueryResponse {
+  success: Boolean!
+  data: [ComprobarValoresEntity!]
+  error: String
+}
+
+type ComprobarValorQueryResponse {
+  success: Boolean!
+  data: ComprobarValoresEntity
+  error: String
+}
+
 type Query {
   authenticateUsuario(passw: String!, usuario: String!): UsuarioQueryResponse!
   getAllUsuarios: UsuariosQueryResponse!
@@ -615,6 +639,8 @@ type Query {
   getNoUsarEnCuentaById(id: Int!): ContaNoUsarEnCuentaQueryResponse!
   getAllTipoUsuarios: TipoUsuariosQueryResponse!
   getTipoUsuarios(id: Int!): TipoUsuarioQueryResponse!
+  getAllComprobarValores: ComprobarValoresQueryResponse!
+  getComprobarValorById(id: Int!): ComprobarValorQueryResponse!
 }
 
 input ConciliaDWHInput {
@@ -688,6 +714,9 @@ type Mutation {
   createNoUsarEnCuenta(noUsarEnCuentaInput: ContaNoUsarEnCuentaInput!): MutationResponse!
   updateNoUsarEnCuenta(noUsarEnCuentaInput: ContaNoUsarEnCuentaInput!): MutationResponse!
   deleteNoUsarEnCuenta(IDs: [Int!]!): MutationResponse!
+  createComprobarValor(comprobarValorInput: ComprobarValoresInput!): MutationResponse!
+  updateComprobarValor(comprobarValorInput: ComprobarValoresInput!): MutationResponse!
+  deleteComprobarValor(IDs: [Int!]!): MutationResponse!
 }
 
 input UsuarioInput {
@@ -848,5 +877,14 @@ input ContaNoUsarEnCuentaInput {
   Crit3: String
   TextoInicio: String
   Centralizada: Boolean!
+  IdDivision: Float!
+}
+
+input ComprobarValoresInput {
+  Id: Float!
+  IdCentro: Float!
+  IdExpresion: Float!
+  IdOperador: String!
+  Valor: Float!
   IdDivision: Float!
 }

@@ -4,7 +4,7 @@ import { ClasificadorCuentaService } from './../clasificador-cuenta/clasificador
 import { XmlJsService } from './../shared/services/xml-js/xml-js.service';
 import { UnidadesService } from './../unidades/unidades.service';
 import { RodasVentasService } from './../rodas-ventas/rodas-ventas.service';
-import { RodasInventarioService } from 'src/rodas-inventario/rodas-inventario.service';
+import { RodasInventarioService } from './../rodas-inventario/rodas-inventario.service';
 import { RodasVentas } from './../rodas-ventas/rodas-ventas.entity';
 import { RodasInventario } from './../rodas-inventario/rodas-inventario.entity';
 import { toNumber, cloneDeep } from 'lodash';
@@ -115,7 +115,7 @@ export class ConciliaContaService {
 
             // devuelvo el resultado de la conciliación
             return new Promise<ConciliaContabilidadQueryResponse>(resolve => {
-                this._getReportesConciliacion(idCentro, consolidado, periodo).then(result => {
+                this._getReportesConciliacion(idCentro, consolidado, periodo, IdDivision).then(result => {
                     if (_error) {
                         result.success = false;
                         result.error = _error;
@@ -427,11 +427,11 @@ export class ConciliaContaService {
         });
     }
 
-    private async _getReportesConciliacion(idCentro: number, consolidado: string, periodo: number): Promise<ConciliaContabilidadQueryResponse> {
+    private async _getReportesConciliacion(idCentro: number, consolidado: string, periodo: number, idDivision: number): Promise<ConciliaContabilidadQueryResponse> {
         // devuelvo el resultado de la conciliación
         const _queryReporteConsultas = this._reporteConsultas(idCentro, consolidado, periodo, 1);
         const _queryReporteExpresiones = this._reporteExpresiones(idCentro, consolidado, periodo);
-        const _queryReporteValores = this._reporteValores(idCentro, consolidado, periodo);
+        const _queryReporteValores = this._reporteValores(idCentro, consolidado, periodo, idDivision);
 
         return new Promise<ConciliaContabilidadQueryResponse>(resolve => {
             Promise.all([_queryReporteConsultas, _queryReporteExpresiones, _queryReporteValores]).then(result => {
@@ -499,7 +499,7 @@ export class ConciliaContaService {
                         data: JSON.stringify(result)
                     });
                 }).catch(err => {
-                    throw new Error(err.message ? err.message : err);
+                    resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
         // } catch (err) {
@@ -507,12 +507,13 @@ export class ConciliaContaService {
         // }
     }
 
-    private async _reporteValores(idUnidad: number, cons: string, periodo: number): Promise<ConciliaContaQueryResponse> {
+    private async _reporteValores(idUnidad: number, cons: string, periodo: number, idDivision: number): Promise<ConciliaContaQueryResponse> {
         // try {
             const _query = queryReporteValores
                     .replace(/@Centro/g, idUnidad.toString())
                     .replace(/@Consolidado/g, cons)
-                    .replace(/@Periodo/g, periodo.toString());
+                    .replace(/@Periodo/g, periodo.toString())
+                    .replace(/@IdDivision/g, idDivision.toString());
 
             return new Promise<ConciliaContaQueryResponse>(resolve => {
                 this.connection.query(_query).then(result => {
@@ -521,7 +522,7 @@ export class ConciliaContaService {
                         data: JSON.stringify(result)
                     });
                 }).catch(err => {
-                    throw new Error(err.message ? err.message : err);
+                    resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
         // } catch (err) {

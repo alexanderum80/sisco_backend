@@ -1,8 +1,8 @@
 import { Usuarios } from './../usuarios/usuarios.entity';
-import { AuthGuard, DEFAULT_GRAPHQL_CONTEXT } from 'src/shared/helpers/auth.guard';
+import { AuthGuard, DEFAULT_GRAPHQL_CONTEXT } from './../shared/helpers/auth.guard';
 import { UseGuards } from '@nestjs/common';
 import { Args, Context, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { MutationResponse } from 'src/shared/models/mutation.response.model';
+import { MutationResponse } from './../shared/models/mutation.response.model';
 import { ContaComprobarExpresionesEntity } from './conta-comprobar-expresiones.entity';
 import { ContaComprobarExpresionesInput, ContaComprobarExpresionesQueryResponse, ContaComprobarExpresionQueryResponse } from './conta-comprobar-expresiones.model';
 import { ContaComprobarExpresionesService } from './conta-comprobar-expresiones.service';

@@ -1,4 +1,4 @@
-import { MultipleQueryResponse, SingleQueryResponse } from 'src/shared/models/query.response.model';
+import { MultipleQueryResponse, SingleQueryResponse } from './../shared/models/query.response.model';
 import { ClasificadorCuentaReal } from './clasificador-cuenta.entity';
 import { Field, ObjectType, InputType } from '@nestjs/graphql';
 

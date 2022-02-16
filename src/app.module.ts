@@ -38,6 +38,7 @@ import { ContaComprobarExpresionesModule } from './conta-comprobar-expresiones/c
 import { ContaOperadoresModule } from './conta-operadores/conta-operadores.module';
 import { ContaNoUsarEnCuentasModule } from './conta-no-usar-en-cuentas/conta-no-usar-en-cuentas.module';
 import { TipoUsuariosModule } from './tipo-usuarios/tipo-usuarios.module';
+import { ContaComprobarValoresModule } from './conta-comprobar-valores/conta-comprobar-valores.module';
 import 'dotenv/config';
 
 @Module({
@@ -101,6 +102,7 @@ import 'dotenv/config';
     ContaOperadoresModule,
     ContaNoUsarEnCuentasModule,
     TipoUsuariosModule,
+    ContaComprobarValoresModule,
   ],
   controllers: [AppController],
   providers: [AppService, EmailsService],

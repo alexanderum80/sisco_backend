@@ -7,7 +7,7 @@ import { Args, Mutation, Query, Resolver, Int, Context, ResolveField, Parent } f
 import { EstadoConexionesRodasQueryResponse, ContaConexionQueryResponse, ContaConexionesQueryResponse, ContaConexionInput } from './conta-conexiones.model';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard, DEFAULT_GRAPHQL_CONTEXT } from '../shared/helpers/auth.guard';
-import { CentrosView } from 'src/unidades/unidades.entity';
+import { CentrosView } from './../unidades/unidades.entity';
 import { getManager } from 'typeorm';
 
 @Resolver(of => ContaConexiones)

@@ -4,7 +4,7 @@ import { ContaCuentaentidad } from './cuenta-entidad.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ClasificadorCuentaReal } from 'src/clasificador-cuenta/clasificador-cuenta.entity';
+import { ClasificadorCuentaReal } from './../clasificador-cuenta/clasificador-cuenta.entity';
 
 @Injectable()
 export class CuentaEntidadService {
