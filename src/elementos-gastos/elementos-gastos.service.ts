@@ -1,5 +1,3 @@
-import { ContaEgastocuenta } from './../elementos-gastos-cuenta/elementos-gastos-cuenta.entity';
-import { ElementosGastosCuentaService } from './../elementos-gastos-cuenta/elementos-gastos-cuenta.service';
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { ElementosGastosQueryResponse, ElementoGastoQueryResponse, ElementoGastoInput } from './elementos-gastos.model';
 import { ContaElementosGastos } from './elementos-gastos.entity';
@@ -11,7 +9,6 @@ import { Repository } from 'typeorm';
 export class ElementosGastosService {
     constructor(
         @InjectRepository(ContaElementosGastos) private readonly elementosGastosRepository: Repository<ContaElementosGastos>,
-        private elementoGastoCuentaSvc: ElementosGastosCuentaService
     ) { }
 
     async getAllElementoGastos(): Promise<ElementosGastosQueryResponse> {
@@ -54,9 +51,7 @@ export class ElementosGastosService {
         try {
             return new Promise<MutationResponse>(resolve => {
                 this.elementosGastosRepository.save(elementoGastoInfo).then(result => {
-                    this.elementoGastoCuentaSvc.actualizaElementoGastoCuenta(result).then(() => {
-                        resolve({ success: true });
-                    });
+                    resolve({ success: true });
                 })
                 .catch(err => {
                     resolve({ success: false, error: err.message ? err.message : err });
@@ -71,13 +66,7 @@ export class ElementosGastosService {
         try {
             return new Promise<MutationResponse>(resolve => {
                 this.elementosGastosRepository.delete(id).then(() => {
-                    this.elementoGastoCuentaSvc.deleteElementoGastoCuenta(id).then(result => {
-                        if (!result.success) {
-                            resolve({ success: false, error: result.error });
-                        } else {
-                            resolve({ success: true });
-                        }
-                    });
+                    resolve({ success: true });
                 })
                 .catch(err => {
                     resolve({ success: false, error: err.message ? err.message : err });

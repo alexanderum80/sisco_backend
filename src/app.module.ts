@@ -30,7 +30,6 @@ import { TipoEntidadesModule } from './tipo-entidades/tipo-entidades.module';
 import { EpigrafesModule } from './epigrafes/epigrafes.module';
 import { CuentaEntidadModule } from './cuenta-entidad/cuenta-entidad.module';
 import { ElementosGastosModule } from './elementos-gastos/elementos-gastos.module';
-import { ElementosGastosCuentaModule } from './elementos-gastos-cuenta/elementos-gastos-cuenta.module';
 import { ClasificadorEntidadesModule } from './clasificador-entidades/clasificador-entidades.module';
 import { ContaExpresionesModule } from './conta-expresiones/conta-expresiones.module';
 import { ContaTipovalorExpresionesModule } from './conta-tipovalor-expresiones/conta-tipovalor-expresiones.module';
@@ -94,7 +93,6 @@ import 'dotenv/config';
     EpigrafesModule,
     CuentaEntidadModule,
     ElementosGastosModule,
-    ElementosGastosCuentaModule,
     ClasificadorEntidadesModule,
     ContaExpresionesModule,
     ContaTipovalorExpresionesModule,

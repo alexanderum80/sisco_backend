@@ -95,7 +95,7 @@ export class ParteAtrasoService {
 
     private async _getParteAtrasos(connection: Connection, unidades: any): Promise<any> {
         try {
-            const _query = queryParteAtrasos + ` AND UC.IdUnidad IN (${ join(unidades.map(u => u.IdUnidad), ', ') })`;
+            const _query = queryParteAtrasos + ` HAVING UC.IdUnidad IN (${ join(unidades.map(u => u.IdUnidad), ', ') })`;
 
             return new Promise<any>(resolve => {
                 connection.query(_query).then(result => {
