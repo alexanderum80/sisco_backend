@@ -6,9 +6,9 @@ export class CargosQueryResponse {
     @Field()
     success: Boolean;
 
-    @Field(type => [Cargos], { nullable: true })
+    @Field(() => [Cargos], { nullable: true })
     data?: Cargos[];
 
-    @Field(type => String, { nullable: true })
+    @Field(() => String, { nullable: true })
     error?: String;
 }

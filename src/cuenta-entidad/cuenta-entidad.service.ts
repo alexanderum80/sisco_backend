@@ -34,7 +34,7 @@ export class CuentaEntidadService {
 
     async saveCuentaEntidad(cuentaEntidadInfo: ContaCuentaEntidadInput): Promise<MutationResponse> {
         return new Promise<MutationResponse>((resolve) => {
-            this.cuentaEntidadRepository.save(cuentaEntidadInfo).then(res => {
+            this.cuentaEntidadRepository.save(cuentaEntidadInfo).then(() => {
                 resolve({ success: true });
             }).catch(err => {
                 resolve({ success: err.message ? err.message : err });
@@ -44,7 +44,7 @@ export class CuentaEntidadService {
 
     async deleteCuentaEntidad(cuenta: string, subcuenta: string, tipo: number): Promise<MutationResponse> {
         return new Promise<MutationResponse>((resolve) => {
-            this.cuentaEntidadRepository.delete({ Cuenta: cuenta, SubCuenta: subcuenta, TipoClasificador: tipo }).then(res => {
+            this.cuentaEntidadRepository.delete({ Cuenta: cuenta, SubCuenta: subcuenta, TipoClasificador: tipo }).then(() => {
                 resolve({ success: true });
             }).catch(err => {
                 resolve({ success: err.message ? err.message : err });
@@ -55,7 +55,7 @@ export class CuentaEntidadService {
     async actualizaCuentaEntidad(clasificadorCuenta: ClasificadorCuentaReal): Promise<MutationResponse> {
         await this.deleteCuentaEntidad(clasificadorCuenta.Cuenta, clasificadorCuenta.SubCuenta, clasificadorCuenta.TipoClasificador);
 
-        const seUtiliza = clasificadorCuenta.SeUtiliza.split(', ');
+        const seUtiliza = clasificadorCuenta.SeUtiliza!.split(', ');
 
         return new Promise<MutationResponse>((resolve) => {
             seUtiliza.forEach(entidad => {

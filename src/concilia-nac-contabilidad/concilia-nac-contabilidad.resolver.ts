@@ -4,7 +4,7 @@ import { ConciliaNacContabilidadService } from './concilia-nac-contabilidad.serv
 import { ConcnacContabilidad } from './concilia-nac-contabilidad.entity';
 import { Resolver, Query, Int, Mutation, Args } from '@nestjs/graphql';
 
-@Resolver(of => ConcnacContabilidad)
+@Resolver(() => ConcnacContabilidad)
 export class ConciliaNacContabilidadResolver {
     constructor(
         private _conciliacionContabService: ConciliaNacContabilidadService

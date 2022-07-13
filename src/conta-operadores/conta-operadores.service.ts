@@ -22,7 +22,7 @@ export class ContaOperadoresService {
                     throw new Error(err);
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }

@@ -6,9 +6,9 @@ export class ContaTipoValorExpresionesQueryResponse {
     @Field()
     success: Boolean;
 
-    @Field(type => [ContaTipoValorExpresionesEntity], { nullable: true })
+    @Field(() => [ContaTipoValorExpresionesEntity], { nullable: true })
     data?: ContaTipoValorExpresionesEntity[];
 
-    @Field(type => String, { nullable: true })
+    @Field(() => String, { nullable: true })
     error?: String;
 }

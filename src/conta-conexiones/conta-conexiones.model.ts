@@ -11,7 +11,7 @@ export class ContaConexionesQueryResponse extends MultipleQueryResponse(ContaCon
 @InputType()
 export class ContaConexionInput {
     @Field({ nullable: true })
-    Id: number;
+    Id?: number;
 
     @Field()
     IdUnidad: number;

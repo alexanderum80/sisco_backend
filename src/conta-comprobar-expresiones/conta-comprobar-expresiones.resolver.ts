@@ -7,7 +7,7 @@ import { ContaComprobarExpresionesEntity } from './conta-comprobar-expresiones.e
 import { ContaComprobarExpresionesInput, ContaComprobarExpresionesQueryResponse, ContaComprobarExpresionQueryResponse } from './conta-comprobar-expresiones.model';
 import { ContaComprobarExpresionesService } from './conta-comprobar-expresiones.service';
 
-@Resolver(of => ContaComprobarExpresionesEntity)
+@Resolver(() => ContaComprobarExpresionesEntity)
 export class ContaComprobarExpresionesResolver {
     constructor(
         private _comprobarExpresionesSvc: ContaComprobarExpresionesService

@@ -6,7 +6,7 @@ import { Resolver, Query, Args, Int, Context } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard, DEFAULT_GRAPHQL_CONTEXT } from '../shared/helpers/auth.guard';
 
-@Resolver(of => Divisiones)
+@Resolver(() => Divisiones)
 export class DivisionesResolver {
     constructor(
         private _divisionesService: DivisionesService

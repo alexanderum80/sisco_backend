@@ -6,7 +6,7 @@ export class SubdivisionesQueryResponse {
     @Field()
     success: boolean;
 
-    @Field(type => [Subdivisiones], { nullable: true })
+    @Field(() => [Subdivisiones], { nullable: true })
     data?: Subdivisiones[];
 
     @Field({ nullable: true })

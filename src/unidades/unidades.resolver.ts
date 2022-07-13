@@ -6,7 +6,7 @@ import { Args, Context, Int, Query, Resolver } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard, DEFAULT_GRAPHQL_CONTEXT } from '../shared/helpers/auth.guard';
 
-@Resolver(of => Unidades)
+@Resolver(() => Unidades)
 export class UnidadesResolver {
     constructor(
         private _unidadesService: UnidadesService

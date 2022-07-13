@@ -4,7 +4,7 @@ import { TipoEntidadesService } from './tipo-entidades.service';
 import { TipoEntidades } from './tipo-entidades.entity';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 
-@Resolver(of => TipoEntidades)
+@Resolver(() => TipoEntidades)
 export class TipoEntidadesResolver {
     constructor(
         private tipoEntidadesSvc: TipoEntidadesService

@@ -6,10 +6,10 @@ export class CuentasEntidadQueryResponse {
     @Field()
     success: Boolean;
 
-    @Field(type => [ContaCuentaentidad], { nullable: true })
+    @Field(() => [ContaCuentaentidad], { nullable: true })
     data?: ContaCuentaentidad[];
 
-    @Field(type => String, { nullable: true })
+    @Field(() => String, { nullable: true })
     error?: String;
 }
 
@@ -18,10 +18,10 @@ export class CuentaEntidadQueryResponse {
     @Field()
     success: Boolean;
 
-    @Field(type => ContaCuentaentidad, { nullable: true })
+    @Field(() => ContaCuentaentidad, { nullable: true })
     data?: ContaCuentaentidad;
 
-    @Field(type => String, { nullable: true })
+    @Field(() => String, { nullable: true })
     error?: String;
 }
 

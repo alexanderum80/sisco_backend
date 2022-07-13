@@ -1,5 +1,5 @@
 import { Almacenes } from './almacenes.entity';
 import { Resolver } from '@nestjs/graphql';
 
-@Resolver(of => Almacenes)
+@Resolver(() => Almacenes)
 export class AlmacenesResolver {}

@@ -22,7 +22,7 @@ export class SubdivisionesService {
                     return { success: false, error: err.message ? err.message : err };
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -39,7 +39,7 @@ export class SubdivisionesService {
                     return { success: false, error: err.message ? err.message : err };
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }

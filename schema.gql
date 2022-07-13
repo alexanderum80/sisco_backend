@@ -586,8 +586,15 @@ type ComprobarValorQueryResponse {
   error: String
 }
 
+type CajaConfiguracionEntity {
+  IdCaja: Int!
+  IP: String!
+  SN: String!
+  IdUnidad: Int!
+}
+
 type Query {
-  authenticateUsuario(passw: String!, usuario: String!): UsuarioQueryResponse!
+  authenticateUsuario(usuario: String!, passw: String!): UsuarioQueryResponse!
   getAllUsuarios: UsuariosQueryResponse!
   getUsuarioById(id: Int!): UsuarioQueryResponse!
   getUsuarioByName(name: String!): UsuariosQueryResponse!
@@ -604,7 +611,7 @@ type Query {
   conciliaDWH(conciliaDWHInput: ConciliaDWHInput!): ConciliaDWHQueryResponse!
   conciliaContabilidad(conciliaContaInput: ConciliaContaInput!): ConciliaContabilidadQueryResponse!
   getAllClasificadorCuentas: ClasificadorCuentasQueryResponse!
-  getClasificadorCuenta(tipo: Int!, subcuenta: String!, cuenta: String!): ClasificadorCuentaQueryResponse!
+  getClasificadorCuenta(cuenta: String!, subcuenta: String!, tipo: Int!): ClasificadorCuentaQueryResponse!
   getCuentasAgrupadas: CuentasAgrupadasQueryResponse!
   getAllEmpleados: EmpleadosQueryResponse!
   getEmpleadoById(id: Int!): EmpleadoQueryResponse!
@@ -612,12 +619,12 @@ type Query {
   getSupervisorById(id: Int!): SupervisorQueryResponse!
   parteAtrasos(idDivision: Int!): ParteAtrasosQueryResponse!
   datosIdGAM(idDivision: Int!): DatosIdGAMQueryResponse!
-  getDataBases(password: String!, ususario: String!, ip: String!): ConexionesQueryResponse!
+  getDataBases(ip: String!, ususario: String!, password: String!): ConexionesQueryResponse!
   conciliaInternaDWH(conciliaInternaDWHInput: ConciliaInternaDWHInput!): ConciliacionInternaDWHQueryResponse!
   getAllSubdivisiones: SubdivisionesQueryResponse!
   getSubdivisionesByIdDivision(idDivision: Int!): SubdivisionesQueryResponse!
-  conciliacionContab(unidadOD: Int!, divisionOD: Int!, unidad: Int!, division: Int!, mes: Int!, annio: Int!): ViewConciliaNacContabilidadQueryResponse!
-  actaConciliacion(unidadOD: Int!, unidad: Int!, mes: Int!, annio: Int!): ActaConciliacionQueryResponse!
+  conciliacionContab(annio: Int!, mes: Int!, division: Int!, unidad: Int!, divisionOD: Int!, unidadOD: Int!): ViewConciliaNacContabilidadQueryResponse!
+  actaConciliacion(annio: Int!, mes: Int!, unidad: Int!, unidadOD: Int!): ActaConciliacionQueryResponse!
   getAllTipoEntidades: ContaTipoentidadesQueryResponse!
   getTipoEntidadById(id: Int!): ContaTipoentidadQueryResponse!
   getAllEpigrafes: EpigrafesQueryResponse!
@@ -641,6 +648,8 @@ type Query {
   getTipoUsuarios(id: Int!): TipoUsuarioQueryResponse!
   getAllComprobarValores: ComprobarValoresQueryResponse!
   getComprobarValorById(id: Int!): ComprobarValorQueryResponse!
+  getCajasConfiguracion: [CajaConfiguracionEntity!]!
+  getCajaConfiguracion(id: Int!): CajaConfiguracionEntity!
 }
 
 input ConciliaDWHInput {
@@ -673,7 +682,7 @@ input ConciliaInternaDWHInput {
 }
 
 type Mutation {
-  changePassword(password: String!, idUsuario: Int!): MutationResponse!
+  changePassword(idUsuario: Int!, password: String!): MutationResponse!
   createUsuario(usuarioInfo: UsuarioInput!): MutationResponse!
   updateUsuario(usuarioInfo: UsuarioInput!): MutationResponse!
   deleteUsuario(IDs: [Int!]!): MutationResponse!
@@ -683,15 +692,16 @@ type Mutation {
   updateDWhConexion(dwhConexionInput: DWHConexionesInput!): MutationResponse!
   iniciarSaldos(iniciarSaldosInput: IniciarSaldosInput!): ConciliaContabilidadQueryResponse!
   chequearCentros(chequearCentrosInput: ChequearCentrosInput!): ConciliaContaQueryResponse!
+  arreglaClasificadorCuenta(idUnidad: Int!, tipoUnidad: String!, annio: String!): ConciliaContaQueryResponse!
   saveClasificadorCuenta(clasificadorInfo: ClasificadorCuentaRealInput!): MutationResponse!
-  deleteClasificadorCuenta(tipo: Int!, subcuenta: String!, cuenta: String!): MutationResponse!
+  deleteClasificadorCuenta(cuenta: String!, subcuenta: String!, tipo: Int!): MutationResponse!
   createEmpleado(empleadoInfo: EmpleadoInput!): MutationResponse!
   updateEmpleado(empleadoInfo: EmpleadoInput!): MutationResponse!
   deleteEmpleado(IDs: [Int!]!): MutationResponse!
   createSupervisor(supervisorInfo: SupervisorInput!): SupervisorQueryResponse!
   updateSupervisor(supervisorInfo: SupervisorInput!): SupervisorQueryResponse!
   deleteSupervisor(IDs: [Int!]!): SupervisorQueryResponse!
-  conciliacionNacionalVsAsiento(unidadOD: Int!, divisionOD: Int!, unidad: Int!, division: Int!, mes: Int!, annio: Int!): MutationResponse!
+  conciliacionNacionalVsAsiento(annio: Int!, mes: Int!, division: Int!, unidad: Int!, divisionOD: Int!, unidadOD: Int!): MutationResponse!
   updateConciliaContab(data: [ConciliaNacContabilidadInput!]!): MutationResponse!
   createTipoEntidad(tipoEntidadInfo: TipoEntidadInput!): MutationResponse!
   updateTipoEntidad(tipoEntidadInfo: TipoEntidadInput!): MutationResponse!
@@ -717,6 +727,9 @@ type Mutation {
   createComprobarValor(comprobarValorInput: ComprobarValoresInput!): MutationResponse!
   updateComprobarValor(comprobarValorInput: ComprobarValoresInput!): MutationResponse!
   deleteComprobarValor(IDs: [Int!]!): MutationResponse!
+  createCajaConfiguracion(cajaConfiguracionInput: CajaConfiguracionInput!): CajaConfiguracionEntity!
+  updateCajaConfiguracion(cajaConfiguracionInput: CajaConfiguracionInput!): CajaConfiguracionEntity!
+  removeCajaConfiguracion(id: Int!): CajaConfiguracionEntity!
 }
 
 input UsuarioInput {
@@ -887,4 +900,11 @@ input ComprobarValoresInput {
   IdOperador: String!
   Valor: Float!
   IdDivision: Float!
+}
+
+input CajaConfiguracionInput {
+  IdCaja: Int!
+  IP: String!
+  SN: String!
+  IdUnidad: Int!
 }

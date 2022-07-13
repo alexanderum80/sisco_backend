@@ -4,13 +4,12 @@ import { MutationResponse } from './../shared/models/mutation.response.model';
 import { Empleado } from './empleados.entity';
 import { EmpleadosQueryResponse, EmpleadoQueryResponse, EmpleadoInput } from './empleados.model';
 import { Injectable } from '@nestjs/common';
-import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
-import { Connection, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class EmpleadosService {
     constructor(
-        @InjectConnection() private readonly connection: Connection,
         @InjectRepository(Empleado) private readonly empleadoRepository: Repository<Empleado>,
         private _usuariosSvc: UsuariosService
     ) {}
@@ -32,12 +31,12 @@ export class EmpleadosService {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
 
-    async findOne(_id): Promise<EmpleadoQueryResponse> {
+    async findOne(_id: number): Promise<EmpleadoQueryResponse> {
         try {
             return new Promise<EmpleadoQueryResponse>(resolve => {
                 this.empleadoRepository.findOne(_id, { relations: ['Cargo', 'Division']}).then(res => {
@@ -46,7 +45,7 @@ export class EmpleadosService {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -56,13 +55,13 @@ export class EmpleadosService {
             delete empleadoInfo.IdEmpleado;
 
             return new Promise<MutationResponse>(resolve => {
-                this.empleadoRepository.save(empleadoInfo).then(res => {
+                this.empleadoRepository.save(empleadoInfo).then(() => {
                     resolve({ success: true });
                 }).catch(err => {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -70,13 +69,13 @@ export class EmpleadosService {
     async update(empleadoInfo: EmpleadoInput): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.empleadoRepository.save(empleadoInfo).then(res => {
+                this.empleadoRepository.save(empleadoInfo).then(() => {
                     resolve({ success: true });
                 }).catch(err => {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -84,13 +83,13 @@ export class EmpleadosService {
     async delete(IDs: number[]): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.empleadoRepository.delete(IDs).then(res => {
+                this.empleadoRepository.delete(IDs).then(() => {
                     resolve({ success: true });
                 }).catch(err => {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }

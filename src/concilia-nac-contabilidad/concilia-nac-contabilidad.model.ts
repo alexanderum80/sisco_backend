@@ -6,10 +6,10 @@ export class ConciliaNacContabilidadQueryResponse {
     @Field()
     success: Boolean;
 
-    @Field(type => [ConcnacContabilidad], { nullable: true })
+    @Field(() => [ConcnacContabilidad], { nullable: true })
     data?: ConcnacContabilidad[];
 
-    @Field(type => String, { nullable: true })
+    @Field(() => String, { nullable: true })
     error?: String;
 }
 
@@ -18,10 +18,10 @@ export class ViewConciliaNacContabilidadQueryResponse {
     @Field()
     success: Boolean;
 
-    @Field(type => [ConcnacContabilidad], { nullable: true })
+    @Field(() => [ConcnacContabilidad], { nullable: true })
     data?: ConcnacContabilidad[];
 
-    @Field(type => String, { nullable: true })
+    @Field(() => String, { nullable: true })
     error?: String;
 }
 
@@ -108,10 +108,10 @@ export class ActaConciliacionQueryResponse {
     @Field()
     success: Boolean;
 
-    @Field(type => [ActaConciliacion], { nullable: true })
+    @Field(() => [ActaConciliacion], { nullable: true })
     data?: ActaConciliacion[];
 
-    @Field(type => String, { nullable: true })
+    @Field(() => String, { nullable: true })
     error?: String;
 }
 

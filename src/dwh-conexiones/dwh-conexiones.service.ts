@@ -29,16 +29,16 @@ export class DwhConexionesService {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
 
     async getDWHConexion(idDivision: number): Promise<DWHConexionQueryResponse> {
         try {
-            const _dwhConexion = await this.dwhConexionesRepository.findOne(idDivision);
-            _dwhConexion.ConexionDWH = await this._omitirDatosInnecesarios(_dwhConexion.ConexionDWH);
-            _dwhConexion.ConexionRest = await this._omitirDatosInnecesarios(_dwhConexion.ConexionRest);
+            const _dwhConexion = await this.dwhConexionesRepository.findOneOrFail(idDivision);
+            _dwhConexion.ConexionDWH = await this._omitirDatosInnecesarios(_dwhConexion.ConexionDWH!);
+            _dwhConexion.ConexionRest = await this._omitirDatosInnecesarios(_dwhConexion.ConexionRest!);
 
             return new Promise<DWHConexionQueryResponse>(resolve => {
                 resolve({
@@ -46,12 +46,12 @@ export class DwhConexionesService {
                     data: _dwhConexion
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
 
-    private async _omitirDatosInnecesarios(conexion) {
+    private async _omitirDatosInnecesarios(conexion: string) {
         let _newConexion = {
             Server: '',
             User: '',
@@ -74,10 +74,10 @@ export class DwhConexionesService {
 
     async updateDWhConexion(dwhConexionInput: DWHConexionesInput): Promise<MutationResponse> {
         try {
-            const dwhConexion = this.DWHConexionString(dwhConexionInput);
+            const dwhConexion = await this.DWHConexionString(dwhConexionInput);
 
-            dwhConexion.ConexionDWH = await this._cryptoService.encrypt(Buffer.from(dwhConexion.ConexionDWH.toString()));
-            dwhConexion.ConexionRest = await this._cryptoService.encrypt(Buffer.from(dwhConexion.ConexionRest.toString()));
+            dwhConexion.ConexionDWH = await this._cryptoService.encrypt(Buffer.from(dwhConexion.ConexionDWH!).toString());
+            dwhConexion.ConexionRest = await this._cryptoService.encrypt(Buffer.from(dwhConexion.ConexionRest!).toString());
 
             return new Promise<MutationResponse>(resolve => {
                 this.dwhConexionesRepository.save(dwhConexion).then(() => {
@@ -86,28 +86,48 @@ export class DwhConexionesService {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
 
-    private DWHConexionString(dwhConexionInput: DWHConexionesInput): DWHConexiones {
-        const conexionDWH = cloneDeep(DEFAULT_CONNECTION_STRING);
-        conexionDWH.host = dwhConexionInput.DWH_ip;
-        conexionDWH.username = dwhConexionInput.DWH_usuario;
-        conexionDWH.password = dwhConexionInput.DWH_contrasena;
-        conexionDWH.database = dwhConexionInput.DWH_baseDatos;
+    private async DWHConexionString(dwhConexionInput: DWHConexionesInput): Promise<DWHConexiones> {
+        const _conexionDWH = cloneDeep(DEFAULT_CONNECTION_STRING);
+        Object.defineProperties(_conexionDWH, {
+            host: {
+                value: dwhConexionInput.DWH_ip
+            },
+            username: {
+                value: dwhConexionInput.DWH_usuario
+            },
+            password: {
+                value: await this._cryptoService.decrypt(dwhConexionInput.DWH_contrasena)
+            },
+            database: {
+                value: dwhConexionInput.DWH_baseDatos
+            }
+        })
 
-        const conexionRest = cloneDeep(DEFAULT_CONNECTION_STRING);
-        conexionRest.host = dwhConexionInput.Rest_ip;
-        conexionRest.username = dwhConexionInput.Rest_usuario;
-        conexionRest.password = dwhConexionInput.Rest_contrasena;
-        conexionRest.database = dwhConexionInput.Rest_baseDatos;
+        const _conexionRest = cloneDeep(DEFAULT_CONNECTION_STRING);
+        Object.defineProperties(_conexionRest, {
+            host: {
+                value: dwhConexionInput.Rest_ip
+            },
+            username: {
+                value: dwhConexionInput.Rest_usuario
+            },
+            password: {
+                value: await this._cryptoService.decrypt(dwhConexionInput.Rest_contrasena)
+            },
+            database: {
+                value: dwhConexionInput.Rest_baseDatos
+            }
+        })
 
         const dwhConexion: DWHConexiones = {
             IdUnidad: dwhConexionInput.IdUnidad,
-            ConexionDWH: JSON.stringify(conexionDWH),
-            ConexionRest: JSON.stringify(conexionRest),
+            ConexionDWH: JSON.stringify(_conexionDWH),
+            ConexionRest: JSON.stringify(_conexionRest),
         };
 
         return dwhConexion;
@@ -122,19 +142,19 @@ export class DwhConexionesService {
     async conexionRestEmpresa(): Promise<Connection> {
         const _connectionQuery = await this.DWHConexion(this.EMPRESA_CODIGO);
         if (!_connectionQuery.success) {
-            return null;
+            return new Connection(DEFAULT_CONNECTION_STRING);
         }
 
-        return await this.conexionDWH(_connectionQuery.data.ConexionRest);
+        return await this.conexionDWH(_connectionQuery.data!.ConexionRest!);
     }
 
     async conexionDWHEmpresa(): Promise<Connection> {
         const _connectionQuery = await this.DWHConexion(this.EMPRESA_CODIGO);
         if (!_connectionQuery.success) {
-            return null;
+            return new Connection(DEFAULT_CONNECTION_STRING);
         }
 
-        return await this.conexionDWH(_connectionQuery.data.ConexionDWH);
+        return await this.conexionDWH(_connectionQuery.data!.ConexionDWH!);
     }
 
 }

@@ -13,6 +13,7 @@ import { ContaConexiones } from './conta-conexiones.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
+import { SqlServerConnectionOptions } from 'typeorm/driver/sqlserver/SqlServerConnectionOptions';
 
 @Injectable()
 export class ContaConexionesService {
@@ -56,7 +57,7 @@ export class ContaConexionesService {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -65,8 +66,8 @@ export class ContaConexionesService {
         try {
             return new Promise<ContaConexionQueryResponse>(resolve => {
                 this.conexionesRespository.findOne(id).then(result => {
-                    this._cryptoService.decrypt(result.Contrasena).then(res => {
-                        result.Contrasena = res;
+                    this._cryptoService.decrypt(result!.Contrasena).then(res => {
+                        result!.Contrasena = res;
 
                         resolve({
                             success: true,
@@ -79,7 +80,7 @@ export class ContaConexionesService {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -100,7 +101,7 @@ export class ContaConexionesService {
                     resolve(err.message ? err.message : err);
                 });
             });
-        // } catch (err) {
+        // } catch (err: any) {
         //     return { success: false, error: err.message ? err.message : err };
         // }
     }
@@ -113,7 +114,7 @@ export class ContaConexionesService {
             conexion.Contrasena = encryptedPassword;
 
             return new Promise<MutationResponse>(resolve => {
-                this.conexionesRespository.save(conexion).then(result => {
+                this.conexionesRespository.save(conexion).then(() => {
                     resolve({
                         success: true
                     });
@@ -121,7 +122,7 @@ export class ContaConexionesService {
                     resolve(err.message ? err.message : err);
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -132,7 +133,7 @@ export class ContaConexionesService {
             conexion.Contrasena = encryptedPassword;
 
             return new Promise<MutationResponse>(resolve => {
-                this.conexionesRespository.save(conexion).then(result => {
+                this.conexionesRespository.save(conexion).then(() => {
                     resolve({
                         success: true
                     });
@@ -140,7 +141,7 @@ export class ContaConexionesService {
                     resolve(err.message ? err.message : err);
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -148,7 +149,7 @@ export class ContaConexionesService {
     async delete(IDs: number[]): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.conexionesRespository.delete(IDs).then(result => {
+                this.conexionesRespository.delete(IDs).then(() => {
                     resolve({
                         success: true
                     });
@@ -156,25 +157,39 @@ export class ContaConexionesService {
                     resolve(err.message ? err.message : err);
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
 
     async conexionRodas(contaConexion: ContaConexiones): Promise<Connection> {
         // try {
-            let _conexionOptions = cloneDeep(DEFAULT_CONNECTION_STRING);
-            _conexionOptions.host = contaConexion.IpRodas;
-            _conexionOptions.username = contaConexion.Usuario;
-            _conexionOptions.password = await this._cryptoService.decrypt(contaConexion.Contrasena);
-            _conexionOptions.database = contaConexion.BaseDatos;
+            let _conexionOptions: SqlServerConnectionOptions = cloneDeep(DEFAULT_CONNECTION_STRING);
+            Object.defineProperties(_conexionOptions, {
+                host: {
+                    value: contaConexion.IpRodas
+                },
+                username: {
+                    value: contaConexion.Usuario
+                },
+                password: {
+                    value: await this._cryptoService.decrypt(contaConexion.Contrasena)
+                },
+                database: {
+                    value: contaConexion.BaseDatos
+                }
+            })
+            // _conexionOptions.host = contaConexion.IpRodas;
+            // _conexionOptions.username = contaConexion.Usuario;
+            // _conexionOptions.password = await this._cryptoService.decrypt(contaConexion.Contrasena);
+            // _conexionOptions.database = contaConexion.BaseDatos;
 
             const _rodasConnection = await new Connection(_conexionOptions).connect();
 
             return new Promise<Connection>(resolve => {
                 resolve(_rodasConnection);
             });
-        // } catch (err) {
+        // } catch (err: any) {
         //     return null;
         // }
     }
@@ -201,7 +216,7 @@ export class ContaConexionesService {
                         Unidad: datoUnidad.IdUnidad + '-' + datoUnidad.Nombre,
                         Estado: 'Correcto'
                     });
-                } catch (err) {
+                } catch (err: any) {
                     _validarUnidades.push({
                         Unidad: datoUnidad.IdUnidad + '-' + datoUnidad.Nombre,
                         Estado: 'Incorrecto'
@@ -215,7 +230,7 @@ export class ContaConexionesService {
                 });
             });
 
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }

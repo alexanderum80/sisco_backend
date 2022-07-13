@@ -4,7 +4,7 @@ import { ClasificadorCuentaService } from './clasificador-cuenta.service';
 import { Resolver, Query, Args, Int, Mutation } from '@nestjs/graphql';
 import { ClasificadorCuentaReal } from './clasificador-cuenta.entity';
 
-@Resolver(of => ClasificadorCuentaReal)
+@Resolver(() => ClasificadorCuentaReal)
 export class ClasificadorCuentaResolver {
     constructor(
         private clasificadorCuentaSvc: ClasificadorCuentaService

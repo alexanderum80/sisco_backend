@@ -32,7 +32,7 @@ export class ConciliacionInternaDWHQueryResponse {
     @Field()
     success: boolean;
 
-    @Field(type => [ConciliacionInterna], { nullable: true })
+    @Field(() => [ConciliacionInterna], { nullable: true })
     data?: ConciliacionInterna[];
 
     @Field({ nullable: true })

@@ -37,7 +37,7 @@ export class ContaExpresionesService {
 
                 resolve({ success: true });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -58,7 +58,7 @@ export class ContaExpresionesService {
                 const borrarExpresionDetalle = differenceBy(originalExpresionDetalle.data, ExpresionesDetalle, 'id');
 
                 if (borrarExpresionDetalle.length) {
-                    const IDs = borrarExpresionDetalle.map(e => e.id);
+                    const IDs = borrarExpresionDetalle.map((e: any) => e.id);
 
                     await this.deleteDetalle(IDs).catch(err => {
                         throw new Error(err);
@@ -74,7 +74,7 @@ export class ContaExpresionesService {
 
                 resolve({ success: true });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -96,7 +96,7 @@ export class ContaExpresionesService {
                     throw new Error(err.message ? err.message : err);
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -113,7 +113,7 @@ export class ContaExpresionesService {
                     throw new Error(err.message ? err.message : err);
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -137,7 +137,7 @@ export class ContaExpresionesService {
                     throw new Error(err.message ? err.message : err);
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -145,13 +145,13 @@ export class ContaExpresionesService {
     async deleteResumen(IDs: number[]): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.contaExpresionesResumenRepository.delete(IDs).then(result => {
+                this.contaExpresionesResumenRepository.delete(IDs).then(() => {
                     resolve({ success: true });
                 }).catch(err => {
                     throw new Error(err.message ? err.message : err);
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -169,7 +169,7 @@ export class ContaExpresionesService {
                     throw new Error(err.message ? err.message : err);
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -186,7 +186,7 @@ export class ContaExpresionesService {
                     throw new Error(err.message ? err.message : err);
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -203,7 +203,7 @@ export class ContaExpresionesService {
                     throw new Error(err.message ? err.message : err);
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -213,13 +213,13 @@ export class ContaExpresionesService {
             delete expresionDetalleInput.id;
 
             return new Promise<MutationResponse>(resolve => {
-                this.contaExpresionDetalleRepository.save(expresionDetalleInput).then(result => {
+                this.contaExpresionDetalleRepository.save(expresionDetalleInput).then(() => {
                     resolve({ success: true });
                 }).catch(err => {
                     throw new Error(err.message ? err.message : err);
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -227,13 +227,13 @@ export class ContaExpresionesService {
     async updateDetalle(expresionDetalleInput: ContaExpresionDetalleInput): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.contaExpresionDetalleRepository.save(expresionDetalleInput).then(result => {
+                this.contaExpresionDetalleRepository.save(expresionDetalleInput).then(() => {
                     resolve({ success: true });
                 }).catch(err => {
                     throw new Error(err.message ? err.message : err);
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -241,13 +241,13 @@ export class ContaExpresionesService {
     async deleteDetalle(idExpresion: number[]): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.contaExpresionDetalleRepository.delete(idExpresion).then(result => {
+                this.contaExpresionDetalleRepository.delete(idExpresion).then(() => {
                     resolve({ success: true });
                 }).catch(err => {
                     throw new Error(err.message ? err.message : err);
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }

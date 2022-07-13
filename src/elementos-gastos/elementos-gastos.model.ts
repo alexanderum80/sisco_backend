@@ -6,10 +6,10 @@ export class ElementosGastosQueryResponse {
     @Field()
     success: Boolean;
 
-    @Field(type => [ContaElementosGastos], { nullable: true })
+    @Field(() => [ContaElementosGastos], { nullable: true })
     data?: ContaElementosGastos[];
 
-    @Field(type => String, { nullable: true })
+    @Field(() => String, { nullable: true })
     error?: String;
 }
 
@@ -18,10 +18,10 @@ export class ElementoGastoQueryResponse {
     @Field()
     success: Boolean;
 
-    @Field(type => ContaElementosGastos, { nullable: true })
+    @Field(() => ContaElementosGastos, { nullable: true })
     data?: ContaElementosGastos;
 
-    @Field(type => String, { nullable: true })
+    @Field(() => String, { nullable: true })
     error?: String;
 }
 

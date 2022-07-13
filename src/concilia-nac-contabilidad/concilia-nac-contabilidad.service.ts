@@ -1,15 +1,13 @@
 import { ActaConciliacionQueryResponse } from './concilia-nac-contabilidad.model';
 import { ViewConciliaNacContabilidadQueryResponse } from './concilia-nac-contabilidad.model';
 import { MutationResponse } from './../shared/models/mutation.response.model';
-import { ConcnacContabilidad } from './concilia-nac-contabilidad.entity';
 import { Injectable } from '@nestjs/common';
-import { InjectRepository, InjectConnection } from '@nestjs/typeorm';
-import { Connection, Repository } from 'typeorm';
+import { InjectConnection } from '@nestjs/typeorm';
+import { Connection } from 'typeorm';
 
 @Injectable()
 export class ConciliaNacContabilidadService {
     constructor(
-        @InjectRepository(ConcnacContabilidad) private readonly conciliacionContabRepository: Repository<ConcnacContabilidad>,
         @InjectConnection() private readonly connection: Connection
     ) {}
 
@@ -22,7 +20,7 @@ export class ConciliaNacContabilidadService {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err };
         }
     }
@@ -45,7 +43,7 @@ export class ConciliaNacContabilidadService {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message };
         }
     }
@@ -66,13 +64,13 @@ export class ConciliaNacContabilidadService {
             return new Promise<MutationResponse>(resolve => {
                 resolve({ success: true });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message };
         }
     }
 
-    async actaConciliacion(annio, mes, unidad, unidadOD): Promise<ActaConciliacionQueryResponse> {
-        if (unidad === '0' || unidadOD === '0') {
+    async actaConciliacion(annio: number, mes: number, unidad: number, unidadOD: number): Promise<ActaConciliacionQueryResponse> {
+        if (unidad ===  0 || unidadOD === 0) {
             return {
                 success: true,
                 data: []
@@ -199,7 +197,7 @@ export class ConciliaNacContabilidadService {
         });
     }
 
-    async getCentrosConOperaciones(annio, mes) {
+    async getCentrosConOperaciones(annio: string, mes: string) {
         const stringQuery = `SELECT CASE WHEN Cuenta IN (135, 136) THEN Unidad
                 WHEN [Tipo de Análisis 1] = 'E' THEN [Análisis 1]
                 WHEN [Tipo de Análisis 2] = 'E' THEN [Análisis 2]

@@ -6,10 +6,10 @@ export class DivisionesQueryResponse {
     @Field()
     success: Boolean;
 
-    @Field(type => [Divisiones], { nullable: true })
+    @Field(() => [Divisiones], { nullable: true })
     data?: Divisiones[];
 
-    @Field(type => String, { nullable: true })
+    @Field(() => String, { nullable: true })
     error?: String;
 }
 
@@ -18,9 +18,9 @@ export class DivisionQueryResponse {
     @Field()
     success: Boolean;
 
-    @Field(type => Divisiones, { nullable: true })
+    @Field(() => Divisiones, { nullable: true })
     data?: Divisiones;
 
-    @Field(type => String, { nullable: true })
+    @Field(() => String, { nullable: true })
     error?: String;
 }

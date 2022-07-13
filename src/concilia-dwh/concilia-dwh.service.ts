@@ -11,7 +11,7 @@ import { DwhConexionesService } from './../dwh-conexiones/dwh-conexiones.service
 import { UnidadesService } from './../unidades/unidades.service';
 import { RodasVentasService } from './../rodas-ventas/rodas-ventas.service';
 import { DwhVentasService } from './../dwh-ventas/dwh-ventas.service';
-import { ConciliaDWHInput, queryInventarioDWH, queryRodasDWHInventarioVentas, queryRodasDWHInventarioVentasResumen, queryVentasDWH, ConciliaDWHQueryResponse, RodasDWHQueryResponse, queryRodasDWHAlmacenes, queryRodasDWHAlmacenesDist, queryRodasDWHNota } from './concilia-dwh.model';
+import { ConciliaDWHInput, queryInventarioDWH, queryRodasDWHInventarioVentas, queryRodasDWHInventarioVentasResumen, queryVentasDWH, RodasDWHQueryResponse, queryRodasDWHAlmacenes, queryRodasDWHAlmacenesDist, queryRodasDWHNota } from './concilia-dwh.model';
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { DwhInventarioService } from './../dwh-inventario/dwh-inventario.service';
 import { Injectable } from '@nestjs/common';
@@ -50,8 +50,8 @@ export class ConciliaDwhService {
             }
             const _divisiones = _divisionesQuery.data;
 
-            for (let i = 0; i < _divisiones.length; i++) {
-                const divisionInfo = _divisiones[i];
+            for (let i = 0; i < _divisiones!.length; i++) {
+                const divisionInfo = _divisiones![i];
 
                 // verificar si se ha definido la conexion al DWH
                 const _conexionDWHQuery = await this._dwhConexionesService.DWHConexion(divisionInfo.IdDivision);
@@ -87,10 +87,10 @@ export class ConciliaDwhService {
                         _unidadesQuery = await this._unidadesService.getUnidadesAbiertasByIdDivision(idCentro);
                         break;
                 }
-                if (!_unidadesQuery.success) {
-                    return { success: false, error: _unidadesQuery.error };
+                if (!_unidadesQuery!.success) {
+                    return { success: false, error: _unidadesQuery!.error };
                 }
-                const _unidades = _unidadesQuery.data;
+                const _unidades = _unidadesQuery!.data;
 
                 // importar datos del DWH
                 const _importarDatosDWH = await this._importarDatosDWH(idCentro, annio, periodo, tipoCentro, ventasAcumuladas, _unidades, _conexionDWH);
@@ -106,7 +106,7 @@ export class ConciliaDwhService {
             }
 
             // obtener la información con los resultados de la conciliación
-            const _queryRodasDWHInventarioVentas = this._rodasDWHInventarioVentas(idCentro, tipoCentro, periodo, ventasAcumuladas);
+            const _queryRodasDWHInventarioVentas = this._rodasDWHInventarioVentas(idCentro, tipoCentro, periodo);
             const _queryRodasDWHAlmacenes = this._rodasDWHAlmacenes(idCentro, tipoCentro, periodo);
             const _queryRodasDWHNota = this._rodasDWHNota(idCentro, annio, periodo);
 
@@ -124,7 +124,7 @@ export class ConciliaDwhService {
                     resolve({success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -141,7 +141,7 @@ export class ConciliaDwhService {
         await Promise.all([deletedDWHInventario, deletedDWHVentas, deletedRodasInventario, deletedRodasVentas]).then(response => {
             response.map(res => {
                 if (!res.success) {
-                    errorOnDelete = res.error.toString();
+                    errorOnDelete = res.error!.toString();
                 }
             });
         });
@@ -156,8 +156,8 @@ export class ConciliaDwhService {
         let dwhConnectionRestaurador: Connection;
         let dwhConnectionEmpresa: Connection;
         try {
-            dwhConnectionDivision = await (await this._dwhConexionesService.conexionDWH(dwhConexiones.ConexionDWH.toString())).connect();
-            dwhConnectionRestaurador = await (await this._dwhConexionesService.conexionDWH(dwhConexiones.ConexionRest.toString())).connect();
+            dwhConnectionDivision = await (await this._dwhConexionesService.conexionDWH(dwhConexiones.ConexionDWH!.toString())).connect();
+            dwhConnectionRestaurador = await (await this._dwhConexionesService.conexionDWH(dwhConexiones.ConexionRest!.toString())).connect();
             dwhConnectionEmpresa = await (await this._dwhConexionesService.conexionRestEmpresa()).connect();
 
             for (let index = 0; index < unidades.length; index++) {
@@ -203,12 +203,12 @@ export class ConciliaDwhService {
                     throw new Error(_importarAlmacenesRes.error + ' No se pudo importar Almacenes DWH de la Unidad ' + unidadInfo.IdUnidad);
                 }
 
-                _importarInventarioRes = await this._importarInventarioDWH(idCentro, annio, mes, unidadInfo, tipoCentro, dwhConnectionEmpresa, null, true);
+                _importarInventarioRes = await this._importarInventarioDWH(idCentro, annio, mes, unidadInfo, tipoCentro, dwhConnectionEmpresa, false, true);
                 if (!_importarInventarioRes.success) {
                     throw new Error(_importarInventarioRes.error + ' No se pudo importar Inventario DWH Empresa de la Unidad ' + unidadInfo.IdUnidad);
                 }
 
-                _importarVentasRes = await this._importarVentasDWH(idCentro, annio, mes, unidadInfo, tipoCentro, ventasAcumuladas, dwhConnectionEmpresa, null, true);
+                _importarVentasRes = await this._importarVentasDWH(idCentro, annio, mes, unidadInfo, tipoCentro, ventasAcumuladas, dwhConnectionEmpresa, false, true);
                 if (!_importarVentasRes.success) {
                     throw new Error(_importarVentasRes.error + ' No se pudo importar Ventas DWH Empresa de la Unidad ' + unidadInfo.IdUnidad);
                 }
@@ -224,7 +224,7 @@ export class ConciliaDwhService {
             return new Promise<MutationResponse>(resolve => {
                 resolve({ success: true });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -258,7 +258,7 @@ export class ConciliaDwhService {
             return new Promise<MutationResponse>(resolve => {
                 resolve({ success: true });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -306,7 +306,7 @@ export class ConciliaDwhService {
             return new Promise<MutationResponse>(resolve => {
                 resolve({ success: true });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -360,7 +360,7 @@ export class ConciliaDwhService {
             return new Promise<MutationResponse>(resolve => {
                 resolve({ success: true });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -393,12 +393,12 @@ export class ConciliaDwhService {
             return new Promise<MutationResponse>(resolve => {
                 resolve({ success: true });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
 
-    private async _rodasDWHInventarioVentas(idUnidad: number, tipoCentro: number, periodo: number, acum: boolean): Promise<RodasDWHQueryResponse> {
+    private async _rodasDWHInventarioVentas(idUnidad: number, tipoCentro: number, periodo: number): Promise<RodasDWHQueryResponse> {
         try {
             const _query = tipoCentro === 0 ?
                 queryRodasDWHInventarioVentas
@@ -418,7 +418,7 @@ export class ConciliaDwhService {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -443,7 +443,7 @@ export class ConciliaDwhService {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -464,7 +464,7 @@ export class ConciliaDwhService {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }

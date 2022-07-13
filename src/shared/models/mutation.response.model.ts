@@ -5,6 +5,6 @@ export class MutationResponse {
     @Field()
     success: Boolean;
 
-    @Field(type => String, { nullable: true })
+    @Field(() => String, { nullable: true })
     error?: string;
 }

@@ -11,7 +11,7 @@ export class EmpleadosQueryResponse extends MultipleQueryResponse(Empleado) {}
 @InputType()
 export class EmpleadoInput {
     @Field()
-    IdEmpleado: number;
+    IdEmpleado?: number;
 
     @Field()
     Empleado: string;

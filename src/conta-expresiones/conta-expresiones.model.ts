@@ -17,7 +17,7 @@ export class ContaExpresionesDetalleQueryResponse extends MultipleQueryResponse(
 @InputType()
 export class ContaExpresionResumenInput {
     @Field({ nullable: true })
-    IdExpresion: number;
+    IdExpresion?: number;
 
     @Field()
     Expresion: string;
@@ -41,7 +41,7 @@ export class ContaExpresionResumenInput {
 @InputType()
 export class ContaExpresionDetalleInput {
     @Field({ nullable: true })
-    id: number;
+    id?: number;
 
     @Field()
     IdExpresion: number;
@@ -76,9 +76,9 @@ export class ContaExpresionDetalleInput {
 
 @InputType()
 export class ContaExpresionInput {
-    @Field(type => ContaExpresionResumenInput)
+    @Field(() => ContaExpresionResumenInput)
     ExpresionResumen: ContaExpresionResumenInput;
 
-    @Field(type => [ContaExpresionDetalleInput])
+    @Field(() => [ContaExpresionDetalleInput])
     ExpresionesDetalle: ContaExpresionDetalleInput[];
 }

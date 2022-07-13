@@ -11,7 +11,7 @@ export class SupervisoresQueryResponse extends MultipleQueryResponse(Supervisor)
 @InputType()
 export class SupervisorInput {
     @Field()
-    IdSupervisor: number;
+    IdSupervisor?: number;
 
     @Field()
     Supervisor: string;

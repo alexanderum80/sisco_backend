@@ -23,7 +23,7 @@ export class TipoEntidadesService {
                     return { success: false, error: err.message ? err.message : err };
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -40,7 +40,7 @@ export class TipoEntidadesService {
                     return { success: false, error: err.message ? err.message : err };
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -56,7 +56,7 @@ export class TipoEntidadesService {
                     return { success: false, error: err.message ? err.message : err };
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -70,7 +70,7 @@ export class TipoEntidadesService {
                     return { success: false, error: err.message ? err.message : err };
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -78,13 +78,13 @@ export class TipoEntidadesService {
     async deleteTipoEntidad(IDs: number[]): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.tipoEntidadesRepository.delete(IDs).then(result => {
+                this.tipoEntidadesRepository.delete(IDs).then(() => {
                     resolve({ success: true });
                 }).catch(err => {
                     return { success: false, error: err.message ? err.message : err };
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }

@@ -1,10 +1,10 @@
-import { DWHConexionesInput, DWHConexionesQueryResponse, DWHConexionQueryResponse } from './dwh-conexiones.model';
+import { DWHConexionesInput, DWHConexionQueryResponse } from './dwh-conexiones.model';
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { DwhConexionesService } from './dwh-conexiones.service';
 import { DWHConexiones } from './dwh-conexiones.entity';
 import { Mutation, Resolver, Args, Query, Int } from '@nestjs/graphql';
 
-@Resolver(of => DWHConexiones)
+@Resolver(() => DWHConexiones)
 export class DwhConexionesResolver {
     constructor(
         private _dwhConexionesService: DwhConexionesService

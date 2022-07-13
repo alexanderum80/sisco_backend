@@ -24,7 +24,7 @@ export class ElementosGastosService {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -42,7 +42,7 @@ export class ElementosGastosService {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -50,14 +50,14 @@ export class ElementosGastosService {
     async saveElementoGasto(elementoGastoInfo: ElementoGastoInput): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.elementosGastosRepository.save(elementoGastoInfo).then(result => {
+                this.elementosGastosRepository.save(elementoGastoInfo).then(() => {
                     resolve({ success: true });
                 })
                 .catch(err => {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -72,7 +72,7 @@ export class ElementosGastosService {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }

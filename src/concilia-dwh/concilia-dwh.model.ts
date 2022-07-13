@@ -8,19 +8,19 @@ export class RodasDWHQueryResponse {
     @Field({ nullable: true })
     data?: string;
 
-    @Field(type => String, { nullable: true })
+    @Field(() => String, { nullable: true })
     error?: String;
 }
 
 @ObjectType()
 export class ConciliaDWH {
-    @Field(type => RodasDWHQueryResponse)
+    @Field(() => RodasDWHQueryResponse)
     RodasDWHInventarioVentas: RodasDWHQueryResponse;
 
-    @Field(type => RodasDWHQueryResponse)
+    @Field(() => RodasDWHQueryResponse)
     RodasDWHAlmacenes: RodasDWHQueryResponse;
 
-    @Field(type => RodasDWHQueryResponse)
+    @Field(() => RodasDWHQueryResponse)
     RodasDWHNota: RodasDWHQueryResponse;
 }
 
@@ -29,10 +29,10 @@ export class ConciliaDWHQueryResponse {
     @Field()
     success: Boolean;
 
-    @Field(type => ConciliaDWH, { nullable: true })
+    @Field(() => ConciliaDWH, { nullable: true })
     data?: ConciliaDWH;
 
-    @Field(type => String, { nullable: true })
+    @Field(() => String, { nullable: true })
     error?: String;
 }
 
@@ -44,7 +44,7 @@ export class ParteAtrasosQueryResponse {
     @Field({ nullable: true })
     data?: string;
 
-    @Field(type => String, { nullable: true })
+    @Field(() => String, { nullable: true })
     error?: String;
 }
 
@@ -56,7 +56,7 @@ export class DatosIdGAMQueryResponse {
     @Field({ nullable: true })
     data?: string;
 
-    @Field(type => String, { nullable: true })
+    @Field(() => String, { nullable: true })
     error?: String;
 }
 

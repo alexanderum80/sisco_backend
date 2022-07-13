@@ -8,22 +8,22 @@ export class ConciliaContaQueryResponse {
     @Field({ nullable: true })
     data?: string;
 
-    @Field(type => String, { nullable: true })
+    @Field(() => String, { nullable: true })
     error?: String;
 }
 
 @ObjectType()
 export class ConciliaContabilidad {
-    @Field(type => ConciliaContaQueryResponse)
+    @Field(() => ConciliaContaQueryResponse)
     ReporteClasificador: ConciliaContaQueryResponse;
 
-    @Field(type => ConciliaContaQueryResponse)
+    @Field(() => ConciliaContaQueryResponse)
     ReporteConsultas: ConciliaContaQueryResponse;
 
-    @Field(type => ConciliaContaQueryResponse)
+    @Field(() => ConciliaContaQueryResponse)
     ReporteExpresiones: ConciliaContaQueryResponse;
 
-    @Field(type => ConciliaContaQueryResponse)
+    @Field(() => ConciliaContaQueryResponse)
     ReporteValores: ConciliaContaQueryResponse;
 }
 
@@ -32,10 +32,10 @@ export class ConciliaContabilidadQueryResponse {
     @Field()
     success: Boolean;
 
-    @Field(type => ConciliaContabilidad, { nullable: true })
+    @Field(() => ConciliaContabilidad, { nullable: true })
     data?: ConciliaContabilidad;
 
-    @Field(type => String, { nullable: true })
+    @Field(() => String, { nullable: true })
     error?: String;
 }
 
@@ -162,5 +162,33 @@ export const queryCentrosByConsolidado = `SELECT T.Centro FROM (
 				WHEN [Tipo de Análisis 3] = 'X' THEN [Análisis 3]
 				ELSE '' END, Cuenta
 	HAVING SUM(Débito - Crédito) NOT BETWEEN -0.0001 AND 0.0001) AS T
-GROUP BY T.Centro
-ORDER BY T.Centro`;
+    GROUP BY T.Centro
+    ORDER BY T.Centro`;
+
+export const queryInsertClasificadorUnidad = `IF NOT EXISTS (SELECT * FROM dbo.[Clasificador de Cuentas] WHERE Año = @Anio AND Cuenta = '@Cta' AND SubCuenta = '@Subcta')
+    INSERT dbo.[Clasificador de Cuentas]
+            (Año, Cuenta, SubCuenta, Descripción, Naturaleza, SubMayor, 
+            [Tipo de Análisis 1], [Tipo de Análisis 2], [Tipo de Análisis 3], Obligación, Terminal, 
+            [Cuenta Consolidación], [SubCuenta Consolidación], [Tipo de Análisis 1 Consolidación], [Tipo de Análisis 2 Consolidación], [Tipo de Análisis 3 Consolidación], [Condición Consolidación], 
+            [Análisis 1 Consolidación], [Análisis 2 Consolidación], [Análisis 3 Consolidación], 
+            [Moneda Extranjera], Estado, aporta_presupuesto, gasto_presupuesto, ingreso_presupuesto, Resultados_presupuesto, Capital_presupuesto, MEMO)
+    VALUES  (@Anio, '@Cta', '@SubCta', '@Desc', '@Nat', @Subm,
+            '@An1', '@An2', '@An3', @Obl, @Term, 
+            '@Cta', '@SubCta', '@ConsTipoAn1', '@ConsTipoAn2', '@ConsTipoAn3', '@CondCons', '@ConsAn1', '@ConsAn2', '@ConsAn3', 
+            0, 'A', 0, 0, 0, 0, 0, 0)`;
+
+export const queryUpdateClasificadorUnidad = `UPDATE dbo.[Clasificador de Cuentas]
+    SET Descripción = '@Desc', Naturaleza = '@Nat', SubMayor = @Subm, 
+                [Tipo de Análisis 1] = '@An1', [Tipo de Análisis 2] = '@An2', [Tipo de Análisis 3] = '@An3', Obligación = @Obl, Terminal = @Term, 
+                [Cuenta Consolidación] = '@Cta', [SubCuenta Consolidación] = '@SubCta', [Tipo de Análisis 1 Consolidación] = '@ConsTipoAn1', [Tipo de Análisis 2 Consolidación] = '@ConsTipoAn2', [Tipo de Análisis 3 Consolidación] = '@ConsTipoAn3', 
+                [Condición Consolidación] = '@CondCons', [Análisis 1 Consolidación] = '@ConsAn1', [Análisis 2 Consolidación] = '@ConsAn2', [Análisis 3 Consolidación] = '@ConsAn2'
+    WHERE Año = @Anio AND Cuenta = '@Cta' AND SubCuenta = '@SubCta'`;
+
+export const querySwitchAuditRodas = `USE master 
+    IF (CAST(PARSENAME(CAST(SERVERPROPERTY('ProductVersion') AS SYSNAME), CASE WHEN SERVERPROPERTY('ProductVersion') IS NULL THEN 3 ELSE 4 END) AS INT) > 9) 
+    BEGIN 
+        DECLARE @query NVARCHAR(255) 
+        SET @query = 'IF EXISTS(SELECT * FROM sys.server_audits WHERE name = ''@DataBase_ServerAudit'') 
+        ALTER SERVER AUDIT [@DataBase_ServerAudit] WITH (STATE=@Accion)' 
+        EXEC(@query) 
+    END`;

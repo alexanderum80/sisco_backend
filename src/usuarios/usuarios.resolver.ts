@@ -7,7 +7,7 @@ import { UseGuards } from '@nestjs/common';
 import { AuthGuard, DEFAULT_GRAPHQL_CONTEXT } from '../shared/helpers/auth.guard';
 
 
-@Resolver(of => Usuarios)
+@Resolver(() => Usuarios)
 export class UsuariosResolver {
     constructor(
         protected readonly _usuariosService: UsuariosService
@@ -23,7 +23,9 @@ export class UsuariosResolver {
 
     @Query(() => UsuariosQueryResponse)
     @UseGuards(new AuthGuard())
-    async getAllUsuarios(@Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios): Promise<UsuariosQueryResponse> {
+    async getAllUsuarios(
+        @Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios
+    ): Promise<UsuariosQueryResponse> {
         return this._usuariosService.findAll(user);
     }
 

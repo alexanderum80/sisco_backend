@@ -8,10 +8,10 @@ const xmlOptions = {
 
 @Injectable()
 export class XmlJsService {
-    jsonToXML(name: string, json: any): XMLDocument {
+    jsonToXML(_name: string, json: any): string {
         try {
             const content = [
-                json.map((el) => this.createXmlElement({ name, content: el }))
+                json.map((el: any) => this.createXmlElement({ name: _name, content: el }))
             ];
 
             return toXML({
@@ -21,12 +21,12 @@ export class XmlJsService {
                 },
                 _content: content
               }, xmlOptions);
-        } catch (err) {
-            return null;
+        } catch (err: any) {
+            return '';
         }
     }
 
-    createXmlElement({ name = null, content = {} } = {}) {
+    createXmlElement({ name = '', content = {} } = {}) {
         if (!Array.isArray(content)) {
           content = [content];
         }

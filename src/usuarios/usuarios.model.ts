@@ -21,7 +21,7 @@ export class UsuariosQueryResponse extends MultipleQueryResponse(Usuarios) {
 @InputType()
 export class UsuarioInput {
     @Field()
-    IdUsuario: number;
+    IdUsuario?: number;
 
     @Field()
     Usuario: string;

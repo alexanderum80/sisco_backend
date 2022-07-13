@@ -6,7 +6,7 @@ import { Args, Context, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard, DEFAULT_GRAPHQL_CONTEXT } from './../shared/helpers/auth.guard';
 
-@Resolver(of => Supervisor)
+@Resolver(() => Supervisor)
 export class SupervisoresResolver {
     constructor(
         private _supervisorService: SupervisoresService

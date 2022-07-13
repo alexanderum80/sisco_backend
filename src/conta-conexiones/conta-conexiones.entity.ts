@@ -1,7 +1,5 @@
-import { Divisiones } from './../divisiones/divisiones.entity';
-import { CentrosView } from './../unidades/unidades.entity';
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, JoinColumn, ViewEntity, ViewColumn, Connection } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @ObjectType()
 @Entity()

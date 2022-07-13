@@ -2,10 +2,10 @@ import { Usuarios } from './../usuarios/usuarios.entity';
 import { UsuariosService } from './../usuarios/usuarios.service';
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { SupervisoresQueryResponse, SupervisorQueryResponse, SupervisorInput } from './supervisores.model';
-import { Repository, Connection } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Supervisor } from './supervisores.entity';
 import { Injectable } from '@nestjs/common';
-import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class SupervisoresService {
@@ -31,12 +31,12 @@ export class SupervisoresService {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
 
-    async findOne(_id): Promise<SupervisorQueryResponse> {
+    async findOne(_id: number): Promise<SupervisorQueryResponse> {
         try {
             return new Promise<SupervisorQueryResponse>(resolve => {
                 this.supervisorRepository.findOne(_id, { relations: ['Cargo', 'Division'] }).then(res => {
@@ -45,7 +45,7 @@ export class SupervisoresService {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -55,13 +55,13 @@ export class SupervisoresService {
             delete SupervisorInfo.IdSupervisor;
 
             return new Promise<MutationResponse>(resolve => {
-                this.supervisorRepository.save(SupervisorInfo).then(res => {
+                this.supervisorRepository.save(SupervisorInfo).then(() => {
                     resolve({ success: true });
                 }).catch(err => {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -69,13 +69,13 @@ export class SupervisoresService {
     async update(SupervisorInfo: SupervisorInput): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.supervisorRepository.save(SupervisorInfo).then(res => {
+                this.supervisorRepository.save(SupervisorInfo).then(() => {
                     resolve({ success: true });
                 }).catch(err => {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -83,13 +83,13 @@ export class SupervisoresService {
     async delete(IDs: number[]): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.supervisorRepository.delete(IDs).then(res => {
+                this.supervisorRepository.delete(IDs).then(() => {
                     resolve({ success: true });
                 }).catch(err => {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }

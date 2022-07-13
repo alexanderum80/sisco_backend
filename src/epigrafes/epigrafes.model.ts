@@ -6,10 +6,10 @@ export class EpigrafesQueryResponse {
     @Field()
     success: Boolean;
 
-    @Field(type => [ContaEpigrafes], { nullable: true })
+    @Field(() => [ContaEpigrafes], { nullable: true })
     data?: ContaEpigrafes[];
 
-    @Field(type => String, { nullable: true })
+    @Field(() => String, { nullable: true })
     error?: String;
 }
 
@@ -18,17 +18,17 @@ export class EpigrafeQueryResponse {
     @Field()
     success: Boolean;
 
-    @Field(type => ContaEpigrafes, { nullable: true })
+    @Field(() => ContaEpigrafes, { nullable: true })
     data?: ContaEpigrafes;
 
-    @Field(type => String, { nullable: true })
+    @Field(() => String, { nullable: true })
     error?: String;
 }
 
 @InputType()
 export class EpigrafeInput {
     @Field()
-    IdEpigafre: number;
+    IdEpigafre?: number;
 
     @Field()
     Epigrafe: string;

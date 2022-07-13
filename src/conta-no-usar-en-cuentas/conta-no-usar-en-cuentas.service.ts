@@ -29,7 +29,7 @@ export class ContaNoUsarEnCuentasService {
                     throw new Error(err);
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -46,7 +46,7 @@ export class ContaNoUsarEnCuentasService {
                     throw new Error(err);
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -59,13 +59,13 @@ export class ContaNoUsarEnCuentasService {
             noUsarEnCuentaInput.Centralizada = IdDivision === 100 && IdTipoUsuario === ETipoUsuarios['Usuario Avanzado'];
 
             return new Promise<MutationResponse>(resolve => {
-                this.noUsarEnCuentaEntity.save(noUsarEnCuentaInput).then(result => {
+                this.noUsarEnCuentaEntity.save(noUsarEnCuentaInput).then(() => {
                     resolve({ success: true });
                 }).catch(err => {
                     throw new Error(err);
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -73,13 +73,13 @@ export class ContaNoUsarEnCuentasService {
     async update(noUsarEnCuentaInput: ContaNoUsarEnCuentaInput): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.noUsarEnCuentaEntity.save(noUsarEnCuentaInput).then(result => {
+                this.noUsarEnCuentaEntity.save(noUsarEnCuentaInput).then(() => {
                     resolve({ success: true });
                 }).catch(err => {
                     throw new Error(err);
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -87,13 +87,13 @@ export class ContaNoUsarEnCuentasService {
     async delete(IDs: number[]): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.noUsarEnCuentaEntity.delete(IDs).then(result => {
+                this.noUsarEnCuentaEntity.delete(IDs).then(() => {
                     resolve({ success: true });
                 }).catch(err => {
                     throw new Error(err);
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }

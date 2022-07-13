@@ -6,10 +6,10 @@ export class DWHConexionesQueryResponse {
     @Field()
     success: Boolean;
 
-    @Field(type => [DWHConexiones], { nullable: true })
+    @Field(() => [DWHConexiones], { nullable: true })
     data?: DWHConexiones[];
 
-    @Field(type => String, { nullable: true })
+    @Field(() => String, { nullable: true })
     error?: String;
 }
 
@@ -18,10 +18,10 @@ export class DWHConexionQueryResponse {
     @Field()
     success: Boolean;
 
-    @Field(type => DWHConexiones, { nullable: true })
+    @Field(() => DWHConexiones, { nullable: true })
     data?: DWHConexiones;
 
-    @Field(type => String, { nullable: true })
+    @Field(() => String, { nullable: true })
     error?: String;
 }
 

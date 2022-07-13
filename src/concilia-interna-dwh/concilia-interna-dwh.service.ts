@@ -39,10 +39,10 @@ export class ConciliaInternaDwhService {
 
             const conexionResp = await this._dwhConexionSvc.DWHConexion(inputValues.IdDivision);
             if (!conexionResp.success) {
-                return { success: false, error: conexionResp.error.toString() };
+                return { success: false, error: conexionResp.error!.toString() };
             }
 
-            const conexion = await (await this._dwhConexionSvc.conexionDWH(conexionResp.data.ConexionRest)).connect();
+            const conexion = await (await this._dwhConexionSvc.conexionDWH(conexionResp.data!.ConexionRest!)).connect();
 
             return new Promise<ConciliacionInternaDWHQueryResponse>(resolve => {
                 conexion.query(queryDWH).then(res => {
@@ -54,7 +54,7 @@ export class ConciliaInternaDwhService {
                     return { success: false, error: err.message ? err.message : err };
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }

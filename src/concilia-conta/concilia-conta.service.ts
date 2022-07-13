@@ -1,3 +1,4 @@
+import { toNumber, cloneDeep } from 'lodash';
 import { Usuarios } from './../usuarios/usuarios.entity';
 import { ETipoClasificadorCuenta } from './../clasificador-cuenta/clasificador-cuenta.model';
 import { ClasificadorCuentaService } from './../clasificador-cuenta/clasificador-cuenta.service';
@@ -7,11 +8,10 @@ import { RodasVentasService } from './../rodas-ventas/rodas-ventas.service';
 import { RodasInventarioService } from './../rodas-inventario/rodas-inventario.service';
 import { RodasVentas } from './../rodas-ventas/rodas-ventas.entity';
 import { RodasInventario } from './../rodas-inventario/rodas-inventario.entity';
-import { toNumber, cloneDeep } from 'lodash';
 import { ContaConexionesService } from './../conta-conexiones/conta-conexiones.service';
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { Injectable } from '@nestjs/common';
-import { queryUltimoPeriodo, queryInventarioRodas, queryVentasRodas, queryInventarioRodasCons, queryVentasRodasCons, queryComprobantesRodas, queryAsientoRodas, queryMayorRodas, queryRangoAsientosMes, querySaldosAcumuladosRodas, ConciliaContaInput, queryClasificadorCuentasRodas, ConciliaContabilidadQueryResponse, queryReporteConsultas, ConciliaContaQueryResponse, queryReporteExpresiones, queryReporteValores, IniciarSaldosInput, ChequearCentrosInput } from './concilia-conta.model';
+import { queryUltimoPeriodo, queryInventarioRodas, queryVentasRodas, queryInventarioRodasCons, queryVentasRodasCons, queryComprobantesRodas, queryAsientoRodas, queryMayorRodas, queryRangoAsientosMes, querySaldosAcumuladosRodas, ConciliaContaInput, queryClasificadorCuentasRodas, ConciliaContabilidadQueryResponse, queryReporteConsultas, ConciliaContaQueryResponse, queryReporteExpresiones, queryReporteValores, IniciarSaldosInput, ChequearCentrosInput, queryInsertClasificadorUnidad, querySwitchAuditRodas } from './concilia-conta.model';
 import { InjectConnection } from '@nestjs/typeorm';
 import { Connection } from 'typeorm';
 
@@ -31,24 +31,13 @@ export class ConciliaContaService {
         try {
             const { IdDivision } = user;
             const { idCentro, periodo, annio, tipoCentro, tipoEntidad } = conciliaContaInput;
-            const consolidado = tipoCentro === 2 ? '1' : '0';
+            const consolidado = tipoCentro === 2 ? '1' : '0'
 
             // verificar si se ha definido la conexión al Rodas
             const _conexionRodasQuery = await this._contaConexionesService.findByIdUnidad(idCentro, tipoCentro === 2);
-            // if (!_conexionRodasQuery.success) {
-            //     throw new Error(_conexionRodasQuery.error + ' No se pudo obtener la Conexión al Rodas del Centro ' + idCentro);
-            // }
+
             const _conexionConta = _conexionRodasQuery.data;
             _conexionConta.BaseDatos = _conexionConta.BaseDatos.substring(0, _conexionConta.BaseDatos.length - 4) + annio.toString();
-
-            // const _conexionCodif = cloneDeep(_conexionConta);
-            // _conexionCodif.BaseDatos = _conexionCodif.BaseDatos.substring(0, _conexionCodif.BaseDatos.length - 4).replace(/Conta/gi, 'Codif');
-
-            // importar el clasificador de cuentas
-            // await this._importarClasificador(idCentro, tipoCentro, annio, consolidado, periodo, _conexionConta);
-            // if (!_importarClasifCuentasRes.success) {
-            //     throw new Error(_importarClasifCuentasRes.error.toString());
-            // }
 
             // conecto al Conta del Centro
             let _contaConexionCentro: Connection = await this._contaConexionesService.conexionRodas(_conexionConta);
@@ -78,9 +67,6 @@ export class ConciliaContaService {
 
             // importar los comprobantes, asientos, etc.
             await this.importarContabilidad(idCentro, annio, periodo, consolidado, _contaConexionCentro);
-            // if (!_importarAsientosRes.success) {
-            //     throw new Error(_importarAsientosRes.error.toString());
-            // }
 
             // cierro la conexión al Rodas del Centro
             if (_contaConexionCentro && _contaConexionCentro.isConnected)
@@ -91,27 +77,6 @@ export class ConciliaContaService {
             await this._calculaConciliacion(idCentro, tipoCentro, annio, periodo, tipoEntidad, IdDivision).catch(err => {
                 _error = err.message;
             });
-            // if (!_calculaConciliacionRes.success) {
-            //     throw new Error(_calculaConciliacionRes.error.toString());
-            // }
-
-            // validando información
-            // if (tipoCentro === 2 && idCentro !== 100) {
-            //     await this._centrosNoConciliados(annio, periodo, idCentro);
-            //     // if (!_queryCentrosNoConciliados.success) {
-            //     //     throw new Error(_queryCentrosNoConciliados.error.toString());
-            //     // }
-
-            //     await this._centrosNoChequeadosVsConsolidado(annio, periodo, idCentro);
-            //     // if (!_queryCentrosNoChequeados.success) {
-            //     //     throw new Error(_queryCentrosNoChequeados.error.toString());
-            //     // }
-
-            //     await this._centrosDiferenciasVsConsolidado(idCentro, periodo);
-            //     // if (!_queryCentrosDiferenciasVsCons.success) {
-            //     //     throw new Error(_queryCentrosDiferenciasVsCons.error.toString());
-            //     // }
-            // }
 
             // devuelvo el resultado de la conciliación
             return new Promise<ConciliaContabilidadQueryResponse>(resolve => {
@@ -126,7 +91,7 @@ export class ConciliaContaService {
                     throw new Error(err);
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return {
                 success: false,
                 data: {
@@ -180,7 +145,7 @@ export class ConciliaContaService {
                     throw new Error(err.message ? err.message : err);
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             if (contaConexion && contaConexion.isConnected)
                 contaConexion.close();
 
@@ -205,9 +170,6 @@ export class ConciliaContaService {
 
             // chequear los datos adulterados
             await this._chequeaDatosAdulterados(idUnidad, contaConexion);
-            // if (!_datosAdulteradosRes.success) {
-            //     throw new Error(_datosAdulteradosRes.error.toString());
-            // }
 
             // chequear saldos acumulados hasta el periodo anterior
             await this._chequearSaldoAcumulados(idUnidad, annio, _ultimoPeriodo, cons, contaConexion);
@@ -217,24 +179,15 @@ export class ConciliaContaService {
             for (let per = _periodoInicial; per <= periodo; per++) {
                 // importar los comprobantes
                 await this._importarComprobantes(idUnidad, annio, per, cons, contaConexion);
-                // if (!_importarCompRes.success) {
-                //     throw new Error(_importarCompRes.error.toString());
-                // }
 
                 // importar los asientos
                 await this._importarAsientos(idUnidad, annio, per, cons, contaConexion);
-                // if (!_importarAsientoRes.success) {
-                //     throw new Error(_importarAsientoRes.error.toString());
-                // }
 
                 // importar mayor
                 await this._importarMayor(idUnidad, annio, periodo, cons, contaConexion);
-                // if (!_importarMayorRes.success) {
-                //     throw new Error(_importarMayorRes.error.toString());
-                // }
             }
 
-        } catch (err) {
+        } catch (err: any) {
             if (contaConexion && contaConexion.isConnected)
                 contaConexion.close();
 
@@ -243,166 +196,132 @@ export class ConciliaContaService {
     }
 
     private async _chequeaDatosAdulterados(idUnidad: number, conexionRodas: Connection): Promise<void> {
-        // try {
-            const _queryAsientos = queryRangoAsientosMes;
+        const _queryAsientos = queryRangoAsientosMes;
 
-            const _unidadRes = await this._unidadesService.getUnidadById(idUnidad);
-            if (!_unidadRes.success) {
-                throw new Error(_unidadRes.error.toString());
-            }
-            const _unidadInfo = _unidadRes.data;
+        const _unidadRes = await this._unidadesService.getUnidadById(idUnidad);
+        if (!_unidadRes.success) {
+            throw new Error(_unidadRes.error.toString());
+        }
+        // const _unidadInfo = _unidadRes.data;
 
-            await conexionRodas.query(_queryAsientos).then(result => {
-                let _asientoAnt = 0;
-                let _asientoIni = 0;
+        await conexionRodas.query(_queryAsientos).then(result => {
+            let _asientoAnt = 0;
+            let _asientoIni = 0;
 
-                result.forEach(asiento => {
-                    _asientoIni = toNumber(asiento.Ini);
+            result.forEach((asiento: any) => {
+                _asientoIni = toNumber(asiento.Ini);
 
-                    if (_asientoIni < _asientoAnt) {
-                        const _periodo = toNumber(asiento.Período) - 1;
-                        const _unidad = _unidadInfo.IdUnidad + '-' + _unidadInfo.Nombre;
-                        const _division = _unidadInfo.IdDivision + '-' + _unidadInfo.Division;
+                if (_asientoIni < _asientoAnt) {
+                    const _periodo = toNumber(asiento.Período) - 1;
+                    // const _unidad = _unidadInfo.IdUnidad + '-' + _unidadInfo.Nombre;
+                    // const _division = _unidadInfo.IdDivision + '-' + _unidadInfo.Division;
 
-                        let _msg;
-                        let _error;
+                    // let _msg = '';
+                    let _error;
 
-                        if (_periodo < 0) {
-                            _msg = `Existe una(s) línea(s) en blanco en los Asientos del Centro ${ _unidad },
-                                perteneciente a la División ${ _division }.`;
-                            _error = `Existe una(s) línea(s) en blanco en los Asientos del Centro`;
-                        } else {
-                            _msg = `Datos del Rodas adulterados en el período ${ _periodo } del Centro ${ _unidad },
-                                pertenciente a la División ${ _division }.`;
-                            _error = `Se adulteraron los datos del sistema Rodas.
-                                Restaure los datos contables a partir del período ${ _periodo }, reconstruya lo que le falta de este y trabaje en el período que le sigue, para después enviar la información al nivel superior.
-                                La causa es uno o más comprobantes hechos en el período ${ _periodo } después de haber trabajado el período ${ _periodo + 1 }`;
-                        }
-
-                        // enviar correo
-
-
-                        throw new Error(_error);
+                    if (_periodo < 0) {
+                        // _msg = `Existe una(s) línea(s) en blanco en los Asientos del Centro ${ _unidad },
+                        //     perteneciente a la División ${ _division }.`;
+                        _error = `Existe una(s) línea(s) en blanco en los Asientos del Centro`;
+                    } else {
+                        // _msg = `Datos del Rodas adulterados en el período ${ _periodo } del Centro ${ _unidad },
+                        //     pertenciente a la División ${ _division }.`;
+                        _error = `Se adulteraron los datos del sistema Rodas.
+                            Restaure los datos contables a partir del período ${ _periodo }, reconstruya lo que le falta de este y trabaje en el período que le sigue, para después enviar la información al nivel superior.
+                            La causa es uno o más comprobantes hechos en el período ${ _periodo } después de haber trabajado el período ${ _periodo + 1 }`;
                     }
 
-                    _asientoAnt = toNumber(asiento.Fin);
-                });
-            }).catch(err => {
-                throw new Error(err.message ? err.message : err);
-            });
-        // } catch (err) {
-        //     if (conexionRodas.isConnected)
-        //         conexionRodas.close();
+                    // enviar correo
 
-        //     throw new Error(err.message ? err.message : err);
-        // }
-    }
-
-    private async _chequearSaldoAcumulados(idUnidad: number, annio: number, periodo: number, cons: string, conexionRodas: Connection): Promise<void> {
-        // try {
-            const _querySaldosAcumRodas = querySaldosAcumuladosRodas.replace(/@Periodo/g, periodo.toString());
-
-            const _querySaldoAcumRodasRes = await conexionRodas.query(_querySaldosAcumRodas).then(result => {
-                return { data: result };
-            }).catch(err => {
-                throw new Error(err.message ? err.message : err);
-            });
-
-            let _saldoDebito = 0;
-            let _saldoCredito = 0;
-            if (_querySaldoAcumRodasRes.data.length > 0) {
-                _saldoDebito = _querySaldoAcumRodasRes.data[0].Debito;
-                _saldoCredito = _querySaldoAcumRodasRes.data[0].Credito;
-            }
-
-            await this.connection.query('EXEC dbo.pConta_SaldoAcumulado @0, @1, @2, @3, @4, @5', [idUnidad, cons, annio, periodo, _saldoDebito, _saldoCredito]).then(result => {
-                if (result[0].DifDebito !== 0 || result[0].DifCredito !== 0) {
-                    const _error = `Los Saldos Acumulados entre el Rodas y SISCO hasta el período ${ periodo - 1 } no coinciden.
-                        Concilie el período anterior, y después concilie el actual.\n\nNo se continuará con la Conciliación.`;
 
                     throw new Error(_error);
                 }
-            }).catch(err => {
-                throw new Error(err.message ? err.message : err);
-            });
-        // } catch (err) {
-        //     if (conexionRodas.isConnected)
-        //         conexionRodas.close();
 
-        //     throw new Error(err.message ? err.message : err);
-        // }
+                _asientoAnt = toNumber(asiento.Fin);
+            });
+        }).catch(err => {
+            throw new Error(err.message ? err.message : err);
+        });
+    }
+
+    private async _chequearSaldoAcumulados(idUnidad: number, annio: number, periodo: number, cons: string, conexionRodas: Connection): Promise<void> {
+        const _querySaldosAcumRodas = querySaldosAcumuladosRodas.replace(/@Periodo/g, periodo.toString());
+
+        const _querySaldoAcumRodasRes = await conexionRodas.query(_querySaldosAcumRodas).then(result => {
+            return { data: result };
+        }).catch(err => {
+            throw new Error(err.message ? err.message : err);
+        });
+
+        let _saldoDebito = 0;
+        let _saldoCredito = 0;
+        if (_querySaldoAcumRodasRes.data.length > 0) {
+            _saldoDebito = _querySaldoAcumRodasRes.data[0].Debito;
+            _saldoCredito = _querySaldoAcumRodasRes.data[0].Credito;
+        }
+
+        await this.connection.query('EXEC dbo.pConta_SaldoAcumulado @0, @1, @2, @3, @4, @5', [idUnidad, cons, annio, periodo, _saldoDebito, _saldoCredito]).then(result => {
+            if (result[0].DifDebito !== 0 || result[0].DifCredito !== 0) {
+                const _error = `Los Saldos Acumulados entre el Rodas y SISCO hasta el período ${ periodo - 1 } no coinciden.
+                    Concilie el período anterior, y después concilie el actual.\n\nNo se continuará con la Conciliación.`;
+
+                throw new Error(_error);
+            }
+        }).catch(err => {
+            throw new Error(err.message ? err.message : err);
+        });
     }
 
     private async _importarComprobantes(idUnidad: number, annio: number, periodo: number, cons: string, rodasConexion: Connection): Promise<void> {
-        // try {
-            const _queryComprobantes = queryComprobantesRodas.replace(/@Periodo/g, periodo.toString());
-            const _queryCompRes = await rodasConexion.query(_queryComprobantes).then(result => {
-                return result;
-            }).catch(err => {
+        const _queryComprobantes = queryComprobantesRodas.replace(/@Periodo/g, periodo.toString());
+        const _queryCompRes = await rodasConexion.query(_queryComprobantes).then(result => {
+            return result;
+        }).catch(err => {
+            throw new Error(err.message ? err.message : err);
+        });
+
+        if (_queryCompRes.length) {
+            const _comprobantes = this._xmlJsService.jsonToXML('Comprobantes', _queryCompRes);
+            
+            await this.connection.query(`EXEC dbo.pConta_ImportComprobanteXML @0, @1, @2, @3, @4`, [_comprobantes, idUnidad, cons, annio, periodo]).catch(err => {
                 throw new Error(err.message ? err.message : err);
             });
-
-            if (_queryCompRes.length) {
-                const _comprobantes = this._xmlJsService.jsonToXML('Comprobantes', _queryCompRes);
-                
-                await this.connection.query(`EXEC dbo.pConta_ImportComprobanteXML @0, @1, @2, @3, @4`, [_comprobantes, idUnidad, cons, annio, periodo]).catch(err => {
-                    throw new Error(err.message ? err.message : err);
-                });
-            }
-        // } catch (err) {
-        //     throw new Error(err.message ? err.message : err);
-        // }
+        }
     }
 
     private async _importarAsientos(idUnidad: number, annio: number, periodo: number, cons: string, rodasConexion: Connection): Promise<void> {
-        // try {
-            const _queryAsientos = queryAsientoRodas.replace(/@Periodo/g, periodo.toString());
-            
-            const _queryAsientosRes = await rodasConexion.query(_queryAsientos).then(result => {
-                return result;
-            }).catch(err => {
+        const _queryAsientos = queryAsientoRodas.replace(/@Periodo/g, periodo.toString());
+        
+        const _queryAsientosRes = await rodasConexion.query(_queryAsientos).then(result => {
+            return result;
+        }).catch(err => {
+            throw new Error(err.message ? err.message : err);
+        });
+        
+        if (_queryAsientosRes.length) {
+            const _asientos = this._xmlJsService.jsonToXML('Asiento', _queryAsientosRes);
+
+            await this.connection.query(`EXEC dbo.pConta_ImportAsientoXML @0, @1, @2, @3, @4`, [_asientos, idUnidad, cons, annio, periodo]).catch(err => {
                 throw new Error(err.message ? err.message : err);
             });
-
-            // let _asientosArray = [];
-            // for (let i = 0; i < _queryAsientosRes.data.length; i++) {
-            //     const element = _queryAsientosRes.data[i];
-            //     _asientosArray.push({
-            //         Asiento: element
-            //     });
-            // }
-            
-            if (_queryAsientosRes.length) {
-                const _asientos = this._xmlJsService.jsonToXML('Asiento', _queryAsientosRes);
-
-                await this.connection.query(`EXEC dbo.pConta_ImportAsientoXML @0, @1, @2, @3, @4`, [_asientos, idUnidad, cons, annio, periodo]).catch(err => {
-                    throw new Error(err.message ? err.message : err);
-                });
-            }
-        // } catch (err) {
-        //     return { success: false, error: err.message ? err.message : err };
-        // }
+        }
     }
 
     private async _importarMayor(idUnidad: number, annio: number, periodo: number, cons: string, rodasConexion: Connection): Promise<void> {
-        // try {
-            const _queryMayor = queryMayorRodas.replace(/@Periodo/g, periodo.toString());
-            const _queryMayorRes = await rodasConexion.query(_queryMayor).then(result => {
-                return result;
-            }).catch(err => {
+        const _queryMayor = queryMayorRodas.replace(/@Periodo/g, periodo.toString());
+        const _queryMayorRes = await rodasConexion.query(_queryMayor).then(result => {
+            return result;
+        }).catch(err => {
+            throw new Error(err.message ? err.message : err);
+        });
+        
+        if (_queryMayorRes.length) {
+            const _mayor = this._xmlJsService.jsonToXML('Mayor', _queryMayorRes);
+
+            await this.connection.query(`EXEC dbo.pConta_ImportMayorXML @0, @1, @2, @3, @4`, [_mayor, idUnidad, cons, annio, periodo]).catch(err => {
                 throw new Error(err.message ? err.message : err);
             });
-            
-            if (_queryMayorRes.length) {
-                const _mayor = this._xmlJsService.jsonToXML('Mayor', _queryMayorRes);
-
-                await this.connection.query(`EXEC dbo.pConta_ImportMayorXML @0, @1, @2, @3, @4`, [_mayor, idUnidad, cons, annio, periodo]).catch(err => {
-                    throw new Error(err.message ? err.message : err);
-                });
-            }
-        // } catch (err) {
-        //     return { success: false, error: err.message ? err.message : err };
-        // }
+        }
     }
 
     private async _calculaConciliacion(idUnidad: number, tipoClasificador: number, anio: number, periodo: number, tipoEntidad: number, idDivision: number): Promise<void> {
@@ -463,143 +382,120 @@ export class ConciliaContaService {
     }
 
     private async _reporteConsultas(idUnidad: number, cons: string, periodo: number, idConsulta: number): Promise<ConciliaContaQueryResponse> {
-        // try {
-            const _query = queryReporteConsultas
-                    .replace(/@Centro/g, idUnidad.toString())
-                    .replace(/@Consolidado/g, cons)
-                    .replace(/@Periodo/g, periodo.toString())
-                    .replace(/@IdConsulta/g, idConsulta.toString());
+        const _query = queryReporteConsultas
+                .replace(/@Centro/g, idUnidad.toString())
+                .replace(/@Consolidado/g, cons)
+                .replace(/@Periodo/g, periodo.toString())
+                .replace(/@IdConsulta/g, idConsulta.toString());
 
-            return new Promise<ConciliaContaQueryResponse>(resolve => {
-                this.connection.query(_query).then(result => {
-                    resolve({
-                        success: true,
-                        data: JSON.stringify(result)
-                    });
-                }).catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
+        return new Promise<ConciliaContaQueryResponse>(resolve => {
+            this.connection.query(_query).then(result => {
+                resolve({
+                    success: true,
+                    data: JSON.stringify(result)
                 });
+            }).catch(err => {
+                resolve({ success: false, error: err.message ? err.message : err });
             });
-        // } catch (err) {
-        //     return { success: false, error: err.message ? err.message : err };
-        // }
+        });
     }
 
     private async _reporteExpresiones(idUnidad: number, cons: string, periodo: number): Promise<ConciliaContaQueryResponse> {
-        // try {
-            const _query = queryReporteExpresiones
-                    .replace(/@Centro/g, idUnidad.toString())
-                    .replace(/@Consolidado/g, cons)
-                    .replace(/@Periodo/g, periodo.toString());
+        const _query = queryReporteExpresiones
+                .replace(/@Centro/g, idUnidad.toString())
+                .replace(/@Consolidado/g, cons)
+                .replace(/@Periodo/g, periodo.toString());
 
-            return new Promise<ConciliaContaQueryResponse>(resolve => {
-                this.connection.query(_query).then(result => {
-                    resolve({
-                        success: true,
-                        data: JSON.stringify(result)
-                    });
-                }).catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
+        return new Promise<ConciliaContaQueryResponse>(resolve => {
+            this.connection.query(_query).then(result => {
+                resolve({
+                    success: true,
+                    data: JSON.stringify(result)
                 });
+            }).catch(err => {
+                resolve({ success: false, error: err.message ? err.message : err });
             });
-        // } catch (err) {
-        //     return { success: false, error: err.message ? err.message : err };
-        // }
+        });
     }
 
     private async _reporteValores(idUnidad: number, cons: string, periodo: number, idDivision: number): Promise<ConciliaContaQueryResponse> {
-        // try {
-            const _query = queryReporteValores
-                    .replace(/@Centro/g, idUnidad.toString())
-                    .replace(/@Consolidado/g, cons)
-                    .replace(/@Periodo/g, periodo.toString())
-                    .replace(/@IdDivision/g, idDivision.toString());
+        const _query = queryReporteValores
+                .replace(/@Centro/g, idUnidad.toString())
+                .replace(/@Consolidado/g, cons)
+                .replace(/@Periodo/g, periodo.toString())
+                .replace(/@IdDivision/g, idDivision.toString());
 
-            return new Promise<ConciliaContaQueryResponse>(resolve => {
-                this.connection.query(_query).then(result => {
-                    resolve({
-                        success: true,
-                        data: JSON.stringify(result)
-                    });
-                }).catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
+        return new Promise<ConciliaContaQueryResponse>(resolve => {
+            this.connection.query(_query).then(result => {
+                resolve({
+                    success: true,
+                    data: JSON.stringify(result)
                 });
+            }).catch(err => {
+                resolve({ success: false, error: err.message ? err.message : err });
             });
-        // } catch (err) {
-        //     return { success: false, error: err.message ? err.message : err };
-        // }
+        });
     }
 
     async importarInventarioRodas(annio: number, periodo: number, idUnidad: number, cons: string): Promise<MutationResponse> {
-        // try {
-            let query;
-            if (cons === '1') {
-                query = queryInventarioRodasCons.replace(/@Anio/g, annio.toString())
-                                            .replace(/@Periodo/g, periodo.toString())
-                                            .replace(/@Centro/g, idUnidad.toString());
-            } else {
-                query = queryInventarioRodas.replace(/@Anio/g, annio.toString())
-                                .replace(/@Periodo/g, periodo.toString())
-                                .replace(/@Centro/g, idUnidad.toString());
+        let query;
+        if (cons === '1') {
+            query = queryInventarioRodasCons.replace(/@Anio/g, annio.toString())
+                                        .replace(/@Periodo/g, periodo.toString())
+                                        .replace(/@Centro/g, idUnidad.toString());
+        } else {
+            query = queryInventarioRodas.replace(/@Anio/g, annio.toString())
+                            .replace(/@Periodo/g, periodo.toString())
+                            .replace(/@Centro/g, idUnidad.toString());
+        }
+
+        const _inventario: RodasInventario[] = await this.connection.query(query).then(result => {
+            return result;
+        }).catch(err => {
+            throw new Error(err.message ? err.message : err);
+        });
+
+        if (_inventario) {
+            for (let i = 0; i < _inventario.length; i++) {
+                const inventario = _inventario[i];
+
+                await this._rodasInventarioService.insertRodasInventario(inventario);
             }
+        }
 
-            const _inventario: RodasInventario[] = await this.connection.query(query).then(result => {
-                return result;
-            }).catch(err => {
-                throw new Error(err.message ? err.message : err);
-            });
-
-            if (_inventario) {
-                for (let i = 0; i < _inventario.length; i++) {
-                    const inventario = _inventario[i];
-
-                    await this._rodasInventarioService.insertRodasInventario(inventario);
-                    // if (!_insertInventarioRes.success) {
-                    //     return { success: false, error: _insertInventarioRes.error };
-                    // }
-                }
-            }
-
-            return new Promise<MutationResponse>(resolve => {
-                resolve({ success: true });
-            });
-        // } catch (err) {
-        //     return { success: false, error: err.message ? err.message : err };
-        // }
+        return new Promise<MutationResponse>(resolve => {
+            resolve({ success: true });
+        });
     }
 
     async importarVentasRodas(annio: number, periodo: number, idUnidad: number, cons: string, ventasAcumuladas: boolean): Promise<MutationResponse> {
-        // try {
-            let query = cons === '1' ? queryVentasRodasCons : queryVentasRodas;
+        let query = cons === '1' ? queryVentasRodasCons : queryVentasRodas;
 
-            if (ventasAcumuladas) {
-                query = query.replace(/= @Periodo/g, '<= @Periodo');
+        if (ventasAcumuladas) {
+            query = query.replace(/= @Periodo/g, '<= @Periodo');
+        }
+
+        query = query.replace(/@Anio/g, annio.toString())
+                .replace(/@Periodo/g, periodo.toString())
+                .replace(/@Centro/g, idUnidad.toString());
+
+        const _Ventas: RodasVentas[] = await this.connection.query(query).then(result => {
+            return result;
+        }).catch(err => {
+            throw new Error(err.message ? err.message : err);
+        });
+
+        if (_Ventas) {
+            for (let i = 0; i < _Ventas.length; i++) {
+                const Ventas = _Ventas[i];
+
+                await this._rodasVentasService.insertRodasVentas(Ventas);
             }
+        }
 
-            query = query.replace(/@Anio/g, annio.toString())
-                    .replace(/@Periodo/g, periodo.toString())
-                    .replace(/@Centro/g, idUnidad.toString());
-
-            const _Ventas: RodasVentas[] = await this.connection.query(query).then(result => {
-                return result;
-            }).catch(err => {
-                throw new Error(err.message ? err.message : err);
-            });
-
-            if (_Ventas) {
-                for (let i = 0; i < _Ventas.length; i++) {
-                    const Ventas = _Ventas[i];
-
-                    await this._rodasVentasService.insertRodasVentas(Ventas);
-                }
-            }
-
-            return new Promise<MutationResponse>(resolve => {
-                resolve({ success: true });
-            });
-        // } catch (err) {
-        //     return { success: false, error: err.message ? err.message : err };
-        // }
+        return new Promise<MutationResponse>(resolve => {
+            resolve({ success: true });
+        });
     }
 
     async iniciarSaldos(iniciarSaldosInput: IniciarSaldosInput): Promise<MutationResponse> {
@@ -614,7 +510,7 @@ export class ConciliaContaService {
                     return { success: false, error: err.message ? err.message : err };
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -629,7 +525,7 @@ export class ConciliaContaService {
             const _conexionCodif = cloneDeep(_conexionConta);
             _conexionCodif.BaseDatos = _conexionCodif.BaseDatos.substring(0, _conexionCodif.BaseDatos.length - 4).replace(/Conta/gi, 'Codif');
 
-            let tipoClasificador;
+            let tipoClasificador: number = 0;
 
             switch (tipoUnidad) {
                 case '0':
@@ -638,7 +534,7 @@ export class ConciliaContaService {
                 case '1':
                     tipoClasificador = ETipoClasificadorCuenta.Complejo
                     break;
-                case '1':
+                case '2':
                     tipoClasificador = ETipoClasificadorCuenta.Consolidado
                     break;
             }
@@ -650,9 +546,98 @@ export class ConciliaContaService {
 
             const _clasifCuentasReal = _clasifCuentasRealQuery.data;
 
+            const bdCodif = await this._contaConexionesService.conexionRodas(_conexionCodif);
+            const bdConta = await this._contaConexionesService.conexionRodas(_conexionConta);
+            // const _clasifCuentaUC = await bdConta.query('SELECT * FROM dbo.[Clasificador de Cuentas]').then(result => {
+            //     return result;
+            // }).catch(err => {
+            //     return { success: false, error: err.message ? err.message : err };
+            // });
+
+            // deshabilito el Audit
+            const _queryStopAudit = querySwitchAuditRodas
+                .replace(/@DataBase/g, bdConta.options.database!.toString())
+                .replace(/@Accion/g, 'OFF');
+
+            await bdCodif.query(_queryStopAudit).catch(err => {
+                return { success: false, error: err.message ? err.message : err };
+            });   
+
+            _clasifCuentasReal.forEach(async (element: { Cuenta: string; SubCuenta: string; Descripcion: string; Naturaleza: string; Terminal: boolean; Crit1: string; Crit2: string; Crit3: string; Obligacion: boolean; Crit1Consolidacion: string; Crit2Consolidacion: string; Crit3Consolidacion: string; }) => {
+                // inserto la cuenta, si no existe
+                const _queryInsert = queryInsertClasificadorUnidad
+                    .replace(/@Anio/g, annio)
+                    .replace(/@Cta/g, element.Cuenta)
+                    .replace(/@SubCta/g, element.SubCuenta)
+                    .replace(/@Desc/g, element.Descripcion)
+                    .replace(/@Nat/g, element.Naturaleza)
+                    .replace(/@Subm/g, element.Terminal === true ? '1' : '0')
+                    .replace(/@An1/g, element.Crit1)
+                    .replace(/@An2/g, element.Crit2)
+                    .replace(/@An3/g, element.Crit3)
+                    .replace(/@Obl/g, element.Obligacion === true ? '1' : '0')
+                    .replace(/@Term/g, element.Terminal === true ? '1' : '0')
+                    .replace(/@ConsTipoAn1/g, element.Crit1Consolidacion)
+                    .replace(/@ConsTipoAn2/g, element.Crit2Consolidacion)
+                    .replace(/@ConsTipoAn3/g, element.Crit3Consolidacion)
+                    .replace(/@CondCons/g, element.Terminal === true ? 'X' : '')
+                    .replace(/@ConsAn1/g, element.Crit1Consolidacion === '@' ? idUnidad.toString() : '')
+                    .replace(/@ConsAn2/g, element.Crit2Consolidacion === '@' ? idUnidad.toString() : '')
+                    .replace(/@ConsAn3/g, element.Crit3Consolidacion === '@' ? idUnidad.toString() : '')
+                
+                await bdCodif.query(_queryInsert).catch(err => {
+                    // habilito el Audit
+                    const _queryStopAudit = querySwitchAuditRodas
+                        .replace(/@DataBase/g, bdConta.options.database!.toString())
+                        .replace(/@Accion/g, 'ON');
+
+                    bdCodif.query(_queryStopAudit).catch(err => {
+                        return { success: false, error: err.message ? err.message : err };
+                    });
+
+                    return { success: false, error: err.message ? err.message : err };
+                });   
+                
+                const _queryUpdate = queryInsertClasificadorUnidad
+                    .replace(/@Anio/g, annio)
+                    .replace(/@Cta/g, element.Cuenta)
+                    .replace(/@SubCta/g, element.SubCuenta)
+                    .replace(/@Desc/g, element.Descripcion)
+                    .replace(/@Nat/g, element.Naturaleza)
+                    .replace(/@Subm/g, element.Terminal === true ? '1' : '0')
+                    .replace(/@An1/g, element.Crit1)
+                    .replace(/@An2/g, element.Crit2)
+                    .replace(/@An3/g, element.Crit3)
+                    .replace(/@Obl/g, element.Obligacion === true ? '1' : '0')
+                    .replace(/@Term/g, element.Terminal === true ? '1' : '0')
+                    .replace(/@ConsTipoAn1/g, element.Crit1Consolidacion)
+                    .replace(/@ConsTipoAn2/g, element.Crit2Consolidacion)
+                    .replace(/@ConsTipoAn3/g, element.Crit3Consolidacion)
+                    .replace(/@CondCons/g, element.Terminal === true ? 'X' : '')
+                    .replace(/@ConsAn1/g, element.Crit1Consolidacion === '@' ? idUnidad.toString() : '')
+                    .replace(/@ConsAn2/g, element.Crit2Consolidacion === '@' ? idUnidad.toString() : '')
+                    .replace(/@ConsAn3/g, element.Crit3Consolidacion === '@' ? idUnidad.toString() : '')
+                
+                await bdCodif.query(_queryUpdate).catch(err => {
+                    // habilito el Audit
+                    const _queryStopAudit = querySwitchAuditRodas
+                        .replace(/@DataBase/g, bdConta.options.database!.toString())
+                        .replace(/@Accion/g, 'ON');
+
+                    bdCodif.query(_queryStopAudit).catch(err => {
+                        return { success: false, error: err.message ? err.message : err };
+                    });
+
+                    return { success: false, error: err.message ? err.message : err };
+                });       
+            });
 
 
-        } catch (err) {
+
+            return new Promise<MutationResponse>(resolve => {
+                resolve({ success: true });
+            });
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -679,7 +664,7 @@ export class ConciliaContaService {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }

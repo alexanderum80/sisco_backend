@@ -19,7 +19,7 @@ export class RodasVentasService {
                     throw new Error(err.message ? err.message : err);
                 });
             });
-        // } catch (err) {
+        // } catch (err: any) {
         //     return { success: false, error: err.message ? err.message : err };
         // }
     }
@@ -32,7 +32,7 @@ export class RodasVentasService {
                     throw new Error(err.message ? err.message : err);
                 });
             });
-        // } catch (err) {
+        // } catch (err: any) {
         //     return { success: false, error: err.message ? err.message : err };
         // }
     }

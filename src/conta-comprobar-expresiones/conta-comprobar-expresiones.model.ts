@@ -11,7 +11,7 @@ export class ContaComprobarExpresionQueryResponse extends SingleQueryResponse(Co
 @InputType()
 export class ContaComprobarExpresionesInput {
     @Field()
-    Id: number;
+    Id?: number;
 
     @Field()
     IdExpresion: number;

@@ -3,7 +3,7 @@ import { SubdivisionesService } from './subdivisiones.service';
 import { Subdivisiones } from './subdivisiones.entity';
 import { Resolver, Query, Args, Int } from '@nestjs/graphql';
 
-@Resolver(of => Subdivisiones)
+@Resolver(() => Subdivisiones)
 export class SubdivisionesResolver {
     constructor(
         private _subdivisionesSvc: SubdivisionesService

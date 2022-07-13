@@ -42,7 +42,7 @@ export class ContaComprobarValoresService {
           resolve({ success: false, error: err.message ? err.message : err });
         })
       })
-    } catch (err) {
+    } catch (err: any) {
       return { success: false, error: err.message ? err.message : err };
     }
   }
@@ -59,7 +59,7 @@ export class ContaComprobarValoresService {
           resolve({ success: false, error: err.message ? err.message : err });
         })
       })
-    } catch (err) {
+    } catch (err: any) {
       return { success: false, error: err.message ? err.message : err };
     }
   }
@@ -73,13 +73,13 @@ export class ContaComprobarValoresService {
       comprobarValoresInput.IdDivision = IdDivision;
 
       return new Promise<MutationResponse>(resolve => {
-        this.comprobarValoresEntity.save(comprobarValoresInput).then(result => {
+        this.comprobarValoresEntity.save(comprobarValoresInput).then(() => {
           resolve({ success: true })
         }).catch(err => {
           resolve({ success: false, error: err.message ? err.message : err });
         })
      })
-    } catch (err) {
+    } catch (err: any) {
       return { success: false, error: err.message ? err.message : err };
     }
   }
@@ -87,13 +87,13 @@ export class ContaComprobarValoresService {
   async update(contaComprobarValoresInput: ComprobarValoresInput): Promise<MutationResponse> {
     try {
       return new Promise<MutationResponse>(resolve => {
-        this.comprobarValoresEntity.save(contaComprobarValoresInput).then(result => {
+        this.comprobarValoresEntity.save(contaComprobarValoresInput).then(() => {
           resolve({ success: true })
         }).catch(err => {
           resolve({ success: false, error: err.message ? err.message : err });
         })
      })
-    } catch (err) {
+    } catch (err: any) {
       return { success: false, error: err.message ? err.message : err };
     }
   }
@@ -101,13 +101,13 @@ export class ContaComprobarValoresService {
   async delete(IDs: number[]) {
     try {
       return new Promise<MutationResponse>(resolve => {
-        this.comprobarValoresEntity.delete(IDs).then(result => {
+        this.comprobarValoresEntity.delete(IDs).then(() => {
           resolve({ success: true })
         }).catch(err => {
           resolve({ success: false, error: err.message ? err.message : err });
         })
      })
-    } catch (err) {
+    } catch (err: any) {
       return { success: false, error: err.message ? err.message : err };
     }
   }

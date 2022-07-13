@@ -4,7 +4,7 @@ import { ClasificarEntidades } from './clasificador-entidades.entity';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { ClasificadorEntidadesService } from './clasificador-entidades.service';
 
-@Resolver(of => ClasificarEntidades)
+@Resolver(() => ClasificarEntidades)
 export class ClasificadorEntidadesResolver {
     constructor(
         private clasificadorEntidadesSvc: ClasificadorEntidadesService

@@ -3,7 +3,7 @@ import { ContaTipoValorExpresionesEntity } from './conta-tipovalor-expresiones.e
 import { ContaTipoValorExpresionesQueryResponse } from './conta-tipovalor-expresiones.model';
 import { ContaTipovalorExpresionesService } from './conta-tipovalor-expresiones.service';
 
-@Resolver(of => ContaTipoValorExpresionesEntity)
+@Resolver(() => ContaTipoValorExpresionesEntity)
 export class ContaTipovalorExpresionesResolver {
     constructor(
         private contaTipoValorExpresionesSvc: ContaTipovalorExpresionesService

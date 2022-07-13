@@ -6,7 +6,7 @@ export class ContaTipoentidadesQueryResponse {
     @Field()
     success: boolean;
 
-    @Field(type => [TipoEntidades], { nullable: true })
+    @Field(() => [TipoEntidades], { nullable: true })
     data?: TipoEntidades[];
 
     @Field({ nullable: true })
@@ -18,7 +18,7 @@ export class ContaTipoentidadQueryResponse {
     @Field()
     success: boolean;
 
-    @Field(type => TipoEntidades, { nullable: true })
+    @Field(() => TipoEntidades, { nullable: true })
     data?: TipoEntidades;
 
     @Field({ nullable: true })
@@ -28,7 +28,7 @@ export class ContaTipoentidadQueryResponse {
 @InputType()
 export class TipoEntidadInput {
     @Field()
-    Id: number;
+    Id?: number;
 
     @Field()
     Entidades: string;

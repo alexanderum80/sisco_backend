@@ -6,9 +6,9 @@ export class ContaOperadoresQueryResponse {
     @Field()
     success: Boolean;
 
-    @Field(type => [ContaOperadoresEntity], { nullable: true })
+    @Field(() => [ContaOperadoresEntity], { nullable: true })
     data?: ContaOperadoresEntity[];
 
-    @Field(type => String, { nullable: true })
+    @Field(() => String, { nullable: true })
     error?: String;
 }

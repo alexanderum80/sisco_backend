@@ -2,7 +2,7 @@ import { Usuarios } from './../usuarios/usuarios.entity';
 import { AuthGuard, DEFAULT_GRAPHQL_CONTEXT } from './../shared/helpers/auth.guard';
 import { ConciliaContaInput, ConciliaContabilidadQueryResponse, IniciarSaldosInput, ChequearCentrosInput, ConciliaContaQueryResponse } from './concilia-conta.model';
 import { ConciliaContaService } from './concilia-conta.service';
-import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Context, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 
 @Resolver()
@@ -32,5 +32,14 @@ export class ConciliaContaResolver {
         @Args({ name: 'chequearCentrosInput', type: () => ChequearCentrosInput }) chequearCentrosInput: ChequearCentrosInput,
     ): Promise<ConciliaContaQueryResponse> {
         return this.conciliaContaSvc.chequearCentro(chequearCentrosInput);
+    }
+
+    @Mutation(() => ConciliaContaQueryResponse)
+    async arreglaClasificadorCuenta(
+        @Args({ name: 'idUnidad', type: () => Int }) idUnidad: number,
+        @Args({ name: 'tipoUnidad', type: () => String }) tipoUnidad: string,
+        @Args({ name: 'annio', type: () => String }) annio: string,
+    ): Promise<ConciliaContaQueryResponse> {
+        return this.conciliaContaSvc.arreglaClasificadorCuenta(idUnidad, tipoUnidad, annio);
     }
 }

@@ -7,7 +7,7 @@ import { ContaExpresionesService } from './conta-expresiones.service';
 import { MutationResponse } from '../shared/models/mutation.response.model';
 import { UseGuards } from '@nestjs/common';
 
-@Resolver(of => ExpresionesResumenEntity)
+@Resolver(() => ExpresionesResumenEntity)
 export class ContaExpresionesResumenResolver {
     constructor(
         private expresionesSvc: ContaExpresionesService
@@ -50,7 +50,7 @@ export class ContaExpresionesResumenResolver {
     }
 }
 
-@Resolver(of => ExpresionesDetalleEntity)
+@Resolver(() => ExpresionesDetalleEntity)
 export class ContaExpresionesDetalleResolver {
     constructor(
         private expresionesSvc: ContaExpresionesService

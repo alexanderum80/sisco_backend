@@ -38,15 +38,18 @@ import { ContaOperadoresModule } from './conta-operadores/conta-operadores.modul
 import { ContaNoUsarEnCuentasModule } from './conta-no-usar-en-cuentas/conta-no-usar-en-cuentas.module';
 import { TipoUsuariosModule } from './tipo-usuarios/tipo-usuarios.module';
 import { ContaComprobarValoresModule } from './conta-comprobar-valores/conta-comprobar-valores.module';
+import { CajaConfiguracionModule } from './caja-configuracion/caja-configuracion.module';
 import 'dotenv/config';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 
 @Module({
   imports: [
-    GraphQLModule.forRoot({
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
       autoSchemaFile: 'schema.gql',
       playground: true,
-      context: ((req) => ({ headers: req.headers })),
-      formatError: (err) => {
+      context: ((req: any) => ({ headers: req.headers })),
+      formatError: (err: any) => {
         return err;
       }
     }),
@@ -101,6 +104,7 @@ import 'dotenv/config';
     ContaNoUsarEnCuentasModule,
     TipoUsuariosModule,
     ContaComprobarValoresModule,
+    CajaConfiguracionModule,
   ],
   controllers: [AppController],
   providers: [AppService, EmailsService],

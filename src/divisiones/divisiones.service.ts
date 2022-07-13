@@ -1,6 +1,6 @@
 import { Usuarios } from './../usuarios/usuarios.entity';
 import { UsuariosService } from './../usuarios/usuarios.service';
-import { DivisionesQueryResponse, DivisionQueryResponse } from './divisiones.model';
+import { DivisionesQueryResponse } from './divisiones.model';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Divisiones } from './divisiones.entity';
@@ -34,7 +34,7 @@ export class DivisionesService {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -55,12 +55,12 @@ export class DivisionesService {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
 
-    async getDivisionById(_id): Promise<DivisionesQueryResponse> {
+    async getDivisionById(_id: number): Promise<DivisionesQueryResponse> {
         try {
             return new Promise<DivisionesQueryResponse>(resolve => {
                 this.divisionesRepository.find({ IdDivision : _id }).then(result => {
@@ -73,7 +73,7 @@ export class DivisionesService {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }

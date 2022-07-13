@@ -32,7 +32,7 @@ export class ClasificadorEntidadesService {
                     return { success: false, error: err.message ? err.message : err };
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -49,7 +49,7 @@ export class ClasificadorEntidadesService {
                     return { success: false, error: err.message ? err.message : err };
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -69,7 +69,7 @@ export class ClasificadorEntidadesService {
                     return { success: false, error: err.message ? err.message : err };
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -83,7 +83,7 @@ export class ClasificadorEntidadesService {
                     return { success: false, error: err.message ? err.message : err };
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -91,13 +91,13 @@ export class ClasificadorEntidadesService {
     async delete(IDs: number[]): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.clasificarEntidadesRepository.delete(IDs).then(result => {
+                this.clasificarEntidadesRepository.delete(IDs).then(() => {
                     resolve({ success: true });
                 }).catch(err => {
                     return { success: false, error: err.message ? err.message : err };
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }

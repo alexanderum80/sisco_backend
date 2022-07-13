@@ -1,25 +1,25 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { ConnectionOptions } from 'typeorm';
+import { SqlServerConnectionOptions } from 'typeorm/driver/sqlserver/SqlServerConnectionOptions';
 
 @ObjectType()
 export class Conexiones {
   @Field()
-  name: string;
+  name: string | undefined;
 }
 
 @ObjectType()
 export class ConexionesQueryResponse {
   @Field()
-  success: Boolean;
+  success: Boolean | undefined;
 
-  @Field(type => [Conexiones], { nullable: true })
+  @Field(() => [Conexiones], { nullable: true })
   data?: Conexiones[];
 
-  @Field(type => String, { nullable: true })
+  @Field(() => String, { nullable: true })
   error?: String;
 }
 
-export const DEFAULT_CONNECTION_STRING: ConnectionOptions = {
+export const DEFAULT_CONNECTION_STRING: SqlServerConnectionOptions = {
     type: 'mssql',
     host: '',
     username: '',

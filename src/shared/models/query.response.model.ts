@@ -5,13 +5,13 @@ export function SingleQueryResponse<TItem>(TItemClass: ClassType<TItem>) {
     // `isAbstract` decorator option is mandatory to prevent registering in schema
     @ObjectType({ isAbstract: true })
     abstract class QueryResponseClass {
-      @Field(type => Boolean)
+      @Field(() => Boolean)
       success: boolean;
       
-      @Field(type => TItemClass, { nullable: true })
+      @Field(() => TItemClass, { nullable: true })
       data?: TItem;
   
-      @Field(type => String, { nullable: true })
+      @Field(() => String, { nullable: true })
       error?: string;
     }
 
@@ -22,13 +22,13 @@ export function MultipleQueryResponse<TItem>(TItemClass: ClassType<TItem>) {
     // `isAbstract` decorator option is mandatory to prevent registering in schema
     @ObjectType({ isAbstract: true })
     abstract class QueryResponseClass {
-      @Field(type => Boolean)
+      @Field(() => Boolean)
       success: boolean;
       
-      @Field(type => [TItemClass], { nullable: true })
+      @Field(() => [TItemClass], { nullable: true })
       data?: TItem[];
   
-      @Field(type => String, { nullable: true })
+      @Field(() => String, { nullable: true })
       error?: string;
     }
 

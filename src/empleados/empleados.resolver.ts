@@ -7,7 +7,7 @@ import { Args, Query, Resolver, Int, Mutation, Context } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard, DEFAULT_GRAPHQL_CONTEXT } from './../shared/helpers/auth.guard';
 
-@Resolver(of => Empleado)
+@Resolver(() => Empleado)
 export class EmpleadosResolver {
     constructor(
         private _empleadosService: EmpleadosService

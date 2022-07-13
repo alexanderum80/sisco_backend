@@ -3,7 +3,7 @@ import { Cargos } from './cargos.entity';
 import { Query, Resolver } from '@nestjs/graphql';
 import { CargosQueryResponse } from './cargos.model';
 
-@Resolver(of => Cargos)
+@Resolver(() => Cargos)
 export class CargosResolver {
     constructor(
         private _cargosService: CargosService

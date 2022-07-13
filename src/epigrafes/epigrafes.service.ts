@@ -24,7 +24,7 @@ export class EpigrafesService {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -42,7 +42,7 @@ export class EpigrafesService {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -52,14 +52,14 @@ export class EpigrafesService {
             delete epigrafeInfo.IdEpigafre;
 
             return new Promise<MutationResponse>(resolve => {
-                this.epigrafeRepository.save(epigrafeInfo).then(result => {
+                this.epigrafeRepository.save(epigrafeInfo).then(() => {
                     resolve({ success: true });
                 })
                 .catch(err => {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -67,14 +67,14 @@ export class EpigrafesService {
     async updateEpigrafe(epigrafeInfo: EpigrafeInput): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.epigrafeRepository.save(epigrafeInfo).then(result => {
+                this.epigrafeRepository.save(epigrafeInfo).then(() => {
                     resolve({ success: true });
                 })
                 .catch(err => {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -82,14 +82,14 @@ export class EpigrafesService {
     async deleteEpigrafe(IDs: number[]): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.epigrafeRepository.delete(IDs).then(result => {
+                this.epigrafeRepository.delete(IDs).then(() => {
                     resolve({ success: true });
                 })
                 .catch(err => {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }

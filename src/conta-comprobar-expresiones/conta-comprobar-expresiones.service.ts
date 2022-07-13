@@ -29,7 +29,7 @@ export class ContaComprobarExpresionesService {
                     throw new Error(err);
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -46,7 +46,7 @@ export class ContaComprobarExpresionesService {
                     throw new Error(err);
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -60,13 +60,13 @@ export class ContaComprobarExpresionesService {
             comprobarExpresionInput.Centralizada = IdDivision === 100 && IdTipoUsuario === ETipoUsuarios['Usuario Avanzado'];
 
             return new Promise<MutationResponse>(resolve => {
-                this.comprobarExpresionesRepository.save(comprobarExpresionInput).then(result => {
+                this.comprobarExpresionesRepository.save(comprobarExpresionInput).then(() => {
                     resolve({ success: true });
                 }).catch(err => {
                     throw new Error(err);
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -74,13 +74,13 @@ export class ContaComprobarExpresionesService {
     async update(comprobarExpresionInput: ContaComprobarExpresionesInput): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.comprobarExpresionesRepository.save(comprobarExpresionInput).then(result => {
+                this.comprobarExpresionesRepository.save(comprobarExpresionInput).then(() => {
                     resolve({ success: true });
                 }).catch(err => {
                     throw new Error(err);
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -88,13 +88,13 @@ export class ContaComprobarExpresionesService {
     async delete(IDs: number[]): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.comprobarExpresionesRepository.delete(IDs).then(result => {
+                this.comprobarExpresionesRepository.delete(IDs).then(() => {
                     resolve({ success: true });
                 }).catch(err => {
                     throw new Error(err);
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }

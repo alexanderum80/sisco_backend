@@ -12,7 +12,7 @@ export class ContaNoUsarEnCuentaQueryResponse extends SingleQueryResponse(ContaN
 @InputType()
 export class ContaNoUsarEnCuentaInput {
     @Field()
-    Id: number;
+    Id?: number;
 
     @Field({ nullable: true })
     Codigo: string;

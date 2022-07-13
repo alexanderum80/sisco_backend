@@ -15,7 +15,7 @@ export class UsuariosService {
         @InjectRepository(Usuarios) private readonly usuariosRepository: Repository<Usuarios>
     ) {}
 
-    async authenticate(usuario, passw): Promise<UsuarioQueryResponse> {
+    async authenticate(usuario: string, passw: string): Promise<UsuarioQueryResponse> {
         try {
             const usuarioInfo: Usuarios = {
                 IdUsuario: 0,
@@ -86,7 +86,7 @@ export class UsuariosService {
                     resolve({ success: false, error: err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -115,7 +115,7 @@ export class UsuariosService {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -132,7 +132,7 @@ export class UsuariosService {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
@@ -149,7 +149,7 @@ export class UsuariosService {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return {
                 success: false,
                 error: err
@@ -159,7 +159,7 @@ export class UsuariosService {
 
     async changePassword(idUsuario: number, password: string): Promise<MutationResponse> {
         try {
-            let encryptedPassw = await bcrypt.genSalt(12).then(salt => {
+            let encryptedPassw = await bcrypt.genSalt(12).then((salt: any) => {
                 return bcrypt.hash(password, salt);
             });
 
@@ -171,7 +171,7 @@ export class UsuariosService {
                 .update(Usuarios)
                 .set({ Contrasena: encryptedPassw, CambiarContrasena: false })
                 .where('IdUsuario = :id', { id: idUsuario })
-                .execute().then(result => {
+                .execute().then(() => {
                     resolve({
                         success: true,
                     });
@@ -179,7 +179,7 @@ export class UsuariosService {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return {
                 success: false,
                 error: err
@@ -191,7 +191,7 @@ export class UsuariosService {
         try {
             delete UsuarioInfo.IdUsuario;
             
-            const encryptedPassw = await bcrypt.genSalt(12).then(salt => {
+            const encryptedPassw = await bcrypt.genSalt(12).then((salt: any) => {
                 return bcrypt.hash(UsuarioInfo.Contrasena, salt);
             });
 
@@ -205,7 +205,7 @@ export class UsuariosService {
             }
 
             return new Promise<MutationResponse>(resolve => {
-                this.usuariosRepository.save(UsuarioInfo).then(result => {
+                this.usuariosRepository.save(UsuarioInfo).then(() => {
                     resolve({
                         success: true,
                     });
@@ -213,7 +213,7 @@ export class UsuariosService {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return {
                 success: false,
                 error: err
@@ -223,7 +223,7 @@ export class UsuariosService {
 
     async update(UsuarioInfo: UsuarioInput): Promise<MutationResponse> {
         try {
-            const encryptedPassw: string = await bcrypt.genSalt(12).then(salt => {
+            const encryptedPassw: string = await bcrypt.genSalt(12).then((salt: any) => {
                 return bcrypt.hash(UsuarioInfo.Contrasena, salt);
             });
 
@@ -245,7 +245,7 @@ export class UsuariosService {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return {
                 success: false,
                 error: err
@@ -264,8 +264,8 @@ export class UsuariosService {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
-            return { success: false, error: err.message ? err.message : err };
+        } catch (err: any) {
+            return { success: false, error: err.message ? err.message : err }
         }
     }
 

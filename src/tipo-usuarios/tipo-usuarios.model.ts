@@ -1,15 +1,15 @@
 import { TipoUsuarios } from './tipo-usuarios.entity';
-import { ObjectType, Field, Int } from '@nestjs/graphql';
+import { ObjectType, Field } from '@nestjs/graphql';
 
 @ObjectType()
 export class TipoUsuariosQueryResponse {
     @Field()
     success: Boolean;
 
-    @Field(type => [TipoUsuarios], { nullable: true })
+    @Field(() => [TipoUsuarios], { nullable: true })
     data?: TipoUsuarios[];
 
-    @Field(type => String, { nullable: true })
+    @Field(() => String, { nullable: true })
     error?: String;
 }
 
@@ -18,9 +18,9 @@ export class TipoUsuarioQueryResponse {
     @Field()
     success: Boolean;
 
-    @Field(type => TipoUsuarios, { nullable: true })
+    @Field(() => TipoUsuarios, { nullable: true })
     data?: TipoUsuarios;
 
-    @Field(type => String, { nullable: true })
+    @Field(() => String, { nullable: true })
     error?: String;
 }

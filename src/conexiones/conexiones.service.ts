@@ -11,10 +11,20 @@ export class ConexionesService {
     async getDataBases(ip: string, ususario: string, password: string): Promise<ConexionesQueryResponse> {
         try {
             let connectionString = cloneDeep(DEFAULT_CONNECTION_STRING);
-            connectionString.host = ip;
-            connectionString.username = ususario;
-            connectionString.password = password;
-            connectionString.database = 'master';
+            Object.defineProperties(connectionString, {
+                host: {
+                    value: ip
+                },
+                username: {
+                    value: ususario
+                },
+                password: {
+                    value: password
+                },
+                database: {
+                    value: 'master'
+                }
+            });
 
             const connection: Connection = await new Connection(connectionString).connect();
             return new Promise<ConexionesQueryResponse>(resolve => {
@@ -24,7 +34,7 @@ export class ConexionesService {
                     resolve({ success: false, error: err.message ? err.message : err });
                 });
             });
-        } catch (err) {
+        } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
