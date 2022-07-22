@@ -7,23 +7,19 @@ import { UseGuards } from '@nestjs/common';
 
 @Resolver()
 export class ConciliaContaResolver {
-    constructor(
-        private conciliaContaSvc: ConciliaContaService
-    ) {}
+    constructor(private conciliaContaSvc: ConciliaContaService) {}
 
     @Query(() => ConciliaContabilidadQueryResponse)
     @UseGuards(new AuthGuard())
     async conciliaContabilidad(
         @Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios,
-        @Args({ name: 'conciliaContaInput', type: () => ConciliaContaInput }) conciliaContaInput: ConciliaContaInput
+        @Args({ name: 'conciliaContaInput', type: () => ConciliaContaInput }) conciliaContaInput: ConciliaContaInput,
     ): Promise<ConciliaContabilidadQueryResponse> {
         return this.conciliaContaSvc.conciliaContabilidad(user, conciliaContaInput);
     }
 
     @Mutation(() => ConciliaContabilidadQueryResponse)
-    async iniciarSaldos(
-        @Args({ name: 'iniciarSaldosInput', type: () => IniciarSaldosInput }) iniciarSaldosInput: IniciarSaldosInput,
-    ): Promise<ConciliaContabilidadQueryResponse> {
+    async iniciarSaldos(@Args({ name: 'iniciarSaldosInput', type: () => IniciarSaldosInput }) iniciarSaldosInput: IniciarSaldosInput): Promise<ConciliaContabilidadQueryResponse> {
         return this.conciliaContaSvc.iniciarSaldos(iniciarSaldosInput);
     }
 

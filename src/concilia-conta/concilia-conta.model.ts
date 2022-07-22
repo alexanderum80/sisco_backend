@@ -3,13 +3,13 @@ import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
 @ObjectType()
 export class ConciliaContaQueryResponse {
     @Field()
-    success: Boolean;
+    success: boolean;
 
     @Field({ nullable: true })
     data?: string;
 
     @Field(() => String, { nullable: true })
-    error?: String;
+    error?: string;
 }
 
 @ObjectType()
@@ -30,13 +30,13 @@ export class ConciliaContabilidad {
 @ObjectType()
 export class ConciliaContabilidadQueryResponse {
     @Field()
-    success: Boolean;
+    success: boolean;
 
     @Field(() => ConciliaContabilidad, { nullable: true })
     data?: ConciliaContabilidad;
 
     @Field(() => String, { nullable: true })
-    error?: String;
+    error?: string;
 }
 
 @InputType()
@@ -84,34 +84,10 @@ export class ChequearCentrosInput {
     centrosAChequear: number[];
 }
 
-export const queryInventarioRodasCons = `SELECT @Centro AS IdCentro, CASE WHEN [Tipo de Análisis 1] = 'X' THEN [Análisis 1] ELSE Centro END AS IdUnidad, '000' AS IdPiso, @Periodo AS Periodo, Cuenta, SubCuenta, SUM(Débito) - SUM(Crédito) AS Saldo, N'' as Crt1, N'' as Crt2, N'' as Crt3
-    FROM dbo.Conta_Asiento
-    WHERE (Centro = @Centro) AND (Consolidado = 1) AND (Año = @Anio) AND (Período <= @Periodo) AND ((RTRIM(Cuenta) BETWEEN 183 AND 209) OR (RTRIM(Cuenta) IN(280, 281))) and ((CASE[Tipo de Análisis 1] WHEN '4' THEN ISNULL([Análisis 1], N'0') ELSE (CASE[Tipo de Análisis 2] WHEN '4' THEN ISNULL([Análisis 2], N'0') ELSE (CASE [Tipo de Análisis 3] WHEN '4' THEN ISNULL([Análisis 3], N'0') ELSE N'001' end) END) END <> '002'))
-    GROUP BY Cuenta, SubCuenta, CASE WHEN [Tipo de Análisis 1] = 'X' THEN [Análisis 1] ELSE Centro END`;
-
-export const queryInventarioRodas = `SELECT @Centro AS IdCentro, CASE WHEN [Tipo de Análisis 1] = 'Y' THEN [Análisis 1] ELSE Centro END AS IdUnidad, CASE [Tipo de Análisis 1] WHEN 'G' then ISNULL([Análisis 1], N'0') ELSE (CASE [Tipo de Análisis 1] WHEN 'A' then
-    ISNULL([Análisis 1], N'0') ELSE (CASE [Tipo de Análisis 2] WHEN 'G' then ISNULL([Análisis 2], N'0') ELSE (CASE [Tipo de Análisis 2] WHEN 'A' then ISNULL([Análisis 2], N'0') ELSE (CASE [Tipo de Análisis 3] WHEN 'G' then ISNULL([Análisis 3], N'0') ELSE (CASE [Tipo de Análisis 3] WHEN 'A' then ISNULL([Análisis 3], N'0') ELSE ('0') END) END) END) END) END) END AS IdPiso,
-    @Periodo AS Periodo, Cuenta, SubCuenta, ISNULL([Análisis 1], N'') as Crt1, ISNULL([Análisis 2], N'') as Crt2, ISNULL([Análisis 3], N'') as Crt3, SUM(Débito) - SUM(Crédito) AS Saldo
-    FROM dbo.Conta_Asiento
-    WHERE (Centro = @Centro) AND (Consolidado = 0) AND (Año = @Anio) AND (Período <= @Periodo) AND ((RTRIM(Cuenta) BETWEEN 183 AND 209) OR (RTRIM(Cuenta) IN (280,281))) and ((CASE[Tipo de Análisis 1] WHEN '4' THEN ISNULL([Análisis 1], N'0') ELSE(CASE[Tipo de Análisis 2] WHEN '4' THEN ISNULL([Análisis 2], N'0') ELSE(CASE[Tipo de Análisis 3] WHEN '4' THEN ISNULL([Análisis 3], N'0') ELSE N'001' end) END) END <> '002'))
-    GROUP BY Cuenta, SubCuenta, CASE WHEN [Tipo de Análisis 1] = 'Y' THEN [Análisis 1] ELSE Centro END, ISNULL([Análisis 1], N''), ISNULL([Análisis 2], N''), ISNULL([Análisis 3], N''), ISNULL([Análisis 1], N'0'), ISNULL([Análisis 2], N'0'), ISNULL([Análisis 3], N'0'), [Tipo de Análisis 1], [Tipo de Análisis 2], [Tipo de Análisis 3]`;
-
-export const queryVentasRodasCons = `SELECT @Centro AS IdCentro, CASE WHEN [Tipo de Análisis 2] = 'X' THEN [Análisis 2] ELSE Centro END AS IdUnidad, '000' AS IdPiso, @Periodo AS Periodo, '' AS Cuenta, '' AS SubCuenta, N'' as Crt1, N'' as Crt2, N'' as Crt3, SUM(Crédito) - SUM(Débito) AS Saldo
-    FROM dbo.Conta_Asiento
-    WHERE(Centro = @Centro) AND (Consolidado = 1) AND(Año = @Anio) AND(Período = @Periodo) AND(RTRIM(Cuenta) IN (900, 901, 912))
-    GROUP BY CASE WHEN [Tipo de Análisis 2] = 'X' THEN [Análisis 2] ELSE Centro END`;
-
-export const queryVentasRodas = `SELECT @Centro AS IdCentro, CASE WHEN [Tipo de Análisis 2] = 'Y' THEN [Análisis 2] ELSE Centro END AS IdUnidad,
-    CASE [Tipo de Análisis 1] WHEN 'G' then ISNULL([Análisis 1], N'0') ELSE (CASE [Tipo de Análisis 1] WHEN 'A' then ISNULL([Análisis 1], N'0') ELSE (CASE [Tipo de Análisis 2] WHEN 'G' then ISNULL([Análisis 2], N'0') ELSE (CASE [Tipo de Análisis 2] WHEN 'A' then ISNULL([Análisis 2], N'0') ELSE (CASE [Tipo de Análisis 3] WHEN 'G' then ISNULL([Análisis 3], N'0') ELSE (CASE [Tipo de Análisis 3] WHEN 'A' then ISNULL([Análisis 3], N'0') ELSE ('0') END) END) END) END) END) END AS IdPiso,
-    @Periodo AS Periodo, Cuenta, SubCuenta, ISNULL([Análisis 1], N'') as Crt1, ISNULL([Análisis 2], N'') as Crt2, ISNULL([Análisis 3], N'') as Crt3, SUM(Crédito -débito) AS Saldo
-    FROM dbo.Conta_Asiento
-    WHERE (Centro = @Centro) AND (Consolidado = 0) AND (Año = @Anio) AND (Período = @Periodo) AND (RTRIM(Cuenta) IN (900, 901, 912))
-    GROUP BY Cuenta, SubCuenta, CASE WHEN [Tipo de Análisis 2] = 'Y' THEN [Análisis 2] ELSE Centro END, ISNULL([Análisis 1], N''), ISNULL([Análisis 2], N''), ISNULL([Análisis 3], N''), ISNULL([Análisis 1], N'0'), ISNULL([Análisis 2], N'0'), ISNULL([Análisis 3], N'0'), [Tipo de Análisis 1], [Tipo de Análisis 2], [Tipo de Análisis 3]`;
-
 export const queryUltimoPeriodo = `SELECT ISNULL(MAX(Período), -1) as Periodo FROM dbo.Conta_Asiento
     WHERE Centro = @Centro and isnull(Consolidado, 0) = @Cons and Año = @Anio`;
 
-export const queryRangoAsientosMes = `SELECT Período, MIN(Asiento) AS Ini, MAX(Asiento) AS Fin FROM dbo.Asiento GROUP BY Período ORDER BY Período`;
+export const queryRangoAsientosMesRodas = `SELECT Período, MIN(Asiento) AS Ini, MAX(Asiento) AS Fin FROM dbo.Asiento GROUP BY Período ORDER BY Período`;
 
 export const queryClasificadorCuentasRodas = `SELECT Año, Cuenta, SubCuenta, Descripción, Naturaleza, [Grupo Clase] AS Grupo_Clase, SubMayor, [Tipo de Análisis 1] AS Tipo_de_Análisis_1, [Tipo de Análisis 2] AS Tipo_de_Análisis_2, [Tipo de Análisis 3] AS Tipo_de_Análisis_3, Obligación, Terminal, Real, [Cuenta Contrapartida] AS Cuenta_Contrapartida,
     [SubCuenta Contrapartida] AS SubCuenta_Contrapartida, [Cuenta Consolidación] AS Cuenta_Consolidación, [SubCuenta Consolidación] AS SubCuenta_Consolidación, [Tipo de Análisis 1 Consolidación] AS Tipo_de_Análisis_1_Consolidación, [Tipo de Análisis 2 Consolidación] AS Tipo_de_Análisis_2_Consolidación, [Tipo de Análisis 3 Consolidación] AS Tipo_de_Análisis_3_Consolidación,

@@ -593,6 +593,44 @@ type CajaConfiguracionEntity {
   IdUnidad: Int!
 }
 
+type ConciliaAFT {
+  Division: String!
+  SubDivision: String!
+  Tipo: String!
+  Centro: String!
+  IdCentro: Float!
+  IdUnidad: Float!
+  Unidad: String!
+  Periodo: Float!
+  Cta: String!
+  Scta: String!
+  An1: String!
+  An2: String!
+  An3: String!
+  Saldo_AF: Float!
+  Saldo_Rodas: Float!
+  Diferencia: Float!
+}
+
+type DiferenciaClasificadorCNMB {
+  Unidad: String!
+  CNMB: String!
+  DCNMB: String!
+  TREPO: Float!
+  TREPO_UC: Float!
+}
+
+type ConciliaAftData {
+  ConciliaAFT: [ConciliaAFT!]
+  DiferenciaClasificadorCNMB: [DiferenciaClasificadorCNMB!]
+}
+
+type ActFijosClasificadorCnmbEntity {
+  CNMB: String!
+  DCNMB: String!
+  TREPO: Float!
+}
+
 type Query {
   authenticateUsuario(usuario: String!, passw: String!): UsuarioQueryResponse!
   getAllUsuarios: UsuariosQueryResponse!
@@ -650,6 +688,9 @@ type Query {
   getComprobarValorById(id: Int!): ComprobarValorQueryResponse!
   getCajasConfiguracion: [CajaConfiguracionEntity!]!
   getCajaConfiguracion(id: Int!): CajaConfiguracionEntity!
+  getAllActFijosClasificadorCnmb: [ActFijosClasificadorCnmbEntity!]!
+  getActFijosClasificadorCnmb(cnmb: String!): ActFijosClasificadorCnmbEntity!
+  conciliaAFT(conciliaAftInput: ConciliaAftInput!): ConciliaAftData!
 }
 
 input ConciliaDWHInput {
@@ -679,6 +720,12 @@ input ConciliaInternaDWHInput {
   IdSubdivisionOD: Float!
   IdUnidadOD: Float!
   SoloDiferencias: Boolean!
+}
+
+input ConciliaAftInput {
+  idCentro: Float!
+  periodo: Float!
+  annio: Float!
 }
 
 type Mutation {
@@ -730,6 +777,8 @@ type Mutation {
   createCajaConfiguracion(cajaConfiguracionInput: CajaConfiguracionInput!): CajaConfiguracionEntity!
   updateCajaConfiguracion(cajaConfiguracionInput: CajaConfiguracionInput!): CajaConfiguracionEntity!
   removeCajaConfiguracion(id: Int!): CajaConfiguracionEntity!
+  saveActFijosClasificadorCnmb(actfijosClasificadorCnmbInput: ActFijosClasificadorCnmbInput!): ActFijosClasificadorCnmbEntity!
+  removeActFijosClasificadorCnmb(cnmb: String!): Float!
 }
 
 input UsuarioInput {
@@ -907,4 +956,10 @@ input CajaConfiguracionInput {
   IP: String!
   SN: String!
   IdUnidad: Int!
+}
+
+input ActFijosClasificadorCnmbInput {
+  CNMB: String!
+  DCNMB: String!
+  TREPO: Float!
 }

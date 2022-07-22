@@ -6,8 +6,8 @@ import { UnidadesService } from './unidades.service';
 import { Unidades } from './unidades.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Unidades]), UsuariosModule],
-  providers: [UnidadesResolver, UnidadesService],
-  exports: [UnidadesService]
+    imports: [TypeOrmModule.forFeature([Unidades]), UsuariosModule],
+    providers: [UnidadesResolver, UnidadesService],
+    exports: [UnidadesService],
 })
 export class UnidadesModule {}

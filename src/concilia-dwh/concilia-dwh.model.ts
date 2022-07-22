@@ -3,13 +3,13 @@ import { ObjectType, Field, InputType } from '@nestjs/graphql';
 @ObjectType()
 export class RodasDWHQueryResponse {
     @Field()
-    success: Boolean;
+    success: boolean;
 
     @Field({ nullable: true })
     data?: string;
 
     @Field(() => String, { nullable: true })
-    error?: String;
+    error?: string;
 }
 
 @ObjectType()
@@ -27,37 +27,37 @@ export class ConciliaDWH {
 @ObjectType()
 export class ConciliaDWHQueryResponse {
     @Field()
-    success: Boolean;
+    success: boolean;
 
     @Field(() => ConciliaDWH, { nullable: true })
     data?: ConciliaDWH;
 
     @Field(() => String, { nullable: true })
-    error?: String;
+    error?: string;
 }
 
 @ObjectType()
 export class ParteAtrasosQueryResponse {
     @Field()
-    success: Boolean;
+    success: boolean;
 
     @Field({ nullable: true })
     data?: string;
 
     @Field(() => String, { nullable: true })
-    error?: String;
+    error?: string;
 }
 
 @ObjectType()
 export class DatosIdGAMQueryResponse {
     @Field()
-    success: Boolean;
+    success: boolean;
 
     @Field({ nullable: true })
     data?: string;
 
     @Field(() => String, { nullable: true })
-    error?: String;
+    error?: string;
 }
 
 @InputType()

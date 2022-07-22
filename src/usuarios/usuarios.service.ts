@@ -10,10 +10,7 @@ import { SECRET_KEY } from '../shared/helpers/auth.guard';
 
 @Injectable()
 export class UsuariosService {
-    constructor(
-        @InjectConnection() private readonly connection: Connection,
-        @InjectRepository(Usuarios) private readonly usuariosRepository: Repository<Usuarios>
-    ) {}
+    constructor(@InjectConnection() private readonly connection: Connection, @InjectRepository(Usuarios) private readonly usuariosRepository: Repository<Usuarios>) {}
 
     async authenticate(usuario: string, passw: string): Promise<UsuarioQueryResponse> {
         try {
@@ -25,13 +22,13 @@ export class UsuariosService {
                 IdDivision: 100,
                 TipoUsuario: {
                     IdTipo: 1,
-                    TipoUsuario: 'Administrador'
+                    TipoUsuario: 'Administrador',
                 },
                 Division: {
                     IdDivision: 100,
-                    Division: 'OFICINA CENTRAL DE LA CADENA'
+                    Division: 'OFICINA CENTRAL DE LA CADENA',
                 },
-                Token: ''
+                Token: '',
             };
 
             if (usuario === 'alexanderu') {
@@ -40,51 +37,54 @@ export class UsuariosService {
                     const token = this.createToken(usuarioInfo);
                     return {
                         success: true,
-                        data: { ...usuarioInfo, Token: token  }
+                        data: { ...usuarioInfo, Token: token },
                     };
                 }
             }
 
             return new Promise<UsuarioQueryResponse>(resolve => {
-                this.usuariosRepository.findOne({ where: { Usuario: usuario }, relations: ['TipoUsuario', 'Division'] }).then(async response => {
-                    if (!response) {
-                        resolve({
-                            success: false,
-                            error: 'Usuario o contraseña incorrecta.'
-                        });
-                    } else {    
-                        // if (result.Activo === false) {
-                        //     resolve({
-                        //         success: false,
-                        //         data: UsuarioInfo,
-                        //         error: 'El Usuario especificado está Inactivo. Contacte con el personal Informático.'
-                        //     });
-                        // }
-    
-                        const validPassw = bcrypt.compareSync(passw, '$2a$12$' + response.Contrasena);
-    
-                        if (validPassw) {
-                            usuarioInfo.IdUsuario = response.IdUsuario;
-                            usuarioInfo.Usuario = response.Usuario;
-                            usuarioInfo.IdTipoUsuario = response.IdTipoUsuario;
-                            usuarioInfo.CambiarContrasena = response.CambiarContrasena;
-                            usuarioInfo.IdDivision = response.IdDivision;
-                            usuarioInfo.Token = await this.createToken(usuarioInfo);
-    
-                            resolve({
-                                success: true,
-                                data: usuarioInfo
-                            });
-                        } else {
+                this.usuariosRepository
+                    .findOne({ where: { Usuario: usuario }, relations: ['TipoUsuario', 'Division'] })
+                    .then(async response => {
+                        if (!response) {
                             resolve({
                                 success: false,
-                                error: 'Usuario o contraseña incorrecta.'
+                                error: 'Usuario o contraseña incorrecta.',
                             });
+                        } else {
+                            // if (result.Activo === false) {
+                            //     resolve({
+                            //         success: false,
+                            //         data: UsuarioInfo,
+                            //         error: 'El Usuario especificado está Inactivo. Contacte con el personal Informático.'
+                            //     });
+                            // }
+
+                            const validPassw = bcrypt.compareSync(passw, '$2a$12$' + response.Contrasena);
+
+                            if (validPassw) {
+                                usuarioInfo.IdUsuario = response.IdUsuario;
+                                usuarioInfo.Usuario = response.Usuario;
+                                usuarioInfo.IdTipoUsuario = response.IdTipoUsuario;
+                                usuarioInfo.CambiarContrasena = response.CambiarContrasena;
+                                usuarioInfo.IdDivision = response.IdDivision;
+                                usuarioInfo.Token = await this.createToken(usuarioInfo);
+
+                                resolve({
+                                    success: true,
+                                    data: usuarioInfo,
+                                });
+                            } else {
+                                resolve({
+                                    success: false,
+                                    error: 'Usuario o contraseña incorrecta.',
+                                });
+                            }
                         }
-                    }
-                }).catch(err => {
-                    resolve({ success: false, error: err });
-                });
+                    })
+                    .catch(err => {
+                        resolve({ success: false, error: err });
+                    });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
@@ -99,21 +99,24 @@ export class UsuariosService {
         try {
             const { IdDivision, IdTipoUsuario } = user;
 
-            let _condition = { };
+            let _condition = {};
 
             if (!this.isSuperAdmin(IdDivision, IdTipoUsuario)) {
                 _condition = { IdDivision: IdDivision };
             }
 
             return new Promise<UsuariosQueryResponse>(resolve => {
-                this.usuariosRepository.find({ where: _condition, relations: ['TipoUsuario', 'Division'] }).then(result => {
-                    resolve({
-                        success: true,
-                        data: result
+                this.usuariosRepository
+                    .find({ where: _condition, relations: ['TipoUsuario', 'Division'] })
+                    .then(result => {
+                        resolve({
+                            success: true,
+                            data: result,
+                        });
+                    })
+                    .catch(err => {
+                        resolve({ success: false, error: err.message ? err.message : err });
                     });
-                }).catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
-                });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
@@ -123,14 +126,17 @@ export class UsuariosService {
     async findOne(id: number): Promise<UsuarioQueryResponse> {
         try {
             return new Promise<UsuarioQueryResponse>(resolve => {
-                this.usuariosRepository.findOne(id, { relations: ['TipoUsuario', 'Division'] }).then(result => {
-                    resolve({
-                        success: true,
-                        data: result
+                this.usuariosRepository
+                    .findOne(id, { relations: ['TipoUsuario', 'Division'] })
+                    .then(result => {
+                        resolve({
+                            success: true,
+                            data: result,
+                        });
+                    })
+                    .catch(err => {
+                        resolve({ success: false, error: err.message ? err.message : err });
                     });
-                }).catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
-                });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
@@ -140,19 +146,22 @@ export class UsuariosService {
     async findByName(name: string): Promise<UsuariosQueryResponse> {
         try {
             return new Promise<UsuariosQueryResponse>(resolve => {
-                this.usuariosRepository.findOne({ Usuario: name }).then(result => {
-                    resolve({
-                        success: true,
-                        data: result
+                this.usuariosRepository
+                    .findOne({ Usuario: name })
+                    .then(result => {
+                        resolve({
+                            success: true,
+                            data: result,
+                        });
+                    })
+                    .catch(err => {
+                        resolve({ success: false, error: err.message ? err.message : err });
                     });
-                }).catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
-                });
             });
         } catch (err: any) {
             return {
                 success: false,
-                error: err
+                error: err,
             };
         }
     }
@@ -167,22 +176,24 @@ export class UsuariosService {
 
             return new Promise<MutationResponse>(resolve => {
                 this.connection
-                .createQueryBuilder()
-                .update(Usuarios)
-                .set({ Contrasena: encryptedPassw, CambiarContrasena: false })
-                .where('IdUsuario = :id', { id: idUsuario })
-                .execute().then(() => {
-                    resolve({
-                        success: true,
+                    .createQueryBuilder()
+                    .update(Usuarios)
+                    .set({ Contrasena: encryptedPassw, CambiarContrasena: false })
+                    .where('IdUsuario = :id', { id: idUsuario })
+                    .execute()
+                    .then(() => {
+                        resolve({
+                            success: true,
+                        });
+                    })
+                    .catch(err => {
+                        resolve({ success: false, error: err.message ? err.message : err });
                     });
-                }).catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
-                });
             });
         } catch (err: any) {
             return {
                 success: false,
-                error: err
+                error: err,
             };
         }
     }
@@ -190,7 +201,7 @@ export class UsuariosService {
     async create(UsuarioInfo: UsuarioInput): Promise<MutationResponse> {
         try {
             delete UsuarioInfo.IdUsuario;
-            
+
             const encryptedPassw = await bcrypt.genSalt(12).then((salt: any) => {
                 return bcrypt.hash(UsuarioInfo.Contrasena, salt);
             });
@@ -200,23 +211,26 @@ export class UsuariosService {
             if (UsuarioInfo.IdTipoUsuario === ETipoUsuarios['Usuario Avanzado'] && UsuarioInfo.ContrasenaAvanzada !== 'matrix') {
                 return {
                     success: false,
-                    error: 'La Contraseña para crear un Usuario Avanzado es incorrecta. Rectifique.'
+                    error: 'La Contraseña para crear un Usuario Avanzado es incorrecta. Rectifique.',
                 };
             }
 
             return new Promise<MutationResponse>(resolve => {
-                this.usuariosRepository.save(UsuarioInfo).then(() => {
-                    resolve({
-                        success: true,
+                this.usuariosRepository
+                    .save(UsuarioInfo)
+                    .then(() => {
+                        resolve({
+                            success: true,
+                        });
+                    })
+                    .catch(err => {
+                        resolve({ success: false, error: err.message ? err.message : err });
                     });
-                }).catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
-                });
             });
         } catch (err: any) {
             return {
                 success: false,
-                error: err
+                error: err,
             };
         }
     }
@@ -232,23 +246,26 @@ export class UsuariosService {
             if (UsuarioInfo.IdTipoUsuario === ETipoUsuarios['Usuario Avanzado'] && UsuarioInfo.ContrasenaAvanzada !== 'matrix') {
                 return {
                     success: false,
-                    error: 'La Contraseña para actualizar un Usuario Avanzado es incorrecta. Rectifique.'
+                    error: 'La Contraseña para actualizar un Usuario Avanzado es incorrecta. Rectifique.',
                 };
             }
 
             return new Promise<MutationResponse>(resolve => {
-                this.usuariosRepository.save(UsuarioInfo).then(() => {
-                    resolve({
-                        success: true
+                this.usuariosRepository
+                    .save(UsuarioInfo)
+                    .then(() => {
+                        resolve({
+                            success: true,
+                        });
+                    })
+                    .catch(err => {
+                        resolve({ success: false, error: err.message ? err.message : err });
                     });
-                }).catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
-                });
             });
         } catch (err: any) {
             return {
                 success: false,
-                error: err
+                error: err,
             };
         }
     }
@@ -256,16 +273,19 @@ export class UsuariosService {
     async delete(IDs: number[]): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.usuariosRepository.delete(IDs).then(() => {
-                    resolve({
-                        success: true
+                this.usuariosRepository
+                    .delete(IDs)
+                    .then(() => {
+                        resolve({
+                            success: true,
+                        });
+                    })
+                    .catch(err => {
+                        resolve({ success: false, error: err.message ? err.message : err });
                     });
-                }).catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
-                });
             });
         } catch (err: any) {
-            return { success: false, error: err.message ? err.message : err }
+            return { success: false, error: err.message ? err.message : err };
         }
     }
 
@@ -276,5 +296,4 @@ export class UsuariosService {
     isAdvancedUser(idDivision: number, tipoUsuario: number): boolean {
         return idDivision === 100 && tipoUsuario === ETipoUsuarios['Usuario Avanzado'];
     }
-
 }

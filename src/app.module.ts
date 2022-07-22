@@ -12,8 +12,6 @@ import { CargosModule } from './cargos/cargos.module';
 import { DwhInventarioModule } from './dwh-inventario/dwh-inventario.module';
 import { ConciliaDwhModule } from './concilia-dwh/concilia-dwh.module';
 import { DwhVentasModule } from './dwh-ventas/dwh-ventas.module';
-import { RodasInventarioModule } from './rodas-inventario/rodas-inventario.module';
-import { RodasVentasModule } from './rodas-ventas/rodas-ventas.module';
 import { AlmacenesModule } from './almacenes/almacenes.module';
 import { EmailsService } from './shared/services/emails/emails.service';
 import { ConciliaContaModule } from './concilia-conta/concilia-conta.module';
@@ -41,72 +39,74 @@ import { ContaComprobarValoresModule } from './conta-comprobar-valores/conta-com
 import { CajaConfiguracionModule } from './caja-configuracion/caja-configuracion.module';
 import 'dotenv/config';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { ConciliaAftModule } from './concilia-aft/concilia-aft.module';
+import { ActfijosClasificadorCnmbModule } from './actfijos-clasificador-cnmb/actfijos-clasificador-cnmb.module';
 
 @Module({
-  imports: [
-    GraphQLModule.forRoot<ApolloDriverConfig>({
-      driver: ApolloDriver,
-      autoSchemaFile: 'schema.gql',
-      playground: true,
-      context: ((req: any) => ({ headers: req.headers })),
-      formatError: (err: any) => {
-        return err;
-      }
-    }),
-    TypeOrmModule.forRoot({
-      type: 'mssql',
-      host: 'localhost',
-      username: 'sa',
-      password: 'sqladmin*123',
-      database: 'SISCO_Web',
-      connectionTimeout: 60000,
-      requestTimeout: 0,
-      entities: ['**/*.entity.js'],
-      synchronize: false,
-      options: {
-        enableArithAbort: true,
-        cryptoCredentialsDetails: {
-          minVersion: 'TLSv1'
-        }
-      }
-    }),
-    SharedModule,
-    UsuariosModule,
-    DivisionesModule,
-    ContaConexionesModule,
-    UnidadesModule,
-    DwhConexionesModule,
-    CargosModule,
-    DwhInventarioModule,
-    ConciliaDwhModule,
-    DwhVentasModule,
-    RodasInventarioModule,
-    RodasVentasModule,
-    AlmacenesModule,
-    ConciliaContaModule,
-    EmpleadosModule,
-    SupervisoresModule,
-    ParteAtrasoModule,
-    ConexionesModule,
-    ConciliaInternaDwhModule,
-    SubdivisionesModule,
-    ClasificadorCuentaModule,
-    ConciliaNacContabilidadModule,
-    TipoEntidadesModule,
-    EpigrafesModule,
-    CuentaEntidadModule,
-    ElementosGastosModule,
-    ClasificadorEntidadesModule,
-    ContaExpresionesModule,
-    ContaTipovalorExpresionesModule,
-    ContaComprobarExpresionesModule,
-    ContaOperadoresModule,
-    ContaNoUsarEnCuentasModule,
-    TipoUsuariosModule,
-    ContaComprobarValoresModule,
-    CajaConfiguracionModule,
-  ],
-  controllers: [AppController],
-  providers: [AppService, EmailsService],
+    imports: [
+        GraphQLModule.forRoot<ApolloDriverConfig>({
+            driver: ApolloDriver,
+            autoSchemaFile: 'schema.gql',
+            playground: true,
+            context: (req: any) => ({ headers: req.headers }),
+            formatError: (err: any) => {
+                return err;
+            },
+        }),
+        TypeOrmModule.forRoot({
+            type: 'mssql',
+            host: 'localhost',
+            username: 'sa',
+            password: 'sqladmin*123',
+            database: 'SISCO_Web',
+            connectionTimeout: 60000,
+            requestTimeout: 0,
+            entities: ['**/*.entity.js'],
+            synchronize: false,
+            options: {
+                enableArithAbort: true,
+                cryptoCredentialsDetails: {
+                    minVersion: 'TLSv1',
+                },
+            },
+        }),
+        SharedModule,
+        UsuariosModule,
+        DivisionesModule,
+        ContaConexionesModule,
+        UnidadesModule,
+        DwhConexionesModule,
+        CargosModule,
+        DwhInventarioModule,
+        ConciliaDwhModule,
+        DwhVentasModule,
+        AlmacenesModule,
+        ConciliaContaModule,
+        EmpleadosModule,
+        SupervisoresModule,
+        ParteAtrasoModule,
+        ConexionesModule,
+        ConciliaInternaDwhModule,
+        SubdivisionesModule,
+        ClasificadorCuentaModule,
+        ConciliaNacContabilidadModule,
+        TipoEntidadesModule,
+        EpigrafesModule,
+        CuentaEntidadModule,
+        ElementosGastosModule,
+        ClasificadorEntidadesModule,
+        ContaExpresionesModule,
+        ContaTipovalorExpresionesModule,
+        ContaComprobarExpresionesModule,
+        ContaOperadoresModule,
+        ContaNoUsarEnCuentasModule,
+        TipoUsuariosModule,
+        ContaComprobarValoresModule,
+        CajaConfiguracionModule,
+        ActfijosClasificadorCnmbModule,
+        ConciliaAftModule,
+    ],
+    controllers: [AppController],
+    providers: [AppService, EmailsService],
 })
 export class AppModule {}

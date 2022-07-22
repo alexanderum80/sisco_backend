@@ -21,21 +21,22 @@ export class ContaConexionesService {
         @InjectRepository(ContaConexiones) private readonly conexionesRespository: Repository<ContaConexiones>,
         private _cryptoService: CryptoService,
         private _unidadesSvc: UnidadesService,
-        private _usuariosSvc: UsuariosService
+        private _usuariosSvc: UsuariosService,
     ) {}
 
     async findAll(user: Usuarios): Promise<ContaConexionesQueryResponse> {
         try {
             const { IdDivision, IdTipoUsuario } = user;
 
-            let _condition = { };
+            let _condition = {};
 
             if (!this._usuariosSvc.isSuperAdmin(IdDivision, IdTipoUsuario)) {
                 _condition = { IdDivision: IdDivision };
             }
 
             return new Promise<ContaConexionesQueryResponse>(resolve => {
-                this.conexionesRespository.createQueryBuilder('con')
+                this.conexionesRespository
+                    .createQueryBuilder('con')
                     .select('con.Id', 'Id')
                     .addSelect('con.IdUnidad', 'IdUnidad')
                     .addSelect('con.IdDivision', 'IdDivision')
@@ -43,19 +44,21 @@ export class ContaConexionesService {
                     .addSelect('con.IpRodas', 'IpRodas')
                     .addSelect('con.Usuario', 'Usuario')
                     .addSelect('con.BaseDatos', 'BaseDatos')
-                    .addSelect('Concat(centros.IdUnidad, \'-\', centros.Nombre)', 'Unidad')
-                    .addSelect('Concat(div.IdDivision, \'-\', div.Division)', 'Division')
+                    .addSelect("Concat(centros.IdUnidad, '-', centros.Nombre)", 'Unidad')
+                    .addSelect("Concat(div.IdDivision, '-', div.Division)", 'Division')
                     .innerJoin(CentrosView, 'centros', 'centros.IdUnidad = con.IdUnidad')
                     .innerJoin(Divisiones, 'div', 'div.IdDivision = centros.IdDivision')
                     .where(_condition)
-                .execute().then(result => {
-                    resolve({
-                        success: true,
-                        data: result
+                    .execute()
+                    .then(result => {
+                        resolve({
+                            success: true,
+                            data: result,
+                        });
+                    })
+                    .catch(err => {
+                        resolve({ success: false, error: err.message ? err.message : err });
                     });
-                }).catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
-                });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
@@ -65,20 +68,26 @@ export class ContaConexionesService {
     async findOne(id: number): Promise<ContaConexionQueryResponse> {
         try {
             return new Promise<ContaConexionQueryResponse>(resolve => {
-                this.conexionesRespository.findOne(id).then(result => {
-                    this._cryptoService.decrypt(result!.Contrasena).then(res => {
-                        result!.Contrasena = res;
+                this.conexionesRespository
+                    .findOne(id)
+                    .then(result => {
+                        this._cryptoService
+                            .decrypt(result.Contrasena)
+                            .then(res => {
+                                result.Contrasena = res;
 
-                        resolve({
-                            success: true,
-                            data: result
-                        });
-                    }).catch(err => {
+                                resolve({
+                                    success: true,
+                                    data: result,
+                                });
+                            })
+                            .catch(err => {
+                                resolve({ success: false, error: err.message ? err.message : err });
+                            });
+                    })
+                    .catch(err => {
                         resolve({ success: false, error: err.message ? err.message : err });
                     });
-                }).catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
-                });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
@@ -86,24 +95,23 @@ export class ContaConexionesService {
     }
 
     async findByIdUnidad(idUnidad: number, consolidado: boolean): Promise<ContaConexionQueryResponse> {
-        // try {
-            return new Promise<ContaConexionQueryResponse>((resolve, reject) => {
-                this.conexionesRespository.findOne({ IdUnidad: idUnidad, Consolidado: consolidado }).then(result => {
+        return new Promise<ContaConexionQueryResponse>((resolve, reject) => {
+            this.conexionesRespository
+                .findOne({ IdUnidad: idUnidad, Consolidado: consolidado })
+                .then(result => {
                     if (result) {
                         resolve({
                             success: true,
-                            data: result
+                            data: result,
                         });
                     } else {
-                        reject(`No se ha definido la conexión al Rodas del Centro: ${ idUnidad }`);
+                        reject(`No se ha definido la conexión al Rodas del Centro: ${idUnidad}`);
                     }
-                }).catch(err => {
+                })
+                .catch(err => {
                     resolve(err.message ? err.message : err);
                 });
-            });
-        // } catch (err: any) {
-        //     return { success: false, error: err.message ? err.message : err };
-        // }
+        });
     }
 
     async create(conexion: ContaConexionInput): Promise<MutationResponse> {
@@ -114,32 +122,38 @@ export class ContaConexionesService {
             conexion.Contrasena = encryptedPassword;
 
             return new Promise<MutationResponse>(resolve => {
-                this.conexionesRespository.save(conexion).then(() => {
-                    resolve({
-                        success: true
+                this.conexionesRespository
+                    .save(conexion)
+                    .then(() => {
+                        resolve({
+                            success: true,
+                        });
+                    })
+                    .catch(err => {
+                        resolve(err.message ? err.message : err);
                     });
-                }).catch(err => {
-                    resolve(err.message ? err.message : err);
-                });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
-    
+
     async update(conexion: ContaConexionInput): Promise<MutationResponse> {
         try {
             const encryptedPassword = await this._cryptoService.encrypt(conexion.Contrasena);
             conexion.Contrasena = encryptedPassword;
 
             return new Promise<MutationResponse>(resolve => {
-                this.conexionesRespository.save(conexion).then(() => {
-                    resolve({
-                        success: true
+                this.conexionesRespository
+                    .save(conexion)
+                    .then(() => {
+                        resolve({
+                            success: true,
+                        });
+                    })
+                    .catch(err => {
+                        resolve(err.message ? err.message : err);
                     });
-                }).catch(err => {
-                    resolve(err.message ? err.message : err);
-                });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
@@ -149,13 +163,16 @@ export class ContaConexionesService {
     async delete(IDs: number[]): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.conexionesRespository.delete(IDs).then(() => {
-                    resolve({
-                        success: true
+                this.conexionesRespository
+                    .delete(IDs)
+                    .then(() => {
+                        resolve({
+                            success: true,
+                        });
+                    })
+                    .catch(err => {
+                        resolve(err.message ? err.message : err);
                     });
-                }).catch(err => {
-                    resolve(err.message ? err.message : err);
-                });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
@@ -163,35 +180,27 @@ export class ContaConexionesService {
     }
 
     async conexionRodas(contaConexion: ContaConexiones): Promise<Connection> {
-        // try {
-            let _conexionOptions: SqlServerConnectionOptions = cloneDeep(DEFAULT_CONNECTION_STRING);
-            Object.defineProperties(_conexionOptions, {
-                host: {
-                    value: contaConexion.IpRodas
-                },
-                username: {
-                    value: contaConexion.Usuario
-                },
-                password: {
-                    value: await this._cryptoService.decrypt(contaConexion.Contrasena)
-                },
-                database: {
-                    value: contaConexion.BaseDatos
-                }
-            })
-            // _conexionOptions.host = contaConexion.IpRodas;
-            // _conexionOptions.username = contaConexion.Usuario;
-            // _conexionOptions.password = await this._cryptoService.decrypt(contaConexion.Contrasena);
-            // _conexionOptions.database = contaConexion.BaseDatos;
+        const _conexionOptions: SqlServerConnectionOptions = cloneDeep(DEFAULT_CONNECTION_STRING);
+        Object.defineProperties(_conexionOptions, {
+            host: {
+                value: contaConexion.IpRodas,
+            },
+            username: {
+                value: contaConexion.Usuario,
+            },
+            password: {
+                value: await this._cryptoService.decrypt(contaConexion.Contrasena),
+            },
+            database: {
+                value: contaConexion.BaseDatos,
+            },
+        });
 
-            const _rodasConnection = await new Connection(_conexionOptions).connect();
+        const _rodasConnection = await new Connection(_conexionOptions).connect();
 
-            return new Promise<Connection>(resolve => {
-                resolve(_rodasConnection);
-            });
-        // } catch (err: any) {
-        //     return null;
-        // }
+        return new Promise<Connection>(resolve => {
+            resolve(_rodasConnection);
+        });
     }
 
     async estadoContaConexiones(idDivision: number): Promise<EstadoConexionesRodasQueryResponse> {
@@ -203,33 +212,32 @@ export class ContaConexionesService {
 
             const _validarUnidades: EstadoConexionesRodas[] = [];
 
-            for (let _unidad of _unidades) {
+            for (const _unidad of _unidades) {
                 const unidad = _unidad.Centro;
                 const _conexionUnidadQuery = await this.findByIdUnidad(unidad, false);
 
-                const datoUnidad =  await (await this._unidadesSvc.getUnidadById(unidad)).data[0];
+                const datoUnidad = await (await this._unidadesSvc.getUnidadById(unidad)).data[0];
 
                 try {
                     await (await this.conexionRodas(_conexionUnidadQuery.data)).connect();
 
                     _validarUnidades.push({
                         Unidad: datoUnidad.IdUnidad + '-' + datoUnidad.Nombre,
-                        Estado: 'Correcto'
+                        Estado: 'Correcto',
                     });
                 } catch (err: any) {
                     _validarUnidades.push({
                         Unidad: datoUnidad.IdUnidad + '-' + datoUnidad.Nombre,
-                        Estado: 'Incorrecto'
+                        Estado: 'Incorrecto',
                     });
                 }
             }
             return new Promise<EstadoConexionesRodasQueryResponse>(resolve => {
                 resolve({
                     success: true,
-                    data: _validarUnidades
+                    data: _validarUnidades,
                 });
             });
-
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }

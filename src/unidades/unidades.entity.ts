@@ -25,7 +25,7 @@ export class Unidades {
     IdDivision: number;
 
     @Field({ nullable: true })
-    @Column('nchar', { length: 3})
+    @Column('nchar', { length: 3 })
     Provincia: string;
 
     @Field({ nullable: true })

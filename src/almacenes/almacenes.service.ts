@@ -6,18 +6,19 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class AlmacenesService {
-    constructor(
-        @InjectRepository(Almacenes) private readonly almacenesRepository: Repository<Almacenes>
-    ) {}
+    constructor(@InjectRepository(Almacenes) private readonly almacenesRepository: Repository<Almacenes>) {}
 
     async insertAlmacenes(almacen: Almacenes): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.almacenesRepository.save(almacen).then(() => {
-                    resolve({ success: true });
-                }).catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
-                });
+                this.almacenesRepository
+                    .save(almacen)
+                    .then(() => {
+                        resolve({ success: true });
+                    })
+                    .catch(err => {
+                        resolve({ success: false, error: err.message ? err.message : err });
+                    });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
@@ -27,11 +28,14 @@ export class AlmacenesService {
     async deleteAlmacenesByIdUnidad(idUnidad: number): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.almacenesRepository.delete({ IdUnidad: idUnidad }).then(() => {
-                    resolve({ success: true });
-                }).catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
-                });
+                this.almacenesRepository
+                    .delete({ IdUnidad: idUnidad })
+                    .then(() => {
+                        resolve({ success: true });
+                    })
+                    .catch(err => {
+                        resolve({ success: false, error: err.message ? err.message : err });
+                    });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };

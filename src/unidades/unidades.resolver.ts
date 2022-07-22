@@ -8,9 +8,7 @@ import { AuthGuard, DEFAULT_GRAPHQL_CONTEXT } from '../shared/helpers/auth.guard
 
 @Resolver(() => Unidades)
 export class UnidadesResolver {
-    constructor(
-        private _unidadesService: UnidadesService
-    ) {}
+    constructor(private _unidadesService: UnidadesService) {}
 
     @Query(() => AllUnidadesQueryResponse)
     @UseGuards(new AuthGuard())
@@ -20,17 +18,13 @@ export class UnidadesResolver {
 
     @Query(() => AllUnidadesQueryResponse)
     @UseGuards(new AuthGuard())
-    async getUnidadesByIdSubdivision(
-        @Args({ name: 'idSubdivision', type: () => Int }) idSubdivision: number
-    ): Promise<AllUnidadesQueryResponse> {
+    async getUnidadesByIdSubdivision(@Args({ name: 'idSubdivision', type: () => Int }) idSubdivision: number): Promise<AllUnidadesQueryResponse> {
         return this._unidadesService.getUnidadesByIdSubdivision(idSubdivision);
     }
 
     @Query(() => AllUnidadesQueryResponse)
     @UseGuards(new AuthGuard())
-    async getUnidadesByIdDivision(
-        @Args({ name: 'idDivision', type: () => Int }) idDivision: number
-    ): Promise<AllUnidadesQueryResponse> {
+    async getUnidadesByIdDivision(@Args({ name: 'idDivision', type: () => Int }) idDivision: number): Promise<AllUnidadesQueryResponse> {
         return this._unidadesService.getUnidadesByIdDivision(idDivision);
     }
 }
