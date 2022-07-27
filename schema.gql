@@ -201,21 +201,31 @@ type CuentasAgrupadasQueryResponse {
   error: String
 }
 
-type RodasDWHQueryResponse {
-  success: Boolean!
-  data: String
-  error: String
-}
-
 type ConciliaDWH {
-  RodasDWHInventarioVentas: RodasDWHQueryResponse!
-  RodasDWHAlmacenes: RodasDWHQueryResponse!
-  RodasDWHNota: RodasDWHQueryResponse!
+  Tipo: String!
+  IdCentro: Float!
+  IdUnidad: String!
+  Unidad: String!
+  IdPiso: String!
+  Almacen: String
+  Cuenta: String
+  Periodo: String!
+  SaldoGolden: Float!
+  SaldoRestaurador: Float!
+  DifGoldenRest: Float!
+  SaldoDistribuidor: Float!
+  DifGoldenDist: Float!
+  SaldoRodas: Float!
+  DifGoldenRodas: Float!
+  IdDivision: Float!
+  Division: String!
+  CuentaR: String
+  Nota: String
 }
 
 type ConciliaDWHQueryResponse {
   success: Boolean!
-  data: ConciliaDWH
+  data: [ConciliaDWH!]
   error: String
 }
 

@@ -9,9 +9,7 @@ import { ContaConexionesModule } from './conta-conexiones/conta-conexiones.modul
 import { UnidadesModule } from './unidades/unidades.module';
 import { DwhConexionesModule } from './dwh-conexiones/dwh-conexiones.module';
 import { CargosModule } from './cargos/cargos.module';
-import { DwhInventarioModule } from './dwh-inventario/dwh-inventario.module';
 import { ConciliaDwhModule } from './concilia-dwh/concilia-dwh.module';
-import { DwhVentasModule } from './dwh-ventas/dwh-ventas.module';
 import { AlmacenesModule } from './almacenes/almacenes.module';
 import { EmailsService } from './shared/services/emails/emails.service';
 import { ConciliaContaModule } from './concilia-conta/concilia-conta.module';
@@ -77,9 +75,7 @@ import { ActfijosClasificadorCnmbModule } from './actfijos-clasificador-cnmb/act
         UnidadesModule,
         DwhConexionesModule,
         CargosModule,
-        DwhInventarioModule,
         ConciliaDwhModule,
-        DwhVentasModule,
         AlmacenesModule,
         ConciliaContaModule,
         EmpleadosModule,

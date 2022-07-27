@@ -1,4 +1,4 @@
-import { cloneDeep, join, padStart, toNumber } from 'lodash';
+import { cloneDeep, padStart, toNumber } from 'lodash';
 import { XmlJsService } from './../shared/services/xml-js/xml-js.service';
 import { ConciliaContaService } from './../concilia-conta/concilia-conta.service';
 import { ContaConexionesService } from './../conta-conexiones/conta-conexiones.service';
@@ -125,7 +125,7 @@ export class ConciliaAftService {
         // importo los MB
         await this._importarMb(idCentro, periodo, conexionRodas);
 
-        return new Promise<boolean>((resolve, reject) => {
+        return new Promise<boolean>(resolve => {
             resolve(true);
         });
     }

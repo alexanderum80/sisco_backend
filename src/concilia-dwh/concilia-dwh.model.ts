@@ -14,14 +14,62 @@ export class RodasDWHQueryResponse {
 
 @ObjectType()
 export class ConciliaDWH {
-    @Field(() => RodasDWHQueryResponse)
-    RodasDWHInventarioVentas: RodasDWHQueryResponse;
+    @Field()
+    Tipo: string;
 
-    @Field(() => RodasDWHQueryResponse)
-    RodasDWHAlmacenes: RodasDWHQueryResponse;
+    @Field()
+    IdCentro: number;
 
-    @Field(() => RodasDWHQueryResponse)
-    RodasDWHNota: RodasDWHQueryResponse;
+    @Field()
+    IdUnidad: string;
+
+    @Field()
+    Unidad: string;
+
+    @Field()
+    IdPiso: string;
+
+    @Field({ nullable: true })
+    Almacen?: string;
+
+    @Field({ nullable: true })
+    Cuenta?: string;
+
+    @Field()
+    Periodo: string;
+
+    @Field()
+    SaldoGolden: number;
+
+    @Field()
+    SaldoRestaurador: number;
+
+    @Field()
+    DifGoldenRest: number;
+
+    @Field()
+    SaldoDistribuidor: number;
+
+    @Field()
+    DifGoldenDist: number;
+
+    @Field()
+    SaldoRodas: number;
+
+    @Field()
+    DifGoldenRodas: number;
+
+    @Field()
+    IdDivision: number;
+
+    @Field()
+    Division: string;
+
+    @Field({ nullable: true })
+    CuentaR?: string;
+
+    @Field({ nullable: true })
+    Nota?: string;
 }
 
 @ObjectType()
@@ -29,8 +77,8 @@ export class ConciliaDWHQueryResponse {
     @Field()
     success: boolean;
 
-    @Field(() => ConciliaDWH, { nullable: true })
-    data?: ConciliaDWH;
+    @Field(() => [ConciliaDWH], { nullable: true })
+    data?: ConciliaDWH[];
 
     @Field(() => String, { nullable: true })
     error?: string;
@@ -175,58 +223,3 @@ export const queryVentasDWH = `SELECT @Centro as IdCentro, vt.IdGerencia as IdUn
     ) AS VT
     GROUP BY VT.IdGerencia, CASE WHEN @Cons = 1 THEN 0 ELSE vt.IdPiso END
     ORDER BY VT.IdGerencia`;
-
-export const queryRodasDWHInventarioVentas = `SELECT 'Inventario' as Tipo, IdCentro, V.IdUnidad, RTRIM(V.IdUnidad) + '-' + U.Nombre AS Unidad, IdPiso, Almacen,
-    SUM(SaldoGolden) AS SaldoGolden, SUM(SaldoRestaurador) AS SaldoRestaurador, SUM(DifGoldenRest) as DifGoldenRest,
-    SUM(SaldoDistribuidor) AS SaldoDistribuidor, SUM(DifGoldenDist) AS DifGoldenDist,
-    SUM(SaldoRodas) AS SaldoRodas, SUM(DifGoldenRodas) AS DifGoldenRodas,
-    Cuenta, Periodo, U.IdDivision, RTRIM(U.IdDivision) + '-' + U.Division AS Division
-    FROM            vDWG_Rodas_Inventario AS V INNER JOIN
-    dbo.vCentros AS U ON U.IdUnidad = V.IdUnidad
-    GROUP BY IdCentro, V.IdUnidad, U.Nombre, IdPiso, Almacen, Cuenta, Periodo, U.IdDivision, U.Division
-    HAVING        (IdCentro = @IdCentro) AND (Periodo = @Periodo) AND (SUM(SaldoGolden) + SUM(SaldoRestaurador) + SUM(SaldoDistribuidor) + SUM(SaldoRodas) NOT BETWEEN - 0.0001 AND 0.0001)
-UNION all
-    SELECT 'Ventas' as Tipo, IdCentro, V.IdUnidad, RTRIM(V.IdUnidad) + '-' + U.Nombre AS Unidad, IdPiso, Almacen,
-    SUM(SaldoGolden) AS SaldoGolden, SUM(SaldoRestaurador) AS SaldoRestaurador, SUM(V.DifGoldenRest) AS DifGoldenRest,
-    SUM(SaldoDistribuidor) AS SaldoDistribuidor, SUM(V.DifGoldenDist) AS DifGoldenDist,
-    SUM(SaldoRodas) AS SaldoRodas, SUM(V.DifGoldenRodas) AS DifGoldenRodas, Cuenta, Periodo, U.IdDivision, RTRIM(U.IdDivision) + '-' + U.Division AS Division
-    FROM            vDWG_Rodas_Ventas AS V INNER JOIN
-            dbo.vCentros AS U ON U.IdUnidad = V.IdUnidad
-    GROUP BY Periodo, IdCentro, V.IdUnidad, U.Nombre, IdPiso, Almacen, Cuenta, U.IdDivision, U.Division
-    HAVING        (IdCentro = @IdCentro) AND (Periodo = @Periodo)
-    ORDER BY IdCentro, IdUnidad, Tipo, IdPiso`;
-
-export const queryRodasDWHInventarioVentasResumen = `SELECT 'Inventario' as Tipo, IdCentro, V.IdUnidad, RTRIM(V.IdUnidad) + '-' + U.Nombre AS Unidad, '000' AS IdPiso, '' AS Almacen,
-    SUM(SaldoGolden) AS SaldoGolden, SUM(SaldoRestaurador) AS SaldoRestaurador, SUM(DifGoldenRest) as DifGoldenRest,
-    SUM(SaldoDistribuidor) AS SaldoDistribuidor, SUM(DifGoldenDist) AS DifGoldenDist,
-    SUM(SaldoRodas) AS SaldoRodas, SUM(DifGoldenRodas) AS DifGoldenRodas,
-    '' AS Cuenta, Periodo, U.IdDivision, RTRIM(U.IdDivision) + '-' + U.Division AS Division
-    FROM            vDWG_Rodas_Inventario AS V INNER JOIN
-    dbo.vCentros AS U ON U.IdUnidad = V.IdUnidad
-    GROUP BY IdCentro, V.IdUnidad, U.Nombre, Periodo, U.IdDivision, U.Division
-    HAVING        (IdCentro = @IdCentro) AND (Periodo = @Periodo) AND (SUM(SaldoGolden) + SUM(SaldoRestaurador) + SUM(SaldoDistribuidor) + SUM(SaldoRodas) NOT BETWEEN - 0.0001 AND 0.0001)
-UNION ALL
-    SELECT 'Ventas' as Tipo, IdCentro, V.IdUnidad, RTRIM(V.IdUnidad) + '-' + U.Nombre AS Unidad, '000' AS IdPiso, '' AS Almacen,
-    SUM(SaldoGolden) AS SaldoGolden, SUM(SaldoRestaurador) AS SaldoRestaurador, SUM(V.DifGoldenRest) AS DifGoldenRest,
-    SUM(SaldoDistribuidor) AS SaldoDistribuidor, SUM(V.DifGoldenDist) AS DifGoldenDist,
-    SUM(SaldoRodas) AS SaldoRodas, SUM(V.DifGoldenRodas) AS DifGoldenRodas,
-    '' AS Cuenta, Periodo, U.IdDivision, RTRIM(U.IdDivision) + '-' + U.Division AS Division
-    FROM            vDWG_Rodas_Ventas AS V INNER JOIN
-            dbo.vCentros AS U ON U.IdUnidad = V.IdUnidad
-    GROUP BY Periodo, IdCentro, V.IdUnidad, U.Nombre, U.IdDivision, U.Division
-    HAVING        (IdCentro = @IdCentro) AND (Periodo = @Periodo)
-    ORDER BY IdCentro, U.IdDivision, Tipo, IdUnidad, IdPiso`;
-
-export const queryRodasDWHAlmacenes = `SELECT IdCentro, RTRIM(C.IdUnidad) + '-' + C.Nombre AS Centro, A.IdUnidad, RTRIM(U.IdUnidad) + '-' + U.Nombre AS Unidad, IdPiso, Almacen, CuentaG, CuentaR, Periodo
-    FROM vDWG_Rodas_Almacenes AS A INNER JOIN
-        dbo.vCentros AS C ON C.IdUnidad = A.IdCentro INNER JOIN
-        dbo.vCentros AS U ON U.IdUnidad = A.IdUnidad
-    WHERE (IdCentro = @IdCentro) AND (Periodo = @Periodo)
-    ORDER BY IdCentro, IdUnidad, IdPiso`;
-
-export const queryRodasDWHAlmacenesDist = `SELECT Almacen, CuentaG, CuentaR, IdCentro, IdPiso, IdUnidad
-    FROM            vDWH_Almacenes_GoldenVsDistribuidor
-    WHERE        (IdCentro = @IdCentro)
-    ORDER BY IdCentro, IdUnidad, IdPiso`;
-
-export const queryRodasDWHNota = `SELECT Nota FROM DWH_Nota WHERE (IdCentro = @IdCentro) AND (Periodo = @Periodo) AND (Año = @Anio)`;
