@@ -35,10 +35,10 @@ import { ContaNoUsarEnCuentasModule } from './conta-no-usar-en-cuentas/conta-no-
 import { TipoUsuariosModule } from './tipo-usuarios/tipo-usuarios.module';
 import { ContaComprobarValoresModule } from './conta-comprobar-valores/conta-comprobar-valores.module';
 import { CajaConfiguracionModule } from './caja-configuracion/caja-configuracion.module';
-import 'dotenv/config';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { ConciliaAftModule } from './concilia-aft/concilia-aft.module';
 import { ActfijosClasificadorCnmbModule } from './actfijos-clasificador-cnmb/actfijos-clasificador-cnmb.module';
+import 'dotenv/config';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 
 @Module({
     imports: [
@@ -62,6 +62,7 @@ import { ActfijosClasificadorCnmbModule } from './actfijos-clasificador-cnmb/act
             entities: ['**/*.entity.js'],
             synchronize: false,
             options: {
+                appName: 'SISCO',
                 enableArithAbort: true,
                 cryptoCredentialsDetails: {
                     minVersion: 'TLSv1',

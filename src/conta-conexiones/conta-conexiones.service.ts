@@ -12,8 +12,7 @@ import { ContaConexionQueryResponse, EstadoConexionesRodasQueryResponse, EstadoC
 import { ContaConexiones } from './conta-conexiones.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Connection, Repository } from 'typeorm';
-import { SqlServerConnectionOptions } from 'typeorm/driver/sqlserver/SqlServerConnectionOptions';
+import { DataSource, Repository } from 'typeorm';
 
 @Injectable()
 export class ContaConexionesService {
@@ -69,7 +68,7 @@ export class ContaConexionesService {
         try {
             return new Promise<ContaConexionQueryResponse>(resolve => {
                 this.conexionesRespository
-                    .findOne(id)
+                    .findOne({ where: [{ Id: id }] })
                     .then(result => {
                         this._cryptoService
                             .decrypt(result.Contrasena)
@@ -97,7 +96,7 @@ export class ContaConexionesService {
     async findByIdUnidad(idUnidad: number, consolidado: boolean): Promise<ContaConexionQueryResponse> {
         return new Promise<ContaConexionQueryResponse>((resolve, reject) => {
             this.conexionesRespository
-                .findOne({ IdUnidad: idUnidad, Consolidado: consolidado })
+                .findOne({ where: [{ IdUnidad: idUnidad, Consolidado: consolidado }] })
                 .then(result => {
                     if (result) {
                         resolve({
@@ -179,8 +178,8 @@ export class ContaConexionesService {
         }
     }
 
-    async conexionRodas(contaConexion: ContaConexiones): Promise<Connection> {
-        const _conexionOptions: SqlServerConnectionOptions = cloneDeep(DEFAULT_CONNECTION_STRING);
+    async conexionRodas(contaConexion: ContaConexiones): Promise<DataSource> {
+        const _conexionOptions = cloneDeep(DEFAULT_CONNECTION_STRING);
         Object.defineProperties(_conexionOptions, {
             host: {
                 value: contaConexion.IpRodas,
@@ -196,9 +195,10 @@ export class ContaConexionesService {
             },
         });
 
-        const _rodasConnection = await new Connection(_conexionOptions).connect();
+        const _rodasConnection: DataSource = await new DataSource(_conexionOptions).initialize();
+        // const _rodasConnection = await new DataSource(_conexionOptions);
 
-        return new Promise<Connection>(resolve => {
+        return new Promise<DataSource>(resolve => {
             resolve(_rodasConnection);
         });
     }
@@ -207,7 +207,7 @@ export class ContaConexionesService {
         try {
             const _conexionDivisionQuery = await this.findByIdUnidad(idDivision, true);
 
-            const _conexionDivision = await (await this.conexionRodas(_conexionDivisionQuery.data)).connect();
+            const _conexionDivision = await (await this.conexionRodas(_conexionDivisionQuery.data)).initialize();
             const _unidades = await _conexionDivision.query(queryCentrosByConsolidado);
 
             const _validarUnidades: EstadoConexionesRodas[] = [];
@@ -219,7 +219,7 @@ export class ContaConexionesService {
                 const datoUnidad = await (await this._unidadesSvc.getUnidadById(unidad)).data[0];
 
                 try {
-                    await (await this.conexionRodas(_conexionUnidadQuery.data)).connect();
+                    await (await this.conexionRodas(_conexionUnidadQuery.data)).initialize();
 
                     _validarUnidades.push({
                         Unidad: datoUnidad.IdUnidad + '-' + datoUnidad.Nombre,

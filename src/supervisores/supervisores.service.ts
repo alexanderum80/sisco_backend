@@ -9,27 +9,27 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class SupervisoresService {
-    constructor(
-        @InjectRepository(Supervisor) private readonly supervisorRepository: Repository<Supervisor>,
-        private _usuariosSvc: UsuariosService
-    ) {}
+    constructor(@InjectRepository(Supervisor) private readonly supervisorRepository: Repository<Supervisor>, private _usuariosSvc: UsuariosService) {}
 
     async findAll(user: Usuarios): Promise<SupervisoresQueryResponse> {
         try {
             const { IdDivision, IdTipoUsuario } = user;
 
-            let _condition = { };
+            let _condition = {};
 
             if (!this._usuariosSvc.isSuperAdmin(IdDivision, IdTipoUsuario)) {
                 _condition = { IdDivision: IdDivision };
             }
 
             return new Promise<SupervisoresQueryResponse>(resolve => {
-                this.supervisorRepository.find({ where: _condition, relations: ['Cargo', 'Division'] }).then(res => {
-                    resolve({ success: true, data: res });
-                }).catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
-                });
+                this.supervisorRepository
+                    .find({ where: _condition, relations: ['Cargo', 'Division'] })
+                    .then(res => {
+                        resolve({ success: true, data: res });
+                    })
+                    .catch(err => {
+                        resolve({ success: false, error: err.message ? err.message : err });
+                    });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
@@ -39,11 +39,14 @@ export class SupervisoresService {
     async findOne(_id: number): Promise<SupervisorQueryResponse> {
         try {
             return new Promise<SupervisorQueryResponse>(resolve => {
-                this.supervisorRepository.findOne(_id, { relations: ['Cargo', 'Division'] }).then(res => {
-                    resolve({ success: true, data: res });
-                }).catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
-                });
+                this.supervisorRepository
+                    .findOne({ where: [{ IdSupervisor: _id }], relations: ['Cargo', 'Division'] })
+                    .then(res => {
+                        resolve({ success: true, data: res });
+                    })
+                    .catch(err => {
+                        resolve({ success: false, error: err.message ? err.message : err });
+                    });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
@@ -55,11 +58,14 @@ export class SupervisoresService {
             delete SupervisorInfo.IdSupervisor;
 
             return new Promise<MutationResponse>(resolve => {
-                this.supervisorRepository.save(SupervisorInfo).then(() => {
-                    resolve({ success: true });
-                }).catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
-                });
+                this.supervisorRepository
+                    .save(SupervisorInfo)
+                    .then(() => {
+                        resolve({ success: true });
+                    })
+                    .catch(err => {
+                        resolve({ success: false, error: err.message ? err.message : err });
+                    });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
@@ -69,11 +75,14 @@ export class SupervisoresService {
     async update(SupervisorInfo: SupervisorInput): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.supervisorRepository.save(SupervisorInfo).then(() => {
-                    resolve({ success: true });
-                }).catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
-                });
+                this.supervisorRepository
+                    .save(SupervisorInfo)
+                    .then(() => {
+                        resolve({ success: true });
+                    })
+                    .catch(err => {
+                        resolve({ success: false, error: err.message ? err.message : err });
+                    });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
@@ -83,11 +92,14 @@ export class SupervisoresService {
     async delete(IDs: number[]): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.supervisorRepository.delete(IDs).then(() => {
-                    resolve({ success: true });
-                }).catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
-                });
+                this.supervisorRepository
+                    .delete(IDs)
+                    .then(() => {
+                        resolve({ success: true });
+                    })
+                    .catch(err => {
+                        resolve({ success: false, error: err.message ? err.message : err });
+                    });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };

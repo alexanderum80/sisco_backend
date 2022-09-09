@@ -3,21 +3,18 @@ import { UsuariosService } from './../usuarios/usuarios.service';
 import { AllUnidadesQueryResponse, AllUnidadQueryResponse } from './unidades.model';
 import { Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
-import { Connection, getManager } from 'typeorm';
+import { getManager, DataSource } from 'typeorm';
 import { CentrosView } from './unidades.entity';
 
 @Injectable()
 export class UnidadesService {
-    constructor(
-        @InjectConnection() private readonly connection: Connection,
-        private _usuariosSvc: UsuariosService
-    ) {}
+    constructor(@InjectConnection() private readonly connection: DataSource, private _usuariosSvc: UsuariosService) {}
 
     async getAllUnidades(user: Usuarios): Promise<AllUnidadesQueryResponse> {
         try {
             const { IdDivision, IdTipoUsuario } = user;
 
-            let _condition = { };
+            let _condition = {};
 
             if (!this._usuariosSvc.isSuperAdmin(IdDivision, IdTipoUsuario) && !this._usuariosSvc.isAdvancedUser(IdDivision, IdTipoUsuario)) {
                 _condition = { IdDivision: IdDivision };
@@ -26,19 +23,22 @@ export class UnidadesService {
             const entityManager = getManager();
 
             return new Promise<AllUnidadesQueryResponse>(resolve => {
-                entityManager.find(CentrosView, { where: _condition }).then(result => {
-                    resolve({
-                        success: true,
-                        data: result
+                entityManager
+                    .find(CentrosView, { where: _condition })
+                    .then(result => {
+                        resolve({
+                            success: true,
+                            data: result,
+                        });
+                    })
+                    .catch(err => {
+                        resolve({ success: false, error: err.message ? err.message : err });
                     });
-                }).catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
-                });
             });
         } catch (err: any) {
             return {
                 success: false,
-                error: err
+                error: err,
             };
         }
     }
@@ -48,19 +48,22 @@ export class UnidadesService {
             const entityManager = getManager();
 
             return new Promise<AllUnidadQueryResponse>(resolve => {
-                entityManager.findOne(CentrosView, { where: { IdUnidad } }).then(result => {
-                    resolve({
-                        success: true,
-                        data: result
+                entityManager
+                    .findOne(CentrosView, { where: { IdUnidad } })
+                    .then(result => {
+                        resolve({
+                            success: true,
+                            data: result,
+                        });
+                    })
+                    .catch(err => {
+                        resolve({ success: false, error: err.message ? err.message : err });
                     });
-                }).catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
-                });
             });
         } catch (err: any) {
             return {
                 success: false,
-                error: err
+                error: err,
             };
         }
     }
@@ -70,19 +73,22 @@ export class UnidadesService {
             const entityManager = getManager();
 
             return new Promise<AllUnidadesQueryResponse>(resolve => {
-                entityManager.find(CentrosView, { where: { IdSubdivision } }).then(result => {
-                    resolve({
-                        success: true,
-                        data: result
+                entityManager
+                    .find(CentrosView, { where: { IdSubdivision } })
+                    .then(result => {
+                        resolve({
+                            success: true,
+                            data: result,
+                        });
+                    })
+                    .catch(err => {
+                        resolve({ success: false, error: err.message ? err.message : err });
                     });
-                }).catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
-                });
             });
         } catch (err: any) {
             return {
                 success: false,
-                error: err
+                error: err,
             };
         }
     }
@@ -92,19 +98,22 @@ export class UnidadesService {
             const entityManager = getManager();
 
             return new Promise<AllUnidadesQueryResponse>(resolve => {
-                entityManager.find(CentrosView, { where: { IdDivision } }).then(result => {
-                    resolve({
-                        success: true,
-                        data: result
+                entityManager
+                    .find(CentrosView, { where: { IdDivision } })
+                    .then(result => {
+                        resolve({
+                            success: true,
+                            data: result,
+                        });
+                    })
+                    .catch(err => {
+                        resolve({ success: false, error: err.message ? err.message : err });
                     });
-                }).catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
-                });
             });
         } catch (err: any) {
             return {
                 success: false,
-                error: err
+                error: err,
             };
         }
     }
@@ -112,21 +121,26 @@ export class UnidadesService {
     async getUnidadesAbiertasByIdSubdivision(idSubdivision: number): Promise<any> {
         try {
             return new Promise<any>(resolve => {
-                this.connection.query(`Select U.*, D.Division from Unidades AS U INNER JOIN dbo.Divisiones AS D ON D.IdDivision = U.IdDivision
-                        WHERE (case isnull(IdComplejo,0) when 0 THEN IdUnidad else IdComplejo end) = ${ idSubdivision }
-                        AND Abierta = 1 order by Idunidad`).then(result => {
-                    resolve({
-                        success: true,
-                        data: result
+                this.connection
+                    .query(
+                        `Select U.*, D.Division from Unidades AS U INNER JOIN dbo.Divisiones AS D ON D.IdDivision = U.IdDivision
+                        WHERE (case isnull(IdComplejo,0) when 0 THEN IdUnidad else IdComplejo end) = ${idSubdivision}
+                        AND Abierta = 1 order by Idunidad`,
+                    )
+                    .then(result => {
+                        resolve({
+                            success: true,
+                            data: result,
+                        });
+                    })
+                    .catch(err => {
+                        resolve({ success: false, error: err.message ? err.message : err });
                     });
-                }).catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
-                });
             });
         } catch (err: any) {
             return {
                 success: false,
-                error: err
+                error: err,
             };
         }
     }
@@ -134,23 +148,27 @@ export class UnidadesService {
     async getUnidadesAbiertasByIdDivision(idDivision: number): Promise<any> {
         try {
             return new Promise<any>(resolve => {
-                this.connection.query(`Select U.*, D.Division from Unidades AS U INNER JOIN dbo.Divisiones AS D ON D.IdDivision = U.IdDivision
-                        WHERE U.IdDivision = ${ idDivision }
-                        AND Abierta = 1 order by Idunidad`).then(result => {
-                    resolve({
-                        success: true,
-                        data: result
+                this.connection
+                    .query(
+                        `Select U.*, D.Division from Unidades AS U INNER JOIN dbo.Divisiones AS D ON D.IdDivision = U.IdDivision
+                        WHERE U.IdDivision = ${idDivision}
+                        AND Abierta = 1 order by Idunidad`,
+                    )
+                    .then(result => {
+                        resolve({
+                            success: true,
+                            data: result,
+                        });
+                    })
+                    .catch(err => {
+                        resolve({ success: false, error: err.message ? err.message : err });
                     });
-                }).catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
-                });
             });
         } catch (err: any) {
             return {
                 success: false,
-                error: err
+                error: err,
             };
         }
     }
-
 }

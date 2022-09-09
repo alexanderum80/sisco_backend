@@ -3,14 +3,14 @@ import { UsuariosQueryResponse, UsuarioInput, ETipoUsuarios, UsuarioQueryRespons
 import { Usuarios } from './usuarios.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
-import { Connection, Repository } from 'typeorm';
+import { Repository, DataSource } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 import { SECRET_KEY } from '../shared/helpers/auth.guard';
 
 @Injectable()
 export class UsuariosService {
-    constructor(@InjectConnection() private readonly connection: Connection, @InjectRepository(Usuarios) private readonly usuariosRepository: Repository<Usuarios>) {}
+    constructor(@InjectConnection() private readonly connection: DataSource, @InjectRepository(Usuarios) private readonly usuariosRepository: Repository<Usuarios>) {}
 
     async authenticate(usuario: string, passw: string): Promise<UsuarioQueryResponse> {
         try {
@@ -127,7 +127,7 @@ export class UsuariosService {
         try {
             return new Promise<UsuarioQueryResponse>(resolve => {
                 this.usuariosRepository
-                    .findOne(id, { relations: ['TipoUsuario', 'Division'] })
+                    .findOne({ where: [{ IdUsuario: id }], relations: ['TipoUsuario', 'Division'] })
                     .then(result => {
                         resolve({
                             success: true,
@@ -147,7 +147,7 @@ export class UsuariosService {
         try {
             return new Promise<UsuariosQueryResponse>(resolve => {
                 this.usuariosRepository
-                    .findOne({ Usuario: name })
+                    .findOne({ where: [{ Usuario: name }] })
                     .then(result => {
                         resolve({
                             success: true,

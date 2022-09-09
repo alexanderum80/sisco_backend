@@ -11,14 +11,14 @@ import { ConciliaDWHInput, queryInventarioDWH, queryVentasDWH } from './concilia
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { Injectable } from '@nestjs/common';
 import { UnidadesQueryResponse } from './../unidades/unidades.model';
-import { Connection } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { ContaConexiones } from './../conta-conexiones/conta-conexiones.entity';
 import { InjectConnection } from '@nestjs/typeorm';
 
 @Injectable()
 export class ConciliaDwhService {
     constructor(
-        @InjectConnection() private readonly connection: Connection,
+        @InjectConnection() private readonly connection: DataSource,
         private _unidadesService: UnidadesService,
         private _dwhConexionesService: DwhConexionesService,
         private _contaConexionesService: ContaConexionesService,
@@ -125,13 +125,13 @@ export class ConciliaDwhService {
         unidades: Unidades[],
         dwhConexiones: DWHConexiones,
     ): Promise<MutationResponse> {
-        let dwhConnectionDivision: Connection;
-        let dwhConnectionRestaurador: Connection;
-        let dwhConnectionEmpresa: Connection;
+        let dwhConnectionDivision: DataSource;
+        let dwhConnectionRestaurador: DataSource;
+        let dwhConnectionEmpresa: DataSource;
         try {
-            dwhConnectionDivision = await (await this._dwhConexionesService.conexionDWH(dwhConexiones.ConexionDWH.toString())).connect();
-            dwhConnectionRestaurador = await (await this._dwhConexionesService.conexionDWH(dwhConexiones.ConexionRest.toString())).connect();
-            dwhConnectionEmpresa = await (await this._dwhConexionesService.conexionRestEmpresa()).connect();
+            dwhConnectionDivision = await (await this._dwhConexionesService.conexionDWH(dwhConexiones.ConexionDWH.toString())).initialize();
+            dwhConnectionRestaurador = await (await this._dwhConexionesService.conexionDWH(dwhConexiones.ConexionRest.toString())).initialize();
+            dwhConnectionEmpresa = await (await this._dwhConexionesService.conexionRestEmpresa()).initialize();
 
             for (let index = 0; index < unidades.length; index++) {
                 const unidadInfo = unidades[index];
@@ -187,9 +187,9 @@ export class ConciliaDwhService {
                 }
             }
 
-            if (dwhConnectionDivision && dwhConnectionDivision.isConnected) dwhConnectionDivision.close();
-            if (dwhConnectionDivision && dwhConnectionRestaurador.isConnected) dwhConnectionRestaurador.close();
-            if (dwhConnectionDivision && dwhConnectionEmpresa.isConnected) dwhConnectionEmpresa.close();
+            // if (dwhConnectionDivision && dwhConnectionDivision.isInitialized) dwhConnectionDivision.destroy();
+            // if (dwhConnectionDivision && dwhConnectionRestaurador.isInitialized) dwhConnectionRestaurador.destroy();
+            // if (dwhConnectionDivision && dwhConnectionEmpresa.isInitialized) dwhConnectionEmpresa.destroy();
 
             return new Promise<MutationResponse>(resolve => {
                 resolve({ success: true });
@@ -199,7 +199,7 @@ export class ConciliaDwhService {
         }
     }
 
-    private async _importarAlmacenesDWH(idUnidad: number, connection: Connection, isDistribuidor = false): Promise<MutationResponse> {
+    private async _importarAlmacenesDWH(idUnidad: number, connection: DataSource, isDistribuidor = false): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
                 connection
@@ -241,7 +241,7 @@ export class ConciliaDwhService {
         mes: number,
         unidadInfo: Unidades,
         tipoCentro: number,
-        connection: Connection,
+        connection: DataSource,
         isRestaura = false,
         isDistribuidor = false,
     ): Promise<MutationResponse> {
@@ -291,7 +291,7 @@ export class ConciliaDwhService {
         unidadInfo: Unidades,
         tipoCentro: number,
         ventasAcumuladas: boolean,
-        connection: Connection,
+        connection: DataSource,
         isRestaura = false,
         isDistribuidor = false,
     ): Promise<MutationResponse> {
@@ -347,6 +347,7 @@ export class ConciliaDwhService {
             // }
 
             return new Promise<MutationResponse>(resolve => {
+                if (rodasConnection.isInitialized) rodasConnection.destroy();
                 resolve({ success: true });
             });
         } catch (err: any) {

@@ -15,13 +15,13 @@ import {
 } from './concilia-aft.model';
 import { Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
-import { Connection } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { ContaConexiones } from './../conta-conexiones/conta-conexiones.entity';
 
 @Injectable()
 export class ConciliaAftService {
     constructor(
-        @InjectConnection() private readonly connection: Connection,
+        @InjectConnection() private readonly connection: DataSource,
         private _contaConexionesSvc: ContaConexionesService,
         private _conciliaContaSvc: ConciliaContaService,
         private _xmlSvc: XmlJsService,
@@ -87,7 +87,7 @@ export class ConciliaAftService {
         });
     }
 
-    private async _importarCnmbAF(idCentro: number, conexionRodas: Connection): Promise<DiferenciaClasificadorCNMB[]> {
+    private async _importarCnmbAF(idCentro: number, conexionRodas: DataSource): Promise<DiferenciaClasificadorCNMB[]> {
         return new Promise<DiferenciaClasificadorCNMB[]>((resolve, reject) => {
             conexionRodas
                 .query(queryMbClanaCNMB)
@@ -111,7 +111,7 @@ export class ConciliaAftService {
         });
     }
 
-    private async _importarMbAF(idCentro: number, periodo: number, conexionRodas: Connection): Promise<boolean> {
+    private async _importarMbAF(idCentro: number, periodo: number, conexionRodas: DataSource): Promise<boolean> {
         // chequeo si el periodo es correcto
         await this._chequeaUltimoPeriodo(periodo, conexionRodas).catch(err => {
             return Promise.reject(err.message || err);
@@ -130,7 +130,7 @@ export class ConciliaAftService {
         });
     }
 
-    private async _chequeaUltimoPeriodo(periodo: number, conexionRodas: Connection): Promise<number> {
+    private async _chequeaUltimoPeriodo(periodo: number, conexionRodas: DataSource): Promise<number> {
         return new Promise<number>((resolve, reject) => {
             conexionRodas
                 .query(queryMbUltimoPeriodo)
@@ -147,7 +147,7 @@ export class ConciliaAftService {
         });
     }
 
-    private async _chequeaMbSinCuentas(conexionRodas: Connection): Promise<boolean> {
+    private async _chequeaMbSinCuentas(conexionRodas: DataSource): Promise<boolean> {
         return new Promise<boolean>((resolve, reject) => {
             conexionRodas
                 .query(queryMbSinCuentas)
@@ -166,7 +166,7 @@ export class ConciliaAftService {
         });
     }
 
-    private async _importarMb(idCentro: number, periodo: number, conexionRodas: Connection): Promise<boolean> {
+    private async _importarMb(idCentro: number, periodo: number, conexionRodas: DataSource): Promise<boolean> {
         return new Promise<boolean>(async (resolve, reject) => {
             // leo primero de la tabla MB_Periodo
             const ultimoPeriodoResp = await this.connection
@@ -244,7 +244,7 @@ export class ConciliaAftService {
     private _calculaConciliacion(idCentro: number, annio: number, periodo: number): Promise<ConciliaAftData> {
         return new Promise<ConciliaAftData>((resolve, reject) => {
             this.connection
-                .query('EXEC pAF_CalculaConciliacion @0, @1, @2', [idCentro, annio, periodo])
+                .query(`EXEC pAF_CalculaConciliacion @0, @1, @2`, [idCentro, annio, periodo])
                 .then(res => {
                     resolve({
                         ConciliaAFT: res,

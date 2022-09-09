@@ -42,7 +42,7 @@ export class ConciliaInternaDwhService {
                 return { success: false, error: conexionResp.error!.toString() };
             }
 
-            const conexion = await (await this._dwhConexionSvc.conexionDWH(conexionResp.data!.ConexionRest!)).connect();
+            const conexion = await (await this._dwhConexionSvc.conexionDWH(conexionResp.data!.ConexionRest!)).initialize();
 
             return new Promise<ConciliacionInternaDWHQueryResponse>(resolve => {
                 conexion.query(queryDWH).then(res => {

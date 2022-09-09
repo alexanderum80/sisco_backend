@@ -27,12 +27,12 @@ import {
     querySwitchAuditRodas,
 } from './concilia-conta.model';
 import { InjectConnection } from '@nestjs/typeorm';
-import { Connection } from 'typeorm';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class ConciliaContaService {
     constructor(
-        @InjectConnection() private readonly connection: Connection,
+        @InjectConnection() private readonly connection: DataSource,
         private _contaConexionesService: ContaConexionesService,
         private _unidadesService: UnidadesService,
         private _xmlJsService: XmlJsService,
@@ -52,7 +52,7 @@ export class ConciliaContaService {
             _conexionConta.BaseDatos = _conexionConta.BaseDatos.substring(0, _conexionConta.BaseDatos.length - 4) + annio.toString();
 
             // conecto al Conta del Centro
-            const _contaConexionCentro: Connection = await this._contaConexionesService.conexionRodas(_conexionConta);
+            const _contaConexionCentro: DataSource = await this._contaConexionesService.conexionRodas(_conexionConta);
 
             // importar y chequear el clasificador de cuentas
             const _chequeaClasifRes = await this._importarClasificador(idCentro, tipoCentro, annio, consolidado, periodo, _contaConexionCentro);
@@ -82,7 +82,7 @@ export class ConciliaContaService {
             await this.importarContabilidad(idCentro, annio, periodo, consolidado, _contaConexionCentro);
 
             // cierro la conexión al Rodas del Centro
-            if (_contaConexionCentro && _contaConexionCentro.isConnected) _contaConexionCentro.close();
+            if (_contaConexionCentro && _contaConexionCentro.isInitialized) _contaConexionCentro.destroy();
 
             // calcular la conciliación
             let _error = '';
@@ -128,7 +128,7 @@ export class ConciliaContaService {
         }
     }
 
-    async _importarClasificador(idUnidad: number, tipoCentro: number, annio: number, cons: string, periodo: number, contaConexion: Connection): Promise<any> {
+    async _importarClasificador(idUnidad: number, tipoCentro: number, annio: number, cons: string, periodo: number, contaConexion: DataSource): Promise<any> {
         try {
             // inserto el clasificador del Rodas
             const _queryClasifCuentasRes = await contaConexion.query(queryClasificadorCuentasRodas).catch(err => {
@@ -165,13 +165,13 @@ export class ConciliaContaService {
                     });
             });
         } catch (err: any) {
-            if (contaConexion && contaConexion.isConnected) contaConexion.close();
+            if (contaConexion && contaConexion.isInitialized) contaConexion.destroy();
 
             throw new Error(err.message ? err.message : err);
         }
     }
 
-    async importarContabilidad(idUnidad: number, annio: number, periodo: number, cons: string, contaConexion: Connection): Promise<void> {
+    async importarContabilidad(idUnidad: number, annio: number, periodo: number, cons: string, contaConexion: DataSource): Promise<void> {
         try {
             // obtener el ultimo periodo importado en el SISCO
             const _queryUltimoPeriodo = queryUltimoPeriodo
@@ -206,13 +206,13 @@ export class ConciliaContaService {
                 await this._importarMayor(idUnidad, annio, periodo, cons, contaConexion);
             }
         } catch (err: any) {
-            if (contaConexion && contaConexion.isConnected) contaConexion.close();
+            if (contaConexion && contaConexion.isInitialized) contaConexion.destroy();
 
             throw new Error(err.message ? err.message : err);
         }
     }
 
-    private async _chequeaDatosAdulterados(idUnidad: number, conexionRodas: Connection): Promise<void> {
+    private async _chequeaDatosAdulterados(idUnidad: number, conexionRodas: DataSource): Promise<void> {
         const _queryAsientos = queryRangoAsientosMesRodas;
 
         const _unidadRes = await this._unidadesService.getUnidadById(idUnidad);
@@ -263,7 +263,7 @@ export class ConciliaContaService {
             });
     }
 
-    private async _chequearSaldoAcumulados(idUnidad: number, annio: number, periodo: number, cons: string, conexionRodas: Connection): Promise<void> {
+    private async _chequearSaldoAcumulados(idUnidad: number, annio: number, periodo: number, cons: string, conexionRodas: DataSource): Promise<void> {
         const _querySaldosAcumRodas = querySaldosAcumuladosRodas.replace(/@Periodo/g, periodo.toString());
 
         const _querySaldoAcumRodasRes = await conexionRodas
@@ -297,7 +297,7 @@ export class ConciliaContaService {
             });
     }
 
-    private async _importarComprobantes(idUnidad: number, annio: number, periodo: number, cons: string, rodasConexion: Connection): Promise<void> {
+    private async _importarComprobantes(idUnidad: number, annio: number, periodo: number, cons: string, rodasConexion: DataSource): Promise<void> {
         const _queryComprobantes = queryComprobantesRodas.replace(/@Periodo/g, periodo.toString());
         const _queryCompRes = await rodasConexion
             .query(_queryComprobantes)
@@ -317,7 +317,7 @@ export class ConciliaContaService {
         }
     }
 
-    private async _importarAsientos(idUnidad: number, annio: number, periodo: number, cons: string, rodasConexion: Connection): Promise<void> {
+    private async _importarAsientos(idUnidad: number, annio: number, periodo: number, cons: string, rodasConexion: DataSource): Promise<void> {
         const _queryAsientos = queryAsientoRodas.replace(/@Periodo/g, periodo.toString());
 
         const _queryAsientosRes = await rodasConexion
@@ -338,7 +338,7 @@ export class ConciliaContaService {
         }
     }
 
-    private async _importarMayor(idUnidad: number, annio: number, periodo: number, cons: string, rodasConexion: Connection): Promise<void> {
+    private async _importarMayor(idUnidad: number, annio: number, periodo: number, cons: string, rodasConexion: DataSource): Promise<void> {
         const _queryMayor = queryMayorRodas.replace(/@Periodo/g, periodo.toString());
         const _queryMayorRes = await rodasConexion
             .query(_queryMayor)

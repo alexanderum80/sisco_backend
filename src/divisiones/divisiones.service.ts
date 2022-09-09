@@ -8,10 +8,7 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class DivisionesService {
-    constructor(
-        @InjectRepository(Divisiones) private readonly divisionesRepository: Repository<Divisiones>,
-        private _usuariosSvc: UsuariosService
-    ) {}
+    constructor(@InjectRepository(Divisiones) private readonly divisionesRepository: Repository<Divisiones>, private _usuariosSvc: UsuariosService) {}
 
     async getAllDivisiones(user: Usuarios): Promise<DivisionesQueryResponse> {
         try {
@@ -24,15 +21,17 @@ export class DivisionesService {
             }
 
             return new Promise<DivisionesQueryResponse>(resolve => {
-                this.divisionesRepository.find(criteria).then(result => {
-                    resolve({
-                        success: true,
-                        data: result
+                this.divisionesRepository
+                    .find(criteria)
+                    .then(result => {
+                        resolve({
+                            success: true,
+                            data: result,
+                        });
+                    })
+                    .catch(err => {
+                        resolve({ success: false, error: err.message ? err.message : err });
                     });
-                })
-                .catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
-                });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
@@ -42,18 +41,19 @@ export class DivisionesService {
     async getDivisionesActivas(): Promise<DivisionesQueryResponse> {
         try {
             return new Promise<DivisionesQueryResponse>(resolve => {
-                this.divisionesRepository.createQueryBuilder()
+                this.divisionesRepository
+                    .createQueryBuilder()
                     .where('IdDivision NOT IN (100, 120, 124)')
                     .getMany()
-                .then(result => {
-                    resolve({
-                        success: true,
-                        data: result
+                    .then(result => {
+                        resolve({
+                            success: true,
+                            data: result,
+                        });
+                    })
+                    .catch(err => {
+                        resolve({ success: false, error: err.message ? err.message : err });
                     });
-                })
-                .catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
-                });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
@@ -63,15 +63,17 @@ export class DivisionesService {
     async getDivisionById(_id: number): Promise<DivisionesQueryResponse> {
         try {
             return new Promise<DivisionesQueryResponse>(resolve => {
-                this.divisionesRepository.find({ IdDivision : _id }).then(result => {
-                    resolve({
-                        success: true,
-                        data: result
+                this.divisionesRepository
+                    .find({ where: [{ IdDivision: _id }] })
+                    .then(result => {
+                        resolve({
+                            success: true,
+                            data: result,
+                        });
+                    })
+                    .catch(err => {
+                        resolve({ success: false, error: err.message ? err.message : err });
                     });
-                })
-                .catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
-                });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };

@@ -9,9 +9,7 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class ContaNoUsarEnCuentasService {
-    constructor(
-        @InjectRepository(ContaNoUsarEnCuentaEntity) private readonly noUsarEnCuentaEntity: Repository<ContaNoUsarEnCuentaEntity>
-    ) {}
+    constructor(@InjectRepository(ContaNoUsarEnCuentaEntity) private readonly noUsarEnCuentaEntity: Repository<ContaNoUsarEnCuentaEntity>) {}
 
     async findAll(user: Usuarios): Promise<ContaNoUsarEnCuentasQueryResponse> {
         try {
@@ -20,14 +18,17 @@ export class ContaNoUsarEnCuentasService {
             const criteria = [{ IdDivision: IdDivision }, { Centralizada: true }];
 
             return new Promise<ContaNoUsarEnCuentasQueryResponse>(resolve => {
-                this.noUsarEnCuentaEntity.find({ where: criteria }).then(result => {
-                    resolve({
-                        success: true,
-                        data: result
+                this.noUsarEnCuentaEntity
+                    .find({ where: criteria })
+                    .then(result => {
+                        resolve({
+                            success: true,
+                            data: result,
+                        });
+                    })
+                    .catch(err => {
+                        throw new Error(err);
                     });
-                }).catch(err => {
-                    throw new Error(err);
-                });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
@@ -37,14 +38,17 @@ export class ContaNoUsarEnCuentasService {
     async findOne(id: number): Promise<ContaNoUsarEnCuentaQueryResponse> {
         try {
             return new Promise<ContaNoUsarEnCuentaQueryResponse>(resolve => {
-                this.noUsarEnCuentaEntity.findOne(id).then(result => {
-                    resolve({
-                        success: true,
-                        data: result
+                this.noUsarEnCuentaEntity
+                    .findOne({ where: [{ Id: id }] })
+                    .then(result => {
+                        resolve({
+                            success: true,
+                            data: result,
+                        });
+                    })
+                    .catch(err => {
+                        throw new Error(err);
                     });
-                }).catch(err => {
-                    throw new Error(err);
-                });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
@@ -59,11 +63,14 @@ export class ContaNoUsarEnCuentasService {
             noUsarEnCuentaInput.Centralizada = IdDivision === 100 && IdTipoUsuario === ETipoUsuarios['Usuario Avanzado'];
 
             return new Promise<MutationResponse>(resolve => {
-                this.noUsarEnCuentaEntity.save(noUsarEnCuentaInput).then(() => {
-                    resolve({ success: true });
-                }).catch(err => {
-                    throw new Error(err);
-                });
+                this.noUsarEnCuentaEntity
+                    .save(noUsarEnCuentaInput)
+                    .then(() => {
+                        resolve({ success: true });
+                    })
+                    .catch(err => {
+                        throw new Error(err);
+                    });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
@@ -73,11 +80,14 @@ export class ContaNoUsarEnCuentasService {
     async update(noUsarEnCuentaInput: ContaNoUsarEnCuentaInput): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.noUsarEnCuentaEntity.save(noUsarEnCuentaInput).then(() => {
-                    resolve({ success: true });
-                }).catch(err => {
-                    throw new Error(err);
-                });
+                this.noUsarEnCuentaEntity
+                    .save(noUsarEnCuentaInput)
+                    .then(() => {
+                        resolve({ success: true });
+                    })
+                    .catch(err => {
+                        throw new Error(err);
+                    });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
@@ -87,11 +97,14 @@ export class ContaNoUsarEnCuentasService {
     async delete(IDs: number[]): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.noUsarEnCuentaEntity.delete(IDs).then(() => {
-                    resolve({ success: true });
-                }).catch(err => {
-                    throw new Error(err);
-                });
+                this.noUsarEnCuentaEntity
+                    .delete(IDs)
+                    .then(() => {
+                        resolve({ success: true });
+                    })
+                    .catch(err => {
+                        throw new Error(err);
+                    });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };

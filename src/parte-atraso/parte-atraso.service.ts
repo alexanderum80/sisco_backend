@@ -1,4 +1,4 @@
-import { Connection } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { UnidadesService } from './../unidades/unidades.service';
 import { DwhConexionesService } from './../dwh-conexiones/dwh-conexiones.service';
 import { Injectable } from '@nestjs/common';
@@ -7,33 +7,30 @@ import { join } from 'lodash';
 
 @Injectable()
 export class ParteAtrasoService {
-    constructor(
-        private _dwhConexionesService: DwhConexionesService,
-        private _unidadesService: UnidadesService
-    ) {}
+    constructor(private _dwhConexionesService: DwhConexionesService, private _unidadesService: UnidadesService) {}
 
     async parteAtrasos(idDivision: number): Promise<any> {
         try {
             // obtener la conexion de los DWH de la Empresa
-            const dwhConnectionDistEmpresa = await (await this._dwhConexionesService.conexionRestEmpresa()).connect();
-            const dwhConnectionDWHEmpresa = await (await this._dwhConexionesService.conexionDWHEmpresa()).connect();
+            const dwhConnectionDistEmpresa = await (await this._dwhConexionesService.conexionRestEmpresa()).initialize();
+            const dwhConnectionDWHEmpresa = await (await this._dwhConexionesService.conexionDWHEmpresa()).initialize();
 
             const parteAtrasos: any[] = [];
 
             // obtener la conexion al DWH
             const _conexionDWHQuery = await this._dwhConexionesService.DWHConexion(idDivision);
             if (!_conexionDWHQuery.success) {
-                return { success: false, error: _conexionDWHQuery.error  + ' No se pudo obtener la Conexión al DWH de la División ' + idDivision };
+                return { success: false, error: _conexionDWHQuery.error + ' No se pudo obtener la Conexión al DWH de la División ' + idDivision };
             }
             if (!_conexionDWHQuery.data) {
-                return { success: false, error: `No se ha definido ninguna conexión de la División ${ idDivision } a los DWH.` };
+                return { success: false, error: `No se ha definido ninguna conexión de la División ${idDivision} a los DWH.` };
             }
             const _conexionDWH = _conexionDWHQuery.data;
-            const dwhConnectionRest = await (await this._dwhConexionesService.conexionDWH(_conexionDWH.ConexionRest!.toString())).connect();
-            const dwhConnectionDWH = await (await this._dwhConexionesService.conexionDWH(_conexionDWH.ConexionDWH!.toString())).connect();
+            const dwhConnectionRest = await (await this._dwhConexionesService.conexionDWH(_conexionDWH.ConexionRest!.toString())).initialize();
+            const dwhConnectionDWH = await (await this._dwhConexionesService.conexionDWH(_conexionDWH.ConexionDWH!.toString())).initialize();
 
             // obtener listados de las unidades subordinadas
-            let _unidadesQuery = await this._unidadesService.getUnidadesAbiertasByIdDivision(idDivision);
+            const _unidadesQuery = await this._unidadesService.getUnidadesAbiertasByIdDivision(idDivision);
             if (!_unidadesQuery.success) {
                 return { success: false, error: _unidadesQuery.error };
             }
@@ -47,15 +44,15 @@ export class ParteAtrasoService {
             await Promise.all([_getParteAtrasosRest, _getParteAtrasosDWH, _getParteAtrasosDist, _getParteAtrasosEmp]).then(results => {
                 for (let i = 0; i < _unidades.length; i++) {
                     const unidad = _unidades[i];
-                    let parteUnidad = {
-                        'IdUnidad': unidad.IdUnidad,
-                        'Unidad': unidad.IdUnidad + '-' + unidad.Nombre,
-                        'IdDivision': unidad.IdDivision,
-                        'Division': unidad.IdDivision + '-' + unidad.Division,
-                        'AtrasoRest': 0,
-                        'AtrasoDWH': 0,
-                        'AtrasoDist': 0,
-                        'AtrasoEmp': 0
+                    const parteUnidad = {
+                        IdUnidad: unidad.IdUnidad,
+                        Unidad: unidad.IdUnidad + '-' + unidad.Nombre,
+                        IdDivision: unidad.IdDivision,
+                        Division: unidad.IdDivision + '-' + unidad.Division,
+                        AtrasoRest: 0,
+                        AtrasoDWH: 0,
+                        AtrasoDist: 0,
+                        AtrasoEmp: 0,
                     };
 
                     const atrasoRest = results[0].data?.find((f: any) => f.IdUnidad === unidad.IdUnidad);
@@ -82,10 +79,10 @@ export class ParteAtrasoService {
                 }
             });
 
-            return new Promise<any>((resolve) => {
+            return new Promise<any>(resolve => {
                 resolve({
                     success: true,
-                    data: JSON.stringify(parteAtrasos)
+                    data: JSON.stringify(parteAtrasos),
                 });
             });
         } catch (err: any) {
@@ -93,19 +90,27 @@ export class ParteAtrasoService {
         }
     }
 
-    private async _getParteAtrasos(connection: Connection, unidades: any): Promise<any> {
+    private async _getParteAtrasos(connection: DataSource, unidades: any): Promise<any> {
         try {
-            const _query = queryParteAtrasos + ` HAVING UC.IdUnidad IN (${ join(unidades.map((u: { IdUnidad: number }) => u.IdUnidad), ', ') })`;
+            const _query =
+                queryParteAtrasos +
+                ` HAVING UC.IdUnidad IN (${join(
+                    unidades.map((u: { IdUnidad: number }) => u.IdUnidad),
+                    ', ',
+                )})`;
 
             return new Promise<any>(resolve => {
-                connection.query(_query).then(result => {
-                    resolve({
-                        success: true,
-                        data: result
+                connection
+                    .query(_query)
+                    .then(result => {
+                        resolve({
+                            success: true,
+                            data: result,
+                        });
+                    })
+                    .catch(err => {
+                        resolve({ success: false, error: err.message ? err.message : err });
                     });
-                }).catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
-                });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
@@ -116,7 +121,7 @@ export class ParteAtrasoService {
     async datosIdGAM(idDivision: number): Promise<any> {
         try {
             // obtener listados de las unidades subordinadas
-            let _unidadesQuery = await this._unidadesService.getUnidadesAbiertasByIdDivision(idDivision);
+            const _unidadesQuery = await this._unidadesService.getUnidadesAbiertasByIdDivision(idDivision);
             if (!_unidadesQuery.success) {
                 return { success: false, error: _unidadesQuery.error };
             }
@@ -125,28 +130,35 @@ export class ParteAtrasoService {
             // obtener la conexion al DWH
             const _conexionDWHQuery = await this._dwhConexionesService.DWHConexion(idDivision);
             if (!_conexionDWHQuery.success) {
-                return { success: false, error: _conexionDWHQuery.error  + ' No se pudo obtener la Conexión al DWH de la División ' + idDivision };
+                return { success: false, error: _conexionDWHQuery.error + ' No se pudo obtener la Conexión al DWH de la División ' + idDivision };
             }
             if (!_conexionDWHQuery.data) {
-                return { success: false, error: `No se ha definido ninguna conexión de la División ${ idDivision } a los DWH.` };
+                return { success: false, error: `No se ha definido ninguna conexión de la División ${idDivision} a los DWH.` };
             }
             const _conexionDWH = _conexionDWHQuery.data;
-            const dwhConnectionRest = await (await this._dwhConexionesService.conexionDWH(_conexionDWH.ConexionRest!.toString())).connect();
+            const dwhConnectionRest = await (await this._dwhConexionesService.conexionDWH(_conexionDWH.ConexionRest!.toString())).initialize();
 
-            return new Promise<any>((resolve) => {
-                const _query = queryDatosIdGAM.replace('@Annio', new Date().getFullYear().toString()) + ` AND IdGerencia IN (${ join(_unidades.map((u: { IdUnidad: number }) => u.IdUnidad), ', ') })`;
-                dwhConnectionRest.query(_query).then(result => {
-                    resolve({
-                        success: true,
-                        data: JSON.stringify(result)
+            return new Promise<any>(resolve => {
+                const _query =
+                    queryDatosIdGAM.replace('@Annio', new Date().getFullYear().toString()) +
+                    ` AND IdGerencia IN (${join(
+                        _unidades.map((u: { IdUnidad: number }) => u.IdUnidad),
+                        ', ',
+                    )})`;
+                dwhConnectionRest
+                    .query(_query)
+                    .then(result => {
+                        resolve({
+                            success: true,
+                            data: JSON.stringify(result),
+                        });
+                    })
+                    .catch(err => {
+                        resolve({ success: false, error: err.message ? err.message : err });
                     });
-                }).catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
-                });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
         }
     }
-
 }

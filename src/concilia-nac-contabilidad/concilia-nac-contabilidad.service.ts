@@ -3,45 +3,57 @@ import { ViewConciliaNacContabilidadQueryResponse } from './concilia-nac-contabi
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/typeorm';
-import { Connection } from 'typeorm';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class ConciliaNacContabilidadService {
-    constructor(
-        @InjectConnection() private readonly connection: Connection
-    ) {}
+    constructor(@InjectConnection() private readonly connection: DataSource) {}
 
     async conciliacionNacionalVsAsiento(annio: number, mes: number, division: number, unidad: number, divisionOD: number, unidadOD: number): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.connection.query(`EXECUTE dbo.p_ConciliacionNacional_vs_Asientos ${annio}, ${mes}, ${division}, ${unidad}, ${divisionOD}, ${unidadOD}`).then(() => {
-                    resolve({ success: true });
-                }).catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
-                });
+                this.connection
+                    .query(`EXECUTE dbo.p_ConciliacionNacional_vs_Asientos ${annio}, ${mes}, ${division}, ${unidad}, ${divisionOD}, ${unidadOD}`)
+                    .then(() => {
+                        resolve({ success: true });
+                    })
+                    .catch(err => {
+                        resolve({ success: false, error: err.message ? err.message : err });
+                    });
             });
         } catch (err: any) {
             return { success: false, error: err };
         }
     }
 
-    async conciliacionContab(annio: number, mes: number, division: number, unidad: number, divisionOD: number, unidadOD: number): Promise<ViewConciliaNacContabilidadQueryResponse> {
+    async conciliacionContab(
+        annio: number,
+        mes: number,
+        division: number,
+        unidad: number,
+        divisionOD: number,
+        unidadOD: number,
+    ): Promise<ViewConciliaNacContabilidadQueryResponse> {
         try {
             return new Promise<ViewConciliaNacContabilidadQueryResponse>(resolve => {
-                this.connection.query(`SELECT * FROM dbo.vConciliacionContabilidad
+                this.connection
+                    .query(
+                        `SELECT * FROM dbo.vConciliacionContabilidad
                     WHERE Annio = ${annio} AND Mes = ${mes}
                     AND ((DivisionEmisorE IN (0, CASE WHEN ${division} = 0 THEN DivisionEmisorE ELSE ${division} END) AND Emisor IN (0, CASE WHEN ${unidad} = 0 THEN Emisor ELSE ${unidad} END) AND DivisionReceptorE IN (0, CASE WHEN ${divisionOD} = 0 THEN DivisionReceptorE ELSE ${divisionOD} END) AND EmitidoA IN (0, CASE WHEN ${unidadOD} = 0 THEN EmitidoA ELSE ${unidadOD} END)
                         AND DivisionEmisorR IN (0, CASE WHEN ${division}= 0 THEN DivisionEmisorR ELSE ${division} END) AND Receptor IN (0, CASE WHEN ${unidadOD} = 0 THEN Receptor ELSE ${unidadOD} END) AND DivisionReceptorR IN (0, CASE WHEN ${divisionOD} = 0 THEN DivisionReceptorR ELSE ${divisionOD} END) AND RecibidoDe IN (0, CASE WHEN ${unidad} = 0 THEN RecibidoDe ELSE ${unidad} END))
                     OR (DivisionEmisorE IN (0, CASE WHEN ${divisionOD} = 0 THEN DivisionEmisorE ELSE ${divisionOD} END) AND Emisor IN (0, CASE WHEN ${unidadOD} = 0 THEN Emisor ELSE ${unidadOD} END) AND DivisionReceptorE IN (0, CASE WHEN ${division} = 0 THEN DivisionReceptorE ELSE ${division} END) AND EmitidoA IN (0, CASE WHEN ${unidad} = 0 THEN EmitidoA ELSE ${unidad} END)
-                        AND DivisionEmisorR IN (0, CASE WHEN ${divisionOD} = 0 THEN DivisionEmisorR ELSE ${divisionOD} END) AND Receptor IN (0, CASE WHEN ${unidad} = 0 THEN Receptor ELSE ${unidad} END) AND DivisionReceptorR IN (0, CASE WHEN ${division} = 0 THEN DivisionReceptorR ELSE ${division} END) AND RecibidoDe IN (0, CASE WHEN ${unidadOD} = 0 THEN RecibidoDe ELSE ${unidadOD} END)))`)
-                .then(result => {
-                    resolve({
-                        success: true,
-                        data: result
+                        AND DivisionEmisorR IN (0, CASE WHEN ${divisionOD} = 0 THEN DivisionEmisorR ELSE ${divisionOD} END) AND Receptor IN (0, CASE WHEN ${unidad} = 0 THEN Receptor ELSE ${unidad} END) AND DivisionReceptorR IN (0, CASE WHEN ${division} = 0 THEN DivisionReceptorR ELSE ${division} END) AND RecibidoDe IN (0, CASE WHEN ${unidadOD} = 0 THEN RecibidoDe ELSE ${unidadOD} END)))`,
+                    )
+                    .then(result => {
+                        resolve({
+                            success: true,
+                            data: result,
+                        });
+                    })
+                    .catch(err => {
+                        resolve({ success: false, error: err.message ? err.message : err });
                     });
-                }).catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
-                });
             });
         } catch (err: any) {
             return { success: false, error: err.message };
@@ -53,12 +65,15 @@ export class ConciliaNacContabilidadService {
             data.map(d => {
                 const recibido: number = d.Recibido ? 1 : 0;
 
-                this.connection.query(`update dbo.ConciliacionContabilidad
+                this.connection
+                    .query(
+                        `update dbo.ConciliacionContabilidad
                     set Recibido = ${recibido}
-                    where Id = ${d.Id}`)
-                .catch(err => {
-                    return({ success: false, error: err.message ? err.message : err });
-                });
+                    where Id = ${d.Id}`,
+                    )
+                    .catch(err => {
+                        return { success: false, error: err.message ? err.message : err };
+                    });
             });
 
             return new Promise<MutationResponse>(resolve => {
@@ -70,10 +85,10 @@ export class ConciliaNacContabilidadService {
     }
 
     async actaConciliacion(annio: number, mes: number, unidad: number, unidadOD: number): Promise<ActaConciliacionQueryResponse> {
-        if (unidad ===  0 || unidadOD === 0) {
+        if (unidad === 0 || unidadOD === 0) {
             return {
                 success: true,
-                data: []
+                data: [],
             };
         }
 
@@ -186,14 +201,17 @@ export class ConciliaNacContabilidadService {
         GROUP BY I.Emisor, I.Receptor`;
 
         return new Promise<ActaConciliacionQueryResponse>(resolve => {
-            this.connection.query(stringQuery).then(result => {
-                resolve({
-                    success: true,
-                    data: result
+            this.connection
+                .query(stringQuery)
+                .then(result => {
+                    resolve({
+                        success: true,
+                        data: result,
+                    });
+                })
+                .catch(err => {
+                    resolve({ success: false, error: err.message ? err.message : err });
                 });
-            }).catch(err => {
-                resolve({ success: false, error: err.message ? err.message : err });
-            });
         });
     }
 
@@ -218,14 +236,17 @@ export class ConciliaNacContabilidadService {
                     WHEN [Tipo de Análisis 3] = 'E' THEN [Análisis 3] ELSE '' END`;
 
         return new Promise<ActaConciliacionQueryResponse>(resolve => {
-            this.connection.query(stringQuery).then(result => {
-                resolve({
-                    success: true,
-                    data: result
+            this.connection
+                .query(stringQuery)
+                .then(result => {
+                    resolve({
+                        success: true,
+                        data: result,
+                    });
+                })
+                .catch(err => {
+                    resolve({ success: false, error: err.message ? err.message : err });
                 });
-            }).catch(err => {
-                resolve({ success: false, error: err.message ? err.message : err });
-            });
         });
     }
 }

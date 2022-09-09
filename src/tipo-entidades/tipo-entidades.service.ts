@@ -7,21 +7,22 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class TipoEntidadesService {
-    constructor(
-        @InjectRepository(TipoEntidades) private readonly tipoEntidadesRepository: Repository<TipoEntidades>
-    ) { }
+    constructor(@InjectRepository(TipoEntidades) private readonly tipoEntidadesRepository: Repository<TipoEntidades>) {}
 
     async getAllTipoEntidades(): Promise<ContaTipoentidadesQueryResponse> {
         try {
             return new Promise<ContaTipoentidadesQueryResponse>(resolve => {
-                this.tipoEntidadesRepository.find().then(result => {
-                    resolve({
-                        success: true,
-                        data: result
+                this.tipoEntidadesRepository
+                    .find()
+                    .then(result => {
+                        resolve({
+                            success: true,
+                            data: result,
+                        });
+                    })
+                    .catch(err => {
+                        return { success: false, error: err.message ? err.message : err };
                     });
-                }).catch(err => {
-                    return { success: false, error: err.message ? err.message : err };
-                });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
@@ -31,14 +32,17 @@ export class TipoEntidadesService {
     async getTipoEntidadById(id: number): Promise<ContaTipoentidadQueryResponse> {
         try {
             return new Promise<ContaTipoentidadQueryResponse>(resolve => {
-                this.tipoEntidadesRepository.findOne({ Id: id}).then(result => {
-                    resolve({
-                        success: true,
-                        data: result
+                this.tipoEntidadesRepository
+                    .findOne({ where: [{ Id: id }] })
+                    .then(result => {
+                        resolve({
+                            success: true,
+                            data: result,
+                        });
+                    })
+                    .catch(err => {
+                        return { success: false, error: err.message ? err.message : err };
                     });
-                }).catch(err => {
-                    return { success: false, error: err.message ? err.message : err };
-                });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
@@ -50,11 +54,14 @@ export class TipoEntidadesService {
             delete tipoEntidadInfo.Id;
 
             return new Promise<MutationResponse>(resolve => {
-                this.tipoEntidadesRepository.save(tipoEntidadInfo).then(() => {
-                    resolve({ success: true });
-                }).catch(err => {
-                    return { success: false, error: err.message ? err.message : err };
-                });
+                this.tipoEntidadesRepository
+                    .save(tipoEntidadInfo)
+                    .then(() => {
+                        resolve({ success: true });
+                    })
+                    .catch(err => {
+                        return { success: false, error: err.message ? err.message : err };
+                    });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
@@ -64,11 +71,14 @@ export class TipoEntidadesService {
     async updateTipoEntidad(tipoEntidadInfo: TipoEntidadInput): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.tipoEntidadesRepository.save(tipoEntidadInfo).then(() => {
-                    resolve({ success: true });
-                }).catch(err => {
-                    return { success: false, error: err.message ? err.message : err };
-                });
+                this.tipoEntidadesRepository
+                    .save(tipoEntidadInfo)
+                    .then(() => {
+                        resolve({ success: true });
+                    })
+                    .catch(err => {
+                        return { success: false, error: err.message ? err.message : err };
+                    });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
@@ -78,11 +88,14 @@ export class TipoEntidadesService {
     async deleteTipoEntidad(IDs: number[]): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.tipoEntidadesRepository.delete(IDs).then(() => {
-                    resolve({ success: true });
-                }).catch(err => {
-                    return { success: false, error: err.message ? err.message : err };
-                });
+                this.tipoEntidadesRepository
+                    .delete(IDs)
+                    .then(() => {
+                        resolve({ success: true });
+                    })
+                    .catch(err => {
+                        return { success: false, error: err.message ? err.message : err };
+                    });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };

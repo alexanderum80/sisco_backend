@@ -9,9 +9,7 @@ import { ContaComprobarExpresionesInput, ContaComprobarExpresionesQueryResponse,
 
 @Injectable()
 export class ContaComprobarExpresionesService {
-    constructor(
-        @InjectRepository(ContaComprobarExpresionesEntity) private readonly comprobarExpresionesRepository: Repository<ContaComprobarExpresionesEntity>
-    ) {}
+    constructor(@InjectRepository(ContaComprobarExpresionesEntity) private readonly comprobarExpresionesRepository: Repository<ContaComprobarExpresionesEntity>) {}
 
     async findAll(user: Usuarios): Promise<ContaComprobarExpresionesQueryResponse> {
         try {
@@ -20,14 +18,17 @@ export class ContaComprobarExpresionesService {
             const criteria = [{ IdDivision: IdDivision }, { Centralizada: true }];
 
             return new Promise<ContaComprobarExpresionesQueryResponse>(resolve => {
-                this.comprobarExpresionesRepository.find({ where: criteria, relations: ['Expresion', 'ExpresionC', 'Operador'] }).then(result => {
-                    resolve({
-                        success: true,
-                        data: result
+                this.comprobarExpresionesRepository
+                    .find({ where: criteria, relations: ['Expresion', 'ExpresionC', 'Operador'] })
+                    .then(result => {
+                        resolve({
+                            success: true,
+                            data: result,
+                        });
+                    })
+                    .catch(err => {
+                        throw new Error(err);
                     });
-                }).catch(err => {
-                    throw new Error(err);
-                });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
@@ -37,14 +38,17 @@ export class ContaComprobarExpresionesService {
     async findOne(id: number): Promise<ContaComprobarExpresionQueryResponse> {
         try {
             return new Promise<ContaComprobarExpresionQueryResponse>(resolve => {
-                this.comprobarExpresionesRepository.findOne(id).then(result => {
-                    resolve({
-                        success: true,
-                        data: result
+                this.comprobarExpresionesRepository
+                    .findOne({ where: [{ Id: id }] })
+                    .then(result => {
+                        resolve({
+                            success: true,
+                            data: result,
+                        });
+                    })
+                    .catch(err => {
+                        throw new Error(err);
                     });
-                }).catch(err => {
-                    throw new Error(err);
-                });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
@@ -60,11 +64,14 @@ export class ContaComprobarExpresionesService {
             comprobarExpresionInput.Centralizada = IdDivision === 100 && IdTipoUsuario === ETipoUsuarios['Usuario Avanzado'];
 
             return new Promise<MutationResponse>(resolve => {
-                this.comprobarExpresionesRepository.save(comprobarExpresionInput).then(() => {
-                    resolve({ success: true });
-                }).catch(err => {
-                    throw new Error(err);
-                });
+                this.comprobarExpresionesRepository
+                    .save(comprobarExpresionInput)
+                    .then(() => {
+                        resolve({ success: true });
+                    })
+                    .catch(err => {
+                        throw new Error(err);
+                    });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
@@ -74,11 +81,14 @@ export class ContaComprobarExpresionesService {
     async update(comprobarExpresionInput: ContaComprobarExpresionesInput): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.comprobarExpresionesRepository.save(comprobarExpresionInput).then(() => {
-                    resolve({ success: true });
-                }).catch(err => {
-                    throw new Error(err);
-                });
+                this.comprobarExpresionesRepository
+                    .save(comprobarExpresionInput)
+                    .then(() => {
+                        resolve({ success: true });
+                    })
+                    .catch(err => {
+                        throw new Error(err);
+                    });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };
@@ -88,11 +98,14 @@ export class ContaComprobarExpresionesService {
     async delete(IDs: number[]): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.comprobarExpresionesRepository.delete(IDs).then(() => {
-                    resolve({ success: true });
-                }).catch(err => {
-                    throw new Error(err);
-                });
+                this.comprobarExpresionesRepository
+                    .delete(IDs)
+                    .then(() => {
+                        resolve({ success: true });
+                    })
+                    .catch(err => {
+                        throw new Error(err);
+                    });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };

@@ -18,7 +18,7 @@ export class DwhConexionesService {
         try {
             return new Promise<DWHConexionQueryResponse>(resolve => {
                 this.dwhConexionesRepository
-                    .findOne(idDivision)
+                    .findOne({ where: [{ IdUnidad: idDivision }] })
                     .then(result => {
                         resolve({
                             success: true,
@@ -36,7 +36,7 @@ export class DwhConexionesService {
 
     async getDWHConexion(idDivision: number): Promise<DWHConexionQueryResponse> {
         try {
-            const _dwhConexion = await this.dwhConexionesRepository.findOneOrFail(idDivision);
+            const _dwhConexion = await this.dwhConexionesRepository.findOneOrFail({ where: [{ IdUnidad: idDivision }] });
             _dwhConexion.ConexionDWH = await this._omitirDatosInnecesarios(_dwhConexion.ConexionDWH);
             _dwhConexion.ConexionRest = await this._omitirDatosInnecesarios(_dwhConexion.ConexionRest);
 

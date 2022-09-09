@@ -8,62 +8,72 @@ import { ClasificadorCuentaReal } from './../clasificador-cuenta/clasificador-cu
 
 @Injectable()
 export class CuentaEntidadService {
-    constructor(
-        @InjectRepository(ContaCuentaentidad) private readonly cuentaEntidadRepository: Repository<ContaCuentaentidad>
-    ) {}
+    constructor(@InjectRepository(ContaCuentaentidad) private readonly cuentaEntidadRepository: Repository<ContaCuentaentidad>) {}
 
     async getAllCuentaEntidad(): Promise<CuentasEntidadQueryResponse> {
-        return new Promise<CuentasEntidadQueryResponse>((resolve) => {
-            this.cuentaEntidadRepository.find().then(res => {
-                resolve({ success: true, data: res });
-            }).catch(err => {
-                resolve({ success: err.message ? err.message : err });
-            });
+        return new Promise<CuentasEntidadQueryResponse>(resolve => {
+            this.cuentaEntidadRepository
+                .find()
+                .then(res => {
+                    resolve({ success: true, data: res });
+                })
+                .catch(err => {
+                    resolve({ success: err.message ? err.message : err });
+                });
         });
     }
 
     async getCuentaEntidad(cuenta: string, subcuenta: string, tipo: number): Promise<CuentaEntidadQueryResponse> {
-        return new Promise<CuentaEntidadQueryResponse>((resolve) => {
-            this.cuentaEntidadRepository.findOne({ Cuenta: cuenta, SubCuenta: subcuenta, TipoClasificador: tipo }).then(res => {
-                resolve({ success: true, data: res });
-            }).catch(err => {
-                resolve({ success: err.message ? err.message : err });
-            });
+        return new Promise<CuentaEntidadQueryResponse>(resolve => {
+            this.cuentaEntidadRepository
+                .findOne({ where: [{ Cuenta: cuenta, SubCuenta: subcuenta, TipoClasificador: tipo }] })
+                .then(res => {
+                    resolve({ success: true, data: res });
+                })
+                .catch(err => {
+                    resolve({ success: err.message ? err.message : err });
+                });
         });
     }
 
     async saveCuentaEntidad(cuentaEntidadInfo: ContaCuentaEntidadInput): Promise<MutationResponse> {
-        return new Promise<MutationResponse>((resolve) => {
-            this.cuentaEntidadRepository.save(cuentaEntidadInfo).then(() => {
-                resolve({ success: true });
-            }).catch(err => {
-                resolve({ success: err.message ? err.message : err });
-            });
+        return new Promise<MutationResponse>(resolve => {
+            this.cuentaEntidadRepository
+                .save(cuentaEntidadInfo)
+                .then(() => {
+                    resolve({ success: true });
+                })
+                .catch(err => {
+                    resolve({ success: err.message ? err.message : err });
+                });
         });
     }
 
     async deleteCuentaEntidad(cuenta: string, subcuenta: string, tipo: number): Promise<MutationResponse> {
-        return new Promise<MutationResponse>((resolve) => {
-            this.cuentaEntidadRepository.delete({ Cuenta: cuenta, SubCuenta: subcuenta, TipoClasificador: tipo }).then(() => {
-                resolve({ success: true });
-            }).catch(err => {
-                resolve({ success: err.message ? err.message : err });
-            });
+        return new Promise<MutationResponse>(resolve => {
+            this.cuentaEntidadRepository
+                .delete({ Cuenta: cuenta, SubCuenta: subcuenta, TipoClasificador: tipo })
+                .then(() => {
+                    resolve({ success: true });
+                })
+                .catch(err => {
+                    resolve({ success: err.message ? err.message : err });
+                });
         });
     }
 
     async actualizaCuentaEntidad(clasificadorCuenta: ClasificadorCuentaReal): Promise<MutationResponse> {
         await this.deleteCuentaEntidad(clasificadorCuenta.Cuenta, clasificadorCuenta.SubCuenta, clasificadorCuenta.TipoClasificador);
 
-        const seUtiliza = clasificadorCuenta.SeUtiliza!.split(', ');
+        const seUtiliza = clasificadorCuenta.SeUtiliza.split(', ');
 
-        return new Promise<MutationResponse>((resolve) => {
+        return new Promise<MutationResponse>(resolve => {
             seUtiliza.forEach(entidad => {
                 const cuentaEntidad: ContaCuentaentidad = {
                     Cuenta: clasificadorCuenta.Cuenta,
                     SubCuenta: clasificadorCuenta.SubCuenta,
                     TipoEntidad: Number(entidad),
-                    TipoClasificador: clasificadorCuenta.TipoClasificador
+                    TipoClasificador: clasificadorCuenta.TipoClasificador,
                 };
 
                 this.saveCuentaEntidad(cuentaEntidad);
@@ -72,5 +82,4 @@ export class CuentaEntidadService {
             resolve({ success: true });
         });
     }
-
 }

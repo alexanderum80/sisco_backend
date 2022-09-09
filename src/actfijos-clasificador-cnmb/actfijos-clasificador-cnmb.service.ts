@@ -29,7 +29,7 @@ export class ActfijosClasificadorCnmbService {
         try {
             return new Promise<ActFijosClasificadorCnmbEntity>((resolve, reject) => {
                 this.aftClasificadorRepo
-                    .findOne(cnmb)
+                    .findOne({ where: [{ CNMB: cnmb }] })
                     .then(res => {
                         resolve(res);
                     })
