@@ -196,7 +196,6 @@ export class ContaConexionesService {
         });
 
         const _rodasConnection: DataSource = await new DataSource(_conexionOptions).initialize();
-        // const _rodasConnection = await new DataSource(_conexionOptions);
 
         return new Promise<DataSource>(resolve => {
             resolve(_rodasConnection);
