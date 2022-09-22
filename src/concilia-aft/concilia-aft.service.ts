@@ -11,17 +11,17 @@ import {
     queryMbSinCuentas,
     queryMbPeriodo,
     queryMb,
-    queryRodasUltimoPeriodoMB,
+    querySiscoUltimoPeriodoMB,
 } from './concilia-aft.model';
 import { Injectable } from '@nestjs/common';
-import { InjectConnection } from '@nestjs/typeorm';
+import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { ContaConexiones } from './../conta-conexiones/conta-conexiones.entity';
+import { ContaConexionesEntity } from './../conta-conexiones/conta-conexiones.entity';
 
 @Injectable()
 export class ConciliaAftService {
     constructor(
-        @InjectConnection() private readonly connection: DataSource,
+        @InjectDataSource() private readonly dataSource: DataSource,
         private _contaConexionesSvc: ContaConexionesService,
         private _conciliaContaSvc: ConciliaContaService,
         private _xmlSvc: XmlJsService,
@@ -68,7 +68,7 @@ export class ConciliaAftService {
         }
     }
 
-    private async _importarDatosAF(idCentro: number, periodo: number, conexionRodas: ContaConexiones): Promise<void | DiferenciaClasificadorCNMB[]> {
+    private async _importarDatosAF(idCentro: number, periodo: number, conexionRodas: ContaConexionesEntity): Promise<void | DiferenciaClasificadorCNMB[]> {
         const mbConnection = await this._contaConexionesSvc.conexionRodas(conexionRodas);
 
         return new Promise<void | DiferenciaClasificadorCNMB[]>(async (resolve, reject) => {
@@ -95,7 +95,7 @@ export class ConciliaAftService {
                     if (res.length) {
                         const _cnmb = this._xmlSvc.jsonToXML('CNMB', res);
 
-                        await this.connection
+                        await this.dataSource
                             .query(`EXEC dbo.pAF_ImportClanaCnmbXML @0, @1`, [_cnmb, idCentro])
                             .then(res => {
                                 resolve(res);
@@ -169,8 +169,8 @@ export class ConciliaAftService {
     private async _importarMb(idCentro: number, periodo: number, conexionRodas: DataSource): Promise<boolean> {
         return new Promise<boolean>(async (resolve, reject) => {
             // leo primero de la tabla MB_Periodo
-            const ultimoPeriodoResp = await this.connection
-                .query(queryRodasUltimoPeriodoMB.replace(/@Centro/gi, idCentro.toString()))
+            const ultimoPeriodoResp = await this.dataSource
+                .query(querySiscoUltimoPeriodoMB.replace(/@Centro/gi, idCentro.toString()))
                 .then(async per => {
                     return per;
                 })
@@ -207,7 +207,7 @@ export class ConciliaAftService {
                 }
                 if (_query) {
                     // inserto los MB
-                    await this.connection
+                    await this.dataSource
                         .query(`EXEC dbo.pAF_ImportMbXML @0, @1, @2`, [_query, idCentro, per])
                         .then(() => {
                             return;
@@ -222,7 +222,7 @@ export class ConciliaAftService {
         });
     }
 
-    private async _importarDatosRodas(annio: number, periodo: number, idUnidad: number, tipoCentro: number, contaConexion: ContaConexiones): Promise<boolean> {
+    private async _importarDatosRodas(annio: number, periodo: number, idUnidad: number, tipoCentro: number, contaConexion: ContaConexionesEntity): Promise<boolean> {
         const cons = tipoCentro === 1 ? '1' : '0';
 
         // me conecto al Rodas del Centro
@@ -243,7 +243,7 @@ export class ConciliaAftService {
 
     private _calculaConciliacion(idCentro: number, annio: number, periodo: number): Promise<ConciliaAftData> {
         return new Promise<ConciliaAftData>((resolve, reject) => {
-            this.connection
+            this.dataSource
                 .query(`EXEC pAF_CalculaConciliacion @0, @1, @2`, [idCentro, annio, periodo])
                 .then(res => {
                     resolve({

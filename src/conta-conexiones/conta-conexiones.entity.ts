@@ -2,8 +2,8 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @ObjectType()
-@Entity()
-export class ContaConexiones {
+@Entity({ name: 'Conta_Conexiones' })
+export class ContaConexionesEntity {
     @Field()
     @PrimaryGeneratedColumn()
     Id: number;

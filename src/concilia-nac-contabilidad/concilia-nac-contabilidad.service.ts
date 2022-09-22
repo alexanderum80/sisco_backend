@@ -2,17 +2,17 @@ import { ActaConciliacionQueryResponse } from './concilia-nac-contabilidad.model
 import { ViewConciliaNacContabilidadQueryResponse } from './concilia-nac-contabilidad.model';
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { Injectable } from '@nestjs/common';
-import { InjectConnection } from '@nestjs/typeorm';
+import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
 @Injectable()
 export class ConciliaNacContabilidadService {
-    constructor(@InjectConnection() private readonly connection: DataSource) {}
+    constructor(@InjectDataSource() private readonly dataSource: DataSource) {}
 
     async conciliacionNacionalVsAsiento(annio: number, mes: number, division: number, unidad: number, divisionOD: number, unidadOD: number): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                this.connection
+                this.dataSource
                     .query(`EXECUTE dbo.p_ConciliacionNacional_vs_Asientos ${annio}, ${mes}, ${division}, ${unidad}, ${divisionOD}, ${unidadOD}`)
                     .then(() => {
                         resolve({ success: true });
@@ -36,7 +36,7 @@ export class ConciliaNacContabilidadService {
     ): Promise<ViewConciliaNacContabilidadQueryResponse> {
         try {
             return new Promise<ViewConciliaNacContabilidadQueryResponse>(resolve => {
-                this.connection
+                this.dataSource
                     .query(
                         `SELECT * FROM dbo.vConciliacionContabilidad
                     WHERE Annio = ${annio} AND Mes = ${mes}
@@ -65,7 +65,7 @@ export class ConciliaNacContabilidadService {
             data.map(d => {
                 const recibido: number = d.Recibido ? 1 : 0;
 
-                this.connection
+                this.dataSource
                     .query(
                         `update dbo.ConciliacionContabilidad
                     set Recibido = ${recibido}
@@ -201,7 +201,7 @@ export class ConciliaNacContabilidadService {
         GROUP BY I.Emisor, I.Receptor`;
 
         return new Promise<ActaConciliacionQueryResponse>(resolve => {
-            this.connection
+            this.dataSource
                 .query(stringQuery)
                 .then(result => {
                     resolve({
@@ -236,7 +236,7 @@ export class ConciliaNacContabilidadService {
                     WHEN [Tipo de Análisis 3] = 'E' THEN [Análisis 3] ELSE '' END`;
 
         return new Promise<ActaConciliacionQueryResponse>(resolve => {
-            this.connection
+            this.dataSource
                 .query(stringQuery)
                 .then(result => {
                     resolve({

@@ -26,13 +26,13 @@ import {
     queryInsertClasificadorUnidad,
     querySwitchAuditRodas,
 } from './concilia-conta.model';
-import { InjectConnection } from '@nestjs/typeorm';
+import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
 @Injectable()
 export class ConciliaContaService {
     constructor(
-        @InjectConnection() private readonly connection: DataSource,
+        @InjectDataSource() private readonly dataSource: DataSource,
         private _contaConexionesService: ContaConexionesService,
         private _unidadesService: UnidadesService,
         private _xmlJsService: XmlJsService,
@@ -155,7 +155,7 @@ export class ConciliaContaService {
             }
 
             return new Promise<any>(resolve => {
-                this.connection
+                this.dataSource
                     .query(`EXEC dbo.pConta_ImportClasifCuentaXML @0, @1, @2, @3, @4, @5`, [_clasifCuentasXML, idUnidad, tipoClasif, cons, annio, periodo])
                     .then(result => {
                         resolve({ data: result });
@@ -178,7 +178,7 @@ export class ConciliaContaService {
                 .replace(/@Anio/g, annio.toString())
                 .replace(/@Cons/g, cons.toString())
                 .replace(/@Centro/g, idUnidad.toString());
-            const _ultimoPeriodoRes = await this.connection.query(_queryUltimoPeriodo).then(result => {
+            const _ultimoPeriodoRes = await this.dataSource.query(_queryUltimoPeriodo).then(result => {
                 return result;
             });
 
@@ -282,7 +282,7 @@ export class ConciliaContaService {
             _saldoCredito = _querySaldoAcumRodasRes.data[0].Credito;
         }
 
-        await this.connection
+        await this.dataSource
             .query('EXEC dbo.pConta_SaldoAcumulado @0, @1, @2, @3, @4, @5', [idUnidad, cons, annio, periodo, _saldoDebito, _saldoCredito])
             .then(result => {
                 if (result[0].DifDebito !== 0 || result[0].DifCredito !== 0) {
@@ -311,7 +311,7 @@ export class ConciliaContaService {
         if (_queryCompRes.length) {
             const _comprobantes = this._xmlJsService.jsonToXML('Comprobantes', _queryCompRes);
 
-            await this.connection.query(`EXEC dbo.pConta_ImportComprobanteXML @0, @1, @2, @3, @4`, [_comprobantes, idUnidad, cons, annio, periodo]).catch(err => {
+            await this.dataSource.query(`EXEC dbo.pConta_ImportComprobanteXML @0, @1, @2, @3, @4`, [_comprobantes, idUnidad, cons, annio, periodo]).catch(err => {
                 throw new Error(err.message ? err.message : err);
             });
         }
@@ -332,7 +332,7 @@ export class ConciliaContaService {
         if (_queryAsientosRes.length) {
             const _asientos = this._xmlJsService.jsonToXML('Asiento', _queryAsientosRes);
 
-            await this.connection.query(`EXEC dbo.pConta_ImportAsientoXML @0, @1, @2, @3, @4`, [_asientos, idUnidad, cons, annio, periodo]).catch(err => {
+            await this.dataSource.query(`EXEC dbo.pConta_ImportAsientoXML @0, @1, @2, @3, @4`, [_asientos, idUnidad, cons, annio, periodo]).catch(err => {
                 throw new Error(err.message ? err.message : err);
             });
         }
@@ -352,7 +352,7 @@ export class ConciliaContaService {
         if (_queryMayorRes.length) {
             const _mayor = this._xmlJsService.jsonToXML('Mayor', _queryMayorRes);
 
-            await this.connection.query(`EXEC dbo.pConta_ImportMayorXML @0, @1, @2, @3, @4`, [_mayor, idUnidad, cons, annio, periodo]).catch(err => {
+            await this.dataSource.query(`EXEC dbo.pConta_ImportMayorXML @0, @1, @2, @3, @4`, [_mayor, idUnidad, cons, annio, periodo]).catch(err => {
                 throw new Error(err.message ? err.message : err);
             });
         }
@@ -375,7 +375,7 @@ export class ConciliaContaService {
                 break;
         }
 
-        await this.connection
+        await this.dataSource
             .query(`EXEC dbo.pConta_CalculaConciliacion @0, @1, @2, @3, @4, @5, @6`, [idUnidad, tipoClasificador, tipoEntidad, cons, anio, periodo, idDivision])
             .catch(err => {
                 throw new Error(err.message ? err.message : err);
@@ -427,7 +427,7 @@ export class ConciliaContaService {
             .replace(/@IdConsulta/g, idConsulta.toString());
 
         return new Promise<ConciliaContaQueryResponse>(resolve => {
-            this.connection
+            this.dataSource
                 .query(_query)
                 .then(result => {
                     resolve({
@@ -448,7 +448,7 @@ export class ConciliaContaService {
             .replace(/@Periodo/g, periodo.toString());
 
         return new Promise<ConciliaContaQueryResponse>(resolve => {
-            this.connection
+            this.dataSource
                 .query(_query)
                 .then(result => {
                     resolve({
@@ -470,7 +470,7 @@ export class ConciliaContaService {
             .replace(/@IdDivision/g, idDivision.toString());
 
         return new Promise<ConciliaContaQueryResponse>(resolve => {
-            this.connection
+            this.dataSource
                 .query(_query)
                 .then(result => {
                     resolve({
@@ -489,7 +489,7 @@ export class ConciliaContaService {
             const { idCentro, consolidado, annio } = iniciarSaldosInput;
 
             return new Promise<MutationResponse>(resolve => {
-                this.connection
+                this.dataSource
                     .query(`EXEC dbo.pConta_InicializarDatos @0, @1, @2`, [idCentro, consolidado, annio])
                     .then(() => {
                         resolve({ success: true });
@@ -646,13 +646,13 @@ export class ConciliaContaService {
             for (let index = 0; index < centrosAChequear.length; index++) {
                 const centroChe = centrosAChequear[index];
 
-                await this.connection.query(`EXEC dbo.InsertChequeoCentroVsConsolidado @0, @1, @2, @3, @4`, [idCentro, cons, annio, periodo, centroChe]).catch(err => {
+                await this.dataSource.query(`EXEC dbo.InsertChequeoCentroVsConsolidado @0, @1, @2, @3, @4`, [idCentro, cons, annio, periodo, centroChe]).catch(err => {
                     throw new Error(err.message ? err.message : err);
                 });
             }
 
             return new Promise<ConciliaContaQueryResponse>(resolve => {
-                this.connection
+                this.dataSource
                     .query(`EXEC dbo.p_ChequeoCentro @0`, [`Centro = ${idCentro} AND Periodo = ${periodo} AND Unidad IN (${centrosAChequear.join(', ')})`])
                     .then(result => {
                         resolve({ success: true, data: JSON.stringify(result) });

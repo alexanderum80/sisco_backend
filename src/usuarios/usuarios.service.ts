@@ -2,7 +2,7 @@ import { MutationResponse } from './../shared/models/mutation.response.model';
 import { UsuariosQueryResponse, UsuarioInput, ETipoUsuarios, UsuarioQueryResponse } from './usuarios.model';
 import { Usuarios } from './usuarios.entity';
 import { Injectable } from '@nestjs/common';
-import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
@@ -10,7 +10,7 @@ import { SECRET_KEY } from '../shared/helpers/auth.guard';
 
 @Injectable()
 export class UsuariosService {
-    constructor(@InjectConnection() private readonly connection: DataSource, @InjectRepository(Usuarios) private readonly usuariosRepository: Repository<Usuarios>) {}
+    constructor(@InjectDataSource() private readonly dataSource: DataSource, @InjectRepository(Usuarios) private readonly usuariosRepository: Repository<Usuarios>) {}
 
     async authenticate(usuario: string, passw: string): Promise<UsuarioQueryResponse> {
         try {
@@ -175,7 +175,7 @@ export class UsuariosService {
             encryptedPassw = encryptedPassw.replace('$2a$12$', '');
 
             return new Promise<MutationResponse>(resolve => {
-                this.connection
+                this.dataSource
                     .createQueryBuilder()
                     .update(Usuarios)
                     .set({ Contrasena: encryptedPassw, CambiarContrasena: false })

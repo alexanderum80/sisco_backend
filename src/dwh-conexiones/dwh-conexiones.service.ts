@@ -5,7 +5,7 @@ import { MutationResponse } from './../shared/models/mutation.response.model';
 import { DWHConexiones } from './dwh-conexiones.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Connection, Repository } from 'typeorm';
+import { Repository, DataSource } from 'typeorm';
 import { cloneDeep } from 'lodash';
 
 @Injectable()
@@ -104,7 +104,7 @@ export class DwhConexionesService {
                 value: dwhConexionInput.DWH_usuario,
             },
             password: {
-                value: await this._cryptoService.decrypt(dwhConexionInput.DWH_contrasena),
+                value: dwhConexionInput.DWH_contrasena,
             },
             database: {
                 value: dwhConexionInput.DWH_baseDatos,
@@ -120,7 +120,7 @@ export class DwhConexionesService {
                 value: dwhConexionInput.Rest_usuario,
             },
             password: {
-                value: await this._cryptoService.decrypt(dwhConexionInput.Rest_contrasena),
+                value: dwhConexionInput.Rest_contrasena,
             },
             database: {
                 value: dwhConexionInput.Rest_baseDatos,
@@ -136,25 +136,25 @@ export class DwhConexionesService {
         return dwhConexion;
     }
 
-    async conexionDWH(connectionString: string): Promise<Connection> {
+    async conexionDWH(connectionString: string): Promise<DataSource> {
         const _connectionOptions = JSON.parse(await this._cryptoService.decrypt(connectionString));
 
-        return new Connection(_connectionOptions);
+        return new DataSource(_connectionOptions);
     }
 
-    async conexionRestEmpresa(): Promise<Connection> {
+    async conexionRestEmpresa(): Promise<DataSource> {
         const _connectionQuery = await this.DWHConexion(this.EMPRESA_CODIGO);
         if (!_connectionQuery.success) {
-            return new Connection(DEFAULT_CONNECTION_STRING);
+            return new DataSource(DEFAULT_CONNECTION_STRING);
         }
 
         return await this.conexionDWH(_connectionQuery.data.ConexionRest);
     }
 
-    async conexionDWHEmpresa(): Promise<Connection> {
+    async conexionDWHEmpresa(): Promise<DataSource> {
         const _connectionQuery = await this.DWHConexion(this.EMPRESA_CODIGO);
         if (!_connectionQuery.success) {
-            return new Connection(DEFAULT_CONNECTION_STRING);
+            return new DataSource(DEFAULT_CONNECTION_STRING);
         }
 
         return await this.conexionDWH(_connectionQuery.data.ConexionDWH);

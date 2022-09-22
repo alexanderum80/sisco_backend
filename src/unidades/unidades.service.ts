@@ -2,13 +2,13 @@ import { Usuarios } from './../usuarios/usuarios.entity';
 import { UsuariosService } from './../usuarios/usuarios.service';
 import { AllUnidadesQueryResponse, AllUnidadQueryResponse } from './unidades.model';
 import { Injectable } from '@nestjs/common';
-import { InjectConnection } from '@nestjs/typeorm';
-import { getManager, DataSource } from 'typeorm';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 import { CentrosView } from './unidades.entity';
 
 @Injectable()
 export class UnidadesService {
-    constructor(@InjectConnection() private readonly connection: DataSource, private _usuariosSvc: UsuariosService) {}
+    constructor(@InjectDataSource() private readonly dataSource: DataSource, private _usuariosSvc: UsuariosService) {}
 
     async getAllUnidades(user: Usuarios): Promise<AllUnidadesQueryResponse> {
         try {
@@ -20,10 +20,8 @@ export class UnidadesService {
                 _condition = { IdDivision: IdDivision };
             }
 
-            const entityManager = getManager();
-
             return new Promise<AllUnidadesQueryResponse>(resolve => {
-                entityManager
+                this.dataSource.manager
                     .find(CentrosView, { where: _condition })
                     .then(result => {
                         resolve({
@@ -45,10 +43,8 @@ export class UnidadesService {
 
     async getUnidadById(IdUnidad: number): Promise<AllUnidadQueryResponse> {
         try {
-            const entityManager = getManager();
-
             return new Promise<AllUnidadQueryResponse>(resolve => {
-                entityManager
+                this.dataSource.manager
                     .findOne(CentrosView, { where: { IdUnidad } })
                     .then(result => {
                         resolve({
@@ -70,10 +66,8 @@ export class UnidadesService {
 
     async getUnidadesByIdSubdivision(IdSubdivision: number): Promise<AllUnidadesQueryResponse> {
         try {
-            const entityManager = getManager();
-
             return new Promise<AllUnidadesQueryResponse>(resolve => {
-                entityManager
+                this.dataSource.manager
                     .find(CentrosView, { where: { IdSubdivision } })
                     .then(result => {
                         resolve({
@@ -95,10 +89,8 @@ export class UnidadesService {
 
     async getUnidadesByIdDivision(IdDivision: number): Promise<AllUnidadesQueryResponse> {
         try {
-            const entityManager = getManager();
-
             return new Promise<AllUnidadesQueryResponse>(resolve => {
-                entityManager
+                this.dataSource.manager
                     .find(CentrosView, { where: { IdDivision } })
                     .then(result => {
                         resolve({
@@ -121,7 +113,7 @@ export class UnidadesService {
     async getUnidadesAbiertasByIdSubdivision(idSubdivision: number): Promise<any> {
         try {
             return new Promise<any>(resolve => {
-                this.connection
+                this.dataSource
                     .query(
                         `Select U.*, D.Division from Unidades AS U INNER JOIN dbo.Divisiones AS D ON D.IdDivision = U.IdDivision
                         WHERE (case isnull(IdComplejo,0) when 0 THEN IdUnidad else IdComplejo end) = ${idSubdivision}
@@ -148,7 +140,7 @@ export class UnidadesService {
     async getUnidadesAbiertasByIdDivision(idDivision: number): Promise<any> {
         try {
             return new Promise<any>(resolve => {
-                this.connection
+                this.dataSource
                     .query(
                         `Select U.*, D.Division from Unidades AS U INNER JOIN dbo.Divisiones AS D ON D.IdDivision = U.IdDivision
                         WHERE U.IdDivision = ${idDivision}

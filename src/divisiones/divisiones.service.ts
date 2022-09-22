@@ -22,7 +22,7 @@ export class DivisionesService {
 
             return new Promise<DivisionesQueryResponse>(resolve => {
                 this.divisionesRepository
-                    .find(criteria)
+                    .find({ where: criteria })
                     .then(result => {
                         resolve({
                             success: true,

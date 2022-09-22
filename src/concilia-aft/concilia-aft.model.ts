@@ -106,4 +106,4 @@ export const queryMb = `SELECT CASE WHEN C.cri1 = 'Y' THEN MB.Anal1 WHEN C.cri2 
     FROM dbo.Mb AS MB INNER JOIN dbo.Cuentas AS C ON C.CtaSCta = MB.CtaSCta
 `;
 
-export const queryRodasUltimoPeriodoMB = `SELECT ISNULL(MAX(Periodo),0) as Periodo FROM ActFijos_MB WHERE IdCentro = @Centro`;
+export const querySiscoUltimoPeriodoMB = `SELECT ISNULL(MAX(Periodo),0) as Periodo FROM ActFijos_MB WHERE IdCentro = @Centro`;

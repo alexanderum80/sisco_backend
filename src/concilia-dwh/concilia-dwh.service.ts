@@ -12,13 +12,13 @@ import { MutationResponse } from './../shared/models/mutation.response.model';
 import { Injectable } from '@nestjs/common';
 import { UnidadesQueryResponse } from './../unidades/unidades.model';
 import { DataSource } from 'typeorm';
-import { ContaConexiones } from './../conta-conexiones/conta-conexiones.entity';
-import { InjectConnection } from '@nestjs/typeorm';
+import { ContaConexionesEntity } from './../conta-conexiones/conta-conexiones.entity';
+import { InjectDataSource } from '@nestjs/typeorm';
 
 @Injectable()
 export class ConciliaDwhService {
     constructor(
-        @InjectConnection() private readonly connection: DataSource,
+        @InjectDataSource() private readonly dataSource: DataSource,
         private _unidadesService: UnidadesService,
         private _dwhConexionesService: DwhConexionesService,
         private _contaConexionesService: ContaConexionesService,
@@ -199,10 +199,10 @@ export class ConciliaDwhService {
         }
     }
 
-    private async _importarAlmacenesDWH(idUnidad: number, connection: DataSource, isDistribuidor = false): Promise<MutationResponse> {
+    private async _importarAlmacenesDWH(idUnidad: number, dataSource: DataSource, isDistribuidor = false): Promise<MutationResponse> {
         try {
             return new Promise<MutationResponse>(resolve => {
-                connection
+                dataSource
                     .query(
                         `SELECT IdGerenciaIdAlmacen, IdUnidad, Almacen, ISNULL(IdPiso, 0) AS IdPiso, ISNULL(EContable, '') AS EContable, ISNULL(EContableMN, '') AS EContableMN, ISNULL(Abierto, 0) AS Abierto, ISNULL(Exhibicion, 0) AS Exhibicion,
                 ISNULL(Interno, 0) AS Interno, ISNULL(Merma, 0) AS Merma, ISNULL(Gastronomia, 0) AS Gastronomia, ISNULL(Insumo, 0) AS Insumo, ISNULL(Inversiones, 0) AS Inversiones, ISNULL(Boutique, 0) AS Boutique,
@@ -216,7 +216,7 @@ export class ConciliaDwhService {
                         if (result) {
                             const _almacenes = this._xmlSvc.jsonToXML('Almacenes', result);
 
-                            await this.connection
+                            await this.dataSource
                                 .query(`EXEC dbo.pDWH_ImportAlmacenesXML @0, @1, @2`, [_almacenes, idUnidad, isDistribuidor ? 1 : 0])
                                 .then(() => {
                                     resolve({ success: true });
@@ -241,7 +241,7 @@ export class ConciliaDwhService {
         mes: number,
         unidadInfo: Unidades,
         tipoCentro: number,
-        connection: DataSource,
+        dataSource: DataSource,
         isRestaura = false,
         isDistribuidor = false,
     ): Promise<MutationResponse> {
@@ -255,11 +255,11 @@ export class ConciliaDwhService {
 
             return new Promise<MutationResponse>(resolve => {
                 resolve({ success: true });
-                connection.query(query).then(async result => {
+                dataSource.query(query).then(async result => {
                     if (result) {
                         const _inventario = this._xmlSvc.jsonToXML('DWH', result);
 
-                        await this.connection
+                        await this.dataSource
                             .query(`EXEC dbo.pDWH_ImportInventarioXML @0, @1, @2, @3, @4, @5`, [
                                 _inventario,
                                 idCentro,
@@ -291,7 +291,7 @@ export class ConciliaDwhService {
         unidadInfo: Unidades,
         tipoCentro: number,
         ventasAcumuladas: boolean,
-        connection: DataSource,
+        dataSource: DataSource,
         isRestaura = false,
         isDistribuidor = false,
     ): Promise<MutationResponse> {
@@ -311,11 +311,11 @@ export class ConciliaDwhService {
 
             return new Promise<MutationResponse>(resolve => {
                 resolve({ success: true });
-                connection.query(query).then(async result => {
+                dataSource.query(query).then(async result => {
                     if (result) {
                         const _ventas = this._xmlSvc.jsonToXML('DWH', result);
 
-                        await this.connection
+                        await this.dataSource
                             .query(`EXEC dbo.pDWH_ImportVentasXML @0, @1, @2, @3, @4, @5`, [_ventas, idCentro, mes, tipoCentro === 1, isRestaura ? 1 : 0, isDistribuidor ? 1 : 0])
                             .then(() => {
                                 resolve({ success: true });
@@ -333,7 +333,7 @@ export class ConciliaDwhService {
         }
     }
 
-    private async _importarDatosRodas(annio: number, periodo: number, idUnidad: number, tipoCentro: number, contaConexion: ContaConexiones): Promise<MutationResponse> {
+    private async _importarDatosRodas(annio: number, periodo: number, idUnidad: number, tipoCentro: number, contaConexion: ContaConexionesEntity): Promise<MutationResponse> {
         try {
             const cons = tipoCentro === 1 ? '1' : '0';
 
@@ -360,7 +360,7 @@ export class ConciliaDwhService {
 
         return new Promise<any>((resolve, reject) => {
             // calculo el inventario y la venta
-            this.connection
+            this.dataSource
                 .query(`EXEC dbo.pDWH_CalculaConciliacion @0, @1, @2, @3, @4`, [cons, idUnidad, annio, periodo, ventasAcumuladas ? 1 : 0])
                 .then(res => {
                     resolve(res);

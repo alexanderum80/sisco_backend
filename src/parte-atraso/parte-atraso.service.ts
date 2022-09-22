@@ -90,7 +90,7 @@ export class ParteAtrasoService {
         }
     }
 
-    private async _getParteAtrasos(connection: DataSource, unidades: any): Promise<any> {
+    private async _getParteAtrasos(dataSource: DataSource, unidades: any): Promise<any> {
         try {
             const _query =
                 queryParteAtrasos +
@@ -100,7 +100,7 @@ export class ParteAtrasoService {
                 )})`;
 
             return new Promise<any>(resolve => {
-                connection
+                dataSource
                     .query(_query)
                     .then(result => {
                         resolve({

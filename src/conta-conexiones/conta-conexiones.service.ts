@@ -9,7 +9,7 @@ import { cloneDeep } from 'lodash';
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { CryptoService } from '../shared/services/crypto/crypto.service';
 import { ContaConexionQueryResponse, EstadoConexionesRodasQueryResponse, EstadoConexionesRodas, ContaConexionesQueryResponse, ContaConexionInput } from './conta-conexiones.model';
-import { ContaConexiones } from './conta-conexiones.entity';
+import { ContaConexionesEntity } from './conta-conexiones.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
@@ -17,7 +17,7 @@ import { DataSource, Repository } from 'typeorm';
 @Injectable()
 export class ContaConexionesService {
     constructor(
-        @InjectRepository(ContaConexiones) private readonly conexionesRespository: Repository<ContaConexiones>,
+        @InjectRepository(ContaConexionesEntity) private readonly conexionesRespository: Repository<ContaConexionesEntity>,
         private _cryptoService: CryptoService,
         private _unidadesSvc: UnidadesService,
         private _usuariosSvc: UsuariosService,
@@ -178,7 +178,7 @@ export class ContaConexionesService {
         }
     }
 
-    async conexionRodas(contaConexion: ContaConexiones): Promise<DataSource> {
+    async conexionRodas(contaConexion: ContaConexionesEntity): Promise<DataSource> {
         const _conexionOptions = cloneDeep(DEFAULT_CONNECTION_STRING);
         Object.defineProperties(_conexionOptions, {
             host: {
@@ -195,10 +195,10 @@ export class ContaConexionesService {
             },
         });
 
-        const _rodasConnection: DataSource = await new DataSource(_conexionOptions).initialize();
+        const _rodasDataSource: DataSource = await new DataSource(_conexionOptions).initialize();
 
         return new Promise<DataSource>(resolve => {
-            resolve(_rodasConnection);
+            resolve(_rodasDataSource);
         });
     }
 

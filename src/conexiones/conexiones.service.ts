@@ -24,9 +24,9 @@ export class ConexionesService {
                 },
             });
 
-            const connection: DataSource = await new DataSource(connectionString).initialize();
+            const dataSource: DataSource = await new DataSource(connectionString).initialize();
             return new Promise<ConexionesQueryResponse>(resolve => {
-                connection
+                dataSource
                     .query(dataBasesQuery)
                     .then(result => {
                         resolve({ success: true, data: result });
