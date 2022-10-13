@@ -2,7 +2,6 @@ import { XmlJsService } from './../shared/services/xml-js/xml-js.service';
 import { DivisionesService } from './../divisiones/divisiones.service';
 import { ConciliaContaService } from './../concilia-conta/concilia-conta.service';
 import { ContaConexionesService } from './../conta-conexiones/conta-conexiones.service';
-import { AlmacenesService } from './../almacenes/almacenes.service';
 import { DWHConexiones } from './../dwh-conexiones/dwh-conexiones.entity';
 import { Unidades } from './../unidades/unidades.entity';
 import { DwhConexionesService } from './../dwh-conexiones/dwh-conexiones.service';
@@ -22,7 +21,6 @@ export class ConciliaDwhService {
         private _unidadesService: UnidadesService,
         private _dwhConexionesService: DwhConexionesService,
         private _contaConexionesService: ContaConexionesService,
-        private _almacenesService: AlmacenesService,
         private _conciliaContaService: ConciliaContaService,
         private _divisionesService: DivisionesService,
         private _xmlSvc: XmlJsService,
@@ -135,12 +133,6 @@ export class ConciliaDwhService {
 
             for (let index = 0; index < unidades.length; index++) {
                 const unidadInfo = unidades[index];
-
-                // elimino los datos de los almacenes
-                const _deleteAlmacenesRes = await this._almacenesService.deleteAlmacenesByIdUnidad(unidadInfo.IdUnidad);
-                if (!_deleteAlmacenesRes.success) {
-                    throw new Error(_deleteAlmacenesRes.error + ' No se pudo borrar Almacenes de la Unidad ' + unidadInfo.IdUnidad);
-                }
 
                 // importo los almacenes
                 let _importarAlmacenesRes = await this._importarAlmacenesDWH(unidadInfo.IdUnidad, dwhConnectionDivision);
@@ -255,29 +247,32 @@ export class ConciliaDwhService {
 
             return new Promise<MutationResponse>(resolve => {
                 resolve({ success: true });
-                dataSource.query(query).then(async result => {
-                    if (result) {
-                        const _inventario = this._xmlSvc.jsonToXML('DWH', result);
+                dataSource
+                    .query(query)
+                    .then(async result => {
+                        if (result) {
+                            const _inventario = this._xmlSvc.jsonToXML('DWH', result);
 
-                        await this.dataSource
-                            .query(`EXEC dbo.pDWH_ImportInventarioXML @0, @1, @2, @3, @4, @5`, [
-                                _inventario,
-                                idCentro,
-                                mes,
-                                tipoCentro === 1,
-                                isRestaura ? 1 : 0,
-                                isDistribuidor ? 1 : 0,
-                            ])
-                            .then(() => {
-                                resolve({ success: true });
-                            })
-                            .catch(err => {
-                                throw new Error(err.message ? err.message : err);
-                            });
-                    }
-                });
-            }).catch(err => {
-                return { success: false, error: err.message ? err.message : err };
+                            await this.dataSource
+                                .query(`EXEC dbo.pDWH_ImportInventarioXML @0, @1, @2, @3, @4, @5`, [
+                                    _inventario,
+                                    idCentro,
+                                    mes,
+                                    tipoCentro === 1,
+                                    isRestaura ? 1 : 0,
+                                    isDistribuidor ? 1 : 0,
+                                ])
+                                .then(() => {
+                                    resolve({ success: true });
+                                })
+                                .catch(err => {
+                                    throw new Error(err.message ? err.message : err);
+                                });
+                        }
+                    })
+                    .catch(err => {
+                        return { success: false, error: err.message ? err.message : err };
+                    });
             });
         } catch (err: any) {
             return { success: false, error: err.message ? err.message : err };

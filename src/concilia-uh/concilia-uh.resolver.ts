@@ -7,7 +7,7 @@ export class ConciliaUhResolver {
     constructor(private readonly conciliaUhService: ConciliaUhService) {}
 
     @Query(() => [ConciliaUH])
-    async conciliaAFT(@Args({ name: 'conciliaUhInput', type: () => ConciliaUhInput }) conciliaAftInput: ConciliaUhInput): Promise<ConciliaUH[]> {
+    async conciliaUH(@Args({ name: 'conciliaUhInput', type: () => ConciliaUhInput }) conciliaAftInput: ConciliaUhInput): Promise<ConciliaUH[]> {
         return this.conciliaUhService.concilia(conciliaAftInput);
     }
 }

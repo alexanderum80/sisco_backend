@@ -41,27 +41,28 @@ export class ConciliaAftService {
 
             return new Promise<ConciliaAftData>(async (resolve, reject) => {
                 // importo los datos de los activos
-                const _clasifCNMB = await this._importarDatosAF(idCentro, periodo, _conexionMB)
+                this._importarDatosAF(idCentro, periodo, _conexionMB)
                     .then(res => {
-                        return res;
+                        // chequeo si hay diferencias en el clasificador CNMB
+                        if ((res as DiferenciaClasificadorCNMB[]).length) {
+                            resolve({ DiferenciaClasificadorCNMB: res as DiferenciaClasificadorCNMB[] });
+                        } else {
+                            // importo los datos de la contabilidad
+                            this._importarDatosRodas(annio, periodo, idCentro, 0, _conexionConta)
+                                .then(() => {
+                                    // calculo la conciliacion
+                                    this._calculaConciliacion(idCentro, annio, periodo).then(res => {
+                                        resolve(res);
+                                    });
+                                })
+                                .catch(err => {
+                                    return reject(err.message || err);
+                                });
+                        }
                     })
                     .catch(err => {
-                        return reject(err.message || err);
+                        reject(err.message || err);
                     });
-                if (!_clasifCNMB) return;
-                if ((_clasifCNMB as DiferenciaClasificadorCNMB[]).length) {
-                    return resolve({ DiferenciaClasificadorCNMB: _clasifCNMB as DiferenciaClasificadorCNMB[] });
-                } else {
-                    // importo los datos de la contabilidad
-                    await this._importarDatosRodas(annio, periodo, idCentro, 0, _conexionConta).catch(err => {
-                        return reject(err.message || err);
-                    });
-
-                    // calculo la conciliacion
-                    this._calculaConciliacion(idCentro, annio, periodo).then(res => {
-                        resolve(res);
-                    });
-                }
             });
         } catch (err) {
             Promise.reject(err.message || err);
@@ -73,17 +74,23 @@ export class ConciliaAftService {
 
         return new Promise<void | DiferenciaClasificadorCNMB[]>(async (resolve, reject) => {
             // importo el clasificador CNMB
-            const _clasifCNMB = await this._importarCnmbAF(idCentro, mbConnection);
-            if (_clasifCNMB.length) {
-                return resolve(_clasifCNMB);
-            }
-
-            // importo los MB
-            await this._importarMbAF(idCentro, periodo, mbConnection).catch(err => {
-                return reject(err.message || err);
-            });
-
-            resolve([]);
+            this._importarCnmbAF(idCentro, mbConnection)
+                .then(_clasifCNMB => {
+                    // compruebo si hay diferencias en el caslificador CNMB
+                    if (_clasifCNMB.length) return resolve(_clasifCNMB);
+                    // importo los MB
+                    else
+                        this._importarMbAF(idCentro, periodo, mbConnection)
+                            .then(() => {
+                                resolve([]);
+                            })
+                            .catch(err => {
+                                reject(err.message || err);
+                            });
+                })
+                .catch(err => {
+                    reject(err.message || err);
+                });
         });
     }
 
@@ -95,13 +102,13 @@ export class ConciliaAftService {
                     if (res.length) {
                         const _cnmb = this._xmlSvc.jsonToXML('CNMB', res);
 
-                        await this.dataSource
+                        this.dataSource
                             .query(`EXEC dbo.pAF_ImportClanaCnmbXML @0, @1`, [_cnmb, idCentro])
                             .then(res => {
                                 resolve(res);
                             })
                             .catch(err => {
-                                throw new Error(err.message ? err.message : err);
+                                reject(err.message ? err.message : err);
                             });
                     }
                 })
@@ -111,22 +118,30 @@ export class ConciliaAftService {
         });
     }
 
-    private async _importarMbAF(idCentro: number, periodo: number, conexionRodas: DataSource): Promise<boolean> {
-        // chequeo si el periodo es correcto
-        await this._chequeaUltimoPeriodo(periodo, conexionRodas).catch(err => {
-            return Promise.reject(err.message || err);
-        });
-
-        // chequeo si todos los MB tienen cuentas
-        await this._chequeaMbSinCuentas(conexionRodas).catch(err => {
-            return Promise.reject(err.message || err);
-        });
-
-        // importo los MB
-        await this._importarMb(idCentro, periodo, conexionRodas);
-
-        return new Promise<boolean>(resolve => {
-            resolve(true);
+    private async _importarMbAF(idCentro: number, periodo: number, conexionRodas: DataSource): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            // chequeo si el periodo es correcto
+            this._chequeaUltimoPeriodo(periodo, conexionRodas)
+                .then(() => {
+                    // chequeo si todos los MB tienen cuentas
+                    this._chequeaMbSinCuentas(conexionRodas)
+                        .then(() => {
+                            // importo los MB
+                            this._importarMb(idCentro, periodo, conexionRodas)
+                                .then(() => {
+                                    resolve();
+                                })
+                                .catch(err => {
+                                    reject(err.message || err);
+                                });
+                        })
+                        .catch(err => {
+                            reject(err.message || err);
+                        });
+                })
+                .catch(err => {
+                    reject(err.message || err);
+                });
         });
     }
 

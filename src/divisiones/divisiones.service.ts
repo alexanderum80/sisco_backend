@@ -17,7 +17,7 @@ export class DivisionesService {
             let criteria = {};
 
             if (!this._usuariosSvc.isSuperAdmin(IdDivision, IdTipoUsuario)) {
-                criteria = { IdDivision: IdDivision };
+                criteria = [{ IdDivision: IdDivision }, { IdDivision: '101' }];
             }
 
             return new Promise<DivisionesQueryResponse>(resolve => {

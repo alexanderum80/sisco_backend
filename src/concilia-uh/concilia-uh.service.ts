@@ -1,6 +1,6 @@
 import { ContaConexionesEntity } from './../conta-conexiones/conta-conexiones.entity';
-import { cloneDeep, toNumber } from 'lodash';
-import { ConciliaUhInput, ConciliaUH, queryUhCategorias, queryUhUltimoPeriodo, queryUhSinCuentas, querySiscoUltimoPeriodoUH, queryUhHistorial, queryUh } from './concilia-uh.model';
+import { cloneDeep } from 'lodash';
+import { ConciliaUhInput, ConciliaUH, queryUhCategorias, queryUhProductos, queryUh } from './concilia-uh.model';
 import { XmlJsService } from './../shared/services/xml-js/xml-js.service';
 import { ConciliaContaService } from './../concilia-conta/concilia-conta.service';
 import { ContaConexionesService } from './../conta-conexiones/conta-conexiones.service';
@@ -26,24 +26,32 @@ export class ConciliaUhService {
             const _conexionConta = _conexionRodasQuery.data;
             _conexionConta.BaseDatos = _conexionConta.BaseDatos.substring(0, _conexionConta.BaseDatos.length - 4) + annio.toString();
 
-            const _conexionMB = cloneDeep(_conexionConta);
-            _conexionMB.BaseDatos = _conexionMB.BaseDatos.replace(/Conta/gi, 'UH');
+            const _conexionUH = cloneDeep(_conexionConta);
+            _conexionUH.BaseDatos = _conexionUH.BaseDatos.replace(/Conta/gi, 'Util');
 
-            return new Promise<ConciliaUH[]>(async (resolve, reject) => {
-                // importo los datos de los activos
-                await this._importarDatosUH(idCentro, periodo, _conexionMB).catch(err => {
-                    return reject(err.message || err);
-                });
-
-                // importo los datos de la contabilidad
-                await this._importarDatosRodas(annio, periodo, idCentro, 0, _conexionConta).catch(err => {
-                    return reject(err.message || err);
-                });
-
-                // calculo la conciliacion
-                this._calculaConciliacion(idCentro, annio, periodo).then(res => {
-                    resolve(res);
-                });
+            return new Promise<ConciliaUH[]>((resolve, reject) => {
+                // importo los datos de los Utiles
+                this._importarDatosUH(idCentro, periodo, _conexionUH)
+                    .then(() => {
+                        // importo los datos de la contabilidad
+                        this._importarDatosRodas(annio, periodo, idCentro, 0, _conexionConta)
+                            .then(() => {
+                                // calculo la conciliacion
+                                this._calculaConciliacion(idCentro, annio, periodo)
+                                    .then(res => {
+                                        resolve(res);
+                                    })
+                                    .catch(err => {
+                                        reject(err.message || err);
+                                    });
+                            })
+                            .catch(err => {
+                                return reject(err.message || err);
+                            });
+                    })
+                    .catch(err => {
+                        return reject(err.message || err);
+                    });
             });
         } catch (err) {
             Promise.reject(err.message || err);
@@ -51,25 +59,32 @@ export class ConciliaUhService {
     }
 
     private async _importarDatosUH(idCentro: number, periodo: number, conexionRodas: ContaConexionesEntity): Promise<void> {
+        // try {
         const mbConnection = await this._contaConexionesSvc.conexionRodas(conexionRodas);
 
-        return new Promise<void>(async (resolve, reject) => {
-            // chequeo si el periodo es correcto
-            await this._chequeaUltimoPeriodo(periodo, mbConnection).catch(err => {
-                return Promise.reject(err.message || err);
-            });
-
+        return new Promise<void>((resolve, reject) => {
             // importo las Categorias
-            await this._importarCategoriaUH(idCentro, mbConnection).catch(err => {
-                return reject(err.message || err);
-            });
-
-            // importo los MB
-            await this._importarUH(idCentro, periodo, mbConnection).catch(err => {
-                return reject(err.message || err);
-            });
-
-            resolve();
+            this._importarCategoriaUH(idCentro, mbConnection)
+                .then(() => {
+                    // importo los Productos
+                    this._importarProductosUH(idCentro, mbConnection)
+                        .then(() => {
+                            // importo los UH
+                            this._importarUH(idCentro, periodo, mbConnection)
+                                .then(() => {
+                                    resolve();
+                                })
+                                .catch(err => {
+                                    reject(err.message || err);
+                                });
+                        })
+                        .catch(err => {
+                            reject(err.message || err);
+                        });
+                })
+                .catch(err => {
+                    reject(err.message || err);
+                });
         });
     }
 
@@ -97,16 +112,23 @@ export class ConciliaUhService {
         });
     }
 
-    private async _chequeaUltimoPeriodo(periodo: number, conexionRodas: DataSource): Promise<number> {
-        return new Promise<number>((resolve, reject) => {
+    private async _importarProductosUH(idCentro: number, conexionRodas: DataSource): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
             conexionRodas
-                .query(queryUhUltimoPeriodo)
-                .then(per => {
-                    const periodoActual = toNumber(per[0].Periodo) + 1;
-                    if (periodoActual !== 0 && periodo > periodoActual) {
-                        return reject('No existen datos de los Útiles y Herramientas para el período que está analizando. Seleccione un período anterior.');
+                .query(queryUhProductos)
+                .then(async res => {
+                    if (res.length) {
+                        const _categoria = this._xmlSvc.jsonToXML('Producto', res);
+
+                        await this.dataSource
+                            .query(`EXEC dbo.pUH_ImportProductosXML @0, @1`, [_categoria, idCentro])
+                            .then(() => {
+                                resolve();
+                            })
+                            .catch(err => {
+                                reject(err.message || err);
+                            });
                     }
-                    resolve(periodoActual);
                 })
                 .catch((err: Error) => {
                     reject(err.message || err);
@@ -114,78 +136,54 @@ export class ConciliaUhService {
         });
     }
 
-    private async _importarUH(idCentro: number, periodo: number, conexionRodas: DataSource): Promise<boolean> {
-        return new Promise<boolean>(async (resolve, reject) => {
-            // leo primero de la tabla MB_Periodo
-            const ultimoPeriodoResp = await this.dataSource
-                .query(querySiscoUltimoPeriodoUH.replace(/@Centro/gi, idCentro.toString()))
-                .then(async per => {
-                    return per;
+    private async _importarUH(idCentro: number, periodo: number, conexionRodas: DataSource): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            conexionRodas
+                .query(queryUh.replace(/@Centro/gi, idCentro.toString()).replace(/@Periodo/gi, periodo.toString()))
+                .then(res => {
+                    if (res.length) {
+                        const _uh = this._xmlSvc.jsonToXML('UH', res);
+
+                        // inserto los MB
+                        this.dataSource
+                            .query(`EXEC dbo.pUH_ImportUtilesXML @0, @1, @2`, [_uh, idCentro, periodo])
+                            .then(() => {
+                                resolve();
+                            })
+                            .catch(err => {
+                                reject(err.message ? err.message : err);
+                            });
+                    } else {
+                        reject('No existen datos de Útiles y Herramientas del período seleccionado. <br/>No se puede realizar la Conciliación.');
+                    }
                 })
-                .catch(err => reject(err));
-
-            let periodoActual = toNumber(ultimoPeriodoResp[0].Periodo);
-            if (periodoActual > periodo) periodoActual = periodo;
-
-            for (let per = periodoActual; per <= periodo; per++) {
-                let _uh: string;
-                let _query = await conexionRodas
-                    .query(queryUhHistorial.replace(/@Centro/gi, idCentro.toString()).replace(/@Periodo/gi, per.toString()))
-                    .then(res => {
-                        if (res.length) {
-                            _uh = this._xmlSvc.jsonToXML('UH', res);
-                        }
-                        return _uh;
-                    })
-                    .catch((err: Error) => {
-                        return reject(err.message || err);
-                    });
-                if (!_query) {
-                    _query = await conexionRodas
-                        .query(queryUh.replace(/@Centro/gi, idCentro.toString()).replace(/@Periodo/gi, per.toString()))
-                        .then(res => {
-                            if (res.length) {
-                                _uh = this._xmlSvc.jsonToXML('UH', res);
-                            }
-                            return _uh;
-                        })
-                        .catch((err: Error) => {
-                            return reject(err.message || err);
-                        });
-                }
-                if (_query) {
-                    // inserto los MB
-                    await this.dataSource
-                        .query(`EXEC dbo.pUH_ImportUtilesXML @0, @1, @2`, [_query, idCentro, per])
-                        .then(() => {
-                            return;
-                        })
-                        .catch(err => {
-                            throw new Error(err.message ? err.message : err);
-                        });
-                }
-            }
-
-            resolve(true);
+                .catch((err: Error) => {
+                    return reject(err.message || err);
+                });
         });
     }
 
     private async _importarDatosRodas(annio: number, periodo: number, idUnidad: number, tipoCentro: number, contaConexion: ContaConexionesEntity): Promise<boolean> {
         const cons = tipoCentro === 1 ? '1' : '0';
 
-        // me conecto al Rodas del Centro
-        const rodasConnection = await this._contaConexionesSvc.conexionRodas(contaConexion);
-
-        // importo los asientos del rodas
-        await this._conciliaContaSvc.importarContabilidad(idUnidad, annio, periodo, cons, rodasConnection).catch(err => {
-            throw new Error(err.message || err);
-        });
-        // if (!_importarAsientoRodas.success) {
-        //     return { success: false, error: _importarAsientoRodas.error + ' No se pudo importar Asientos del Rodas de la Unidad ' + idUnidad };
-        // }
-
         return new Promise<boolean>(resolve => {
-            resolve(true);
+            // me conecto al Rodas del Centro
+            this._contaConexionesSvc
+                .conexionRodas(contaConexion)
+                .then(rodasConnection => {
+                    // importo los asientos del Rodas
+                    this._conciliaContaSvc
+                        .importarContabilidad(idUnidad, annio, periodo, cons, rodasConnection)
+                        .then(() => {
+                            resolve(true);
+                        })
+                        .catch(err => {
+                            throw new Error(err.message || err);
+                        });
+                })
+                .catch(err => {
+                    throw new Error(err.message || err);
+                });
         });
     }
 

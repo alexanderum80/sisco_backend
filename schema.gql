@@ -642,21 +642,22 @@ type ActFijosClasificadorCnmbEntity {
 }
 
 type ConciliaUH {
+  Tipo: String!
+  IdDivision: Float!
   Division: String!
   SubDivision: String!
-  Tipo: String!
   Centro: String!
   IdCentro: Float!
   IdUnidad: Float!
   Unidad: String!
   Periodo: Float!
-  Cta: String!
-  Scta: String!
-  An1: String!
-  An2: String!
-  An3: String!
-  Saldo_AF: Float!
-  Saldo_Rodas: Float!
+  Cuenta: String!
+  SubCuenta: String!
+  Analisis1: String!
+  Analisis2: String!
+  Analisis3: String!
+  SaldoUH: Float!
+  SaldoRodas: Float!
   Diferencia: Float!
 }
 
@@ -719,7 +720,8 @@ type Query {
   getCajaConfiguracion(id: Int!): CajaConfiguracionEntity!
   getAllActFijosClasificadorCnmb: [ActFijosClasificadorCnmbEntity!]!
   getActFijosClasificadorCnmb(cnmb: String!): ActFijosClasificadorCnmbEntity!
-  conciliaAFT(conciliaUhInput: ConciliaUhInput!): [ConciliaUH!]!
+  conciliaAFT(conciliaAftInput: ConciliaAftInput!): ConciliaAftData!
+  conciliaUH(conciliaUhInput: ConciliaUhInput!): [ConciliaUH!]!
 }
 
 input ConciliaDWHInput {
@@ -749,6 +751,12 @@ input ConciliaInternaDWHInput {
   IdSubdivisionOD: Float!
   IdUnidadOD: Float!
   SoloDiferencias: Boolean!
+}
+
+input ConciliaAftInput {
+  idCentro: Float!
+  periodo: Float!
+  annio: Float!
 }
 
 input ConciliaUhInput {
