@@ -361,7 +361,7 @@ export class ConciliaDwhService {
                     resolve(res);
                 })
                 .catch(err => {
-                    throw new Error(err.message ? err.message : err);
+                    reject(err.message ? err.message : err);
                 });
         });
     }

@@ -10,7 +10,6 @@ import { UnidadesModule } from './unidades/unidades.module';
 import { DwhConexionesModule } from './dwh-conexiones/dwh-conexiones.module';
 import { CargosModule } from './cargos/cargos.module';
 import { ConciliaDwhModule } from './concilia-dwh/concilia-dwh.module';
-import { AlmacenesModule } from './almacenes/almacenes.module';
 import { EmailsService } from './shared/services/emails/emails.service';
 import { ConciliaContaModule } from './concilia-conta/concilia-conta.module';
 import { SharedModule } from './shared/shared.module';
@@ -78,7 +77,6 @@ import { ConciliaUhModule } from './concilia-uh/concilia-uh.module';
         DwhConexionesModule,
         CargosModule,
         ConciliaDwhModule,
-        AlmacenesModule,
         ConciliaContaModule,
         EmpleadosModule,
         SupervisoresModule,
