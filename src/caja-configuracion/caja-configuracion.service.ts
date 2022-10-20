@@ -21,7 +21,7 @@ export class CajaConfiguracionService {
                     });
             });
         } catch (err: any) {
-            return Promise.reject(err.message || err);
+            throw new Error(err.message || err);
         }
     }
 
@@ -38,7 +38,7 @@ export class CajaConfiguracionService {
                     });
             });
         } catch (err: any) {
-            return Promise.reject(err.message || err);
+            throw new Error(err.message || err);
         }
     }
 
@@ -57,7 +57,7 @@ export class CajaConfiguracionService {
                     });
             });
         } catch (err: any) {
-            return Promise.reject(err.message || err);
+            throw new Error(err.message || err);
         }
     }
 
@@ -74,7 +74,7 @@ export class CajaConfiguracionService {
                     });
             });
         } catch (err: any) {
-            return Promise.reject(err.message || err);
+            throw new Error(err.message || err);
         }
     }
 
@@ -91,7 +91,7 @@ export class CajaConfiguracionService {
                     });
             });
         } catch (err: any) {
-            return Promise.reject(err.message || err);
+            throw new Error(err.message || err);
         }
     }
 }

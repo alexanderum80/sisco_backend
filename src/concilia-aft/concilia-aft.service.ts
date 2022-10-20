@@ -65,7 +65,7 @@ export class ConciliaAftService {
                     });
             });
         } catch (err) {
-            Promise.reject(err.message || err);
+            throw new Error(err.message || err);
         }
     }
 

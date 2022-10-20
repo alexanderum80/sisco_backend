@@ -17,7 +17,7 @@ export class UnidadesService {
             let _condition = {};
 
             if (!this._usuariosSvc.isSuperAdmin(IdDivision, IdTipoUsuario) && !this._usuariosSvc.isAdvancedUser(IdDivision, IdTipoUsuario)) {
-                _condition = { IdDivision: IdDivision };
+                _condition = [{ IdDivision: IdDivision }, { IdDivision: 101 }];
             }
 
             return new Promise<AllUnidadesQueryResponse>(resolve => {
