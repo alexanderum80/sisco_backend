@@ -118,10 +118,10 @@ export class ConciliaUhService {
                 .query(queryUhProductos)
                 .then(async res => {
                     if (res.length) {
-                        const _categoria = this._xmlSvc.jsonToXML('Producto', res);
+                        const _productos = this._xmlSvc.jsonToXML('Producto', res);
 
                         await this.dataSource
-                            .query(`EXEC dbo.pUH_ImportProductosXML @0, @1`, [_categoria, idCentro])
+                            .query(`EXEC dbo.pUH_ImportProductosXML @0, @1`, [_productos, idCentro])
                             .then(() => {
                                 resolve();
                             })

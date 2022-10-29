@@ -47,7 +47,8 @@ import { ConciliaUhModule } from './concilia-uh/concilia-uh.module';
             autoSchemaFile: 'schema.gql',
             playground: true,
             context: (req: any) => ({ headers: req.headers }),
-            formatError: (err: any) => {
+            formatError: err => {
+                err.message = err.message.replace('Unexpected error value: ', '').replace(/"/g, '');
                 return err;
             },
         }),
