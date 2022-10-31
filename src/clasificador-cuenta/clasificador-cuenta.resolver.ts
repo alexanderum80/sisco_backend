@@ -6,20 +6,18 @@ import { ClasificadorCuentaReal } from './clasificador-cuenta.entity';
 
 @Resolver(() => ClasificadorCuentaReal)
 export class ClasificadorCuentaResolver {
-    constructor(
-        private clasificadorCuentaSvc: ClasificadorCuentaService
-    ) {}
+    constructor(private clasificadorCuentaSvc: ClasificadorCuentaService) {}
 
     @Query(() => ClasificadorCuentasQueryResponse)
-    async getAllClasificadorCuentas(): Promise<ClasificadorCuentasQueryResponse> {
-        return this.clasificadorCuentaSvc.getAllClasificadorCuentas();
+    async getAllClasificadorCuentas(@Args('tipo', { nullable: true }) tipo: string): Promise<ClasificadorCuentasQueryResponse> {
+        return this.clasificadorCuentaSvc.getAllClasificadorCuentas(tipo);
     }
 
     @Query(() => ClasificadorCuentaQueryResponse)
     async getClasificadorCuenta(
         @Args('cuenta') cuenta: string,
         @Args('subcuenta') subcuenta: string,
-        @Args({ name: 'tipo', type: () => Int }) tipo: number
+        @Args({ name: 'tipo', type: () => Int }) tipo: number,
     ): Promise<ClasificadorCuentaQueryResponse> {
         return this.clasificadorCuentaSvc.getClasificadorCuenta(cuenta, subcuenta, tipo);
     }
@@ -31,7 +29,7 @@ export class ClasificadorCuentaResolver {
 
     @Mutation(() => MutationResponse)
     async saveClasificadorCuenta(
-        @Args({ name: 'clasificadorInfo', type: () => ClasificadorCuentaRealInput }) clasificadorInfo: ClasificadorCuentaRealInput
+        @Args({ name: 'clasificadorInfo', type: () => ClasificadorCuentaRealInput }) clasificadorInfo: ClasificadorCuentaRealInput,
     ): Promise<ClasificadorCuentasQueryResponse> {
         return this.clasificadorCuentaSvc.saveClasificadorCuenta(clasificadorInfo);
     }
@@ -40,7 +38,7 @@ export class ClasificadorCuentaResolver {
     async deleteClasificadorCuenta(
         @Args('cuenta') cuenta: string,
         @Args('subcuenta') subcuenta: string,
-        @Args({ name: 'tipo', type: () => Int }) tipo: number
+        @Args({ name: 'tipo', type: () => Int }) tipo: number,
     ): Promise<ClasificadorCuentasQueryResponse> {
         return this.clasificadorCuentaSvc.deleteClasificadorCuenta(cuenta, subcuenta, tipo);
     }

@@ -13,10 +13,12 @@ export class ClasificadorCuentaService {
         private cuentaEntidadSvc: CuentaEntidadService,
     ) {}
 
-    async getAllClasificadorCuentas(): Promise<ClasificadorCuentasQueryResponse> {
+    async getAllClasificadorCuentas(tipo?: string): Promise<ClasificadorCuentasQueryResponse> {
+        let _where = {};
+        if (tipo) _where = { TipoClasificador: tipo };
         return new Promise<ClasificadorCuentasQueryResponse>(resolve => {
             this.clasificadorCuentaRepository
-                .find()
+                .find({ where: _where })
                 .then(res => {
                     resolve({ success: true, data: res });
                 })
