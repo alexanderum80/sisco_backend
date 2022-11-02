@@ -10,9 +10,9 @@ export class ClasificadorEntidadQueryResponse extends SingleQueryResponse(Clasif
 
 @InputType()
 export class ClasificadorEntidadInput {
-    @Field()
-    IdUnidad: number;
+  @Field()
+  IdUnidad: number;
 
-    @Field()
-    IdTipoEntidad: number;
+  @Field()
+  IdTipoEntidad: number;
 }

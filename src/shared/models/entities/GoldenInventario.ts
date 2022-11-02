@@ -1,34 +1,34 @@
-import { Column, Entity } from "typeorm";
+import { Column, Entity } from 'typeorm';
 
-@Entity("Golden_Inventario", { schema: "dbo" })
+@Entity('Golden_Inventario', { schema: 'dbo' })
 export class GoldenInventario {
-  @Column("int", { name: "IdCentro" })
+  @Column('int', { name: 'IdCentro' })
   idCentro: number;
 
-  @Column("int", { name: "IdUnidad" })
+  @Column('int', { name: 'IdUnidad' })
   idUnidad: number;
 
-  @Column("int", { name: "IdPiso" })
+  @Column('int', { name: 'IdPiso' })
   idPiso: number;
 
-  @Column("decimal", { name: "Saldo", precision: 18, scale: 4 })
+  @Column('decimal', { name: 'Saldo', precision: 18, scale: 4 })
   saldo: number;
 
-  @Column("nchar", { name: "Cuenta", length: 10 })
+  @Column('nchar', { name: 'Cuenta', length: 10 })
   cuenta: string;
 
-  @Column("nchar", { name: "SubCuenta", length: 10 })
+  @Column('nchar', { name: 'SubCuenta', length: 10 })
   subCuenta: string;
 
-  @Column("nchar", { name: "Crt1", length: 10 })
+  @Column('nchar', { name: 'Crt1', length: 10 })
   crt1: string;
 
-  @Column("nchar", { name: "Crt2", length: 10 })
+  @Column('nchar', { name: 'Crt2', length: 10 })
   crt2: string;
 
-  @Column("nchar", { name: "Crt3", length: 10 })
+  @Column('nchar', { name: 'Crt3', length: 10 })
   crt3: string;
 
-  @Column("int", { name: "Periodo" })
+  @Column('int', { name: 'Periodo' })
   periodo: number;
 }

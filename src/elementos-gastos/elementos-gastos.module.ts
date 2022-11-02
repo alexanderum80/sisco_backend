@@ -6,6 +6,6 @@ import { ElementosGastosService } from './elementos-gastos.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([ContaElementosGastos])],
-  providers: [ElementosGastosResolver, ElementosGastosService]
+  providers: [ElementosGastosResolver, ElementosGastosService],
 })
 export class ElementosGastosModule {}

@@ -9,106 +9,106 @@ import { ContaComprobarExpresionesInput, ContaComprobarExpresionesQueryResponse,
 
 @Injectable()
 export class ContaComprobarExpresionesService {
-    constructor(@InjectRepository(ContaComprobarExpresionesEntity) private readonly comprobarExpresionesRepository: Repository<ContaComprobarExpresionesEntity>) {}
+  constructor(@InjectRepository(ContaComprobarExpresionesEntity) private readonly comprobarExpresionesRepository: Repository<ContaComprobarExpresionesEntity>) {}
 
-    async findAll(user: Usuarios): Promise<ContaComprobarExpresionesQueryResponse> {
-        try {
-            const { IdDivision } = user;
+  async findAll(user: Usuarios): Promise<ContaComprobarExpresionesQueryResponse> {
+    try {
+      const { IdDivision } = user;
 
-            const criteria = [{ IdDivision: IdDivision }, { Centralizada: true }];
+      const criteria = [{ IdDivision: IdDivision }, { Centralizada: true }];
 
-            return new Promise<ContaComprobarExpresionesQueryResponse>(resolve => {
-                this.comprobarExpresionesRepository
-                    .find({ where: criteria, relations: ['Expresion', 'ExpresionC', 'Operador'] })
-                    .then(result => {
-                        resolve({
-                            success: true,
-                            data: result,
-                        });
-                    })
-                    .catch(err => {
-                        throw new Error(err);
-                    });
+      return new Promise<ContaComprobarExpresionesQueryResponse>(resolve => {
+        this.comprobarExpresionesRepository
+          .find({ where: criteria, relations: ['Expresion', 'ExpresionC', 'Operador'] })
+          .then(result => {
+            resolve({
+              success: true,
+              data: result,
             });
-        } catch (err: any) {
-            return { success: false, error: err.message ? err.message : err };
-        }
+          })
+          .catch(err => {
+            throw new Error(err);
+          });
+      });
+    } catch (err: any) {
+      return { success: false, error: err.message ? err.message : err };
     }
+  }
 
-    async findOne(id: number): Promise<ContaComprobarExpresionQueryResponse> {
-        try {
-            return new Promise<ContaComprobarExpresionQueryResponse>(resolve => {
-                this.comprobarExpresionesRepository
-                    .findOne({ where: [{ Id: id }] })
-                    .then(result => {
-                        resolve({
-                            success: true,
-                            data: result,
-                        });
-                    })
-                    .catch(err => {
-                        throw new Error(err);
-                    });
+  async findOne(id: number): Promise<ContaComprobarExpresionQueryResponse> {
+    try {
+      return new Promise<ContaComprobarExpresionQueryResponse>(resolve => {
+        this.comprobarExpresionesRepository
+          .findOne({ where: [{ Id: id }] })
+          .then(result => {
+            resolve({
+              success: true,
+              data: result,
             });
-        } catch (err: any) {
-            return { success: false, error: err.message ? err.message : err };
-        }
+          })
+          .catch(err => {
+            throw new Error(err);
+          });
+      });
+    } catch (err: any) {
+      return { success: false, error: err.message ? err.message : err };
     }
+  }
 
-    async create(user: Usuarios, comprobarExpresionInput: ContaComprobarExpresionesInput): Promise<MutationResponse> {
-        try {
-            const { IdDivision, IdTipoUsuario } = user;
+  async create(user: Usuarios, comprobarExpresionInput: ContaComprobarExpresionesInput): Promise<MutationResponse> {
+    try {
+      const { IdDivision, IdTipoUsuario } = user;
 
-            delete comprobarExpresionInput.Id;
+      delete comprobarExpresionInput.Id;
 
-            comprobarExpresionInput.Centralizada = IdDivision === 100 && IdTipoUsuario === ETipoUsuarios['Usuario Avanzado'];
+      comprobarExpresionInput.Centralizada = IdDivision === 100 && IdTipoUsuario === ETipoUsuarios['Usuario Avanzado'];
 
-            return new Promise<MutationResponse>(resolve => {
-                this.comprobarExpresionesRepository
-                    .save(comprobarExpresionInput)
-                    .then(() => {
-                        resolve({ success: true });
-                    })
-                    .catch(err => {
-                        throw new Error(err);
-                    });
-            });
-        } catch (err: any) {
-            return { success: false, error: err.message ? err.message : err };
-        }
+      return new Promise<MutationResponse>(resolve => {
+        this.comprobarExpresionesRepository
+          .save(comprobarExpresionInput)
+          .then(() => {
+            resolve({ success: true });
+          })
+          .catch(err => {
+            throw new Error(err);
+          });
+      });
+    } catch (err: any) {
+      return { success: false, error: err.message ? err.message : err };
     }
+  }
 
-    async update(comprobarExpresionInput: ContaComprobarExpresionesInput): Promise<MutationResponse> {
-        try {
-            return new Promise<MutationResponse>(resolve => {
-                this.comprobarExpresionesRepository
-                    .save(comprobarExpresionInput)
-                    .then(() => {
-                        resolve({ success: true });
-                    })
-                    .catch(err => {
-                        throw new Error(err);
-                    });
-            });
-        } catch (err: any) {
-            return { success: false, error: err.message ? err.message : err };
-        }
+  async update(comprobarExpresionInput: ContaComprobarExpresionesInput): Promise<MutationResponse> {
+    try {
+      return new Promise<MutationResponse>(resolve => {
+        this.comprobarExpresionesRepository
+          .save(comprobarExpresionInput)
+          .then(() => {
+            resolve({ success: true });
+          })
+          .catch(err => {
+            throw new Error(err);
+          });
+      });
+    } catch (err: any) {
+      return { success: false, error: err.message ? err.message : err };
     }
+  }
 
-    async delete(IDs: number[]): Promise<MutationResponse> {
-        try {
-            return new Promise<MutationResponse>(resolve => {
-                this.comprobarExpresionesRepository
-                    .delete(IDs)
-                    .then(() => {
-                        resolve({ success: true });
-                    })
-                    .catch(err => {
-                        throw new Error(err);
-                    });
-            });
-        } catch (err: any) {
-            return { success: false, error: err.message ? err.message : err };
-        }
+  async delete(IDs: number[]): Promise<MutationResponse> {
+    try {
+      return new Promise<MutationResponse>(resolve => {
+        this.comprobarExpresionesRepository
+          .delete(IDs)
+          .then(() => {
+            resolve({ success: true });
+          })
+          .catch(err => {
+            throw new Error(err);
+          });
+      });
+    } catch (err: any) {
+      return { success: false, error: err.message ? err.message : err };
     }
+  }
 }

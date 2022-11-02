@@ -4,14 +4,12 @@ import { ConciliaInternaDWHInput, ConciliacionInternaDWHQueryResponse } from './
 
 @Resolver()
 export class ConciliaInternaDwhResolver {
-    constructor(
-        private _conciliaInternaDWHSvc: ConciliaInternaDwhService
-    ) {}
+  constructor(private _conciliaInternaDWHSvc: ConciliaInternaDwhService) {}
 
-    @Query(() => ConciliacionInternaDWHQueryResponse)
-    async conciliaInternaDWH(
-        @Args({ name: 'conciliaInternaDWHInput', type: () => ConciliaInternaDWHInput }) conciliaInternaDWHInput: ConciliaInternaDWHInput
-    ): Promise<ConciliacionInternaDWHQueryResponse> {
-        return this._conciliaInternaDWHSvc.conciliaInternaDWH(conciliaInternaDWHInput);
-    }
+  @Query(() => ConciliacionInternaDWHQueryResponse)
+  async conciliaInternaDWH(
+    @Args({ name: 'conciliaInternaDWHInput', type: () => ConciliaInternaDWHInput }) conciliaInternaDWHInput: ConciliaInternaDWHInput,
+  ): Promise<ConciliacionInternaDWHQueryResponse> {
+    return this._conciliaInternaDWHSvc.conciliaInternaDWH(conciliaInternaDWHInput);
+  }
 }

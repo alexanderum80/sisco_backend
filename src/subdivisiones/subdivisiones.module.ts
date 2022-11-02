@@ -6,6 +6,6 @@ import { SubdivisionesService } from './subdivisiones.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Subdivisiones])],
-  providers: [SubdivisionesResolver, SubdivisionesService]
+  providers: [SubdivisionesResolver, SubdivisionesService],
 })
 export class SubdivisionesModule {}

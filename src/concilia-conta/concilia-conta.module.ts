@@ -7,8 +7,8 @@ import { ConciliaContaService } from './concilia-conta.service';
 import { ConciliaContaResolver } from './concilia-conta.resolver';
 
 @Module({
-    imports: [ContaConexionesModule, UnidadesModule, SharedModule, ClasificadorCuentaModule],
-    providers: [ConciliaContaService, ConciliaContaResolver],
-    exports: [ConciliaContaService],
+  imports: [ContaConexionesModule, UnidadesModule, SharedModule, ClasificadorCuentaModule],
+  providers: [ConciliaContaService, ConciliaContaResolver],
+  exports: [ConciliaContaService],
 })
 export class ConciliaContaModule {}

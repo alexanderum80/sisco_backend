@@ -10,30 +10,30 @@ export class ContaComprobarExpresionQueryResponse extends SingleQueryResponse(Co
 
 @InputType()
 export class ContaComprobarExpresionesInput {
-    @Field()
-    Id?: number;
+  @Field()
+  Id?: number;
 
-    @Field()
-    IdExpresion: number;
+  @Field()
+  IdExpresion: number;
 
-    @Field()
-    IdOperador: string;
+  @Field()
+  IdOperador: string;
 
-    @Field()
-    IdExpresionC: number;
+  @Field()
+  IdExpresionC: number;
 
-    @Field()
-    Centro: boolean;
+  @Field()
+  Centro: boolean;
 
-    @Field()
-    Complejo: boolean;
+  @Field()
+  Complejo: boolean;
 
-    @Field()
-    Con: boolean;
+  @Field()
+  Con: boolean;
 
-    @Field()
-    Centralizada: boolean;
+  @Field()
+  Centralizada: boolean;
 
-    @Field()
-    IdDivision: number;
+  @Field()
+  IdDivision: number;
 }

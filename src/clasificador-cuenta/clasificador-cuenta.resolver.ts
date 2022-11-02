@@ -6,40 +6,40 @@ import { ClasificadorCuentaReal } from './clasificador-cuenta.entity';
 
 @Resolver(() => ClasificadorCuentaReal)
 export class ClasificadorCuentaResolver {
-    constructor(private clasificadorCuentaSvc: ClasificadorCuentaService) {}
+  constructor(private clasificadorCuentaSvc: ClasificadorCuentaService) {}
 
-    @Query(() => ClasificadorCuentasQueryResponse)
-    async getAllClasificadorCuentas(@Args('tipo', { nullable: true }) tipo: string): Promise<ClasificadorCuentasQueryResponse> {
-        return this.clasificadorCuentaSvc.getAllClasificadorCuentas(tipo);
-    }
+  @Query(() => ClasificadorCuentasQueryResponse)
+  async getAllClasificadorCuentas(@Args('tipo', { nullable: true }) tipo: string): Promise<ClasificadorCuentasQueryResponse> {
+    return this.clasificadorCuentaSvc.getAllClasificadorCuentas(tipo);
+  }
 
-    @Query(() => ClasificadorCuentaQueryResponse)
-    async getClasificadorCuenta(
-        @Args('cuenta') cuenta: string,
-        @Args('subcuenta') subcuenta: string,
-        @Args({ name: 'tipo', type: () => Int }) tipo: number,
-    ): Promise<ClasificadorCuentaQueryResponse> {
-        return this.clasificadorCuentaSvc.getClasificadorCuenta(cuenta, subcuenta, tipo);
-    }
+  @Query(() => ClasificadorCuentaQueryResponse)
+  async getClasificadorCuenta(
+    @Args('cuenta') cuenta: string,
+    @Args('subcuenta') subcuenta: string,
+    @Args({ name: 'tipo', type: () => Int }) tipo: number,
+  ): Promise<ClasificadorCuentaQueryResponse> {
+    return this.clasificadorCuentaSvc.getClasificadorCuenta(cuenta, subcuenta, tipo);
+  }
 
-    @Query(() => CuentasAgrupadasQueryResponse)
-    async getCuentasAgrupadas(): Promise<CuentasAgrupadasQueryResponse> {
-        return this.clasificadorCuentaSvc.getCuentasAgrupadas();
-    }
+  @Query(() => CuentasAgrupadasQueryResponse)
+  async getCuentasAgrupadas(): Promise<CuentasAgrupadasQueryResponse> {
+    return this.clasificadorCuentaSvc.getCuentasAgrupadas();
+  }
 
-    @Mutation(() => MutationResponse)
-    async saveClasificadorCuenta(
-        @Args({ name: 'clasificadorInfo', type: () => ClasificadorCuentaRealInput }) clasificadorInfo: ClasificadorCuentaRealInput,
-    ): Promise<ClasificadorCuentasQueryResponse> {
-        return this.clasificadorCuentaSvc.saveClasificadorCuenta(clasificadorInfo);
-    }
+  @Mutation(() => MutationResponse)
+  async saveClasificadorCuenta(
+    @Args({ name: 'clasificadorInfo', type: () => ClasificadorCuentaRealInput }) clasificadorInfo: ClasificadorCuentaRealInput,
+  ): Promise<ClasificadorCuentasQueryResponse> {
+    return this.clasificadorCuentaSvc.saveClasificadorCuenta(clasificadorInfo);
+  }
 
-    @Mutation(() => MutationResponse)
-    async deleteClasificadorCuenta(
-        @Args('cuenta') cuenta: string,
-        @Args('subcuenta') subcuenta: string,
-        @Args({ name: 'tipo', type: () => Int }) tipo: number,
-    ): Promise<ClasificadorCuentasQueryResponse> {
-        return this.clasificadorCuentaSvc.deleteClasificadorCuenta(cuenta, subcuenta, tipo);
-    }
+  @Mutation(() => MutationResponse)
+  async deleteClasificadorCuenta(
+    @Args('cuenta') cuenta: string,
+    @Args('subcuenta') subcuenta: string,
+    @Args({ name: 'tipo', type: () => Int }) tipo: number,
+  ): Promise<ClasificadorCuentasQueryResponse> {
+    return this.clasificadorCuentaSvc.deleteClasificadorCuenta(cuenta, subcuenta, tipo);
+  }
 }

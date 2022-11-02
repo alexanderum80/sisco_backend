@@ -5,7 +5,7 @@ import { ActfijosClasificadorCnmbService } from './actfijos-clasificador-cnmb.se
 import { ActfijosClasificadorCnmbResolver } from './actfijos-clasificador-cnmb.resolver';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([ActFijosClasificadorCnmbEntity])],
-    providers: [ActfijosClasificadorCnmbResolver, ActfijosClasificadorCnmbService],
+  imports: [TypeOrmModule.forFeature([ActFijosClasificadorCnmbEntity])],
+  providers: [ActfijosClasificadorCnmbResolver, ActfijosClasificadorCnmbService],
 })
 export class ActfijosClasificadorCnmbModule {}

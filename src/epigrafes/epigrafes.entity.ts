@@ -4,11 +4,11 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 @ObjectType()
 @Entity()
 export class ContaEpigrafes {
-    @Field()
-    @PrimaryGeneratedColumn()
-    IdEpigafre: number;
+  @Field()
+  @PrimaryGeneratedColumn()
+  IdEpigafre: number;
 
-    @Field()
-    @Column()
-    Epigrafe: string;
+  @Field()
+  @Column()
+  Epigrafe: string;
 }

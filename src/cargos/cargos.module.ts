@@ -6,6 +6,6 @@ import { Cargos } from './cargos.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Cargos])],
-  providers: [CargosResolver, CargosService]
+  providers: [CargosResolver, CargosService],
 })
 export class CargosModule {}

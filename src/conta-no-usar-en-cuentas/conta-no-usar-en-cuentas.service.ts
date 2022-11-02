@@ -9,105 +9,105 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class ContaNoUsarEnCuentasService {
-    constructor(@InjectRepository(ContaNoUsarEnCuentaEntity) private readonly noUsarEnCuentaEntity: Repository<ContaNoUsarEnCuentaEntity>) {}
+  constructor(@InjectRepository(ContaNoUsarEnCuentaEntity) private readonly noUsarEnCuentaEntity: Repository<ContaNoUsarEnCuentaEntity>) {}
 
-    async findAll(user: Usuarios): Promise<ContaNoUsarEnCuentasQueryResponse> {
-        try {
-            const { IdDivision } = user;
+  async findAll(user: Usuarios): Promise<ContaNoUsarEnCuentasQueryResponse> {
+    try {
+      const { IdDivision } = user;
 
-            const criteria = [{ IdDivision: IdDivision }, { Centralizada: true }];
+      const criteria = [{ IdDivision: IdDivision }, { Centralizada: true }];
 
-            return new Promise<ContaNoUsarEnCuentasQueryResponse>(resolve => {
-                this.noUsarEnCuentaEntity
-                    .find({ where: criteria })
-                    .then(result => {
-                        resolve({
-                            success: true,
-                            data: result,
-                        });
-                    })
-                    .catch(err => {
-                        throw new Error(err);
-                    });
+      return new Promise<ContaNoUsarEnCuentasQueryResponse>(resolve => {
+        this.noUsarEnCuentaEntity
+          .find({ where: criteria })
+          .then(result => {
+            resolve({
+              success: true,
+              data: result,
             });
-        } catch (err: any) {
-            return { success: false, error: err.message ? err.message : err };
-        }
+          })
+          .catch(err => {
+            throw new Error(err);
+          });
+      });
+    } catch (err: any) {
+      return { success: false, error: err.message ? err.message : err };
     }
+  }
 
-    async findOne(id: number): Promise<ContaNoUsarEnCuentaQueryResponse> {
-        try {
-            return new Promise<ContaNoUsarEnCuentaQueryResponse>(resolve => {
-                this.noUsarEnCuentaEntity
-                    .findOne({ where: [{ Id: id }] })
-                    .then(result => {
-                        resolve({
-                            success: true,
-                            data: result,
-                        });
-                    })
-                    .catch(err => {
-                        throw new Error(err);
-                    });
+  async findOne(id: number): Promise<ContaNoUsarEnCuentaQueryResponse> {
+    try {
+      return new Promise<ContaNoUsarEnCuentaQueryResponse>(resolve => {
+        this.noUsarEnCuentaEntity
+          .findOne({ where: [{ Id: id }] })
+          .then(result => {
+            resolve({
+              success: true,
+              data: result,
             });
-        } catch (err: any) {
-            return { success: false, error: err.message ? err.message : err };
-        }
+          })
+          .catch(err => {
+            throw new Error(err);
+          });
+      });
+    } catch (err: any) {
+      return { success: false, error: err.message ? err.message : err };
     }
+  }
 
-    async create(user: Usuarios, noUsarEnCuentaInput: ContaNoUsarEnCuentaInput): Promise<MutationResponse> {
-        try {
-            delete noUsarEnCuentaInput.Id;
+  async create(user: Usuarios, noUsarEnCuentaInput: ContaNoUsarEnCuentaInput): Promise<MutationResponse> {
+    try {
+      delete noUsarEnCuentaInput.Id;
 
-            const { IdDivision, IdTipoUsuario } = user;
-            noUsarEnCuentaInput.Centralizada = IdDivision === 100 && IdTipoUsuario === ETipoUsuarios['Usuario Avanzado'];
+      const { IdDivision, IdTipoUsuario } = user;
+      noUsarEnCuentaInput.Centralizada = IdDivision === 100 && IdTipoUsuario === ETipoUsuarios['Usuario Avanzado'];
 
-            return new Promise<MutationResponse>(resolve => {
-                this.noUsarEnCuentaEntity
-                    .save(noUsarEnCuentaInput)
-                    .then(() => {
-                        resolve({ success: true });
-                    })
-                    .catch(err => {
-                        throw new Error(err);
-                    });
-            });
-        } catch (err: any) {
-            return { success: false, error: err.message ? err.message : err };
-        }
+      return new Promise<MutationResponse>(resolve => {
+        this.noUsarEnCuentaEntity
+          .save(noUsarEnCuentaInput)
+          .then(() => {
+            resolve({ success: true });
+          })
+          .catch(err => {
+            throw new Error(err);
+          });
+      });
+    } catch (err: any) {
+      return { success: false, error: err.message ? err.message : err };
     }
+  }
 
-    async update(noUsarEnCuentaInput: ContaNoUsarEnCuentaInput): Promise<MutationResponse> {
-        try {
-            return new Promise<MutationResponse>(resolve => {
-                this.noUsarEnCuentaEntity
-                    .save(noUsarEnCuentaInput)
-                    .then(() => {
-                        resolve({ success: true });
-                    })
-                    .catch(err => {
-                        throw new Error(err);
-                    });
-            });
-        } catch (err: any) {
-            return { success: false, error: err.message ? err.message : err };
-        }
+  async update(noUsarEnCuentaInput: ContaNoUsarEnCuentaInput): Promise<MutationResponse> {
+    try {
+      return new Promise<MutationResponse>(resolve => {
+        this.noUsarEnCuentaEntity
+          .save(noUsarEnCuentaInput)
+          .then(() => {
+            resolve({ success: true });
+          })
+          .catch(err => {
+            throw new Error(err);
+          });
+      });
+    } catch (err: any) {
+      return { success: false, error: err.message ? err.message : err };
     }
+  }
 
-    async delete(IDs: number[]): Promise<MutationResponse> {
-        try {
-            return new Promise<MutationResponse>(resolve => {
-                this.noUsarEnCuentaEntity
-                    .delete(IDs)
-                    .then(() => {
-                        resolve({ success: true });
-                    })
-                    .catch(err => {
-                        throw new Error(err);
-                    });
-            });
-        } catch (err: any) {
-            return { success: false, error: err.message ? err.message : err };
-        }
+  async delete(IDs: number[]): Promise<MutationResponse> {
+    try {
+      return new Promise<MutationResponse>(resolve => {
+        this.noUsarEnCuentaEntity
+          .delete(IDs)
+          .then(() => {
+            resolve({ success: true });
+          })
+          .catch(err => {
+            throw new Error(err);
+          });
+      });
+    } catch (err: any) {
+      return { success: false, error: err.message ? err.message : err };
     }
+  }
 }

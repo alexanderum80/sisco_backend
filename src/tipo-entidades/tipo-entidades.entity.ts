@@ -4,15 +4,15 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 @ObjectType()
 @Entity('Conta_TipoEntidades')
 export class TipoEntidades {
-    @Field()
-    @PrimaryGeneratedColumn()
-    Id: number;
+  @Field()
+  @PrimaryGeneratedColumn()
+  Id: number;
 
-    @Field()
-    @Column()
-    Entidades: string;
+  @Field()
+  @Column()
+  Entidades: string;
 
-    @Field()
-    @Column()
-    Descripcion: string;
+  @Field()
+  @Column()
+  Descripcion: string;
 }

@@ -4,15 +4,15 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 @ObjectType()
 @Entity()
 export class Subdivisiones {
-    @Field()
-    @PrimaryColumn()
-    IdSubdivision: number;
+  @Field()
+  @PrimaryColumn()
+  IdSubdivision: number;
 
-    @Field()
-    @Column()
-    Subdivision: string;
+  @Field()
+  @Column()
+  Subdivision: string;
 
-    @Field()
-    @Column()
-    IdDivision: number;
+  @Field()
+  @Column()
+  IdDivision: number;
 }

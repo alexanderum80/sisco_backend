@@ -6,6 +6,6 @@ import { ClasificadorEntidadesService } from './clasificador-entidades.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([ClasificarEntidades])],
-  providers: [ClasificadorEntidadesResolver, ClasificadorEntidadesService]
+  providers: [ClasificadorEntidadesResolver, ClasificadorEntidadesService],
 })
 export class ClasificadorEntidadesModule {}

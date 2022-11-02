@@ -4,10 +4,10 @@ import { ConciliaUhService } from './concilia-uh.service';
 
 @Resolver()
 export class ConciliaUhResolver {
-    constructor(private readonly conciliaUhService: ConciliaUhService) {}
+  constructor(private readonly conciliaUhService: ConciliaUhService) {}
 
-    @Query(() => [ConciliaUH])
-    async conciliaUH(@Args({ name: 'conciliaUhInput', type: () => ConciliaUhInput }) conciliaAftInput: ConciliaUhInput): Promise<ConciliaUH[]> {
-        return this.conciliaUhService.concilia(conciliaAftInput);
-    }
+  @Query(() => [ConciliaUH])
+  async conciliaUH(@Args({ name: 'conciliaUhInput', type: () => ConciliaUhInput }) conciliaAftInput: ConciliaUhInput): Promise<ConciliaUH[]> {
+    return this.conciliaUhService.concilia(conciliaAftInput);
+  }
 }

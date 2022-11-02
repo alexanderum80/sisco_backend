@@ -6,6 +6,6 @@ import { EpigrafesService } from './epigrafes.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([ContaEpigrafes])],
-  providers: [EpigrafesResolver, EpigrafesService]
+  providers: [EpigrafesResolver, EpigrafesService],
 })
 export class EpigrafesModule {}

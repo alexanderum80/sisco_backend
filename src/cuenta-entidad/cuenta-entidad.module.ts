@@ -7,6 +7,6 @@ import { CuentaEntidadService } from './cuenta-entidad.service';
 @Module({
   imports: [TypeOrmModule.forFeature([ContaCuentaentidad])],
   providers: [CuentaEntidadResolver, CuentaEntidadService],
-  exports: [CuentaEntidadService]
+  exports: [CuentaEntidadService],
 })
 export class CuentaEntidadModule {}

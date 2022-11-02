@@ -3,46 +3,45 @@ import { ContaElementosGastos } from './elementos-gastos.entity';
 
 @ObjectType()
 export class ElementosGastosQueryResponse {
-    @Field()
-    success: Boolean;
+  @Field()
+  success: boolean;
 
-    @Field(() => [ContaElementosGastos], { nullable: true })
-    data?: ContaElementosGastos[];
+  @Field(() => [ContaElementosGastos], { nullable: true })
+  data?: ContaElementosGastos[];
 
-    @Field(() => String, { nullable: true })
-    error?: String;
+  @Field(() => String, { nullable: true })
+  error?: string;
 }
 
 @ObjectType()
 export class ElementoGastoQueryResponse {
-    @Field()
-    success: Boolean;
+  @Field()
+  success: boolean;
 
-    @Field(() => ContaElementosGastos, { nullable: true })
-    data?: ContaElementosGastos;
+  @Field(() => ContaElementosGastos, { nullable: true })
+  data?: ContaElementosGastos;
 
-    @Field(() => String, { nullable: true })
-    error?: String;
+  @Field(() => String, { nullable: true })
+  error?: string;
 }
 
 @InputType()
 export class ElementoGastoInput {
-    @Field()
-    Egasto: string;
+  @Field()
+  Egasto: string;
 
-    @Field()
-    Descripcion: string;
+  @Field()
+  Descripcion: string;
 
-    @Field()
-    UsoContenido: string;
+  @Field()
+  UsoContenido: string;
 
-    @Field()
-    TipoEntidad: string;
+  @Field()
+  TipoEntidad: string;
 
-    @Field()
-    CuentaAsociada: string;
+  @Field()
+  CuentaAsociada: string;
 
-    @Field()
-    IdEpigrafe: number;
+  @Field()
+  IdEpigrafe: number;
 }
-

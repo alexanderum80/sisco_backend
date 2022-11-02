@@ -1,4 +1,3 @@
-
 export const queryParteAtrasos = `SELECT UC.IdUnidad, MIN(UC.Nombre) AS Nombre, MIN(UC.IdDivision) AS IdDivision, MIN(Divisiones.Division) AS Division,
     CASE WHEN MAX(Fecha) IS NOT NULL THEN LTrim(Str(DateDiff(day, MAX(Fecha), GetDate() -1))) ELSE 'infinito' END AS Atraso
     FROM (SELECT G.IdGAM, G.IdGerencia, g.Ano, g.Mes, g.Fecha, g.Version, G.UltimaCircular

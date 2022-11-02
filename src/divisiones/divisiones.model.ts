@@ -3,24 +3,24 @@ import { ObjectType, Field } from '@nestjs/graphql';
 
 @ObjectType()
 export class DivisionesQueryResponse {
-    @Field()
-    success: Boolean;
+  @Field()
+  success: boolean;
 
-    @Field(() => [Divisiones], { nullable: true })
-    data?: Divisiones[];
+  @Field(() => [Divisiones], { nullable: true })
+  data?: Divisiones[];
 
-    @Field(() => String, { nullable: true })
-    error?: String;
+  @Field(() => String, { nullable: true })
+  error?: string;
 }
 
 @ObjectType()
 export class DivisionQueryResponse {
-    @Field()
-    success: Boolean;
+  @Field()
+  success: boolean;
 
-    @Field(() => Divisiones, { nullable: true })
-    data?: Divisiones;
+  @Field(() => Divisiones, { nullable: true })
+  data?: Divisiones;
 
-    @Field(() => String, { nullable: true })
-    error?: String;
+  @Field(() => String, { nullable: true })
+  error?: string;
 }

@@ -5,12 +5,10 @@ import { ContaTipovalorExpresionesService } from './conta-tipovalor-expresiones.
 
 @Resolver(() => ContaTipoValorExpresionesEntity)
 export class ContaTipovalorExpresionesResolver {
-    constructor(
-        private contaTipoValorExpresionesSvc: ContaTipovalorExpresionesService
-    ) {}
+  constructor(private contaTipoValorExpresionesSvc: ContaTipovalorExpresionesService) {}
 
-    @Query(() => ContaTipoValorExpresionesQueryResponse)
-    async getAllContaTipoValorExpresiones(): Promise<ContaTipoValorExpresionesQueryResponse> {
-        return this.contaTipoValorExpresionesSvc.getAllContaTipoValorExpresiones();
-    }
+  @Query(() => ContaTipoValorExpresionesQueryResponse)
+  async getAllContaTipoValorExpresiones(): Promise<ContaTipoValorExpresionesQueryResponse> {
+    return this.contaTipoValorExpresionesSvc.getAllContaTipoValorExpresiones();
+  }
 }

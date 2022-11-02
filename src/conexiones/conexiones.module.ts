@@ -3,6 +3,6 @@ import { ConexionesResolver } from './conexiones.resolver';
 import { ConexionesService } from './conexiones.service';
 
 @Module({
-  providers: [ConexionesResolver, ConexionesService]
+  providers: [ConexionesResolver, ConexionesService],
 })
 export class ConexionesModule {}

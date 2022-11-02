@@ -1,13 +1,13 @@
-import { Column, Entity } from "typeorm";
+import { Column, Entity } from 'typeorm';
 
-@Entity("Golden_Tipos de Ajustes", { schema: "dbo" })
+@Entity('Golden_Tipos de Ajustes', { schema: 'dbo' })
 export class GoldenTiposDeAjustes {
-  @Column("tinyint", { name: "IdTipoAjuste", nullable: true })
+  @Column('tinyint', { name: 'IdTipoAjuste', nullable: true })
   idTipoAjuste: number | null;
 
-  @Column("nvarchar", { name: "TipoAjuste", length: 50 })
+  @Column('nvarchar', { name: 'TipoAjuste', length: 50 })
   tipoAjuste: string;
 
-  @Column("smallint", { name: "Signo" })
+  @Column('smallint', { name: 'Signo' })
   signo: number;
 }

@@ -7,35 +7,33 @@ import { UseGuards } from '@nestjs/common';
 
 @Resolver()
 export class ConciliaContaResolver {
-    constructor(private conciliaContaSvc: ConciliaContaService) {}
+  constructor(private conciliaContaSvc: ConciliaContaService) {}
 
-    @Query(() => ConciliaContabilidadQueryResponse)
-    @UseGuards(new AuthGuard())
-    async conciliaContabilidad(
-        @Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios,
-        @Args({ name: 'conciliaContaInput', type: () => ConciliaContaInput }) conciliaContaInput: ConciliaContaInput,
-    ): Promise<ConciliaContabilidadQueryResponse> {
-        return this.conciliaContaSvc.conciliaContabilidad(user, conciliaContaInput);
-    }
+  @Query(() => ConciliaContabilidadQueryResponse)
+  @UseGuards(new AuthGuard())
+  async conciliaContabilidad(
+    @Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios,
+    @Args({ name: 'conciliaContaInput', type: () => ConciliaContaInput }) conciliaContaInput: ConciliaContaInput,
+  ): Promise<ConciliaContabilidadQueryResponse> {
+    return this.conciliaContaSvc.conciliaContabilidad(user, conciliaContaInput);
+  }
 
-    @Mutation(() => ConciliaContabilidadQueryResponse)
-    async iniciarSaldos(@Args({ name: 'iniciarSaldosInput', type: () => IniciarSaldosInput }) iniciarSaldosInput: IniciarSaldosInput): Promise<ConciliaContabilidadQueryResponse> {
-        return this.conciliaContaSvc.iniciarSaldos(iniciarSaldosInput);
-    }
+  @Mutation(() => ConciliaContabilidadQueryResponse)
+  async iniciarSaldos(@Args({ name: 'iniciarSaldosInput', type: () => IniciarSaldosInput }) iniciarSaldosInput: IniciarSaldosInput): Promise<ConciliaContabilidadQueryResponse> {
+    return this.conciliaContaSvc.iniciarSaldos(iniciarSaldosInput);
+  }
 
-    @Mutation(() => ConciliaContaQueryResponse)
-    async chequearCentros(
-        @Args({ name: 'chequearCentrosInput', type: () => ChequearCentrosInput }) chequearCentrosInput: ChequearCentrosInput,
-    ): Promise<ConciliaContaQueryResponse> {
-        return this.conciliaContaSvc.chequearCentro(chequearCentrosInput);
-    }
+  @Mutation(() => ConciliaContaQueryResponse)
+  async chequearCentros(@Args({ name: 'chequearCentrosInput', type: () => ChequearCentrosInput }) chequearCentrosInput: ChequearCentrosInput): Promise<ConciliaContaQueryResponse> {
+    return this.conciliaContaSvc.chequearCentro(chequearCentrosInput);
+  }
 
-    @Mutation(() => ConciliaContaQueryResponse)
-    async arreglaClasificadorCuenta(
-        @Args({ name: 'idUnidad', type: () => Int }) idUnidad: number,
-        @Args({ name: 'tipoUnidad', type: () => String }) tipoUnidad: string,
-        @Args({ name: 'annio', type: () => String }) annio: string,
-    ): Promise<ConciliaContaQueryResponse> {
-        return this.conciliaContaSvc.arreglaClasificadorCuenta(idUnidad, tipoUnidad, annio);
-    }
+  @Mutation(() => ConciliaContaQueryResponse)
+  async arreglaClasificadorCuenta(
+    @Args({ name: 'idUnidad', type: () => Int }) idUnidad: number,
+    @Args({ name: 'tipoUnidad', type: () => String }) tipoUnidad: string,
+    @Args({ name: 'annio', type: () => String }) annio: string,
+  ): Promise<ConciliaContaQueryResponse> {
+    return this.conciliaContaSvc.arreglaClasificadorCuenta(idUnidad, tipoUnidad, annio);
+  }
 }

@@ -424,6 +424,8 @@ type ClasificarEntidades {
   Unidad: String
   IdTipoEntidad: Float!
   TipoEntidad: String!
+  Division: String!
+  SubDivision: String!
 }
 
 type ClasificadorEntidadesQueryResponse {

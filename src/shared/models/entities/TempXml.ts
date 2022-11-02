@@ -1,7 +1,7 @@
-import { Column, Entity } from "typeorm";
+import { Column, Entity } from 'typeorm';
 
-@Entity("TempXML", { schema: "dbo" })
+@Entity('TempXML', { schema: 'dbo' })
 export class TempXml {
-  @Column("xml", { name: "XML_Data" })
+  @Column('xml', { name: 'XML_Data' })
   xmlData: string;
 }

@@ -8,17 +8,17 @@ import { AuthGuard, DEFAULT_GRAPHQL_CONTEXT } from '../shared/helpers/auth.guard
 
 @Resolver(() => Divisiones)
 export class DivisionesResolver {
-    constructor(private _divisionesService: DivisionesService) {}
+  constructor(private _divisionesService: DivisionesService) {}
 
-    @Query(() => DivisionesQueryResponse)
-    @UseGuards(new AuthGuard())
-    async getAllDivisiones(@Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios): Promise<DivisionesQueryResponse> {
-        return this._divisionesService.getAllDivisiones(user);
-    }
+  @Query(() => DivisionesQueryResponse)
+  @UseGuards(new AuthGuard())
+  async getAllDivisiones(@Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios): Promise<DivisionesQueryResponse> {
+    return this._divisionesService.getAllDivisiones(user);
+  }
 
-    @Query(() => DivisionesQueryResponse)
-    @UseGuards(new AuthGuard())
-    async getDivisionById(@Args({ name: 'id', type: () => Int }) id: number): Promise<DivisionesQueryResponse> {
-        return this._divisionesService.getDivisionById(id);
-    }
+  @Query(() => DivisionesQueryResponse)
+  @UseGuards(new AuthGuard())
+  async getDivisionById(@Args({ name: 'id', type: () => Int }) id: number): Promise<DivisionesQueryResponse> {
+    return this._divisionesService.getDivisionById(id);
+  }
 }

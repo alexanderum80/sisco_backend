@@ -4,19 +4,19 @@ import { Entity, PrimaryColumn } from 'typeorm';
 @ObjectType()
 @Entity()
 export class ContaCuentaentidad {
-    @Field()
-    @PrimaryColumn()
-    Cuenta: string;
+  @Field()
+  @PrimaryColumn()
+  Cuenta: string;
 
-    @Field()
-    @PrimaryColumn()
-    SubCuenta: string;
+  @Field()
+  @PrimaryColumn()
+  SubCuenta: string;
 
-    @Field()
-    @PrimaryColumn()
-    TipoEntidad: number;
+  @Field()
+  @PrimaryColumn()
+  TipoEntidad: number;
 
-    @Field()
-    @PrimaryColumn()
-    TipoClasificador: number;
+  @Field()
+  @PrimaryColumn()
+  TipoClasificador: number;
 }

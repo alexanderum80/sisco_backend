@@ -2,131 +2,131 @@ import { ObjectType, Field, InputType } from '@nestjs/graphql';
 
 @ObjectType()
 export class RodasDWHQueryResponse {
-    @Field()
-    success: boolean;
+  @Field()
+  success: boolean;
 
-    @Field({ nullable: true })
-    data?: string;
+  @Field({ nullable: true })
+  data?: string;
 
-    @Field(() => String, { nullable: true })
-    error?: string;
+  @Field(() => String, { nullable: true })
+  error?: string;
 }
 
 @ObjectType()
 export class ConciliaDWH {
-    @Field()
-    Tipo: string;
+  @Field()
+  Tipo: string;
 
-    @Field()
-    IdCentro: number;
+  @Field()
+  IdCentro: number;
 
-    @Field()
-    IdUnidad: string;
+  @Field()
+  IdUnidad: string;
 
-    @Field()
-    Unidad: string;
+  @Field()
+  Unidad: string;
 
-    @Field()
-    IdPiso: string;
+  @Field()
+  IdPiso: string;
 
-    @Field({ nullable: true })
-    Almacen?: string;
+  @Field({ nullable: true })
+  Almacen?: string;
 
-    @Field({ nullable: true })
-    Cuenta?: string;
+  @Field({ nullable: true })
+  Cuenta?: string;
 
-    @Field()
-    Periodo: string;
+  @Field()
+  Periodo: string;
 
-    @Field()
-    SaldoGolden: number;
+  @Field()
+  SaldoGolden: number;
 
-    @Field()
-    SaldoRestaurador: number;
+  @Field()
+  SaldoRestaurador: number;
 
-    @Field()
-    DifGoldenRest: number;
+  @Field()
+  DifGoldenRest: number;
 
-    @Field()
-    SaldoDistribuidor: number;
+  @Field()
+  SaldoDistribuidor: number;
 
-    @Field()
-    DifGoldenDist: number;
+  @Field()
+  DifGoldenDist: number;
 
-    @Field()
-    SaldoRodas: number;
+  @Field()
+  SaldoRodas: number;
 
-    @Field()
-    DifGoldenRodas: number;
+  @Field()
+  DifGoldenRodas: number;
 
-    @Field()
-    IdDivision: number;
+  @Field()
+  IdDivision: number;
 
-    @Field()
-    Division: string;
+  @Field()
+  Division: string;
 
-    @Field({ nullable: true })
-    CuentaR?: string;
+  @Field({ nullable: true })
+  CuentaR?: string;
 
-    @Field({ nullable: true })
-    Nota?: string;
+  @Field({ nullable: true })
+  Nota?: string;
 }
 
 @ObjectType()
 export class ConciliaDWHQueryResponse {
-    @Field()
-    success: boolean;
+  @Field()
+  success: boolean;
 
-    @Field(() => [ConciliaDWH], { nullable: true })
-    data?: ConciliaDWH[];
+  @Field(() => [ConciliaDWH], { nullable: true })
+  data?: ConciliaDWH[];
 
-    @Field(() => String, { nullable: true })
-    error?: string;
+  @Field(() => String, { nullable: true })
+  error?: string;
 }
 
 @ObjectType()
 export class ParteAtrasosQueryResponse {
-    @Field()
-    success: boolean;
+  @Field()
+  success: boolean;
 
-    @Field({ nullable: true })
-    data?: string;
+  @Field({ nullable: true })
+  data?: string;
 
-    @Field(() => String, { nullable: true })
-    error?: string;
+  @Field(() => String, { nullable: true })
+  error?: string;
 }
 
 @ObjectType()
 export class DatosIdGAMQueryResponse {
-    @Field()
-    success: boolean;
+  @Field()
+  success: boolean;
 
-    @Field({ nullable: true })
-    data?: string;
+  @Field({ nullable: true })
+  data?: string;
 
-    @Field(() => String, { nullable: true })
-    error?: string;
+  @Field(() => String, { nullable: true })
+  error?: string;
 }
 
 @InputType()
 export class ConciliaDWHInput {
-    @Field()
-    idDivision: number;
+  @Field()
+  idDivision: number;
 
-    @Field()
-    idCentro: number;
+  @Field()
+  idCentro: number;
 
-    @Field()
-    periodo: number;
+  @Field()
+  periodo: number;
 
-    @Field()
-    annio: number;
+  @Field()
+  annio: number;
 
-    @Field()
-    tipoCentro: number;
+  @Field()
+  tipoCentro: number;
 
-    @Field()
-    ventasAcumuladas: boolean;
+  @Field()
+  ventasAcumuladas: boolean;
 }
 
 export const queryInventarioDWH = `SELECT @Centro as IdCentro, GAM.IdGerencia as IdUnidad, CASE WHEN @Cons = 1 THEN 0 ELSE EP.IdPiso END AS IdPiso, GAM.Mes as Periodo,

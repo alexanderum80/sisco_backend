@@ -10,5 +10,5 @@ export class TipoUsuarios {
 
   @Field()
   @Column()
-  TipoUsuario: string
+  TipoUsuario: string;
 }

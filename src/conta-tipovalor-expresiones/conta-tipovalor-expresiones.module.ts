@@ -6,6 +6,6 @@ import { ContaTipoValorExpresionesEntity } from './conta-tipovalor-expresiones.e
 
 @Module({
   imports: [TypeOrmModule.forFeature([ContaTipoValorExpresionesEntity])],
-  providers: [ContaTipovalorExpresionesService, ContaTipovalorExpresionesResolver]
+  providers: [ContaTipovalorExpresionesService, ContaTipovalorExpresionesResolver],
 })
 export class ContaTipovalorExpresionesModule {}

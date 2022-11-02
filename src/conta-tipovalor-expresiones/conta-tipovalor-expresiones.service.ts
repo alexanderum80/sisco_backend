@@ -6,24 +6,25 @@ import { ContaTipoValorExpresionesQueryResponse } from './conta-tipovalor-expres
 
 @Injectable()
 export class ContaTipovalorExpresionesService {
-    constructor(
-        @InjectRepository(ContaTipoValorExpresionesEntity) private readonly tipoValorExpresionesRepos: Repository<ContaTipoValorExpresionesEntity>,
-    ) {}
+  constructor(@InjectRepository(ContaTipoValorExpresionesEntity) private readonly tipoValorExpresionesRepos: Repository<ContaTipoValorExpresionesEntity>) {}
 
-    async getAllContaTipoValorExpresiones(): Promise<ContaTipoValorExpresionesQueryResponse> {
-        try {
-            return new Promise<ContaTipoValorExpresionesQueryResponse>(resolve => {
-                this.tipoValorExpresionesRepos.find().then(result => {
-                    resolve({
-                        success: true,
-                        data: result
-                    });
-                }).catch(err => {
-                    throw new Error(err);
-                });
+  async getAllContaTipoValorExpresiones(): Promise<ContaTipoValorExpresionesQueryResponse> {
+    try {
+      return new Promise<ContaTipoValorExpresionesQueryResponse>(resolve => {
+        this.tipoValorExpresionesRepos
+          .find()
+          .then(result => {
+            resolve({
+              success: true,
+              data: result,
             });
-        } catch (err: any) {
-            return { success: false, error: err.message ? err.message : err };
-        }
+          })
+          .catch(err => {
+            throw new Error(err);
+          });
+      });
+    } catch (err: any) {
+      return { success: false, error: err.message ? err.message : err };
     }
+  }
 }

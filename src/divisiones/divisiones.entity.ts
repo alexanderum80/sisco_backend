@@ -4,11 +4,11 @@ import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 @ObjectType()
 @Entity()
 export class Divisiones {
-    @Field()
-    @PrimaryGeneratedColumn()
-    IdDivision: number;
+  @Field()
+  @PrimaryGeneratedColumn()
+  IdDivision: number;
 
-    @Field()
-    @Column()
-    Division: string;
+  @Field()
+  @Column()
+  Division: string;
 }

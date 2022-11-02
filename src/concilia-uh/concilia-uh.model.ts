@@ -2,68 +2,68 @@ import { Field, InputType, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
 export class ConciliaUH {
-    @Field()
-    Tipo: string;
+  @Field()
+  Tipo: string;
 
-    @Field()
-    IdDivision: number;
+  @Field()
+  IdDivision: number;
 
-    @Field()
-    Division: string;
+  @Field()
+  Division: string;
 
-    @Field()
-    SubDivision: string;
+  @Field()
+  SubDivision: string;
 
-    @Field()
-    Centro: string;
+  @Field()
+  Centro: string;
 
-    @Field()
-    IdCentro: number;
+  @Field()
+  IdCentro: number;
 
-    @Field()
-    IdUnidad: number;
+  @Field()
+  IdUnidad: number;
 
-    @Field()
-    Unidad: string;
+  @Field()
+  Unidad: string;
 
-    @Field()
-    Periodo: number;
+  @Field()
+  Periodo: number;
 
-    @Field()
-    Cuenta: string;
+  @Field()
+  Cuenta: string;
 
-    @Field()
-    SubCuenta: string;
+  @Field()
+  SubCuenta: string;
 
-    @Field()
-    Analisis1: string;
+  @Field()
+  Analisis1: string;
 
-    @Field()
-    Analisis2: string;
+  @Field()
+  Analisis2: string;
 
-    @Field()
-    Analisis3: string;
+  @Field()
+  Analisis3: string;
 
-    @Field()
-    SaldoUH: number;
+  @Field()
+  SaldoUH: number;
 
-    @Field()
-    SaldoRodas: number;
+  @Field()
+  SaldoRodas: number;
 
-    @Field()
-    Diferencia: number;
+  @Field()
+  Diferencia: number;
 }
 
 @InputType()
 export class ConciliaUhInput {
-    @Field()
-    idCentro: number;
+  @Field()
+  idCentro: number;
 
-    @Field()
-    periodo: number;
+  @Field()
+  periodo: number;
 
-    @Field()
-    annio: number;
+  @Field()
+  annio: number;
 }
 
 export const queryUhCategorias = `SELECT CodCategoria, Categoria, CuentaMN, SubCuentaMN, Analisis1MN, Analisis2MN, Analisis3MN, CuentaMLC, SubCuentaMLC, Analisis1MLC, Analisis2MLC, Analisis3MLC, CuentaMND, SubCuentaMND, Analisis1MND, 

@@ -10,38 +10,38 @@ export class ContaConexionesQueryResponse extends MultipleQueryResponse(ContaCon
 
 @InputType()
 export class ContaConexionInput {
-    @Field({ nullable: true })
-    Id?: number;
+  @Field({ nullable: true })
+  Id?: number;
 
-    @Field()
-    IdUnidad: number;
+  @Field()
+  IdUnidad: number;
 
-    @Field()
-    Consolidado: boolean;
+  @Field()
+  Consolidado: boolean;
 
-    @Field()
-    IdDivision: number;
+  @Field()
+  IdDivision: number;
 
-    @Field({ nullable: true })
-    IpRodas: string;
+  @Field({ nullable: true })
+  IpRodas: string;
 
-    @Field({ nullable: true })
-    Usuario: string;
+  @Field({ nullable: true })
+  Usuario: string;
 
-    @Field({ nullable: true })
-    Contrasena: string;
+  @Field({ nullable: true })
+  Contrasena: string;
 
-    @Field({ nullable: true })
-    BaseDatos: string;
+  @Field({ nullable: true })
+  BaseDatos: string;
 }
 
 @ObjectType()
 export class EstadoConexionesRodas {
-    @Field()
-    Unidad: string;
+  @Field()
+  Unidad: string;
 
-    @Field()
-    Estado: string;
+  @Field()
+  Estado: string;
 }
 
 @ObjectType()

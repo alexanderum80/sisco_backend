@@ -6,6 +6,6 @@ import { ContaExpresionesService } from './conta-expresiones.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([ExpresionesResumenEntity, ExpresionesDetalleEntity])],
-  providers: [ContaExpresionesResumenResolver, ContaExpresionesDetalleResolver, ContaExpresionesService]
+  providers: [ContaExpresionesResumenResolver, ContaExpresionesDetalleResolver, ContaExpresionesService],
 })
 export class ContaExpresionesModule {}

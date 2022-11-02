@@ -6,6 +6,6 @@ import { ConciliaNacContabilidadService } from './concilia-nac-contabilidad.serv
 
 @Module({
   imports: [TypeOrmModule.forFeature([ConcnacContabilidad])],
-  providers: [ConciliaNacContabilidadResolver, ConciliaNacContabilidadService]
+  providers: [ConciliaNacContabilidadResolver, ConciliaNacContabilidadService],
 })
 export class ConciliaNacContabilidadModule {}

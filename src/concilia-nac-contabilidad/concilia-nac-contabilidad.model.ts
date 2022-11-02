@@ -3,147 +3,147 @@ import { Field, InputType, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
 export class ConciliaNacContabilidadQueryResponse {
-    @Field()
-    success: Boolean;
+  @Field()
+  success: boolean;
 
-    @Field(() => [ConcnacContabilidad], { nullable: true })
-    data?: ConcnacContabilidad[];
+  @Field(() => [ConcnacContabilidad], { nullable: true })
+  data?: ConcnacContabilidad[];
 
-    @Field(() => String, { nullable: true })
-    error?: String;
+  @Field(() => String, { nullable: true })
+  error?: string;
 }
 
 @ObjectType()
 export class ViewConciliaNacContabilidadQueryResponse {
-    @Field()
-    success: Boolean;
+  @Field()
+  success: boolean;
 
-    @Field(() => [ConcnacContabilidad], { nullable: true })
-    data?: ConcnacContabilidad[];
+  @Field(() => [ConcnacContabilidad], { nullable: true })
+  data?: ConcnacContabilidad[];
 
-    @Field(() => String, { nullable: true })
-    error?: String;
+  @Field(() => String, { nullable: true })
+  error?: string;
 }
 
 @ObjectType()
 export class ViewConciliaNacContabilidad {
-    @Field()
-    Id: number;
+  @Field()
+  Id: number;
 
-    @Field()
-    Annio: string;
+  @Field()
+  Annio: string;
 
-    @Field()
-    Mes: number;
+  @Field()
+  Mes: number;
 
-    @Field()
-    Tipo: string;
+  @Field()
+  Tipo: string;
 
-    @Field()
-    CuentaE: string;
+  @Field()
+  CuentaE: string;
 
-    @Field()
-    SubCuentaE: string;
+  @Field()
+  SubCuentaE: string;
 
-    @Field()
-    DivisionEmisorE: number;
+  @Field()
+  DivisionEmisorE: number;
 
-    @Field()
-    Emisor: number;
+  @Field()
+  Emisor: number;
 
-    @Field()
-    DivisionReceptorE: number;
+  @Field()
+  DivisionReceptorE: number;
 
-    @Field()
-    EmitidoA: number;
+  @Field()
+  EmitidoA: number;
 
-    @Field()
-    DocumentoE: string;
+  @Field()
+  DocumentoE: string;
 
-    @Field()
-    FechaE: Date;
+  @Field()
+  FechaE: Date;
 
-    @Field()
-    ValorE: number;
+  @Field()
+  ValorE: number;
 
-    @Field()
-    CuentaR: string;
+  @Field()
+  CuentaR: string;
 
-    @Field()
-    SubCuentaR: string;
+  @Field()
+  SubCuentaR: string;
 
-    @Field()
-    DivisionReceptorR: number;
+  @Field()
+  DivisionReceptorR: number;
 
-    @Field()
-    Receptor: number;
+  @Field()
+  Receptor: number;
 
-    @Field()
-    DivisionEmisorR: number;
+  @Field()
+  DivisionEmisorR: number;
 
-    @Field()
-    RecibidoDe: number;
+  @Field()
+  RecibidoDe: number;
 
-    @Field()
-    DocumentoR: string;
+  @Field()
+  DocumentoR: string;
 
-    @Field()
-    FechaR: Date;
+  @Field()
+  FechaR: Date;
 
-    @Field()
-    ValorR: number;
+  @Field()
+  ValorR: number;
 
-    @Field()
-    DiferenciaDias: number;
+  @Field()
+  DiferenciaDias: number;
 
-    @Field()
-    DiferenciaImporte: number;
+  @Field()
+  DiferenciaImporte: number;
 
-    @Field()
-    Recibido: boolean;
+  @Field()
+  Recibido: boolean;
 }
 
 @ObjectType()
 export class ActaConciliacionQueryResponse {
-    @Field()
-    success: Boolean;
+  @Field()
+  success: boolean;
 
-    @Field(() => [ActaConciliacion], { nullable: true })
-    data?: ActaConciliacion[];
+  @Field(() => [ActaConciliacion], { nullable: true })
+  data?: ActaConciliacion[];
 
-    @Field(() => String, { nullable: true })
-    error?: String;
+  @Field(() => String, { nullable: true })
+  error?: string;
 }
 
 @ObjectType()
 export class ActaConciliacion {
-    @Field()
-    ID: number;
+  @Field()
+  ID: number;
 
-    @Field()
-    Detalle: number;
+  @Field()
+  Detalle: number;
 
-    @Field()
-    Emisor: number;
+  @Field()
+  Emisor: number;
 
-    @Field()
-    Receptor: number;
+  @Field()
+  Receptor: number;
 
-    @Field()
-    SaldoEmisor: number;
+  @Field()
+  SaldoEmisor: number;
 
-    @Field()
-    SaldoReceptor: number;
+  @Field()
+  SaldoReceptor: number;
 
-    @Field()
-    Diferencia: number;
+  @Field()
+  Diferencia: number;
 }
 
 @InputType()
 export class ConciliaNacContabilidadInput {
-    @Field()
-    Id: number;
+  @Field()
+  Id: number;
 
-    @Field()
-    Recibido: boolean;
+  @Field()
+  Recibido: boolean;
 }

@@ -4,17 +4,23 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 @ObjectType()
 @Entity('Conta_ClasificarUnidades')
 export class ClasificarEntidades {
-    @Field()
-    @PrimaryColumn()
-    IdUnidad: number;
+  @Field()
+  @PrimaryColumn()
+  IdUnidad: number;
 
-    @Field({ nullable: true })
-    Unidad: string
+  @Field({ nullable: true })
+  Unidad: string;
 
-    @Field()
-    @Column()
-    IdTipoEntidad: number;
+  @Field()
+  @Column()
+  IdTipoEntidad: number;
 
-    @Field()
-    TipoEntidad: string
+  @Field()
+  TipoEntidad: string;
+
+  @Field()
+  Division: string;
+
+  @Field()
+  SubDivision: string;
 }

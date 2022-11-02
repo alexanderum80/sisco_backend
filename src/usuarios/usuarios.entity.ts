@@ -6,40 +6,40 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 't
 @ObjectType()
 @Entity()
 export class Usuarios {
-    @Field()
-    @PrimaryGeneratedColumn()
-    IdUsuario: number;
+  @Field()
+  @PrimaryGeneratedColumn()
+  IdUsuario: number;
 
-    @Field()
-    @Column()
-    Usuario: string;
+  @Field()
+  @Column()
+  Usuario: string;
 
-    @Field()
-    @Column()
-    Contrasena?: string;
+  @Field()
+  @Column()
+  Contrasena?: string;
 
-    @Field()
-    @Column()
-    IdTipoUsuario: number;
+  @Field()
+  @Column()
+  IdTipoUsuario: number;
 
-    @Field(() => TipoUsuarios)
-    @ManyToOne(() => TipoUsuarios, tipoUsuarios => tipoUsuarios.IdTipo)
-    @JoinColumn({ name: 'IdTipoUsuario', referencedColumnName: 'IdTipo' })
-    TipoUsuario?: TipoUsuarios;
+  @Field(() => TipoUsuarios)
+  @ManyToOne(() => TipoUsuarios, tipoUsuarios => tipoUsuarios.IdTipo)
+  @JoinColumn({ name: 'IdTipoUsuario', referencedColumnName: 'IdTipo' })
+  TipoUsuario?: TipoUsuarios;
 
-    @Field()
-    @Column()
-    CambiarContrasena: boolean;
+  @Field()
+  @Column()
+  CambiarContrasena: boolean;
 
-    @Field()
-    @Column()
-    IdDivision: number;
+  @Field()
+  @Column()
+  IdDivision: number;
 
-    @Field(() => Divisiones)
-    @ManyToOne(() => Divisiones, divisiones => divisiones.IdDivision)
-    @JoinColumn({ name: 'IdDivision', referencedColumnName: 'IdDivision' })
-    Division?: Divisiones;
+  @Field(() => Divisiones)
+  @ManyToOne(() => Divisiones, divisiones => divisiones.IdDivision)
+  @JoinColumn({ name: 'IdDivision', referencedColumnName: 'IdDivision' })
+  Division?: Divisiones;
 
-    @Field()
-    Token: string;
+  @Field()
+  Token: string;
 }

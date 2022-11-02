@@ -3,12 +3,12 @@ import { ContaTipoValorExpresionesEntity } from './conta-tipovalor-expresiones.e
 
 @ObjectType()
 export class ContaTipoValorExpresionesQueryResponse {
-    @Field()
-    success: Boolean;
+  @Field()
+  success: boolean;
 
-    @Field(() => [ContaTipoValorExpresionesEntity], { nullable: true })
-    data?: ContaTipoValorExpresionesEntity[];
+  @Field(() => [ContaTipoValorExpresionesEntity], { nullable: true })
+  data?: ContaTipoValorExpresionesEntity[];
 
-    @Field(() => String, { nullable: true })
-    error?: String;
+  @Field(() => String, { nullable: true })
+  error?: string;
 }

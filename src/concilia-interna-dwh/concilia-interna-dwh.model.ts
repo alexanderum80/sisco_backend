@@ -2,71 +2,71 @@ import { Field, InputType, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
 class ConciliacionInterna {
-    @Field()
-    Documento: string;
+  @Field()
+  Documento: string;
 
-    @Field()
-    Emisor: string;
+  @Field()
+  Emisor: string;
 
-    @Field()
-    FechaE: Date;
+  @Field()
+  FechaE: Date;
 
-    @Field()
-    ImporteE: number;
+  @Field()
+  ImporteE: number;
 
-    @Field()
-    Receptor: string;
+  @Field()
+  Receptor: string;
 
-    @Field()
-    FechaR: Date;
+  @Field()
+  FechaR: Date;
 
-    @Field()
-    ImporteR: number;
+  @Field()
+  ImporteR: number;
 
-    @Field()
-    Diferencia: number;
+  @Field()
+  Diferencia: number;
 }
 
 @ObjectType()
 export class ConciliacionInternaDWHQueryResponse {
-    @Field()
-    success: boolean;
+  @Field()
+  success: boolean;
 
-    @Field(() => [ConciliacionInterna], { nullable: true })
-    data?: ConciliacionInterna[];
+  @Field(() => [ConciliacionInterna], { nullable: true })
+  data?: ConciliacionInterna[];
 
-    @Field({ nullable: true })
-    error?: string;
+  @Field({ nullable: true })
+  error?: string;
 }
 
 @InputType()
 export class ConciliaInternaDWHInput {
-    @Field()
-    FechaInicial: string;
+  @Field()
+  FechaInicial: string;
 
-    @Field()
-    FechaFinal: string;
+  @Field()
+  FechaFinal: string;
 
-    @Field()
-    IdDivision: number;
+  @Field()
+  IdDivision: number;
 
-    @Field()
-    IdSubdivision: number;
+  @Field()
+  IdSubdivision: number;
 
-    @Field()
-    IdUnidad: number;
+  @Field()
+  IdUnidad: number;
 
-    @Field()
-    IdDivisionOD: number;
+  @Field()
+  IdDivisionOD: number;
 
-    @Field()
-    IdSubdivisionOD: number;
+  @Field()
+  IdSubdivisionOD: number;
 
-    @Field()
-    IdUnidadOD: number;
+  @Field()
+  IdUnidadOD: number;
 
-    @Field()
-    SoloDiferencias: boolean;
+  @Field()
+  SoloDiferencias: boolean;
 }
 
 export const queryConciliaInternaDWH = `SELECT Emisor, MAX(T.FechaE) AS FechaE, Receptor, MAX(T.FechaR) AS FechaR, Documento, ROUND(SUM(ISNULL(ImporteE, 0)) * -1, 2) AS ImporteE, ROUND(SUM(ISNULL(ImporteR, 0)), 2) AS ImporteR, ROUND(SUM(ISNULL(ImporteE, 0) * -1 - ISNULL(ImporteR, 0)), 2) AS Diferencia

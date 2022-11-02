@@ -10,21 +10,21 @@ export class ComprobarValorQueryResponse extends SingleQueryResponse(ComprobarVa
 
 @InputType()
 export class ComprobarValoresInput {
-    @Field()
-    Id?: number;
-  
-    @Field()
-    IdCentro: number;
-  
-    @Field()
-    IdExpresion: number;
-  
-    @Field()
-    IdOperador: string;
-  
-    @Field()
-    Valor: number;
-      
-    @Field()
-    IdDivision?: number;
+  @Field()
+  Id?: number;
+
+  @Field()
+  IdCentro: number;
+
+  @Field()
+  IdExpresion: number;
+
+  @Field()
+  IdOperador: string;
+
+  @Field()
+  Valor: number;
+
+  @Field()
+  IdDivision?: number;
 }

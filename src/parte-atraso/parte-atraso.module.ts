@@ -7,6 +7,6 @@ import { ParteAtrasoService } from './parte-atraso.service';
 
 @Module({
   imports: [DivisionesModule, DwhConexionesModule, UnidadesModule],
-  providers: [ParteAtrasoResolver, ParteAtrasoService]
+  providers: [ParteAtrasoResolver, ParteAtrasoService],
 })
 export class ParteAtrasoModule {}

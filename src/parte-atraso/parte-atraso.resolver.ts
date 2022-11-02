@@ -4,22 +4,15 @@ import { ParteAtrasoService } from './parte-atraso.service';
 
 @Resolver()
 export class ParteAtrasoResolver {
-    constructor(
-        private _parteAtrasoService: ParteAtrasoService
-    ) {}
+  constructor(private _parteAtrasoService: ParteAtrasoService) {}
 
-    @Query(() => ParteAtrasosQueryResponse)
-    async parteAtrasos(
-        @Args({ name: 'idDivision', type: () => Int }) idDivision: number
-    ): Promise<ParteAtrasosQueryResponse> {
-        return this._parteAtrasoService.parteAtrasos(idDivision);
-    }
+  @Query(() => ParteAtrasosQueryResponse)
+  async parteAtrasos(@Args({ name: 'idDivision', type: () => Int }) idDivision: number): Promise<ParteAtrasosQueryResponse> {
+    return this._parteAtrasoService.parteAtrasos(idDivision);
+  }
 
-    @Query(() => DatosIdGAMQueryResponse)
-    async datosIdGAM(
-        @Args({ name: 'idDivision', type: () => Int }) idDivision: number
-    ): Promise<DatosIdGAMQueryResponse> {
-        return this._parteAtrasoService.datosIdGAM(idDivision);
-    }
-
+  @Query(() => DatosIdGAMQueryResponse)
+  async datosIdGAM(@Args({ name: 'idDivision', type: () => Int }) idDivision: number): Promise<DatosIdGAMQueryResponse> {
+    return this._parteAtrasoService.datosIdGAM(idDivision);
+  }
 }

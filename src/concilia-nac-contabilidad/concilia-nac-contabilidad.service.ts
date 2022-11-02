@@ -7,92 +7,85 @@ import { DataSource } from 'typeorm';
 
 @Injectable()
 export class ConciliaNacContabilidadService {
-    constructor(@InjectDataSource() private readonly dataSource: DataSource) {}
+  constructor(@InjectDataSource() private readonly dataSource: DataSource) {}
 
-    async conciliacionNacionalVsAsiento(annio: number, mes: number, division: number, unidad: number, divisionOD: number, unidadOD: number): Promise<MutationResponse> {
-        try {
-            return new Promise<MutationResponse>(resolve => {
-                this.dataSource
-                    .query(`EXECUTE dbo.p_ConciliacionNacional_vs_Asientos ${annio}, ${mes}, ${division}, ${unidad}, ${divisionOD}, ${unidadOD}`)
-                    .then(() => {
-                        resolve({ success: true });
-                    })
-                    .catch(err => {
-                        resolve({ success: false, error: err.message ? err.message : err });
-                    });
-            });
-        } catch (err: any) {
-            return { success: false, error: err };
-        }
+  async conciliacionNacionalVsAsiento(annio: number, mes: number, division: number, unidad: number, divisionOD: number, unidadOD: number): Promise<MutationResponse> {
+    try {
+      return new Promise<MutationResponse>(resolve => {
+        this.dataSource
+          .query(`EXECUTE dbo.p_ConciliacionNacional_vs_Asientos ${annio}, ${mes}, ${division}, ${unidad}, ${divisionOD}, ${unidadOD}`)
+          .then(() => {
+            resolve({ success: true });
+          })
+          .catch(err => {
+            resolve({ success: false, error: err.message ? err.message : err });
+          });
+      });
+    } catch (err: any) {
+      return { success: false, error: err };
     }
+  }
 
-    async conciliacionContab(
-        annio: number,
-        mes: number,
-        division: number,
-        unidad: number,
-        divisionOD: number,
-        unidadOD: number,
-    ): Promise<ViewConciliaNacContabilidadQueryResponse> {
-        try {
-            return new Promise<ViewConciliaNacContabilidadQueryResponse>(resolve => {
-                this.dataSource
-                    .query(
-                        `SELECT * FROM dbo.vConciliacionContabilidad
+  async conciliacionContab(annio: number, mes: number, division: number, unidad: number, divisionOD: number, unidadOD: number): Promise<ViewConciliaNacContabilidadQueryResponse> {
+    try {
+      return new Promise<ViewConciliaNacContabilidadQueryResponse>(resolve => {
+        this.dataSource
+          .query(
+            `SELECT * FROM dbo.vConciliacionContabilidad
                     WHERE Annio = ${annio} AND Mes = ${mes}
                     AND ((DivisionEmisorE IN (0, CASE WHEN ${division} = 0 THEN DivisionEmisorE ELSE ${division} END) AND Emisor IN (0, CASE WHEN ${unidad} = 0 THEN Emisor ELSE ${unidad} END) AND DivisionReceptorE IN (0, CASE WHEN ${divisionOD} = 0 THEN DivisionReceptorE ELSE ${divisionOD} END) AND EmitidoA IN (0, CASE WHEN ${unidadOD} = 0 THEN EmitidoA ELSE ${unidadOD} END)
                         AND DivisionEmisorR IN (0, CASE WHEN ${division}= 0 THEN DivisionEmisorR ELSE ${division} END) AND Receptor IN (0, CASE WHEN ${unidadOD} = 0 THEN Receptor ELSE ${unidadOD} END) AND DivisionReceptorR IN (0, CASE WHEN ${divisionOD} = 0 THEN DivisionReceptorR ELSE ${divisionOD} END) AND RecibidoDe IN (0, CASE WHEN ${unidad} = 0 THEN RecibidoDe ELSE ${unidad} END))
                     OR (DivisionEmisorE IN (0, CASE WHEN ${divisionOD} = 0 THEN DivisionEmisorE ELSE ${divisionOD} END) AND Emisor IN (0, CASE WHEN ${unidadOD} = 0 THEN Emisor ELSE ${unidadOD} END) AND DivisionReceptorE IN (0, CASE WHEN ${division} = 0 THEN DivisionReceptorE ELSE ${division} END) AND EmitidoA IN (0, CASE WHEN ${unidad} = 0 THEN EmitidoA ELSE ${unidad} END)
                         AND DivisionEmisorR IN (0, CASE WHEN ${divisionOD} = 0 THEN DivisionEmisorR ELSE ${divisionOD} END) AND Receptor IN (0, CASE WHEN ${unidad} = 0 THEN Receptor ELSE ${unidad} END) AND DivisionReceptorR IN (0, CASE WHEN ${division} = 0 THEN DivisionReceptorR ELSE ${division} END) AND RecibidoDe IN (0, CASE WHEN ${unidadOD} = 0 THEN RecibidoDe ELSE ${unidadOD} END)))`,
-                    )
-                    .then(result => {
-                        resolve({
-                            success: true,
-                            data: result,
-                        });
-                    })
-                    .catch(err => {
-                        resolve({ success: false, error: err.message ? err.message : err });
-                    });
+          )
+          .then(result => {
+            resolve({
+              success: true,
+              data: result,
             });
-        } catch (err: any) {
-            return { success: false, error: err.message };
-        }
+          })
+          .catch(err => {
+            resolve({ success: false, error: err.message ? err.message : err });
+          });
+      });
+    } catch (err: any) {
+      return { success: false, error: err.message };
     }
+  }
 
-    async updateConciliaContab(data: any[]): Promise<MutationResponse> {
-        try {
-            data.map(d => {
-                const recibido: number = d.Recibido ? 1 : 0;
+  async updateConciliaContab(data: any[]): Promise<MutationResponse> {
+    try {
+      data.map(d => {
+        const recibido: number = d.Recibido ? 1 : 0;
 
-                this.dataSource
-                    .query(
-                        `update dbo.ConciliacionContabilidad
+        this.dataSource
+          .query(
+            `update dbo.ConciliacionContabilidad
                     set Recibido = ${recibido}
                     where Id = ${d.Id}`,
-                    )
-                    .catch(err => {
-                        return { success: false, error: err.message ? err.message : err };
-                    });
-            });
+          )
+          .catch(err => {
+            return { success: false, error: err.message ? err.message : err };
+          });
+      });
 
-            return new Promise<MutationResponse>(resolve => {
-                resolve({ success: true });
-            });
-        } catch (err: any) {
-            return { success: false, error: err.message };
-        }
+      return new Promise<MutationResponse>(resolve => {
+        resolve({ success: true });
+      });
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  }
+
+  async actaConciliacion(annio: number, mes: number, unidad: number, unidadOD: number): Promise<ActaConciliacionQueryResponse> {
+    if (unidad === 0 || unidadOD === 0) {
+      return {
+        success: true,
+        data: [],
+      };
     }
 
-    async actaConciliacion(annio: number, mes: number, unidad: number, unidadOD: number): Promise<ActaConciliacionQueryResponse> {
-        if (unidad === 0 || unidadOD === 0) {
-            return {
-                success: true,
-                data: [],
-            };
-        }
-
-        const stringQuery = `SELECT 1 AS ID, 'Saldo Inicial (Saldo período anterior)' AS Detalle, I.Emisor, I.Receptor, ISNULL(SUM(I.SaldoEmisor), 0) AS SaldoEmisor, ISNULL(SUM(I.SaldoReceptor), 0) AS SaldoReceptor, ISNULL(SUM(I.SaldoEmisor - I.SaldoReceptor), 0) AS Diferencia FROM (
+    const stringQuery = `SELECT 1 AS ID, 'Saldo Inicial (Saldo período anterior)' AS Detalle, I.Emisor, I.Receptor, ISNULL(SUM(I.SaldoEmisor), 0) AS SaldoEmisor, ISNULL(SUM(I.SaldoReceptor), 0) AS SaldoReceptor, ISNULL(SUM(I.SaldoEmisor - I.SaldoReceptor), 0) AS Diferencia FROM (
             SELECT ${unidad} AS Emisor, ${unidadOD} AS Receptor, 0 AS SaldoEmisor, 0 AS SaldoReceptor
             UNION ALL
             SELECT ${unidadOD} AS Emisor, ${unidad} AS Receptor, 0 AS SaldoEmisor, 0 AS SaldoReceptor
@@ -200,23 +193,23 @@ export class ConciliaNacContabilidadService {
         ) AS I
         GROUP BY I.Emisor, I.Receptor`;
 
-        return new Promise<ActaConciliacionQueryResponse>(resolve => {
-            this.dataSource
-                .query(stringQuery)
-                .then(result => {
-                    resolve({
-                        success: true,
-                        data: result,
-                    });
-                })
-                .catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
-                });
+    return new Promise<ActaConciliacionQueryResponse>(resolve => {
+      this.dataSource
+        .query(stringQuery)
+        .then(result => {
+          resolve({
+            success: true,
+            data: result,
+          });
+        })
+        .catch(err => {
+          resolve({ success: false, error: err.message ? err.message : err });
         });
-    }
+    });
+  }
 
-    async getCentrosConOperaciones(annio: string, mes: string) {
-        const stringQuery = `SELECT CASE WHEN Cuenta IN (135, 136) THEN Unidad
+  async getCentrosConOperaciones(annio: string, mes: string) {
+    const stringQuery = `SELECT CASE WHEN Cuenta IN (135, 136) THEN Unidad
                 WHEN [Tipo de Análisis 1] = 'E' THEN [Análisis 1]
                 WHEN [Tipo de Análisis 2] = 'E' THEN [Análisis 2]
                 WHEN [Tipo de Análisis 3] = 'E' THEN [Análisis 3] ELSE '' END AS Emisor,
@@ -235,18 +228,18 @@ export class ConciliaNacContabilidadService {
                     WHEN [Tipo de Análisis 2] = 'E' THEN [Análisis 2]
                     WHEN [Tipo de Análisis 3] = 'E' THEN [Análisis 3] ELSE '' END`;
 
-        return new Promise<ActaConciliacionQueryResponse>(resolve => {
-            this.dataSource
-                .query(stringQuery)
-                .then(result => {
-                    resolve({
-                        success: true,
-                        data: result,
-                    });
-                })
-                .catch(err => {
-                    resolve({ success: false, error: err.message ? err.message : err });
-                });
+    return new Promise<ActaConciliacionQueryResponse>(resolve => {
+      this.dataSource
+        .query(stringQuery)
+        .then(result => {
+          resolve({
+            success: true,
+            data: result,
+          });
+        })
+        .catch(err => {
+          resolve({ success: false, error: err.message ? err.message : err });
         });
-    }
+    });
+  }
 }

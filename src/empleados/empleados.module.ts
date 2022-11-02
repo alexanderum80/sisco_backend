@@ -7,6 +7,6 @@ import { EmpleadosService } from './empleados.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Empleado]), UsuariosModule],
-  providers: [EmpleadosResolver, EmpleadosService]
+  providers: [EmpleadosResolver, EmpleadosService],
 })
 export class EmpleadosModule {}

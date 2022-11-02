@@ -8,6 +8,6 @@ import { CuentaEntidadModule } from './../cuenta-entidad/cuenta-entidad.module';
 @Module({
   imports: [TypeOrmModule.forFeature([ClasificadorCuentaReal]), CuentaEntidadModule],
   providers: [ClasificadorCuentaResolver, ClasificadorCuentaService],
-  exports: [ClasificadorCuentaService]
+  exports: [ClasificadorCuentaService],
 })
 export class ClasificadorCuentaModule {}

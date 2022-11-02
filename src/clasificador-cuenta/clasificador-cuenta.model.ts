@@ -10,60 +10,60 @@ export class ClasificadorCuentasQueryResponse extends MultipleQueryResponse(Clas
 
 @InputType()
 export class ClasificadorCuentaRealInput {
-    @Field()
-    Cuenta: string;
+  @Field()
+  Cuenta: string;
 
-    @Field()
-    SubCuenta: string;
+  @Field()
+  SubCuenta: string;
 
-    @Field()
-    Descripcion: string;
+  @Field()
+  Descripcion: string;
 
-    @Field()
-    Naturaleza: string;
+  @Field()
+  Naturaleza: string;
 
-    @Field({ nullable: true })
-    Crit1: string;
+  @Field({ nullable: true })
+  Crit1: string;
 
-    @Field({ nullable: true })
-    Crit2: string;
+  @Field({ nullable: true })
+  Crit2: string;
 
-    @Field({ nullable: true })
-    Crit3: string;
+  @Field({ nullable: true })
+  Crit3: string;
 
-    @Field()
-    Obligacion: boolean;
+  @Field()
+  Obligacion: boolean;
 
-    @Field()
-    TipoClasificador: number;
+  @Field()
+  TipoClasificador: number;
 
-    @Field({ nullable: true })
-    SeUtiliza: string;
+  @Field({ nullable: true })
+  SeUtiliza: string;
 
-    @Field()
-    Terminal: boolean;
+  @Field()
+  Terminal: boolean;
 
-    @Field({ nullable: true })
-    Crit1Consolidacion: string;
+  @Field({ nullable: true })
+  Crit1Consolidacion: string;
 
-    @Field({ nullable: true })
-    Crit2Consolidacion: string;
+  @Field({ nullable: true })
+  Crit2Consolidacion: string;
 
-    @Field({ nullable: true })
-    Crit3Consolidacion: string;
+  @Field({ nullable: true })
+  Crit3Consolidacion: string;
 }
 
 @ObjectType()
 export class CuentasAgrupadas {
-    @Field()
-    Cuenta: string;
+  @Field()
+  Cuenta: string;
 }
 
 @ObjectType()
 export class CuentasAgrupadasQueryResponse extends MultipleQueryResponse(CuentasAgrupadas) {}
 
 export enum ETipoClasificadorCuenta {
-    Consolidado = 1,
-    Centro = 2,
-    Complejo = 3
+  Consolidado = 1,
+  Centro = 2,
+  Complejo = 3,
 }

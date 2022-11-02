@@ -2,92 +2,92 @@ import { Field, InputType, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
 class ConciliaAFT {
-    @Field()
-    Division: string;
+  @Field()
+  Division: string;
 
-    @Field()
-    SubDivision: string;
+  @Field()
+  SubDivision: string;
 
-    @Field()
-    Tipo: string;
+  @Field()
+  Tipo: string;
 
-    @Field()
-    Centro: string;
+  @Field()
+  Centro: string;
 
-    @Field()
-    IdCentro: number;
+  @Field()
+  IdCentro: number;
 
-    @Field()
-    IdUnidad: number;
+  @Field()
+  IdUnidad: number;
 
-    @Field()
-    Unidad: string;
+  @Field()
+  Unidad: string;
 
-    @Field()
-    Periodo: number;
+  @Field()
+  Periodo: number;
 
-    @Field()
-    Cta: string;
+  @Field()
+  Cta: string;
 
-    @Field()
-    Scta: string;
+  @Field()
+  Scta: string;
 
-    @Field()
-    An1: string;
+  @Field()
+  An1: string;
 
-    @Field()
-    An2: string;
+  @Field()
+  An2: string;
 
-    @Field()
-    An3: string;
+  @Field()
+  An3: string;
 
-    @Field()
-    Saldo_AF: number;
+  @Field()
+  Saldo_AF: number;
 
-    @Field()
-    Saldo_Rodas: number;
+  @Field()
+  Saldo_Rodas: number;
 
-    @Field()
-    Diferencia: number;
+  @Field()
+  Diferencia: number;
 }
 
 @ObjectType()
 export class DiferenciaClasificadorCNMB {
-    @Field()
-    Unidad: string;
+  @Field()
+  Unidad: string;
 
-    @Field()
-    CNMB: string;
+  @Field()
+  CNMB: string;
 
-    @Field()
-    DCNMB: string;
+  @Field()
+  DCNMB: string;
 
-    @Field()
-    TREPO: number;
+  @Field()
+  TREPO: number;
 
-    @Field()
-    TREPO_UC: number;
+  @Field()
+  TREPO_UC: number;
 }
 
 @ObjectType()
 export class ConciliaAftData {
-    @Field(() => [ConciliaAFT], { nullable: true })
-    ConciliaAFT?: ConciliaAFT[];
+  @Field(() => [ConciliaAFT], { nullable: true })
+  ConciliaAFT?: ConciliaAFT[];
 
-    @Field(() => [DiferenciaClasificadorCNMB], { nullable: true })
-    DiferenciaClasificadorCNMB?: DiferenciaClasificadorCNMB[];
+  @Field(() => [DiferenciaClasificadorCNMB], { nullable: true })
+  DiferenciaClasificadorCNMB?: DiferenciaClasificadorCNMB[];
 }
 
 @InputType()
 export class ConciliaAftInput {
-    @Field()
-    idCentro: number;
+  @Field()
+  idCentro: number;
 
-    @Field()
-    periodo: number;
+  @Field()
+  periodo: number;
 
-    @Field()
-    annio: number;
+  @Field()
+  annio: number;
 }
 
 export const queryMbClanaCNMB = `SELECT CNMB, DCNMB, TREPO FROM dbo.CLANACMB`;

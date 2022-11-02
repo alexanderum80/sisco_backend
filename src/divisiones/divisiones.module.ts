@@ -8,6 +8,6 @@ import { DivisionesService } from './divisiones.service';
 @Module({
   imports: [TypeOrmModule.forFeature([Divisiones]), UsuariosModule],
   providers: [DivisionesResolver, DivisionesService],
-  exports: [DivisionesService]
+  exports: [DivisionesService],
 })
 export class DivisionesModule {}

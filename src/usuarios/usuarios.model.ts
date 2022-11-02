@@ -4,40 +4,38 @@ import { MultipleQueryResponse } from '../shared/models/query.response.model';
 import { SingleQueryResponse } from '../shared/models/query.response.model';
 
 export enum ETipoUsuarios {
-    'Administrador' = 1,
-    'Usuario' = 2,
-    'Usuario Avanzado' = 3
+  'Administrador' = 1,
+  'Usuario' = 2,
+  'Usuario Avanzado' = 3,
 }
 
 @ObjectType()
-export class UsuarioQueryResponse extends SingleQueryResponse(Usuarios) {
-}
+export class UsuarioQueryResponse extends SingleQueryResponse(Usuarios) {}
 
 @ObjectType()
-export class UsuariosQueryResponse extends MultipleQueryResponse(Usuarios) {
-}
+export class UsuariosQueryResponse extends MultipleQueryResponse(Usuarios) {}
 
 // Input Type
 @InputType()
 export class UsuarioInput {
-    @Field()
-    IdUsuario?: number;
+  @Field()
+  IdUsuario?: number;
 
-    @Field()
-    Usuario: string;
+  @Field()
+  Usuario: string;
 
-    @Field()
-    Contrasena: string;
+  @Field()
+  Contrasena: string;
 
-    @Field()
-    IdTipoUsuario: number;
+  @Field()
+  IdTipoUsuario: number;
 
-    @Field()
-    CambiarContrasena: boolean;
+  @Field()
+  CambiarContrasena: boolean;
 
-    @Field()
-    ContrasenaAvanzada: string;
+  @Field()
+  ContrasenaAvanzada: string;
 
-    @Field()
-    IdDivision: number;
+  @Field()
+  IdDivision: number;
 }

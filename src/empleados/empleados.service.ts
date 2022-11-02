@@ -9,100 +9,100 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class EmpleadosService {
-    constructor(@InjectRepository(Empleado) private readonly empleadoRepository: Repository<Empleado>, private _usuariosSvc: UsuariosService) {}
+  constructor(@InjectRepository(Empleado) private readonly empleadoRepository: Repository<Empleado>, private _usuariosSvc: UsuariosService) {}
 
-    async findAll(user: Usuarios): Promise<EmpleadosQueryResponse> {
-        try {
-            const { IdDivision, IdTipoUsuario } = user;
+  async findAll(user: Usuarios): Promise<EmpleadosQueryResponse> {
+    try {
+      const { IdDivision, IdTipoUsuario } = user;
 
-            let _condition = {};
+      let _condition = {};
 
-            if (!this._usuariosSvc.isSuperAdmin(IdDivision, IdTipoUsuario)) {
-                _condition = { IdDivision: IdDivision };
-            }
+      if (!this._usuariosSvc.isSuperAdmin(IdDivision, IdTipoUsuario)) {
+        _condition = { IdDivision: IdDivision };
+      }
 
-            return new Promise<EmpleadosQueryResponse>(resolve => {
-                this.empleadoRepository
-                    .find({ where: _condition, relations: ['Cargo', 'Division'] })
-                    .then(res => {
-                        resolve({ success: true, data: res });
-                    })
-                    .catch(err => {
-                        resolve({ success: false, error: err.message ? err.message : err });
-                    });
-            });
-        } catch (err: any) {
-            return { success: false, error: err.message ? err.message : err };
-        }
+      return new Promise<EmpleadosQueryResponse>(resolve => {
+        this.empleadoRepository
+          .find({ where: _condition, relations: ['Cargo', 'Division'] })
+          .then(res => {
+            resolve({ success: true, data: res });
+          })
+          .catch(err => {
+            resolve({ success: false, error: err.message ? err.message : err });
+          });
+      });
+    } catch (err: any) {
+      return { success: false, error: err.message ? err.message : err };
     }
+  }
 
-    async findOne(_id: number): Promise<EmpleadoQueryResponse> {
-        try {
-            return new Promise<EmpleadoQueryResponse>(resolve => {
-                this.empleadoRepository
-                    .findOne({ where: [{ IdEmpleado: _id }], relations: ['Cargo', 'Division'] })
-                    .then(res => {
-                        resolve({ success: true, data: res });
-                    })
-                    .catch(err => {
-                        resolve({ success: false, error: err.message ? err.message : err });
-                    });
-            });
-        } catch (err: any) {
-            return { success: false, error: err.message ? err.message : err };
-        }
+  async findOne(_id: number): Promise<EmpleadoQueryResponse> {
+    try {
+      return new Promise<EmpleadoQueryResponse>(resolve => {
+        this.empleadoRepository
+          .findOne({ where: [{ IdEmpleado: _id }], relations: ['Cargo', 'Division'] })
+          .then(res => {
+            resolve({ success: true, data: res });
+          })
+          .catch(err => {
+            resolve({ success: false, error: err.message ? err.message : err });
+          });
+      });
+    } catch (err: any) {
+      return { success: false, error: err.message ? err.message : err };
     }
+  }
 
-    async create(empleadoInfo: EmpleadoInput): Promise<MutationResponse> {
-        try {
-            delete empleadoInfo.IdEmpleado;
+  async create(empleadoInfo: EmpleadoInput): Promise<MutationResponse> {
+    try {
+      delete empleadoInfo.IdEmpleado;
 
-            return new Promise<MutationResponse>(resolve => {
-                this.empleadoRepository
-                    .save(empleadoInfo)
-                    .then(() => {
-                        resolve({ success: true });
-                    })
-                    .catch(err => {
-                        resolve({ success: false, error: err.message ? err.message : err });
-                    });
-            });
-        } catch (err: any) {
-            return { success: false, error: err.message ? err.message : err };
-        }
+      return new Promise<MutationResponse>(resolve => {
+        this.empleadoRepository
+          .save(empleadoInfo)
+          .then(() => {
+            resolve({ success: true });
+          })
+          .catch(err => {
+            resolve({ success: false, error: err.message ? err.message : err });
+          });
+      });
+    } catch (err: any) {
+      return { success: false, error: err.message ? err.message : err };
     }
+  }
 
-    async update(empleadoInfo: EmpleadoInput): Promise<MutationResponse> {
-        try {
-            return new Promise<MutationResponse>(resolve => {
-                this.empleadoRepository
-                    .save(empleadoInfo)
-                    .then(() => {
-                        resolve({ success: true });
-                    })
-                    .catch(err => {
-                        resolve({ success: false, error: err.message ? err.message : err });
-                    });
-            });
-        } catch (err: any) {
-            return { success: false, error: err.message ? err.message : err };
-        }
+  async update(empleadoInfo: EmpleadoInput): Promise<MutationResponse> {
+    try {
+      return new Promise<MutationResponse>(resolve => {
+        this.empleadoRepository
+          .save(empleadoInfo)
+          .then(() => {
+            resolve({ success: true });
+          })
+          .catch(err => {
+            resolve({ success: false, error: err.message ? err.message : err });
+          });
+      });
+    } catch (err: any) {
+      return { success: false, error: err.message ? err.message : err };
     }
+  }
 
-    async delete(IDs: number[]): Promise<MutationResponse> {
-        try {
-            return new Promise<MutationResponse>(resolve => {
-                this.empleadoRepository
-                    .delete(IDs)
-                    .then(() => {
-                        resolve({ success: true });
-                    })
-                    .catch(err => {
-                        resolve({ success: false, error: err.message ? err.message : err });
-                    });
-            });
-        } catch (err: any) {
-            return { success: false, error: err.message ? err.message : err };
-        }
+  async delete(IDs: number[]): Promise<MutationResponse> {
+    try {
+      return new Promise<MutationResponse>(resolve => {
+        this.empleadoRepository
+          .delete(IDs)
+          .then(() => {
+            resolve({ success: true });
+          })
+          .catch(err => {
+            resolve({ success: false, error: err.message ? err.message : err });
+          });
+      });
+    } catch (err: any) {
+      return { success: false, error: err.message ? err.message : err };
     }
+  }
 }

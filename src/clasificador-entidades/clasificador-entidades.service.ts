@@ -9,109 +9,111 @@ import { ClasificadorEntidadQueryResponse, ClasificadorEntidadInput, Clasificado
 
 @Injectable()
 export class ClasificadorEntidadesService {
-    constructor(@InjectRepository(ClasificarEntidades) private readonly clasificarEntidadesRepository: Repository<ClasificarEntidades>) {}
+  constructor(@InjectRepository(ClasificarEntidades) private readonly clasificarEntidadesRepository: Repository<ClasificarEntidades>) {}
 
-    async findAll(): Promise<ClasificadorEntidadesQueryResponse> {
-        try {
-            return new Promise<ClasificadorEntidadesQueryResponse>(resolve => {
-                this.clasificarEntidadesRepository
-                    .createQueryBuilder('clas')
-                    .select('clas.IdUnidad', 'IdUnidad')
-                    .addSelect('clas.IdTipoEntidad', 'IdTipoEntidad')
-                    .addSelect("Concat(centros.IdUnidad, '-', centros.Nombre)", 'Unidad')
-                    .addSelect('tipo.Entidades', 'TipoEntidad')
-                    .innerJoin(CentrosView, 'centros', 'centros.IdUnidad = clas.IdUnidad')
-                    .innerJoin(TipoEntidades, 'tipo', 'tipo.Id = clas.IdTipoEntidad')
-                    .execute()
-                    .then(result => {
-                        resolve({
-                            success: true,
-                            data: result,
-                        });
-                    })
-                    .catch(err => {
-                        return { success: false, error: err.message ? err.message : err };
-                    });
+  async findAll(): Promise<ClasificadorEntidadesQueryResponse> {
+    try {
+      return new Promise<ClasificadorEntidadesQueryResponse>(resolve => {
+        this.clasificarEntidadesRepository
+          .createQueryBuilder('clas')
+          .select('clas.IdUnidad', 'IdUnidad')
+          .addSelect('clas.IdTipoEntidad', 'IdTipoEntidad')
+          .addSelect("Concat(centros.IdUnidad, '-', centros.Nombre)", 'Unidad')
+          .addSelect('tipo.Entidades', 'TipoEntidad')
+          .addSelect("Concat(centros.IdDivision, '-', centros.Division)", 'Division')
+          .addSelect("Concat(centros.IdSubDivision, '-', centros.SubDivision)", 'SubDivision')
+          .innerJoin(CentrosView, 'centros', 'centros.IdUnidad = clas.IdUnidad')
+          .innerJoin(TipoEntidades, 'tipo', 'tipo.Id = clas.IdTipoEntidad')
+          .execute()
+          .then(result => {
+            resolve({
+              success: true,
+              data: result,
             });
-        } catch (err: any) {
+          })
+          .catch(err => {
             return { success: false, error: err.message ? err.message : err };
-        }
+          });
+      });
+    } catch (err: any) {
+      return { success: false, error: err.message ? err.message : err };
     }
+  }
 
-    async findOne(idUnidad: number): Promise<ClasificadorEntidadQueryResponse> {
-        try {
-            return new Promise<ClasificadorEntidadQueryResponse>(resolve => {
-                this.clasificarEntidadesRepository
-                    .findOne({ where: [{ IdUnidad: idUnidad }] })
-                    .then(result => {
-                        resolve({
-                            success: true,
-                            data: result,
-                        });
-                    })
-                    .catch(err => {
-                        return { success: false, error: err.message ? err.message : err };
-                    });
+  async findOne(idUnidad: number): Promise<ClasificadorEntidadQueryResponse> {
+    try {
+      return new Promise<ClasificadorEntidadQueryResponse>(resolve => {
+        this.clasificarEntidadesRepository
+          .findOne({ where: [{ IdUnidad: idUnidad }] })
+          .then(result => {
+            resolve({
+              success: true,
+              data: result,
             });
-        } catch (err: any) {
+          })
+          .catch(err => {
             return { success: false, error: err.message ? err.message : err };
-        }
+          });
+      });
+    } catch (err: any) {
+      return { success: false, error: err.message ? err.message : err };
     }
+  }
 
-    async create(clasificadorEntidadInfo: ClasificadorEntidadInput): Promise<MutationResponse> {
-        try {
-            const clasif = await this.clasificarEntidadesRepository.findOne({ where: [{ IdUnidad: clasificadorEntidadInfo.IdUnidad }] });
+  async create(clasificadorEntidadInfo: ClasificadorEntidadInput): Promise<MutationResponse> {
+    try {
+      const clasif = await this.clasificarEntidadesRepository.findOne({ where: [{ IdUnidad: clasificadorEntidadInfo.IdUnidad }] });
 
-            if (clasif) {
-                return { success: false, error: `La Entidad ${clasificadorEntidadInfo.IdUnidad} ya está clasificada. Si lo desea, modifíquela.` };
-            }
+      if (clasif) {
+        return { success: false, error: `La Entidad ${clasificadorEntidadInfo.IdUnidad} ya está clasificada. Si lo desea, modifíquela.` };
+      }
 
-            return new Promise<MutationResponse>(resolve => {
-                this.clasificarEntidadesRepository
-                    .save(clasificadorEntidadInfo)
-                    .then(() => {
-                        resolve({ success: true });
-                    })
-                    .catch(err => {
-                        return { success: false, error: err.message ? err.message : err };
-                    });
-            });
-        } catch (err: any) {
+      return new Promise<MutationResponse>(resolve => {
+        this.clasificarEntidadesRepository
+          .save(clasificadorEntidadInfo)
+          .then(() => {
+            resolve({ success: true });
+          })
+          .catch(err => {
             return { success: false, error: err.message ? err.message : err };
-        }
+          });
+      });
+    } catch (err: any) {
+      return { success: false, error: err.message ? err.message : err };
     }
+  }
 
-    async update(clasificadorEntidadInfo: ClasificadorEntidadInput): Promise<MutationResponse> {
-        try {
-            return new Promise<MutationResponse>(resolve => {
-                this.clasificarEntidadesRepository
-                    .save(clasificadorEntidadInfo)
-                    .then(() => {
-                        resolve({ success: true });
-                    })
-                    .catch(err => {
-                        return { success: false, error: err.message ? err.message : err };
-                    });
-            });
-        } catch (err: any) {
+  async update(clasificadorEntidadInfo: ClasificadorEntidadInput): Promise<MutationResponse> {
+    try {
+      return new Promise<MutationResponse>(resolve => {
+        this.clasificarEntidadesRepository
+          .save(clasificadorEntidadInfo)
+          .then(() => {
+            resolve({ success: true });
+          })
+          .catch(err => {
             return { success: false, error: err.message ? err.message : err };
-        }
+          });
+      });
+    } catch (err: any) {
+      return { success: false, error: err.message ? err.message : err };
     }
+  }
 
-    async delete(IDs: number[]): Promise<MutationResponse> {
-        try {
-            return new Promise<MutationResponse>(resolve => {
-                this.clasificarEntidadesRepository
-                    .delete(IDs)
-                    .then(() => {
-                        resolve({ success: true });
-                    })
-                    .catch(err => {
-                        return { success: false, error: err.message ? err.message : err };
-                    });
-            });
-        } catch (err: any) {
+  async delete(IDs: number[]): Promise<MutationResponse> {
+    try {
+      return new Promise<MutationResponse>(resolve => {
+        this.clasificarEntidadesRepository
+          .delete(IDs)
+          .then(() => {
+            resolve({ success: true });
+          })
+          .catch(err => {
             return { success: false, error: err.message ? err.message : err };
-        }
+          });
+      });
+    } catch (err: any) {
+      return { success: false, error: err.message ? err.message : err };
     }
+  }
 }

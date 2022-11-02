@@ -9,44 +9,37 @@ import { ContaComprobarExpresionesService } from './conta-comprobar-expresiones.
 
 @Resolver(() => ContaComprobarExpresionesEntity)
 export class ContaComprobarExpresionesResolver {
-    constructor(
-        private _comprobarExpresionesSvc: ContaComprobarExpresionesService
-    ) {}
+  constructor(private _comprobarExpresionesSvc: ContaComprobarExpresionesService) {}
 
-    @Query(() => ContaComprobarExpresionesQueryResponse)
-    @UseGuards(new AuthGuard())
-    async getAllComprobarExpresiones(@Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios): Promise<ContaComprobarExpresionesQueryResponse> {
-        return this._comprobarExpresionesSvc.findAll(user);
-    }
+  @Query(() => ContaComprobarExpresionesQueryResponse)
+  @UseGuards(new AuthGuard())
+  async getAllComprobarExpresiones(@Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios): Promise<ContaComprobarExpresionesQueryResponse> {
+    return this._comprobarExpresionesSvc.findAll(user);
+  }
 
-    @Query(() => ContaComprobarExpresionQueryResponse)
-    async getComprobarExpresionById(
-        @Args({ name: 'id', type: () => Int}) id: number
-    ): Promise<ContaComprobarExpresionQueryResponse> {
-        return this._comprobarExpresionesSvc.findOne(id);
-    }
+  @Query(() => ContaComprobarExpresionQueryResponse)
+  async getComprobarExpresionById(@Args({ name: 'id', type: () => Int }) id: number): Promise<ContaComprobarExpresionQueryResponse> {
+    return this._comprobarExpresionesSvc.findOne(id);
+  }
 
-    @Mutation(() => MutationResponse)
-    @UseGuards(new AuthGuard())
-    async createComprobarExpresion(
-        @Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios,
-        @Args({ 'name': 'comprobarExpresionInput', type: () => ContaComprobarExpresionesInput }) comprobarExpresionInput: ContaComprobarExpresionesInput
-    ): Promise<MutationResponse> {
-        return this._comprobarExpresionesSvc.create(user, comprobarExpresionInput);
-    }
+  @Mutation(() => MutationResponse)
+  @UseGuards(new AuthGuard())
+  async createComprobarExpresion(
+    @Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios,
+    @Args({ name: 'comprobarExpresionInput', type: () => ContaComprobarExpresionesInput }) comprobarExpresionInput: ContaComprobarExpresionesInput,
+  ): Promise<MutationResponse> {
+    return this._comprobarExpresionesSvc.create(user, comprobarExpresionInput);
+  }
 
-    @Mutation(() => MutationResponse)
-    async updateComprobarExpresion(
-        @Args({ 'name': 'comprobarExpresionInput', type: () => ContaComprobarExpresionesInput }) comprobarExpresionInput: ContaComprobarExpresionesInput
-    ): Promise<MutationResponse> {
-        return this._comprobarExpresionesSvc.update(comprobarExpresionInput);
-    }
+  @Mutation(() => MutationResponse)
+  async updateComprobarExpresion(
+    @Args({ name: 'comprobarExpresionInput', type: () => ContaComprobarExpresionesInput }) comprobarExpresionInput: ContaComprobarExpresionesInput,
+  ): Promise<MutationResponse> {
+    return this._comprobarExpresionesSvc.update(comprobarExpresionInput);
+  }
 
-    @Mutation(() => MutationResponse)
-    async deleteComprobarExpresion(
-        @Args({ name: 'IDs', type: () => [Int]}) IDs: number[]
-    ): Promise<MutationResponse> {
-        return this._comprobarExpresionesSvc.delete(IDs);
-    }
-
+  @Mutation(() => MutationResponse)
+  async deleteComprobarExpresion(@Args({ name: 'IDs', type: () => [Int] }) IDs: number[]): Promise<MutationResponse> {
+    return this._comprobarExpresionesSvc.delete(IDs);
+  }
 }

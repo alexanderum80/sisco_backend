@@ -6,92 +6,92 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class CajaConfiguracionService {
-    constructor(@InjectRepository(CajaConfiguracionEntity) private readonly cajaConfiguracionRepository: Repository<CajaConfiguracionEntity>) {}
+  constructor(@InjectRepository(CajaConfiguracionEntity) private readonly cajaConfiguracionRepository: Repository<CajaConfiguracionEntity>) {}
 
-    async findAll(): Promise<CajaConfiguracionEntity[]> {
-        try {
-            return new Promise<CajaConfiguracionEntity[]>((resolve, reject) => {
-                return this.cajaConfiguracionRepository
-                    .find()
-                    .then(res => {
-                        resolve(res);
-                    })
-                    .catch(err => {
-                        reject(err.message || err);
-                    });
-            });
-        } catch (err: any) {
-            throw new Error(err.message || err);
-        }
+  async findAll(): Promise<CajaConfiguracionEntity[]> {
+    try {
+      return new Promise<CajaConfiguracionEntity[]>((resolve, reject) => {
+        return this.cajaConfiguracionRepository
+          .find()
+          .then(res => {
+            resolve(res);
+          })
+          .catch(err => {
+            reject(err.message || err);
+          });
+      });
+    } catch (err: any) {
+      throw new Error(err.message || err);
     }
+  }
 
-    async findOne(id: number): Promise<CajaConfiguracionEntity> {
-        try {
-            return new Promise<CajaConfiguracionEntity>((resolve, reject) => {
-                return this.cajaConfiguracionRepository
-                    .findOneOrFail({ where: [{ IdCaja: id }] })
-                    .then(res => {
-                        resolve(res);
-                    })
-                    .catch(err => {
-                        reject(err.message || err);
-                    });
-            });
-        } catch (err: any) {
-            throw new Error(err.message || err);
-        }
+  async findOne(id: number): Promise<CajaConfiguracionEntity> {
+    try {
+      return new Promise<CajaConfiguracionEntity>((resolve, reject) => {
+        return this.cajaConfiguracionRepository
+          .findOneOrFail({ where: [{ IdCaja: id }] })
+          .then(res => {
+            resolve(res);
+          })
+          .catch(err => {
+            reject(err.message || err);
+          });
+      });
+    } catch (err: any) {
+      throw new Error(err.message || err);
     }
+  }
 
-    async create(cajaConfiguracionInput: CajaConfiguracionInput): Promise<CajaConfiguracionEntity> {
-        try {
-            delete cajaConfiguracionInput.IdCaja;
+  async create(cajaConfiguracionInput: CajaConfiguracionInput): Promise<CajaConfiguracionEntity> {
+    try {
+      delete cajaConfiguracionInput.IdCaja;
 
-            return new Promise<CajaConfiguracionEntity>((resolve, reject) => {
-                return this.cajaConfiguracionRepository
-                    .save(cajaConfiguracionInput)
-                    .then(res => {
-                        resolve(res);
-                    })
-                    .catch(err => {
-                        reject(err.message || err);
-                    });
-            });
-        } catch (err: any) {
-            throw new Error(err.message || err);
-        }
+      return new Promise<CajaConfiguracionEntity>((resolve, reject) => {
+        return this.cajaConfiguracionRepository
+          .save(cajaConfiguracionInput)
+          .then(res => {
+            resolve(res);
+          })
+          .catch(err => {
+            reject(err.message || err);
+          });
+      });
+    } catch (err: any) {
+      throw new Error(err.message || err);
     }
+  }
 
-    async update(cajaConfiguracionInput: CajaConfiguracionInput): Promise<CajaConfiguracionEntity> {
-        try {
-            return new Promise<CajaConfiguracionEntity>((resolve, reject) => {
-                return this.cajaConfiguracionRepository
-                    .save(cajaConfiguracionInput)
-                    .then(res => {
-                        resolve(res);
-                    })
-                    .catch(err => {
-                        reject(err.message || err);
-                    });
-            });
-        } catch (err: any) {
-            throw new Error(err.message || err);
-        }
+  async update(cajaConfiguracionInput: CajaConfiguracionInput): Promise<CajaConfiguracionEntity> {
+    try {
+      return new Promise<CajaConfiguracionEntity>((resolve, reject) => {
+        return this.cajaConfiguracionRepository
+          .save(cajaConfiguracionInput)
+          .then(res => {
+            resolve(res);
+          })
+          .catch(err => {
+            reject(err.message || err);
+          });
+      });
+    } catch (err: any) {
+      throw new Error(err.message || err);
     }
+  }
 
-    async remove(id: number): Promise<number> {
-        try {
-            return new Promise<number>((resolve, reject) => {
-                return this.cajaConfiguracionRepository
-                    .delete(id)
-                    .then(res => {
-                        resolve(res.affected as number);
-                    })
-                    .catch(err => {
-                        reject(err.message || err);
-                    });
-            });
-        } catch (err: any) {
-            throw new Error(err.message || err);
-        }
+  async remove(id: number): Promise<number> {
+    try {
+      return new Promise<number>((resolve, reject) => {
+        return this.cajaConfiguracionRepository
+          .delete(id)
+          .then(res => {
+            resolve(res.affected as number);
+          })
+          .catch(err => {
+            reject(err.message || err);
+          });
+      });
+    } catch (err: any) {
+      throw new Error(err.message || err);
     }
+  }
 }

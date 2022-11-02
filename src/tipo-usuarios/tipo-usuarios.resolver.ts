@@ -13,10 +13,7 @@ export class TipoUsuariosResolver {
   }
 
   @Query(() => TipoUsuarioQueryResponse)
-  async getTipoUsuarios(
-    @Args('id', { type: () => Int }) id: number
-  ): Promise<TipoUsuarioQueryResponse> {
-      return this.tipoUsuariosService.findOne(id);
+  async getTipoUsuarios(@Args('id', { type: () => Int }) id: number): Promise<TipoUsuarioQueryResponse> {
+    return this.tipoUsuariosService.findOne(id);
   }
-
 }

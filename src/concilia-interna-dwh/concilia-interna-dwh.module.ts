@@ -5,6 +5,6 @@ import { ConciliaInternaDwhService } from './concilia-interna-dwh.service';
 
 @Module({
   imports: [DwhConexionesModule],
-  providers: [ConciliaInternaDwhResolver, ConciliaInternaDwhService]
+  providers: [ConciliaInternaDwhResolver, ConciliaInternaDwhService],
 })
 export class ConciliaInternaDwhModule {}

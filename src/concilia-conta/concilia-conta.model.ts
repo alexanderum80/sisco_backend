@@ -2,86 +2,86 @@ import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
 export class ConciliaContaQueryResponse {
-    @Field()
-    success: boolean;
+  @Field()
+  success: boolean;
 
-    @Field({ nullable: true })
-    data?: string;
+  @Field({ nullable: true })
+  data?: string;
 
-    @Field(() => String, { nullable: true })
-    error?: string;
+  @Field(() => String, { nullable: true })
+  error?: string;
 }
 
 @ObjectType()
 export class ConciliaContabilidad {
-    @Field(() => ConciliaContaQueryResponse)
-    ReporteClasificador: ConciliaContaQueryResponse;
+  @Field(() => ConciliaContaQueryResponse)
+  ReporteClasificador: ConciliaContaQueryResponse;
 
-    @Field(() => ConciliaContaQueryResponse)
-    ReporteConsultas: ConciliaContaQueryResponse;
+  @Field(() => ConciliaContaQueryResponse)
+  ReporteConsultas: ConciliaContaQueryResponse;
 
-    @Field(() => ConciliaContaQueryResponse)
-    ReporteExpresiones: ConciliaContaQueryResponse;
+  @Field(() => ConciliaContaQueryResponse)
+  ReporteExpresiones: ConciliaContaQueryResponse;
 
-    @Field(() => ConciliaContaQueryResponse)
-    ReporteValores: ConciliaContaQueryResponse;
+  @Field(() => ConciliaContaQueryResponse)
+  ReporteValores: ConciliaContaQueryResponse;
 }
 
 @ObjectType()
 export class ConciliaContabilidadQueryResponse {
-    @Field()
-    success: boolean;
+  @Field()
+  success: boolean;
 
-    @Field(() => ConciliaContabilidad, { nullable: true })
-    data?: ConciliaContabilidad;
+  @Field(() => ConciliaContabilidad, { nullable: true })
+  data?: ConciliaContabilidad;
 
-    @Field(() => String, { nullable: true })
-    error?: string;
+  @Field(() => String, { nullable: true })
+  error?: string;
 }
 
 @InputType()
 export class ConciliaContaInput {
-    @Field()
-    idCentro: number;
+  @Field()
+  idCentro: number;
 
-    @Field()
-    periodo: number;
+  @Field()
+  periodo: number;
 
-    @Field()
-    annio: number;
+  @Field()
+  annio: number;
 
-    @Field()
-    tipoCentro: number;
+  @Field()
+  tipoCentro: number;
 
-    @Field()
-    tipoEntidad: number;
+  @Field()
+  tipoEntidad: number;
 }
 
 @InputType()
 export class IniciarSaldosInput {
-    @Field()
-    idCentro: number;
+  @Field()
+  idCentro: number;
 
-    @Field()
-    consolidado: boolean;
+  @Field()
+  consolidado: boolean;
 
-    @Field()
-    annio: number;
+  @Field()
+  annio: number;
 }
 
 @InputType()
 export class ChequearCentrosInput {
-    @Field()
-    idCentro: number;
+  @Field()
+  idCentro: number;
 
-    @Field()
-    annio: number;
+  @Field()
+  annio: number;
 
-    @Field()
-    periodo: number;
+  @Field()
+  periodo: number;
 
-    @Field(() => [Int])
-    centrosAChequear: number[];
+  @Field(() => [Int])
+  centrosAChequear: number[];
 }
 
 export const queryUltimoPeriodo = `SELECT ISNULL(MAX(Período), -1) as Periodo FROM dbo.Conta_Asiento

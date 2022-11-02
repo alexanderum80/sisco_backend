@@ -6,29 +6,29 @@ import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 't
 @ObjectType()
 @Entity()
 export class Empleado {
-    @Field()
-    @PrimaryGeneratedColumn()
-    IdEmpleado: number;
+  @Field()
+  @PrimaryGeneratedColumn()
+  IdEmpleado: number;
 
-    @Field()
-    @Column()
-    Empleado: string;
+  @Field()
+  @Column()
+  Empleado: string;
 
-    @Field()
-    @Column()
-    IdCargo: number;
+  @Field()
+  @Column()
+  IdCargo: number;
 
-    @Field(() => Cargos)
-    @ManyToOne(() => Cargos, cargos => cargos.IdCargo)
-    @JoinColumn({ name: 'IdCargo', referencedColumnName: 'IdCargo' })
-    Cargo: Cargos;
+  @Field(() => Cargos)
+  @ManyToOne(() => Cargos, cargos => cargos.IdCargo)
+  @JoinColumn({ name: 'IdCargo', referencedColumnName: 'IdCargo' })
+  Cargo: Cargos;
 
-    @Field()
-    @Column()
-    IdDivision: number;
+  @Field()
+  @Column()
+  IdDivision: number;
 
-    @Field(() => Divisiones)
-    @ManyToOne(() => Divisiones, divisiones => divisiones.IdDivision)
-    @JoinColumn({ name: 'IdDivision', referencedColumnName: 'IdDivision'})
-    Division: Divisiones;
+  @Field(() => Divisiones)
+  @ManyToOne(() => Divisiones, divisiones => divisiones.IdDivision)
+  @JoinColumn({ name: 'IdDivision', referencedColumnName: 'IdDivision' })
+  Division: Divisiones;
 }
