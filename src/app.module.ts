@@ -39,6 +39,8 @@ import { ActfijosClasificadorCnmbModule } from './actfijos-clasificador-cnmb/act
 import 'dotenv/config';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { ConciliaUhModule } from './concilia-uh/concilia-uh.module';
+import { ContaEstadisticaModule } from './conta-estadistica/conta-estadistica.module';
+import { ConciliaInternaContaModule } from './concilia-interna-conta/concilia-interna-conta.module';
 
 @Module({
   imports: [
@@ -48,7 +50,7 @@ import { ConciliaUhModule } from './concilia-uh/concilia-uh.module';
       playground: true,
       context: (req: any) => ({ headers: req.headers }),
       formatError: err => {
-        err.message = err.message.replace('Unexpected error value: ', '').replace(/"/g, '');
+        err.message = err.message.replace('Unexpected error value: ', '').replace(/"/g, '').replace('Error: ', '');
         return err;
       },
     }),
@@ -103,6 +105,8 @@ import { ConciliaUhModule } from './concilia-uh/concilia-uh.module';
     ActfijosClasificadorCnmbModule,
     ConciliaAftModule,
     ConciliaUhModule,
+    ContaEstadisticaModule,
+    ConciliaInternaContaModule,
   ],
   controllers: [AppController],
   providers: [AppService, EmailsService],

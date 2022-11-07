@@ -663,6 +663,31 @@ type ConciliaUH {
   Diferencia: Float!
 }
 
+type ContaEstadistica {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+type ConciliaInternaConta {
+  Division: String!
+  Annio: String!
+  Periodo: String!
+  CuentaE: String!
+  SubCuentaE: String!
+  TipoE: String!
+  EmisorE: String!
+  ReceptorE: String!
+  ValorE: Float!
+  Operador: String!
+  CuentaR: String!
+  SubCuentaR: String!
+  TipoR: String!
+  EmisorR: String!
+  ReceptorR: String!
+  ValorR: Float!
+  Diferencia: Float!
+}
+
 type Query {
   authenticateUsuario(usuario: String!, passw: String!): UsuarioQueryResponse!
   getAllUsuarios: UsuariosQueryResponse!
@@ -724,6 +749,8 @@ type Query {
   getActFijosClasificadorCnmb(cnmb: String!): ActFijosClasificadorCnmbEntity!
   conciliaAFT(conciliaAftInput: ConciliaAftInput!): ConciliaAftData!
   conciliaUH(conciliaUhInput: ConciliaUhInput!): [ConciliaUH!]!
+  contaEstadistica(id: Int!): ContaEstadistica!
+  conciliaInternaConta(conciliaInternaContaInput: ConciliaInternaContaInput!): [ConciliaInternaConta!]!
 }
 
 input ConciliaDWHInput {
@@ -765,6 +792,14 @@ input ConciliaUhInput {
   idCentro: Float!
   periodo: Float!
   annio: Float!
+}
+
+input ConciliaInternaContaInput {
+  annio: Int!
+  periodo: Int!
+  centro: Int!
+  unidad: Int!
+  emisorReceptor: Int!
 }
 
 type Mutation {
@@ -818,6 +853,9 @@ type Mutation {
   removeCajaConfiguracion(id: Int!): CajaConfiguracionEntity!
   saveActFijosClasificadorCnmb(actfijosClasificadorCnmbInput: ActFijosClasificadorCnmbInput!): ActFijosClasificadorCnmbEntity!
   removeActFijosClasificadorCnmb(cnmb: String!): Float!
+  createContaEstadistica(createContaEstadisticaInput: CreateContaEstadisticaInput!): ContaEstadistica!
+  updateContaEstadistica(updateContaEstadisticaInput: UpdateContaEstadisticaInput!): ContaEstadistica!
+  removeContaEstadistica(id: Int!): ContaEstadistica!
 }
 
 input UsuarioInput {
@@ -1001,4 +1039,15 @@ input ActFijosClasificadorCnmbInput {
   CNMB: String!
   DCNMB: String!
   TREPO: Float!
+}
+
+input CreateContaEstadisticaInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateContaEstadisticaInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
 }
