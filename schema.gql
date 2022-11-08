@@ -663,9 +663,20 @@ type ConciliaUH {
   Diferencia: Float!
 }
 
-type ContaEstadistica {
-  """Example field (placeholder)"""
-  exampleField: Int!
+type ContaEstadisticaView {
+  IdDivision: Int!
+  Division: String!
+  IdCentro: Int!
+  Centro: String!
+  Consolidado: Boolean!
+  Annio: Int!
+  Periodo: Int!
+  FechaInicio: DateTime
+  FechaFin: DateTime
+  Comprobantes: Int!
+  Traspasados: Int!
+  SinTraspasar: Int!
+  Invalidos: Int!
 }
 
 type ConciliaInternaConta {
@@ -749,7 +760,7 @@ type Query {
   getActFijosClasificadorCnmb(cnmb: String!): ActFijosClasificadorCnmbEntity!
   conciliaAFT(conciliaAftInput: ConciliaAftInput!): ConciliaAftData!
   conciliaUH(conciliaUhInput: ConciliaUhInput!): [ConciliaUH!]!
-  contaEstadistica(id: Int!): ContaEstadistica!
+  contaEstadistica(contaEstadisticaInput: ContaEstadisticaInput!): [ContaEstadisticaView!]!
   conciliaInternaConta(conciliaInternaContaInput: ConciliaInternaContaInput!): [ConciliaInternaConta!]!
 }
 
@@ -792,6 +803,12 @@ input ConciliaUhInput {
   idCentro: Float!
   periodo: Float!
   annio: Float!
+}
+
+input ContaEstadisticaInput {
+  idDivision: Int!
+  annio: Float!
+  periodo: Float!
 }
 
 input ConciliaInternaContaInput {
@@ -853,9 +870,6 @@ type Mutation {
   removeCajaConfiguracion(id: Int!): CajaConfiguracionEntity!
   saveActFijosClasificadorCnmb(actfijosClasificadorCnmbInput: ActFijosClasificadorCnmbInput!): ActFijosClasificadorCnmbEntity!
   removeActFijosClasificadorCnmb(cnmb: String!): Float!
-  createContaEstadistica(createContaEstadisticaInput: CreateContaEstadisticaInput!): ContaEstadistica!
-  updateContaEstadistica(updateContaEstadisticaInput: UpdateContaEstadisticaInput!): ContaEstadistica!
-  removeContaEstadistica(id: Int!): ContaEstadistica!
 }
 
 input UsuarioInput {
@@ -1039,15 +1053,4 @@ input ActFijosClasificadorCnmbInput {
   CNMB: String!
   DCNMB: String!
   TREPO: Float!
-}
-
-input CreateContaEstadisticaInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
-}
-
-input UpdateContaEstadisticaInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
 }
