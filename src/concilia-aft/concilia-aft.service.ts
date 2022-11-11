@@ -34,7 +34,7 @@ export class ConciliaAftService {
       // verificar si se ha definido la conexión al Rodas
       const _conexionRodasQuery = await this._contaConexionesSvc.findByIdUnidad(idCentro, false);
       const _conexionConta = _conexionRodasQuery.data;
-      _conexionConta.BaseDatos = _conexionConta.BaseDatos.substring(0, _conexionConta.BaseDatos.length - 4) + annio.toString();
+      _conexionConta.BaseDatos = `Conta${_conexionConta.BaseDatos}${annio.toString()}`;
 
       const _conexionMB = cloneDeep(_conexionConta);
       _conexionMB.BaseDatos = _conexionMB.BaseDatos.replace(/Conta/gi, 'MB');

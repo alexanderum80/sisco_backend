@@ -45,4 +45,13 @@ export class EstadoConexionesRodas {
 }
 
 @ObjectType()
+export class EntidadesRodas {
+  @Field()
+  Siglas: string;
+
+  @Field()
+  Entidad: string;
+}
+
+@ObjectType()
 export class EstadoConexionesRodasQueryResponse extends MultipleQueryResponse(EstadoConexionesRodas) {}

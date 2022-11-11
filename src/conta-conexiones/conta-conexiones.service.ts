@@ -8,7 +8,14 @@ import { DEFAULT_CONNECTION_STRING } from '../conexiones/conexiones.model';
 import { cloneDeep } from 'lodash';
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { CryptoService } from '../shared/services/crypto/crypto.service';
-import { ContaConexionQueryResponse, EstadoConexionesRodasQueryResponse, EstadoConexionesRodas, ContaConexionesQueryResponse, ContaConexionInput } from './conta-conexiones.model';
+import {
+  ContaConexionQueryResponse,
+  EstadoConexionesRodasQueryResponse,
+  EstadoConexionesRodas,
+  ContaConexionesQueryResponse,
+  ContaConexionInput,
+  EntidadesRodas,
+} from './conta-conexiones.model';
 import { ContaConexionesEntity } from './conta-conexiones.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -175,6 +182,40 @@ export class ContaConexionesService {
       });
     } catch (err: any) {
       return { success: false, error: err.message ? err.message : err };
+    }
+  }
+
+  async getEntidadesRodas(ip: string, ususario: string, password: string): Promise<EntidadesRodas[]> {
+    try {
+      const connectionString = cloneDeep(DEFAULT_CONNECTION_STRING);
+      Object.defineProperties(connectionString, {
+        host: {
+          value: ip,
+        },
+        username: {
+          value: ususario,
+        },
+        password: {
+          value: password,
+        },
+        database: {
+          value: 'ADMIN',
+        },
+      });
+
+      const dataSource: DataSource = await new DataSource(connectionString).initialize();
+      return new Promise<EntidadesRodas[]>((resolve, reject) => {
+        dataSource
+          .query(`SELECT Siglas, Código + '-' + Nombre AS Entidad FROM dbo.ENTIDADES`)
+          .then(result => {
+            resolve(result);
+          })
+          .catch(err => {
+            reject(err.message || err);
+          });
+      });
+    } catch (err: any) {
+      return Promise.reject(err.message || err);
     }
   }
 

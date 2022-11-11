@@ -1,12 +1,5 @@
 import { DwhConexionesService } from './../dwh-conexiones/dwh-conexiones.service';
-import {
-  ConciliacionInternaDWHQueryResponse,
-  queryConciliaInternaDWH,
-  ConciliaInternaDWHInput,
-  filtroInternaEmisor,
-  soloDiferencias,
-  filtroInternaReceptor,
-} from './concilia-interna-dwh.model';
+import { ConciliacionInternaDWHQueryResponse, queryConciliaInternaDWH, ConciliaInternaDWHInput, filtroInternaEmisor, filtroInternaReceptor } from './concilia-interna-dwh.model';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -15,8 +8,8 @@ export class ConciliaInternaDwhService {
 
   async conciliaInternaDWH(inputValues: ConciliaInternaDWHInput): Promise<ConciliacionInternaDWHQueryResponse> {
     try {
-      inputValues.FechaInicial = inputValues.FechaInicial.substr(0, 10).replace(/-/g, '');
-      inputValues.FechaFinal = inputValues.FechaFinal.substr(0, 10).replace(/-/g, '');
+      inputValues.FechaInicial = inputValues.FechaInicial.substring(0, 10).replace(/-/g, '');
+      inputValues.FechaFinal = inputValues.FechaFinal.substring(0, 10).replace(/-/g, '');
 
       const _filtroInternaEmisor = filtroInternaEmisor
         .replace('@FechaInicial', inputValues.FechaInicial)
@@ -38,12 +31,7 @@ export class ConciliaInternaDwhService {
         .replace(/@IdSubdivisionO/g, inputValues.IdSubdivisionOD.toString())
         .replace(/@IdUnidadO/g, inputValues.IdUnidadOD.toString());
 
-      const _filtroSoloDiferencias = inputValues.SoloDiferencias ? soloDiferencias : '';
-
-      const queryDWH = queryConciliaInternaDWH
-        .replace('@FiltroInternaEmisor', _filtroInternaEmisor)
-        .replace('@FiltroInternaReceptor', _filtroInternaReceptor)
-        .replace('@FiltroSoloDiferencias', _filtroSoloDiferencias);
+      const queryDWH = queryConciliaInternaDWH.replace('@FiltroInternaEmisor', _filtroInternaEmisor).replace('@FiltroInternaReceptor', _filtroInternaReceptor);
 
       const conexionResp = await this._dwhConexionSvc.DWHConexion(inputValues.IdDivision);
       if (!conexionResp.success) {

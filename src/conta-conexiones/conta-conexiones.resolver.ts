@@ -3,7 +3,7 @@ import { MutationResponse } from './../shared/models/mutation.response.model';
 import { ContaConexionesService } from './conta-conexiones.service';
 import { ContaConexionesEntity } from './conta-conexiones.entity';
 import { Args, Mutation, Query, Resolver, Int, Context } from '@nestjs/graphql';
-import { EstadoConexionesRodasQueryResponse, ContaConexionQueryResponse, ContaConexionesQueryResponse, ContaConexionInput } from './conta-conexiones.model';
+import { EstadoConexionesRodasQueryResponse, ContaConexionQueryResponse, ContaConexionesQueryResponse, ContaConexionInput, EntidadesRodas } from './conta-conexiones.model';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard, DEFAULT_GRAPHQL_CONTEXT } from '../shared/helpers/auth.guard';
 
@@ -27,6 +27,12 @@ export class ContaConexionesResolver {
   @UseGuards(new AuthGuard())
   async estadoContaConexiones(@Args({ name: 'idDivision', type: () => Int }) idDivision: number): Promise<EstadoConexionesRodasQueryResponse> {
     return this._contaConexionesService.estadoContaConexiones(idDivision);
+  }
+
+  @Query(() => [EntidadesRodas])
+  // @UseGuards(new AuthGuard())
+  async entidadesRodas(@Args('ip') ip: string, @Args('usuario') usuario: string, @Args('password') password: string): Promise<EntidadesRodas[]> {
+    return this._contaConexionesService.getEntidadesRodas(ip, usuario, password);
   }
 
   @Mutation(() => MutationResponse)

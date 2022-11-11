@@ -112,7 +112,7 @@ export const queryAsientoRodas = `SELECT [Tipo de Comprobante] AS Tipo_de_Compro
 export const queryMayorRodas = `SELECT Cuenta, SubCuenta, Período, Débito, Crédito, [Débito Acumulado] as Débito_Acumulado, [Crédito Acumulado] as Crédito_Acumulado
     FROM Mayor where Período = @Periodo ORDER BY Período, Cuenta, SubCuenta`;
 
-export const querySaldosAcumuladosRodas = `SELECT ROUND(SUM(ISNULL(Débito, 0)), 2) AS Debito, ROUND(SUM(ISNULL(Crédito, 0)), 2) AS Credito
+export const querySaldosAcumuladosRodas = `SELECT ROUND(SUM(ROUND(Débito, 2)), 2) AS Debito, ROUND(SUM(ROUND(Crédito, 2)), 2) AS Credito
     FROM dbo.Asiento WHERE Período < @Periodo`;
 
 export const queryReporteConsultas = `SELECT Periodo, Centro, IdConsulta, Consulta, Cuenta, SubCuenta, [Análisis 1] as Analisis1, [Análisis 2] as Analisis2, [Análisis 3] as Analisis3, SUM(Total) AS Total, Consolidado

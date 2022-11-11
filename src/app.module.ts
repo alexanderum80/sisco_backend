@@ -50,7 +50,10 @@ import { ConciliaInternaContaModule } from './concilia-interna-conta/concilia-in
       playground: true,
       context: (req: any) => ({ headers: req.headers }),
       formatError: err => {
-        err.message = err.message.replace('Unexpected error value: ', '').replace(/"/g, '').replace('Error: ', '');
+        err.message = err.message
+          .replace('Unexpected error value: ', '')
+          .replace(/"/g, '')
+          .replace(/Error:/g, '');
         return err;
       },
     }),

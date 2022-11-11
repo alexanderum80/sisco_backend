@@ -49,7 +49,7 @@ export class ConciliaContaService {
       const _conexionRodasQuery = await this._contaConexionesService.findByIdUnidad(idCentro, tipoCentro === 2);
 
       const _conexionConta = _conexionRodasQuery.data;
-      _conexionConta.BaseDatos = _conexionConta.BaseDatos.substring(0, _conexionConta.BaseDatos.length - 4) + annio.toString();
+      _conexionConta.BaseDatos = `Conta${_conexionConta.BaseDatos}${annio.toString()}`;
 
       // conecto al Conta del Centro
       const _contaConexionCentro: DataSource = await this._contaConexionesService.conexionRodas(_conexionConta);
@@ -191,8 +191,10 @@ export class ConciliaContaService {
       // chequear los datos adulterados
       await this._chequeaDatosAdulterados(idUnidad, contaConexion);
 
-      // chequear saldos acumulados hasta el periodo anterior
-      await this._chequearSaldoAcumulados(idUnidad, annio, _ultimoPeriodo, cons, contaConexion);
+      if (_ultimoPeriodo > 0) {
+        // chequear saldos acumulados hasta el periodo anterior
+        await this._chequearSaldoAcumulados(idUnidad, annio, _ultimoPeriodo, cons, contaConexion);
+      }
 
       const _periodoInicial = _ultimoPeriodo < periodo ? _ultimoPeriodo : periodo;
 
@@ -509,10 +511,10 @@ export class ConciliaContaService {
       // verificar si se ha definido la conexión al Rodas
       const _conexionRodasQuery = await this._contaConexionesService.findByIdUnidad(idUnidad, tipoUnidad === '2');
       const _conexionConta = _conexionRodasQuery.data;
-      _conexionConta.BaseDatos = _conexionConta.BaseDatos.substring(0, _conexionConta.BaseDatos.length - 4) + annio.toString();
+      _conexionConta.BaseDatos = `Conta${_conexionConta.BaseDatos}${annio.toString()}`;
 
       const _conexionCodif = cloneDeep(_conexionConta);
-      _conexionCodif.BaseDatos = _conexionCodif.BaseDatos.substring(0, _conexionCodif.BaseDatos.length - 4).replace(/Conta/gi, 'Codif');
+      _conexionCodif.BaseDatos = `Codif${_conexionConta.BaseDatos}`;
 
       let tipoClasificador = 0;
 

@@ -132,6 +132,11 @@ type EstadoConexionesRodas {
   Estado: String!
 }
 
+type EntidadesRodas {
+  Siglas: String!
+  Entidad: String!
+}
+
 type EstadoConexionesRodasQueryResponse {
   success: Boolean!
   data: [EstadoConexionesRodas!]
@@ -286,18 +291,13 @@ type SupervisoresQueryResponse {
 type ConciliacionInterna {
   Documento: String!
   Emisor: String!
-  FechaE: DateTime!
+  FechaE: String
   ImporteE: Float!
   Receptor: String!
-  FechaR: DateTime!
+  FechaR: String
   ImporteR: Float!
   Diferencia: Float!
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 type ConciliacionInternaDWHQueryResponse {
   success: Boolean!
@@ -340,6 +340,11 @@ type ConcnacContabilidad {
   Diferencia: Float!
   Recibido: Boolean!
 }
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
 
 type ViewConciliaNacContabilidadQueryResponse {
   success: Boolean!
@@ -709,6 +714,7 @@ type Query {
   getAllContaConexiones: ContaConexionesQueryResponse!
   getContaConexionById(id: Int!): ContaConexionQueryResponse!
   estadoContaConexiones(idDivision: Int!): EstadoConexionesRodasQueryResponse!
+  entidadesRodas(ip: String!, usuario: String!, password: String!): [EntidadesRodas!]!
   getAllUnidades: AllUnidadesQueryResponse!
   getUnidadesByIdSubdivision(idSubdivision: Int!): AllUnidadesQueryResponse!
   getUnidadesByIdDivision(idDivision: Int!): AllUnidadesQueryResponse!
@@ -790,7 +796,6 @@ input ConciliaInternaDWHInput {
   IdDivisionOD: Float!
   IdSubdivisionOD: Float!
   IdUnidadOD: Float!
-  SoloDiferencias: Boolean!
 }
 
 input ConciliaAftInput {
