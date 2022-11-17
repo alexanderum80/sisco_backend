@@ -27,4 +27,7 @@ export class ComprobarValoresInput {
 
   @Field()
   IdDivision?: number;
+
+  @Field()
+  Consolidado: boolean;
 }

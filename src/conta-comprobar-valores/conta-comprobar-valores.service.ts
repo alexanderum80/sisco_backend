@@ -25,6 +25,7 @@ export class ContaComprobarValoresService {
           .addSelect('v.IdExpresion', 'IdExpresion')
           .addSelect('v.IdOperador', 'IdOperador')
           .addSelect('v.Valor', 'Valor')
+          .addSelect('v.Consolidado', 'Consolidado')
           .addSelect("Concat(c.IdUnidad, '-', c.Nombre)", 'Centro')
           .addSelect('e.Expresion', 'Expresion')
           .addSelect('o.Operador', 'Operador')

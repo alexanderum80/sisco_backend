@@ -36,4 +36,8 @@ export class ComprobarValoresEntity {
   @Field()
   @Column()
   IdDivision: number;
+
+  @Field()
+  @Column('bit')
+  Consolidado: boolean;
 }

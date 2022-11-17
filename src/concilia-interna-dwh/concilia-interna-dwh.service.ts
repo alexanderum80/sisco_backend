@@ -12,8 +12,6 @@ export class ConciliaInternaDwhService {
       inputValues.FechaFinal = inputValues.FechaFinal.substring(0, 10).replace(/-/g, '');
 
       const _filtroInternaEmisor = filtroInternaEmisor
-        .replace('@FechaInicial', inputValues.FechaInicial)
-        .replace(/@FechaFinal/g, inputValues.FechaFinal)
         .replace(/@IdDivisionA/g, inputValues.IdDivision.toString())
         .replace(/@IdSubdivisionA/g, inputValues.IdSubdivision.toString())
         .replace(/@IdUnidadA/g, inputValues.IdUnidad.toString())
@@ -22,8 +20,6 @@ export class ConciliaInternaDwhService {
         .replace(/@IdUnidadO/g, inputValues.IdUnidadOD.toString());
 
       const _filtroInternaReceptor = filtroInternaReceptor
-        .replace('@FechaInicial', inputValues.FechaInicial)
-        .replace(/@FechaFinal/g, inputValues.FechaFinal)
         .replace(/@IdDivisionA/g, inputValues.IdDivision.toString())
         .replace(/@IdSubdivisionA/g, inputValues.IdSubdivision.toString())
         .replace(/@IdUnidadA/g, inputValues.IdUnidad.toString())
@@ -31,7 +27,11 @@ export class ConciliaInternaDwhService {
         .replace(/@IdSubdivisionO/g, inputValues.IdSubdivisionOD.toString())
         .replace(/@IdUnidadO/g, inputValues.IdUnidadOD.toString());
 
-      const queryDWH = queryConciliaInternaDWH.replace('@FiltroInternaEmisor', _filtroInternaEmisor).replace('@FiltroInternaReceptor', _filtroInternaReceptor);
+      const queryDWH = queryConciliaInternaDWH
+        .replace(/@FechaInicial/g, inputValues.FechaInicial)
+        .replace(/@FechaFinal/g, inputValues.FechaFinal)
+        .replace('@FiltroInternaEmisor', _filtroInternaEmisor)
+        .replace('@FiltroInternaReceptor', _filtroInternaReceptor);
 
       const conexionResp = await this._dwhConexionSvc.DWHConexion(inputValues.IdDivision);
       if (!conexionResp.success) {

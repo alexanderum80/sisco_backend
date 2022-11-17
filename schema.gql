@@ -589,6 +589,7 @@ type ComprobarValoresEntity {
   Operador: String!
   Valor: Float!
   IdDivision: Float!
+  Consolidado: Boolean!
 }
 
 type ComprobarValoresQueryResponse {
@@ -1045,6 +1046,7 @@ input ComprobarValoresInput {
   IdOperador: String!
   Valor: Float!
   IdDivision: Float!
+  Consolidado: Boolean!
 }
 
 input CajaConfiguracionInput {
