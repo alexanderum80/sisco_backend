@@ -40,4 +40,7 @@ export class ContaEstadisticaView {
 
   @Field(() => Int)
   Invalidos: number;
+
+  @Field(() => Int)
+  Anulados: number;
 }
