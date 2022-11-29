@@ -16,7 +16,7 @@ export class DivisionesService {
 
       let criteria = {};
 
-      if (!this._usuariosSvc.isSuperAdmin(IdDivision, IdTipoUsuario)) {
+      if (!this._usuariosSvc.isSuperAdmin(IdDivision, IdTipoUsuario) && !this._usuariosSvc.isAdvancedUser(IdDivision, IdTipoUsuario)) {
         criteria = [{ IdDivision: IdDivision }, { IdDivision: '101' }];
       }
 
