@@ -11,7 +11,6 @@ import {
   queryUltimoPeriodo,
   queryComprobantesRodas,
   queryAsientoRodas,
-  queryMayorRodas,
   queryRangoAsientosMesRodas,
   querySaldosAcumuladosRodas,
   ConciliaContaInput,
@@ -204,9 +203,6 @@ export class ConciliaContaService {
 
         // importar los asientos
         await this._importarAsientos(idUnidad, annio, per, cons, contaConexion);
-
-        // importar mayor
-        await this._importarMayor(idUnidad, annio, periodo, cons, contaConexion);
       }
     } catch (err: any) {
       if (contaConexion && contaConexion.isInitialized) contaConexion.destroy();
@@ -222,7 +218,6 @@ export class ConciliaContaService {
     if (!_unidadRes.success) {
       throw new Error(_unidadRes.error.toString());
     }
-    // const _unidadInfo = _unidadRes.data;
 
     await conexionRodas
       .query(_queryAsientos)
@@ -336,26 +331,6 @@ export class ConciliaContaService {
       const _asientos = this._xmlJsService.jsonToXML('Asiento', _queryAsientosRes);
 
       await this.dataSource.query(`EXEC dbo.pConta_ImportAsientoXML @0, @1, @2, @3, @4`, [_asientos, idUnidad, cons, annio, periodo]).catch(err => {
-        throw new Error(err.message ? err.message : err);
-      });
-    }
-  }
-
-  private async _importarMayor(idUnidad: number, annio: number, periodo: number, cons: string, rodasConexion: DataSource): Promise<void> {
-    const _queryMayor = queryMayorRodas.replace(/@Periodo/g, periodo.toString());
-    const _queryMayorRes = await rodasConexion
-      .query(_queryMayor)
-      .then(result => {
-        return result;
-      })
-      .catch(err => {
-        throw new Error(err.message ? err.message : err);
-      });
-
-    if (_queryMayorRes.length) {
-      const _mayor = this._xmlJsService.jsonToXML('Mayor', _queryMayorRes);
-
-      await this.dataSource.query(`EXEC dbo.pConta_ImportMayorXML @0, @1, @2, @3, @4`, [_mayor, idUnidad, cons, annio, periodo]).catch(err => {
         throw new Error(err.message ? err.message : err);
       });
     }

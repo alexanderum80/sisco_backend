@@ -3,7 +3,7 @@ import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @ObjectType()
 @Entity()
-export class Divisiones {
+export class DivisionesEntity {
   @Field()
   @PrimaryGeneratedColumn()
   IdDivision: number;

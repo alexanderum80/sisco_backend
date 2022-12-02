@@ -97,13 +97,12 @@ export const queryMbUltimoPeriodo = `SELECT ISNULL(MAX(Periodo),0) as Periodo FR
 export const queryMbSinCuentas = `SELECT Inventa FROM dbo.MB WHERE CtaSCta IS NULL OR CtaSCta = '' OR CtaSCtaD IS NULL OR CtaSCtaD = ''`;
 
 export const queryMbPeriodo = `SELECT CASE WHEN C.cri1 = 'Y' THEN MB.Anal1 WHEN C.cri2 = 'Y' THEN MB.Anal2 WHEN C.cri3 = 'Y' THEN MB.Anal3 ELSE @Centro END AS IdUnidad, MB.* 
-    FROM dbo.Mb_periodo AS MB INNER JOIN dbo.Cuentas AS C ON C.CtaSCta = MB.CtaSCta
+    FROM dbo.Mb_periodo AS MB INNER JOIN dbo.Cuentas AS C ON C.CtaSCta = MB.CtaSCta COLLATE Modern_Spanish_CI_AS
     WHERE MB.periodo = @Periodo`;
 
 export const queryMb = `SELECT CASE WHEN C.cri1 = 'Y' THEN MB.Anal1 WHEN C.cri2 = 'Y' THEN MB.Anal2 WHEN C.cri3 = 'Y' THEN MB.Anal3 ELSE @Centro END AS IdUnidad, @Periodo AS periodo, 
     MB.Submayor, MB.Inventa, MB.CtaSCta, MB.Anal1, MB.Anal2, MB.Anal3, MB.CtaSCtaD, MB.AnD1, MB.AnD2, MB.AnD3, MB.CtaSctaG, MB.AnG1, MB.AnG2, MB.AnG3, MB.ValorI, MB.Repara, 
     MB.UDepP, MB.DepAc, MB.TasaD, MB.ALEX, MB.Area, MB.Revalorizacion, MB.mbaja, MB.malta 
-    FROM dbo.Mb AS MB INNER JOIN dbo.Cuentas AS C ON C.CtaSCta = MB.CtaSCta
-`;
+    FROM dbo.Mb AS MB INNER JOIN dbo.Cuentas AS C ON C.CtaSCta = MB.CtaSCta COLLATE Modern_Spanish_CI_AS`;
 
 export const querySiscoUltimoPeriodoMB = `SELECT ISNULL(MAX(Periodo),0) as Periodo FROM ActFijos_MB WHERE IdCentro = @Centro`;

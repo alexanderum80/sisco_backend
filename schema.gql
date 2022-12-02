@@ -7,7 +7,7 @@ type MutationResponse {
   error: String
 }
 
-type Divisiones {
+type DivisionesEntity {
   IdDivision: Float!
   Division: String!
 }
@@ -25,7 +25,7 @@ type Usuarios {
   TipoUsuario: TipoUsuarios!
   CambiarContrasena: Boolean!
   IdDivision: Float!
-  Division: Divisiones!
+  Division: DivisionesEntity!
   Token: String!
 }
 
@@ -43,7 +43,7 @@ type UsuariosQueryResponse {
 
 type DivisionesQueryResponse {
   success: Boolean!
-  data: [Divisiones!]
+  data: [DivisionesEntity!]
   error: String
 }
 
@@ -76,14 +76,22 @@ type AllUnidadesQueryResponse {
 type ContaConexionesEntity {
   Id: Float!
   IdUnidad: Float!
-  Unidad: String!
+  Unidad: CentrosView!
   Consolidado: Boolean!
   IdDivision: Float!
-  Division: String!
+  Division: DivisionesEntity!
   IpRodas: String
-  Usuario: String
-  Contrasena: String
   BaseDatos: String
+}
+
+type Conexiones {
+  name: String!
+}
+
+type ConexionesQueryResponse {
+  success: Boolean!
+  data: [Conexiones!]
+  error: String
 }
 
 type ConciliaContaQueryResponse {
@@ -102,16 +110,6 @@ type ConciliaContabilidad {
 type ConciliaContabilidadQueryResponse {
   success: Boolean!
   data: ConciliaContabilidad
-  error: String
-}
-
-type Conexiones {
-  name: String!
-}
-
-type ConexionesQueryResponse {
-  success: Boolean!
-  data: [Conexiones!]
   error: String
 }
 
@@ -252,7 +250,7 @@ type Empleado {
   IdCargo: Float!
   Cargo: Cargos!
   IdDivision: Float!
-  Division: Divisiones!
+  Division: DivisionesEntity!
 }
 
 type EmpleadoQueryResponse {
@@ -273,7 +271,7 @@ type Supervisor {
   IdCargo: Float!
   Cargo: Cargos!
   IdDivision: Float!
-  Division: Divisiones!
+  Division: DivisionesEntity!
 }
 
 type SupervisorQueryResponse {
@@ -716,7 +714,7 @@ type Query {
   getAllContaConexiones: ContaConexionesQueryResponse!
   getContaConexionById(id: Int!): ContaConexionQueryResponse!
   estadoContaConexiones(idDivision: Int!): EstadoConexionesRodasQueryResponse!
-  entidadesRodas(ip: String!, usuario: String!, password: String!): [EntidadesRodas!]!
+  entidadesRodas(ip: String!): [EntidadesRodas!]!
   getAllUnidades: AllUnidadesQueryResponse!
   getUnidadesByIdSubdivision(idSubdivision: Int!): AllUnidadesQueryResponse!
   getUnidadesByIdDivision(idDivision: Int!): AllUnidadesQueryResponse!

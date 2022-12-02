@@ -1,4 +1,4 @@
-import { Divisiones } from './../divisiones/divisiones.entity';
+import { DivisionesEntity } from './../divisiones/divisiones.entity';
 import { TipoUsuarios } from './../tipo-usuarios/tipo-usuarios.entity';
 import { ObjectType, Field } from '@nestjs/graphql';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
@@ -35,10 +35,10 @@ export class Usuarios {
   @Column()
   IdDivision: number;
 
-  @Field(() => Divisiones)
-  @ManyToOne(() => Divisiones, divisiones => divisiones.IdDivision)
+  @Field(() => DivisionesEntity)
+  @ManyToOne(() => DivisionesEntity, divisiones => divisiones.IdDivision)
   @JoinColumn({ name: 'IdDivision', referencedColumnName: 'IdDivision' })
-  Division?: Divisiones;
+  Division?: DivisionesEntity;
 
   @Field()
   Token: string;

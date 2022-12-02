@@ -31,8 +31,8 @@ export class ContaConexionesResolver {
 
   @Query(() => [EntidadesRodas])
   // @UseGuards(new AuthGuard())
-  async entidadesRodas(@Args('ip') ip: string, @Args('usuario') usuario: string, @Args('password') password: string): Promise<EntidadesRodas[]> {
-    return this._contaConexionesService.getEntidadesRodas(ip, usuario, password);
+  async entidadesRodas(@Args('ip') ip: string): Promise<EntidadesRodas[]> {
+    return this._contaConexionesService.getEntidadesRodas(ip);
   }
 
   @Mutation(() => MutationResponse)

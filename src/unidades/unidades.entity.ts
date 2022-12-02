@@ -42,6 +42,7 @@ export class Unidades {
 export class CentrosView {
   @Field()
   @ViewColumn()
+  @PrimaryColumn()
   IdUnidad: number;
 
   @Field()

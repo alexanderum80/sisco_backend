@@ -3,12 +3,12 @@ import { UsuariosService } from './../usuarios/usuarios.service';
 import { DivisionesQueryResponse } from './divisiones.model';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Divisiones } from './divisiones.entity';
+import { DivisionesEntity } from './divisiones.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class DivisionesService {
-  constructor(@InjectRepository(Divisiones) private readonly divisionesRepository: Repository<Divisiones>, private _usuariosSvc: UsuariosService) {}
+  constructor(@InjectRepository(DivisionesEntity) private readonly divisionesRepository: Repository<DivisionesEntity>, private _usuariosSvc: UsuariosService) {}
 
   async getAllDivisiones(user: Usuarios): Promise<DivisionesQueryResponse> {
     try {

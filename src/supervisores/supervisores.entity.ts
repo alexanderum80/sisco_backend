@@ -1,4 +1,4 @@
-import { Divisiones } from './../divisiones/divisiones.entity';
+import { DivisionesEntity } from './../divisiones/divisiones.entity';
 import { Cargos } from './../cargos/cargos.entity';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, PrimaryGeneratedColumn, JoinColumn, ManyToOne } from 'typeorm';
@@ -27,8 +27,8 @@ export class Supervisor {
   @Column()
   IdDivision: number;
 
-  @Field(() => Divisiones)
-  @ManyToOne(() => Divisiones, divisiones => divisiones.IdDivision)
+  @Field(() => DivisionesEntity)
+  @ManyToOne(() => DivisionesEntity, divisiones => divisiones.IdDivision)
   @JoinColumn({ name: 'IdDivision', referencedColumnName: 'IdDivision' })
-  Division: Divisiones;
+  Division: DivisionesEntity;
 }

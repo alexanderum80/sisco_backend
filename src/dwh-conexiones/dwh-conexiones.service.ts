@@ -1,4 +1,4 @@
-import { DEFAULT_CONNECTION_STRING } from '../conexiones/conexiones.model';
+import { DEFAULT_SQL_CONNECTION_STRING } from '../conexiones/conexiones.model';
 import { DWHConexionQueryResponse, DWHConexionesInput } from './dwh-conexiones.model';
 import { CryptoService } from '../shared/services/crypto/crypto.service';
 import { MutationResponse } from './../shared/models/mutation.response.model';
@@ -95,7 +95,7 @@ export class DwhConexionesService {
   }
 
   private async DWHConexionString(dwhConexionInput: DWHConexionesInput): Promise<DWHConexiones> {
-    const _conexionDWH = cloneDeep(DEFAULT_CONNECTION_STRING);
+    const _conexionDWH = cloneDeep(DEFAULT_SQL_CONNECTION_STRING);
     Object.defineProperties(_conexionDWH, {
       host: {
         value: dwhConexionInput.DWH_ip,
@@ -111,7 +111,7 @@ export class DwhConexionesService {
       },
     });
 
-    const _conexionRest = cloneDeep(DEFAULT_CONNECTION_STRING);
+    const _conexionRest = cloneDeep(DEFAULT_SQL_CONNECTION_STRING);
     Object.defineProperties(_conexionRest, {
       host: {
         value: dwhConexionInput.Rest_ip,
@@ -145,7 +145,7 @@ export class DwhConexionesService {
   async conexionRestEmpresa(): Promise<DataSource> {
     const _connectionQuery = await this.DWHConexion(this.EMPRESA_CODIGO);
     if (!_connectionQuery.success) {
-      return new DataSource(DEFAULT_CONNECTION_STRING);
+      return new DataSource(DEFAULT_SQL_CONNECTION_STRING);
     }
 
     return await this.conexionDWH(_connectionQuery.data.ConexionRest);
@@ -154,7 +154,7 @@ export class DwhConexionesService {
   async conexionDWHEmpresa(): Promise<DataSource> {
     const _connectionQuery = await this.DWHConexion(this.EMPRESA_CODIGO);
     if (!_connectionQuery.success) {
-      return new DataSource(DEFAULT_CONNECTION_STRING);
+      return new DataSource(DEFAULT_SQL_CONNECTION_STRING);
     }
 
     return await this.conexionDWH(_connectionQuery.data.ConexionDWH);

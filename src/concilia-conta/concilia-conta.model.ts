@@ -87,33 +87,31 @@ export class ChequearCentrosInput {
 export const queryUltimoPeriodo = `SELECT ISNULL(MAX(Período), -1) as Periodo FROM dbo.Conta_Asiento
     WHERE Centro = @Centro and isnull(Consolidado, 0) = @Cons and Año = @Anio`;
 
-export const queryRangoAsientosMesRodas = `SELECT Período, MIN(Asiento) AS Ini, MAX(Asiento) AS Fin FROM dbo.Asiento GROUP BY Período ORDER BY Período`;
+export const queryRangoAsientosMesRodas = `SELECT periodo, min(id) as ini, max(id) as fin
+    FROM contabilidad.asientos as a inner join contabilidad.comprobantes as c on a.anno_comprobante = c.anno and 
+        a.tipo_comprobante = c.tipo and a.numero_comprobante = c.numero
+    group by periodo
+    order by periodo;`;
 
-export const queryClasificadorCuentasRodas = `SELECT Año, Cuenta, SubCuenta, Descripción, Naturaleza, [Grupo Clase] AS Grupo_Clase, SubMayor, [Tipo de Análisis 1] AS Tipo_de_Análisis_1, [Tipo de Análisis 2] AS Tipo_de_Análisis_2, [Tipo de Análisis 3] AS Tipo_de_Análisis_3, Obligación, Terminal, Real, [Cuenta Contrapartida] AS Cuenta_Contrapartida,
-    [SubCuenta Contrapartida] AS SubCuenta_Contrapartida, [Cuenta Consolidación] AS Cuenta_Consolidación, [SubCuenta Consolidación] AS SubCuenta_Consolidación, [Tipo de Análisis 1 Consolidación] AS Tipo_de_Análisis_1_Consolidación, [Tipo de Análisis 2 Consolidación] AS Tipo_de_Análisis_2_Consolidación, [Tipo de Análisis 3 Consolidación] AS Tipo_de_Análisis_3_Consolidación,
-    [Obligación Consolidación] AS Obligación_Consolidación, [Condición Consolidación] AS Condición_Consolidación, [Cuenta Ganancia] AS Cuenta_Ganancia, [SubCuenta Ganancia] AS SubCuenta_Ganancia, [Cuenta Pérdida] AS Cuenta_Pérdida, [SubCuenta Pérdida] AS SubCuenta_Pérdida, [Moneda Extranjera] AS Moneda_Extranjera, Estado, [Cuenta Conversión] AS Cuenta_Conversión,
-    [SubCuenta Conversión] AS SubCuenta_Conversión, [Tipo de Análisis 1 Conversión] AS Tipo_de_Análisis_1_Conversión, [Tipo de Análisis 2 Conversión] AS  Tipo_de_Análisis_2_Conversión, [Tipo de Análisis 3 Conversión]  AS Tipo_de_Análisis_3_Conversión, [Obligación Conversión] AS Obligación_Conversión, [Descripción Conversión] AS Descripción_Conversión, [Naturaleza Conversión] AS Naturaleza_Conversión,
-    [Terminal Conversión] AS Terminal_Conversión, [Moneda Extranjera Conversión] AS Moneda_Extranjera_Conversión, [Análisis 1 Consolidación] AS Análisis_1_Consolidación, [Análisis 2 Consolidación] AS Análisis_2_Consolidación, [Análisis 3 Consolidación] AS Análisis_3_Consolidación, aporta_presupuesto, gasto_presupuesto, ingreso_presupuesto,
-    Resultados_presupuesto, Capital_presupuesto, MEMO
-    FROM [Clasificador de Cuentas] as [Clasificador_de_Cuentas]`;
+export const queryClasificadorCuentasRodas = `SELECT anno, cuenta, subcuenta, nombre, naturaleza, tipo_analisis_1, tipo_analisis_2, tipo_analisis_3, tipo_analisis_4, tipo_analisis_5, 
+    obligacion, tipo_moneda, grupo, clase, categoria, clasificacion, tipo, estado
+    from contabilidad.cuentas
+    where anno = @anno
+    order by anno asc, cuenta asc, subcuenta asc`;
 
-export const queryComprobantesRodas = `SELECT Tipo, Número, Período, RTRIM(YEAR(Fecha)) + '/' + RIGHT('00' + RTRIM(MONTH(Fecha)), 2) + '/' + RIGHT('00' + RTRIM(DAY(Fecha)), 2) AS Fecha, Descripción,
-    Estado, Usuario, RTRIM(YEAR([Ultima Actualización])) + '/' + RIGHT('00' + RTRIM(MONTH([Ultima Actualización])), 2) + '/' + RIGHT('00' + RTRIM(DAY([Ultima Actualización])), 2) AS Ultima_Actualización,
-    [Traspasado por] AS Traspasado_por, RTRIM(YEAR([Fecha Traspaso])) + '/' + RIGHT('00' + RTRIM(MONTH([Fecha Traspaso])), 2) + '/' + RIGHT('00' + RTRIM(DAY([Fecha Traspaso])), 2) AS Fecha_Traspaso,
-    Débito, Crédito, IsNull([Usuario Red], '') AS Usuario_Red, IsNull(subsistema, '') as subsistema, IsNull(siglas, '') as siglas
-    FROM Comprobantes WHERE Período = @Periodo`;
+export const queryComprobantesRodas = `SELECT anno, tipo, numero, periodo, estado, descripcion, fecha_hora, usuario, fecha_hora_actualizacion, usuario_actualizacion, fecha_hora_traspaso, usuario_traspaso, modo, origen, entidad, tipo_, numero_, archivo, debito, credito
+    FROM contabilidad.comprobantes
+    where anno = @anno and periodo = @periodo;`;
 
-export const queryAsientoRodas = `SELECT [Tipo de Comprobante] AS Tipo_de_Comprobante, [Número de Comprobante] AS Número_de_Comprobante, [Número de Documento] AS Número_de_Documento, [Período], [Asiento],
-    [Tipo de Asiento] AS Tipo_de_Asiento, [Cuenta], [SubCuenta],[Tipo de Análisis 1] AS Tipo_de_Análisis_1, [Análisis 1] AS Análisis_1, [Tipo de Análisis 2] AS Tipo_de_Análisis_2, [Análisis 2] AS Análisis_2, [Tipo de Análisis 3] AS Tipo_de_Análisis_3, [Análisis 3] AS Análisis_3,
-    [Detalle], [Naturaleza], [Débito], [Crédito], [Moneda Extranjera] AS Moneda_Extranjera, [Tipo de Moneda] AS Tipo_de_Moneda, [Tasa], [Estado], [Documento de Obligación] AS Documento_de_Obligación,
-	ISNULL(RTRIM(YEAR([Fecha])) + '/' + RIGHT('00' + RTRIM(MONTH(Fecha)), 2) + '/' + RIGHT('00' + RTRIM(DAY(Fecha)), 2), '') AS Fecha, [Saldo]
-    FROM Asiento WHERE Período = @Periodo ORDER BY Asiento`;
+export const queryAsientoRodas = `SELECT a.anno_comprobante, a.tipo_comprobante, a.numero_comprobante, a.tipo_documento, a.documento, a.id, a.cuenta, a.subcuenta, a.tipo_analisis_1, a.analisis_1, a.tipo_analisis_2, a.analisis_2, a.tipo_analisis_3, a.analisis_3, a.tipo_analisis_4, a.analisis_4, a.tipo_analisis_5, a.analisis_5, a.naturaleza, a.debito, a.credito, a.tipo_moneda, a.tasa_cambio, a.debito_moneda, a.credito_moneda, a.tipo_documento_obligacion, a.documento_obligacion, a.fecha_documento_obligacion, a.detalle, a.fecha_compromiso_documento_obligacion, a.codigo_almacen
+    FROM contabilidad.asientos as a inner join contabilidad.comprobantes as c on a.anno_comprobante = c.anno and 
+        a.tipo_comprobante = c.tipo and a.numero_comprobante = c.numero
+    where a.anno_comprobante = @anno and c.periodo = @periodo;`;
 
-export const queryMayorRodas = `SELECT Cuenta, SubCuenta, Período, Débito, Crédito, [Débito Acumulado] as Débito_Acumulado, [Crédito Acumulado] as Crédito_Acumulado
-    FROM Mayor where Período = @Periodo ORDER BY Período, Cuenta, SubCuenta`;
-
-export const querySaldosAcumuladosRodas = `SELECT ROUND(SUM(ROUND(Débito, 2)), 2) AS Debito, ROUND(SUM(ROUND(Crédito, 2)), 2) AS Credito
-    FROM dbo.Asiento WHERE Período < @Periodo`;
+export const querySaldosAcumuladosRodas = `SELECT ROUND(SUM(ROUND(a.debito, 2)), 2) AS debito, ROUND(SUM(ROUND(a.credito, 2)), 2) AS credito
+    FROM contabilidad.asientos as a inner join contabilidad.comprobantes as c on a.anno_comprobante = c.anno and 
+        a.tipo_comprobante = c.tipo and a.numero_comprobante = c.numero
+        where a.anno_comprobante = @anno and c.periodo = @periodo;`;
 
 export const queryReporteConsultas = `SELECT Periodo, Centro, IdConsulta, Consulta, Cuenta, SubCuenta, [Análisis 1] as Analisis1, [Análisis 2] as Analisis2, [Análisis 3] as Analisis3, SUM(Total) AS Total, Consolidado
     FROM Conta_ReporteConsultas
