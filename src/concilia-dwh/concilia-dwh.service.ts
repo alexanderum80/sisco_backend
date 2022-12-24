@@ -131,6 +131,11 @@ export class ConciliaDwhService {
       dwhConnectionRestaurador = await (await this._dwhConexionesService.conexionDWH(dwhConexiones.ConexionRest.toString())).initialize();
       dwhConnectionEmpresa = await (await this._dwhConexionesService.conexionRestEmpresa()).initialize();
 
+      // borro los datos del Golden DWH
+      await this.dataSource.query(`DELETE dbo.DWH_Inventario WHERE IdCentro = ${idCentro} AND Periodo = ${mes}`);
+      await this.dataSource.query(`DELETE dbo.DWH_Ventas WHERE IdCentro = ${idCentro} AND Periodo = ${mes}`);
+
+      // importo los datos de cada una de las unidades
       for (let index = 0; index < unidades.length; index++) {
         const unidadInfo = unidades[index];
 
@@ -141,12 +146,12 @@ export class ConciliaDwhService {
         }
 
         // importo el inventario
-        let _importarInventarioRes = await this._importarInventarioDWH(idCentro, annio, mes, unidadInfo, tipoCentro, dwhConnectionDivision);
+        let _importarInventarioRes = await this._importarInventarioDWH(idCentro, annio, mes, unidadInfo.IdUnidad, tipoCentro, dwhConnectionDivision);
         if (!_importarInventarioRes.success) {
           throw new Error(_importarInventarioRes.error + ' No se pudo importar Inventario DWH de la Unidad ' + unidadInfo.IdUnidad);
         }
 
-        _importarInventarioRes = await this._importarInventarioDWH(idCentro, annio, mes, unidadInfo, tipoCentro, dwhConnectionRestaurador, true);
+        _importarInventarioRes = await this._importarInventarioDWH(idCentro, annio, mes, unidadInfo.IdUnidad, tipoCentro, dwhConnectionRestaurador, true);
         if (!_importarInventarioRes.success) {
           throw new Error(_importarInventarioRes.error + ' No se pudo importar Inventario DWH de la Unidad ' + unidadInfo.IdUnidad);
         }
@@ -168,7 +173,7 @@ export class ConciliaDwhService {
           throw new Error(_importarAlmacenesRes.error + ' No se pudo importar Almacenes DWH de la Unidad ' + unidadInfo.IdUnidad);
         }
 
-        _importarInventarioRes = await this._importarInventarioDWH(idCentro, annio, mes, unidadInfo, tipoCentro, dwhConnectionEmpresa, false, true);
+        _importarInventarioRes = await this._importarInventarioDWH(idCentro, annio, mes, unidadInfo.IdUnidad, tipoCentro, dwhConnectionEmpresa, false, true);
         if (!_importarInventarioRes.success) {
           throw new Error(_importarInventarioRes.error + ' No se pudo importar Inventario DWH Empresa de la Unidad ' + unidadInfo.IdUnidad);
         }
@@ -231,7 +236,7 @@ export class ConciliaDwhService {
     idCentro: number,
     annio: number,
     mes: number,
-    unidadInfo: Unidades,
+    idUnidad: number,
     tipoCentro: number,
     dataSource: DataSource,
     isRestaura = false,
@@ -242,7 +247,7 @@ export class ConciliaDwhService {
         .replace(/@Anio/g, annio.toString())
         .replace(/@Mes/g, mes.toString())
         .replace(/@Centro/g, idCentro.toString())
-        .replace(/@Unidad/g, unidadInfo.IdUnidad.toString())
+        .replace(/@Unidad/g, idUnidad.toString())
         .replace(/@Cons/g, tipoCentro.toString());
 
       return new Promise<MutationResponse>(resolve => {
