@@ -96,14 +96,34 @@ export const queryMbUltimoPeriodo = `SELECT ISNULL(MAX(Periodo),0) as Periodo FR
 
 export const queryMbSinCuentas = `SELECT Inventa FROM dbo.MB WHERE CtaSCta IS NULL OR CtaSCta = '' OR CtaSCtaD IS NULL OR CtaSCtaD = ''`;
 
-export const queryMbPeriodo = `SELECT CASE WHEN C.cri1 = 'Y' THEN MB.Anal1 WHEN C.cri2 = 'Y' THEN MB.Anal2 WHEN C.cri3 = 'Y' THEN MB.Anal3 ELSE @Centro END AS IdUnidad, MB.* 
-    FROM dbo.Mb_periodo AS MB INNER JOIN dbo.Cuentas AS C ON C.CtaSCta = MB.CtaSCta
-    WHERE MB.periodo = @Periodo`;
-
-export const queryMb = `SELECT CASE WHEN C.cri1 = 'Y' THEN MB.Anal1 WHEN C.cri2 = 'Y' THEN MB.Anal2 WHEN C.cri3 = 'Y' THEN MB.Anal3 ELSE @Centro END AS IdUnidad, @Periodo AS periodo, 
-    MB.Submayor, MB.Inventa, MB.CtaSCta, MB.Anal1, MB.Anal2, MB.Anal3, MB.CtaSCtaD, MB.AnD1, MB.AnD2, MB.AnD3, MB.CtaSctaG, MB.AnG1, MB.AnG2, MB.AnG3, MB.ValorI, MB.Repara, 
-    MB.UDepP, MB.DepAc, MB.TasaD, MB.ALEX, MB.Area, MB.Revalorizacion, MB.mbaja, MB.malta 
-    FROM dbo.Mb AS MB INNER JOIN dbo.Cuentas AS C ON C.CtaSCta = MB.CtaSCta
-`;
+export const queryMb = `SELECT CASE WHEN C.cri1 = 'Y' THEN Inv.Anal1 WHEN C.cri2 = 'Y' THEN Inv.Anal2 WHEN C.cri3 = 'Y' THEN Inv.Anal3 ELSE @Centro END AS IdUnidad, Inv.periodo, Inv.Submayor, Inv.Inventa, 
+  Inv.CtaSCta, Inv.Anal1, Inv.Anal2, Inv.Anal3, 
+  Inv.CtaSCtaD, Inv.AnD1, Inv.AnD2, Inv.AnD3, Inv.CtaSctaG, Inv.AnG1, Inv.AnG2, Inv.AnG3, 
+  Inv.ValorI, Inv.Repara, Inv.UDepP, Inv.DepAc, Inv.TasaD, Inv.ALEX, Inv.Area, Inv.Revalorizacion, Inv.mbaja, Inv.malta
+  FROM (
+    SELECT MB.periodo, MB.Submayor, MB.Inventa, MB.CtaSCta, MB.Anal1, MB.Anal2, MB.Anal3, 
+      MB.CtaSCtaD, MB.AnD1, MB.AnD2, MB.AnD3, MB.CtaSctaG, MB.AnG1, MB.AnG2, MB.AnG3, 
+      MB.ValorI, MB.Repara, MB.UDepP, MB.DepAc, MB.TasaD, MB.ALEX, MB.Area, MB.Revalorizacion, MB.mbaja, MB.malta 
+    FROM dbo.Mb_periodo AS MB
+    WHERE MB.periodo = @Periodo
+    UNION ALL
+    SELECT Conf.PeríodoA AS periodo, MB.Submayor, MB.Inventa, MB.CtaSCta, MB.Anal1, MB.Anal2, MB.Anal3, 
+      MB.CtaSCtaD, MB.AnD1, MB.AnD2, MB.AnD3, MB.CtaSctaG, MB.AnG1, MB.AnG2, MB.AnG3, 
+      MB.ValorI, MB.Repara, MB.UDepP, MB.DepAc, MB.TasaD, MB.ALEX, MB.Area, MB.Revalorizacion, MB.mbaja, MB.malta 
+    FROM dbo.Mb AS MB CROSS JOIN
+    dbo.Configura AS Conf 
+    WHERE CASE  WHEN CAST(Conf.PeríodoA AS INT) = 1 THEN Conf.Ene
+            WHEN CAST(Conf.PeríodoA AS INT) = 2 THEN Conf.Feb
+            WHEN CAST(Conf.PeríodoA AS INT) = 3 THEN Conf.Mar
+            WHEN CAST(Conf.PeríodoA AS INT) = 4 THEN Conf.Abr
+            WHEN CAST(Conf.PeríodoA AS INT) = 5 THEN Conf.May
+            WHEN CAST(Conf.PeríodoA AS INT) = 6 THEN Conf.Jun
+            WHEN CAST(Conf.PeríodoA AS INT) = 7 THEN Conf.Jul
+            WHEN CAST(Conf.PeríodoA AS INT) = 8 THEN Conf.Ago
+            WHEN CAST(Conf.PeríodoA AS INT) = 9 THEN Conf.Sep
+            WHEN CAST(Conf.PeríodoA AS INT) = 10 THEN Conf.Oct
+            WHEN CAST(Conf.PeríodoA AS INT) = 11 THEN Conf.Nov
+            WHEN CAST(Conf.PeríodoA AS INT) = 12 THEN Conf.Dic END = 0
+  ) AS Inv INNER JOIN dbo.Cuentas AS C ON C.CtaSCta = Inv.CtaSCta`;
 
 export const querySiscoUltimoPeriodoMB = `SELECT ISNULL(MAX(Periodo),0) as Periodo FROM ActFijos_MB WHERE IdCentro = @Centro`;

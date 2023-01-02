@@ -724,7 +724,7 @@ type Query {
   getAllCargos: CargosQueryResponse!
   conciliaDWH(conciliaDWHInput: ConciliaDWHInput!): ConciliaDWHQueryResponse!
   conciliaContabilidad(conciliaContaInput: ConciliaContaInput!): ConciliaContabilidadQueryResponse!
-  getAllClasificadorCuentas(tipo: String): ClasificadorCuentasQueryResponse!
+  getAllClasificadorCuentas(tipo: Int): ClasificadorCuentasQueryResponse!
   getClasificadorCuenta(cuenta: String!, subcuenta: String!, tipo: Int!): ClasificadorCuentaQueryResponse!
   getCuentasAgrupadas: CuentasAgrupadasQueryResponse!
   getAllEmpleados: EmpleadosQueryResponse!

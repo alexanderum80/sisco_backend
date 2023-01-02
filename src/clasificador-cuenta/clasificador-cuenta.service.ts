@@ -10,7 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 export class ClasificadorCuentaService {
   constructor(@InjectRepository(ClasificadorCuentaReal) private clasificadorCuentaRepository: Repository<ClasificadorCuentaReal>, private cuentaEntidadSvc: CuentaEntidadService) {}
 
-  async getAllClasificadorCuentas(tipo?: string): Promise<ClasificadorCuentasQueryResponse> {
+  async getAllClasificadorCuentas(tipo?: number): Promise<ClasificadorCuentasQueryResponse> {
     let _where = {};
     if (tipo) _where = { TipoClasificador: tipo };
     return new Promise<ClasificadorCuentasQueryResponse>(resolve => {
