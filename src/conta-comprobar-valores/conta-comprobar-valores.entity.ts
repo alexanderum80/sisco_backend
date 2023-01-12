@@ -40,4 +40,8 @@ export class ComprobarValoresEntity {
   @Field()
   @Column('bit')
   Consolidado: boolean;
+
+  @Field()
+  @Column('bit')
+  Activo: boolean;
 }
