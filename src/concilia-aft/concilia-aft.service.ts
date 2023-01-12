@@ -50,9 +50,13 @@ export class ConciliaAftService {
               this._importarDatosRodas(annio, periodo, idCentro, 0, _conexionConta)
                 .then(() => {
                   // calculo la conciliacion
-                  this._calculaConciliacion(idCentro, annio, periodo).then(res => {
-                    resolve(res);
-                  });
+                  this._calculaConciliacion(idCentro, annio, periodo)
+                    .then(res => {
+                      resolve(res);
+                    })
+                    .catch(err => {
+                      return reject(err.message || err);
+                    });
                 })
                 .catch(err => {
                   return reject(err.message || err);
@@ -202,8 +206,8 @@ export class ConciliaAftService {
             }
             return _mb;
           })
-          .catch((err: Error) => {
-            return reject(err.message || err);
+          .catch(err => {
+            throw new Error(err.message ? err.message : err);
           });
 
         if (_query) {

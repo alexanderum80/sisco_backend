@@ -12,7 +12,13 @@ export class DivisionesResolver {
 
   @Query(() => DivisionesQueryResponse)
   @UseGuards(new AuthGuard())
-  async getAllDivisiones(@Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios): Promise<DivisionesQueryResponse> {
+  async getAllDivisiones(): Promise<DivisionesQueryResponse> {
+    return this._divisionesService.getAllDivisiones();
+  }
+
+  @Query(() => DivisionesQueryResponse)
+  @UseGuards(new AuthGuard())
+  async getAllDivisionesByUsuario(@Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios): Promise<DivisionesQueryResponse> {
     return this._divisionesService.getAllDivisiones(user);
   }
 

@@ -1,32 +1,7 @@
-import { ConcnacContabilidad } from './concilia-nac-contabilidad.entity';
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
-export class ConciliaNacContabilidadQueryResponse {
-  @Field()
-  success: boolean;
-
-  @Field(() => [ConcnacContabilidad], { nullable: true })
-  data?: ConcnacContabilidad[];
-
-  @Field(() => String, { nullable: true })
-  error?: string;
-}
-
-@ObjectType()
-export class ViewConciliaNacContabilidadQueryResponse {
-  @Field()
-  success: boolean;
-
-  @Field(() => [ConcnacContabilidad], { nullable: true })
-  data?: ConcnacContabilidad[];
-
-  @Field(() => String, { nullable: true })
-  error?: string;
-}
-
-@ObjectType()
-export class ViewConciliaNacContabilidad {
+export class ViewConciliaExtContabilidad {
   @Field()
   Id: number;
 
@@ -104,18 +79,6 @@ export class ViewConciliaNacContabilidad {
 }
 
 @ObjectType()
-export class ActaConciliacionQueryResponse {
-  @Field()
-  success: boolean;
-
-  @Field(() => [ActaConciliacion], { nullable: true })
-  data?: ActaConciliacion[];
-
-  @Field(() => String, { nullable: true })
-  error?: string;
-}
-
-@ObjectType()
 export class ActaConciliacion {
   @Field()
   ID: number;
@@ -140,7 +103,7 @@ export class ActaConciliacion {
 }
 
 @InputType()
-export class ConciliaNacContabilidadInput {
+export class ConciliaExtContabilidadInput {
   @Field()
   Id: number;
 

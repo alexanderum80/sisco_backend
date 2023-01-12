@@ -10,14 +10,16 @@ import { CentrosView } from './unidades.entity';
 export class UnidadesService {
   constructor(@InjectDataSource() private readonly dataSource: DataSource, private _usuariosSvc: UsuariosService) {}
 
-  async getAllUnidades(user: Usuarios): Promise<AllUnidadesQueryResponse> {
+  async getAllUnidades(user?: Usuarios): Promise<AllUnidadesQueryResponse> {
     try {
-      const { IdDivision, IdTipoUsuario } = user;
-
       let _condition = {};
 
-      if (!this._usuariosSvc.isSuperAdmin(IdDivision, IdTipoUsuario) && !this._usuariosSvc.isAdvancedUser(IdDivision, IdTipoUsuario)) {
-        _condition = [{ IdDivision: IdDivision }, { IdDivision: 101 }];
+      if (user) {
+        const { IdDivision, IdTipoUsuario } = user;
+
+        if (!this._usuariosSvc.isSuperAdmin(IdDivision, IdTipoUsuario) && !this._usuariosSvc.isAdvancedUser(IdDivision, IdTipoUsuario)) {
+          _condition = [{ IdDivision: IdDivision }, { IdDivision: 101 }];
+        }
       }
 
       return new Promise<AllUnidadesQueryResponse>(resolve => {

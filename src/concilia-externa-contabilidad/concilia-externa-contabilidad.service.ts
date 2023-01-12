@@ -1,37 +1,20 @@
-import { ActaConciliacionQueryResponse } from './concilia-nac-contabilidad.model';
-import { ViewConciliaNacContabilidadQueryResponse } from './concilia-nac-contabilidad.model';
-import { MutationResponse } from './../shared/models/mutation.response.model';
+import { ActaConciliacion } from './concilia-externa-contabilidad.model';
+import { ConcExtContabilidad } from './concilia-externa-contabilidad.entity';
+import { MutationResponse } from '../shared/models/mutation.response.model';
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
 @Injectable()
-export class ConciliaNacContabilidadService {
+export class ConciliaExtContabilidadService {
   constructor(@InjectDataSource() private readonly dataSource: DataSource) {}
 
-  async conciliacionNacionalVsAsiento(annio: number, mes: number, division: number, unidad: number, divisionOD: number, unidadOD: number): Promise<MutationResponse> {
+  async conciliacionContab(annio: number, mes: number, division: number, unidad: number, divisionOD: number, unidadOD: number): Promise<ConcExtContabilidad> {
     try {
-      return new Promise<MutationResponse>(resolve => {
-        this.dataSource
-          .query(`EXECUTE dbo.p_ConciliacionNacional_vs_Asientos ${annio}, ${mes}, ${division}, ${unidad}, ${divisionOD}, ${unidadOD}`)
-          .then(() => {
-            resolve({ success: true });
-          })
-          .catch(err => {
-            resolve({ success: false, error: err.message ? err.message : err });
-          });
-      });
-    } catch (err: any) {
-      return { success: false, error: err };
-    }
-  }
-
-  async conciliacionContab(annio: number, mes: number, division: number, unidad: number, divisionOD: number, unidadOD: number): Promise<ViewConciliaNacContabilidadQueryResponse> {
-    try {
-      return new Promise<ViewConciliaNacContabilidadQueryResponse>(resolve => {
+      return new Promise<ConcExtContabilidad>((resolve, reject) => {
         this.dataSource
           .query(
-            `SELECT * FROM dbo.vConciliacionContabilidad
+            `SELECT * FROM dbo.vConcExt_ConciliaContabilidad
                     WHERE Annio = ${annio} AND Mes = ${mes}
                     AND ((DivisionEmisorE IN (0, CASE WHEN ${division} = 0 THEN DivisionEmisorE ELSE ${division} END) AND Emisor IN (0, CASE WHEN ${unidad} = 0 THEN Emisor ELSE ${unidad} END) AND DivisionReceptorE IN (0, CASE WHEN ${divisionOD} = 0 THEN DivisionReceptorE ELSE ${divisionOD} END) AND EmitidoA IN (0, CASE WHEN ${unidadOD} = 0 THEN EmitidoA ELSE ${unidadOD} END)
                         AND DivisionEmisorR IN (0, CASE WHEN ${division}= 0 THEN DivisionEmisorR ELSE ${division} END) AND Receptor IN (0, CASE WHEN ${unidadOD} = 0 THEN Receptor ELSE ${unidadOD} END) AND DivisionReceptorR IN (0, CASE WHEN ${divisionOD} = 0 THEN DivisionReceptorR ELSE ${divisionOD} END) AND RecibidoDe IN (0, CASE WHEN ${unidad} = 0 THEN RecibidoDe ELSE ${unidad} END))
@@ -39,17 +22,14 @@ export class ConciliaNacContabilidadService {
                         AND DivisionEmisorR IN (0, CASE WHEN ${divisionOD} = 0 THEN DivisionEmisorR ELSE ${divisionOD} END) AND Receptor IN (0, CASE WHEN ${unidad} = 0 THEN Receptor ELSE ${unidad} END) AND DivisionReceptorR IN (0, CASE WHEN ${division} = 0 THEN DivisionReceptorR ELSE ${division} END) AND RecibidoDe IN (0, CASE WHEN ${unidadOD} = 0 THEN RecibidoDe ELSE ${unidadOD} END)))`,
           )
           .then(result => {
-            resolve({
-              success: true,
-              data: result,
-            });
+            resolve(result);
           })
           .catch(err => {
-            resolve({ success: false, error: err.message ? err.message : err });
+            return reject(err.message || err);
           });
       });
     } catch (err: any) {
-      return { success: false, error: err.message };
+      return Promise.reject(err.message);
     }
   }
 
@@ -60,7 +40,7 @@ export class ConciliaNacContabilidadService {
 
         this.dataSource
           .query(
-            `update dbo.ConciliacionContabilidad
+            `update dbo.ConcExt_ConciliaContabilidad
                     set Recibido = ${recibido}
                     where Id = ${d.Id}`,
           )
@@ -77,12 +57,9 @@ export class ConciliaNacContabilidadService {
     }
   }
 
-  async actaConciliacion(annio: number, mes: number, unidad: number, unidadOD: number): Promise<ActaConciliacionQueryResponse> {
+  async actaConciliacion(annio: number, mes: number, unidad: number, unidadOD: number): Promise<ActaConciliacion[]> {
     if (unidad === 0 || unidadOD === 0) {
-      return {
-        success: true,
-        data: [],
-      };
+      return [];
     }
 
     const stringQuery = `SELECT 1 AS ID, 'Saldo Inicial (Saldo período anterior)' AS Detalle, I.Emisor, I.Receptor, ISNULL(SUM(I.SaldoEmisor), 0) AS SaldoEmisor, ISNULL(SUM(I.SaldoReceptor), 0) AS SaldoReceptor, ISNULL(SUM(I.SaldoEmisor - I.SaldoReceptor), 0) AS Diferencia FROM (
@@ -193,22 +170,19 @@ export class ConciliaNacContabilidadService {
         ) AS I
         GROUP BY I.Emisor, I.Receptor`;
 
-    return new Promise<ActaConciliacionQueryResponse>(resolve => {
+    return new Promise<ActaConciliacion[]>((resolve, reject) => {
       this.dataSource
         .query(stringQuery)
         .then(result => {
-          resolve({
-            success: true,
-            data: result,
-          });
+          resolve(result);
         })
         .catch(err => {
-          resolve({ success: false, error: err.message ? err.message : err });
+          reject(err.message || err);
         });
     });
   }
 
-  async getCentrosConOperaciones(annio: string, mes: string) {
+  async getCentrosConOperaciones(annio: number, mes: number) {
     const stringQuery = `SELECT CASE WHEN Cuenta IN (135, 136) THEN Unidad
                 WHEN [Tipo de Análisis 1] = 'E' THEN [Análisis 1]
                 WHEN [Tipo de Análisis 2] = 'E' THEN [Análisis 2]
@@ -228,18 +202,35 @@ export class ConciliaNacContabilidadService {
                     WHEN [Tipo de Análisis 2] = 'E' THEN [Análisis 2]
                     WHEN [Tipo de Análisis 3] = 'E' THEN [Análisis 3] ELSE '' END`;
 
-    return new Promise<ActaConciliacionQueryResponse>(resolve => {
+    return new Promise<ActaConciliacion[]>((resolve, reject) => {
       this.dataSource
         .query(stringQuery)
         .then(result => {
-          resolve({
-            success: true,
-            data: result,
-          });
+          resolve(result);
         })
         .catch(err => {
-          resolve({ success: false, error: err.message ? err.message : err });
+          reject(err.message || err);
         });
     });
+  }
+
+  async getDiferenciasEnConciliacion(annio: number, mes: number): Promise<ConcExtContabilidad[]> {
+    try {
+      return new Promise<ConcExtContabilidad[]>((resolve, reject) => {
+        const stringQuery = `select * from vDiferenciasEnConciliacion
+                        where Annio = ${annio} and Mes = ${mes}`;
+
+        this.dataSource
+          .query(stringQuery)
+          .then(result => {
+            resolve(result);
+          })
+          .catch(err => {
+            reject(err.message || err);
+          });
+      });
+    } catch (err) {
+      return Promise.reject(err.message || err);
+    }
   }
 }

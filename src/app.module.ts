@@ -20,7 +20,7 @@ import { ConexionesModule } from './conexiones/conexiones.module';
 import { ConciliaInternaDwhModule } from './concilia-interna-dwh/concilia-interna-dwh.module';
 import { SubdivisionesModule } from './subdivisiones/subdivisiones.module';
 import { ClasificadorCuentaModule } from './clasificador-cuenta/clasificador-cuenta.module';
-import { ConciliaNacContabilidadModule } from './concilia-nac-contabilidad/concilia-nac-contabilidad.module';
+import { ConciliaExtContabilidadModule } from './concilia-externa-contabilidad/concilia-externa-contabilidad.module';
 import { TipoEntidadesModule } from './tipo-entidades/tipo-entidades.module';
 import { EpigrafesModule } from './epigrafes/epigrafes.module';
 import { CuentaEntidadModule } from './cuenta-entidad/cuenta-entidad.module';
@@ -41,6 +41,10 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { ConciliaUhModule } from './concilia-uh/concilia-uh.module';
 import { ContaEstadisticaModule } from './conta-estadistica/conta-estadistica.module';
 import { ConciliaInternaContaModule } from './concilia-interna-conta/concilia-interna-conta.module';
+import { ConciliaExternaModule } from './concilia-externa/concilia-externa.module';
+import { ConciliaExternaDwhModule } from './concilia-externa-dwh/concilia-externa-dwh.module';
+import { ConciliaExternaEntreUnidadesModule } from './concilia-externa-entre-unidades/concilia-externa-entre-unidades.module';
+import { ConciliaExternaChatsModule } from './concilia-externa-chats/concilia-externa-chats.module';
 
 @Module({
   imports: [
@@ -91,7 +95,7 @@ import { ConciliaInternaContaModule } from './concilia-interna-conta/concilia-in
     ConciliaInternaDwhModule,
     SubdivisionesModule,
     ClasificadorCuentaModule,
-    ConciliaNacContabilidadModule,
+    ConciliaExtContabilidadModule,
     TipoEntidadesModule,
     EpigrafesModule,
     CuentaEntidadModule,
@@ -110,6 +114,10 @@ import { ConciliaInternaContaModule } from './concilia-interna-conta/concilia-in
     ConciliaUhModule,
     ContaEstadisticaModule,
     ConciliaInternaContaModule,
+    ConciliaExternaModule,
+    ConciliaExternaDwhModule,
+    ConciliaExternaEntreUnidadesModule,
+    ConciliaExternaChatsModule,
   ],
   controllers: [AppController],
   providers: [AppService, EmailsService],
