@@ -937,7 +937,7 @@ type Mutation {
   updateDWhConexion(dwhConexionInput: DWHConexionesInput!): MutationResponse!
   iniciarSaldos(iniciarSaldosInput: IniciarSaldosInput!): ConciliaContabilidadQueryResponse!
   chequearCentros(chequearCentrosInput: ChequearCentrosInput!): ConciliaContaQueryResponse!
-  arreglaClasificadorCuenta(idUnidad: Int!, tipoUnidad: String!, annio: String!): ConciliaContaQueryResponse!
+  arreglaClasificadorCuenta(idUnidad: Int!, tipoUnidad: String!, annio: String!): Boolean!
   saveClasificadorCuenta(clasificadorInfo: ClasificadorCuentaRealInput!): MutationResponse!
   deleteClasificadorCuenta(cuenta: String!, subcuenta: String!, tipo: Int!): MutationResponse!
   createEmpleado(empleadoInfo: EmpleadoInput!): MutationResponse!

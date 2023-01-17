@@ -141,7 +141,7 @@ export const queryCentrosByConsolidado = `SELECT T.Centro FROM (
     GROUP BY T.Centro
     ORDER BY T.Centro`;
 
-export const queryInsertClasificadorUnidad = `IF NOT EXISTS (SELECT * FROM dbo.[Clasificador de Cuentas] WHERE Año = @Anio AND Cuenta = '@Cta' AND SubCuenta = '@Subcta')
+export const queryInsertClasificadorUnidad = `IF NOT EXISTS (SELECT * FROM dbo.[Clasificador de Cuentas] WHERE Año = @Anio AND Cuenta = '@Cta' AND SubCuenta = '@SubCta')
     INSERT dbo.[Clasificador de Cuentas]
             (Año, Cuenta, SubCuenta, Descripción, Naturaleza, SubMayor, 
             [Tipo de Análisis 1], [Tipo de Análisis 2], [Tipo de Análisis 3], Obligación, Terminal, 

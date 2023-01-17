@@ -2,7 +2,7 @@ import { ConciliaExternaChatsService } from './concilia-externa-chats/concilia-e
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-// import * as socket from 'socket.io';
+import * as socket from 'socket.io';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -14,35 +14,36 @@ async function bootstrap() {
     next();
   });
 
-  const server = await app.listen(9091);
+  const server = await app.listen(3000);
 
-  // // Socket
-  // const io = socket.listen(server);
+  // Socket
+  const io = new socket.Server(server);
 
-  // io.on('connection', socket => {
-  //   let IdUsuario: string;
+  io.on('connection', socket => {
+    let IdUsuario: string;
 
-  //   io.emit('new-connection', null);
+    io.emit('new-connection', null);
 
-  //   socket.on('connect-user', idUsuario => {
-  //     IdUsuario = idUsuario;
-  //     io.emit('connected-user', IdUsuario);
-  //   });
+    socket.on('connect-user', idUsuario => {
+      IdUsuario = idUsuario;
+      io.emit('connected-user', IdUsuario);
+    });
 
-  //   socket.on('new-message', message => {
-  //     ConciliaExternaChatsService.registerChat(message);
-  //     io.emit('new-message', message);
-  //   });
+    socket.on('new-message', message => {
+      ConciliaExternaChatsService.registerChat(message);
+      io.emit('new-message', message);
+    });
 
-  //   socket.on('disconnect', () => {
-  //     if (IdUsuario) {
-  //       io.emit('disconnected-user', IdUsuario);
-  //     }
-  //   });
+    socket.on('disconnect', () => {
+      if (IdUsuario) {
+        io.emit('disconnected-user', IdUsuario);
+      }
+    });
 
-  //   socket.on('concilia-status-change', status => {
-  //     io.emit('concilia-status', status);
-  //   });
-  // });
+    socket.on('concilia-status-change', status => {
+      io.emit('concilia-status', status);
+    });
+  });
 }
+
 bootstrap();
