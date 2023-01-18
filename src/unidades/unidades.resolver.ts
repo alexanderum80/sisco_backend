@@ -12,7 +12,13 @@ export class UnidadesResolver {
 
   @Query(() => AllUnidadesQueryResponse)
   @UseGuards(new AuthGuard())
-  async getAllUnidades(@Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios): Promise<AllUnidadesQueryResponse> {
+  async getAllUnidades(): Promise<AllUnidadesQueryResponse> {
+    return this._unidadesService.getAllUnidades();
+  }
+
+  @Query(() => AllUnidadesQueryResponse)
+  @UseGuards(new AuthGuard())
+  async getAllUnidadesByUsuario(@Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios): Promise<AllUnidadesQueryResponse> {
     return this._unidadesService.getAllUnidades(user);
   }
 

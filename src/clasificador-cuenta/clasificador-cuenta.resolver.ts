@@ -9,7 +9,7 @@ export class ClasificadorCuentaResolver {
   constructor(private clasificadorCuentaSvc: ClasificadorCuentaService) {}
 
   @Query(() => ClasificadorCuentasQueryResponse)
-  async getAllClasificadorCuentas(@Args('tipo', { nullable: true }) tipo: string): Promise<ClasificadorCuentasQueryResponse> {
+  async getAllClasificadorCuentas(@Args('tipo', { nullable: true, type: () => Int }) tipo: number): Promise<ClasificadorCuentasQueryResponse> {
     return this.clasificadorCuentaSvc.getAllClasificadorCuentas(tipo);
   }
 

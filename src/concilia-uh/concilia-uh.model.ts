@@ -85,7 +85,19 @@ export const queryUh = `SELECT CASE WHEN Cat.Analisis1MN = 'CCOSTO' OR Cat.Anali
         SELECT Conf.Periodo AS Periodo, Inv.Codig_Producto, Inv.Codig_Trabajador, Inv.Codig_Area, Inv.Existencia, 
             Inv.Importe_MN_p, Inv.Importe_MLC_p, Inv.Depreciacion_MN_p, Inv.Depreciacion_MLC_p
             FROM TbActa AS Inv CROSS JOIN
-        dbo.TbConfiguracion AS Conf
+            dbo.TbConfiguracion AS Conf
+            WHERE CASE  WHEN Conf.Periodo = 1 THEN Conf.P1 
+                        WHEN Conf.Periodo = 2 THEN Conf.P2
+                        WHEN Conf.Periodo = 3 THEN Conf.P3 
+                        WHEN Conf.Periodo = 4 THEN Conf.P4
+                        WHEN Conf.Periodo = 5 THEN Conf.P5
+                        WHEN Conf.Periodo = 6 THEN Conf.P6
+                        WHEN Conf.Periodo = 7 THEN Conf.P7
+                        WHEN Conf.Periodo = 8 THEN Conf.P8
+                        WHEN Conf.Periodo = 9 THEN Conf.P9
+                        WHEN Conf.Periodo = 10 THEN Conf.P10
+                        WHEN Conf.Periodo = 11 THEN Conf.P11
+                        WHEN Conf.Periodo = 12 THEN Conf.P12 END = 'A'
     ) AS Inv INNER JOIN
     TbProducto AS Prod ON Prod.Codig_PRODUCTO = Inv.Codig_Producto INNER JOIN
     TbCategorias AS Cat ON Cat.CodCategoria = Prod.CodCategoria INNER JOIN

@@ -10,14 +10,16 @@ import { Repository } from 'typeorm';
 export class DivisionesService {
   constructor(@InjectRepository(DivisionesEntity) private readonly divisionesRepository: Repository<DivisionesEntity>, private _usuariosSvc: UsuariosService) {}
 
-  async getAllDivisiones(user: Usuarios): Promise<DivisionesQueryResponse> {
+  async getAllDivisiones(user?: Usuarios): Promise<DivisionesQueryResponse> {
     try {
-      const { IdDivision, IdTipoUsuario } = user;
-
       let criteria = {};
 
-      if (!this._usuariosSvc.isSuperAdmin(IdDivision, IdTipoUsuario) && !this._usuariosSvc.isAdvancedUser(IdDivision, IdTipoUsuario)) {
-        criteria = [{ IdDivision: IdDivision }, { IdDivision: '101' }];
+      if (user) {
+        const { IdDivision, IdTipoUsuario } = user;
+
+        if (!this._usuariosSvc.isSuperAdmin(IdDivision, IdTipoUsuario) && !this._usuariosSvc.isAdvancedUser(IdDivision, IdTipoUsuario)) {
+          criteria = [{ IdDivision: IdDivision }, { IdDivision: '101' }];
+        }
       }
 
       return new Promise<DivisionesQueryResponse>(resolve => {

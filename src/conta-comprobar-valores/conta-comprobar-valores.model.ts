@@ -30,4 +30,7 @@ export class ComprobarValoresInput {
 
   @Field()
   Consolidado: boolean;
+
+  @Field()
+  Activo: boolean;
 }

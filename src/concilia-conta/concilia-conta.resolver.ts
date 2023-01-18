@@ -28,12 +28,12 @@ export class ConciliaContaResolver {
     return this.conciliaContaSvc.chequearCentro(chequearCentrosInput);
   }
 
-  @Mutation(() => ConciliaContaQueryResponse)
+  @Mutation(() => Boolean)
   async arreglaClasificadorCuenta(
     @Args({ name: 'idUnidad', type: () => Int }) idUnidad: number,
     @Args({ name: 'tipoUnidad', type: () => String }) tipoUnidad: string,
     @Args({ name: 'annio', type: () => String }) annio: string,
-  ): Promise<ConciliaContaQueryResponse> {
+  ): Promise<boolean> {
     return this.conciliaContaSvc.arreglaClasificadorCuenta(idUnidad, tipoUnidad, annio);
   }
 }

@@ -24,6 +24,7 @@ import {
   ChequearCentrosInput,
   queryInsertClasificadorUnidad,
   querySwitchAuditRodas,
+  queryUpdateClasificadorUnidad,
 } from './concilia-conta.model';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
@@ -481,15 +482,15 @@ export class ConciliaContaService {
     }
   }
 
-  async arreglaClasificadorCuenta(idUnidad: number, tipoUnidad: string, annio: string): Promise<MutationResponse> {
+  async arreglaClasificadorCuenta(idUnidad: number, tipoUnidad: string, annio: string): Promise<boolean> {
     try {
       // verificar si se ha definido la conexión al Rodas
       const _conexionRodasQuery = await this._contaConexionesService.findByIdUnidad(idUnidad, tipoUnidad === '2');
       const _conexionConta = _conexionRodasQuery.data;
-      _conexionConta.BaseDatos = `Conta${_conexionConta.BaseDatos}${annio.toString()}`;
-
       const _conexionCodif = cloneDeep(_conexionConta);
-      _conexionCodif.BaseDatos = `Codif${_conexionConta.BaseDatos}`;
+
+      _conexionConta.BaseDatos = `Conta${_conexionConta.BaseDatos}${annio.toString()}`;
+      _conexionCodif.BaseDatos = `Codif${_conexionCodif.BaseDatos}`;
 
       let tipoClasificador = 0;
 
@@ -524,7 +525,7 @@ export class ConciliaContaService {
       const _queryStopAudit = querySwitchAuditRodas.replace(/@DataBase/g, bdConta.options.database.toString()).replace(/@Accion/g, 'OFF');
 
       await bdCodif.query(_queryStopAudit).catch(err => {
-        return { success: false, error: err.message ? err.message : err };
+        throw new Error(err);
       });
 
       _clasifCuentasReal.forEach(
@@ -568,13 +569,13 @@ export class ConciliaContaService {
             const _queryStopAudit = querySwitchAuditRodas.replace(/@DataBase/g, bdConta.options.database.toString()).replace(/@Accion/g, 'ON');
 
             bdCodif.query(_queryStopAudit).catch(err => {
-              return { success: false, error: err.message ? err.message : err };
+              throw Error(err);
             });
 
-            return { success: false, error: err.message ? err.message : err };
+            throw Error(err);
           });
 
-          const _queryUpdate = queryInsertClasificadorUnidad
+          const _queryUpdate = queryUpdateClasificadorUnidad
             .replace(/@Anio/g, annio)
             .replace(/@Cta/g, element.Cuenta)
             .replace(/@SubCta/g, element.SubCuenta)
@@ -599,19 +600,19 @@ export class ConciliaContaService {
             const _queryStopAudit = querySwitchAuditRodas.replace(/@DataBase/g, bdConta.options.database.toString()).replace(/@Accion/g, 'ON');
 
             bdCodif.query(_queryStopAudit).catch(err => {
-              return { success: false, error: err.message ? err.message : err };
+              throw new Error(err);
             });
 
-            return { success: false, error: err.message ? err.message : err };
+            throw new Error(err);
           });
         },
       );
 
-      return new Promise<MutationResponse>(resolve => {
-        resolve({ success: true });
+      return new Promise<boolean>(resolve => {
+        resolve(true);
       });
     } catch (err: any) {
-      return { success: false, error: err.message ? err.message : err };
+      return Promise.reject(err.message || err);
     }
   }
 

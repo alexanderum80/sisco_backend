@@ -9,7 +9,6 @@ import {
   DiferenciaClasificadorCNMB,
   queryMbUltimoPeriodo,
   queryMbSinCuentas,
-  queryMbPeriodo,
   queryMb,
   querySiscoUltimoPeriodoMB,
 } from './concilia-aft.model';
@@ -51,9 +50,13 @@ export class ConciliaAftService {
               this._importarDatosRodas(annio, periodo, idCentro, 0, _conexionConta)
                 .then(() => {
                   // calculo la conciliacion
-                  this._calculaConciliacion(idCentro, annio, periodo).then(res => {
-                    resolve(res);
-                  });
+                  this._calculaConciliacion(idCentro, annio, periodo)
+                    .then(res => {
+                      resolve(res);
+                    })
+                    .catch(err => {
+                      return reject(err.message || err);
+                    });
                 })
                 .catch(err => {
                   return reject(err.message || err);
@@ -183,7 +186,6 @@ export class ConciliaAftService {
 
   private async _importarMb(idCentro: number, periodo: number, conexionRodas: DataSource): Promise<boolean> {
     return new Promise<boolean>(async (resolve, reject) => {
-      // leo primero de la tabla MB_Periodo
       const ultimoPeriodoResp = await this.dataSource
         .query(querySiscoUltimoPeriodoMB.replace(/@Centro/gi, idCentro.toString()))
         .then(async per => {
@@ -196,30 +198,18 @@ export class ConciliaAftService {
 
       for (let per = periodoActual; per <= periodo; per++) {
         let _mb: string;
-        let _query = await conexionRodas
-          .query(queryMbPeriodo.replace(/@Centro/gi, idCentro.toString()).replace(/@Periodo/gi, padStart(per.toString(), 2, '0')))
+        const _query = await conexionRodas
+          .query(queryMb.replace(/@Centro/gi, idCentro.toString()).replace(/@Periodo/gi, padStart(per.toString(), 2, '0')))
           .then(res => {
             if (res.length) {
               _mb = this._xmlSvc.jsonToXML('MB', res);
             }
             return _mb;
           })
-          .catch((err: Error) => {
-            return reject(err.message || err);
+          .catch(err => {
+            throw new Error(err.message ? err.message : err);
           });
-        if (!_query) {
-          _query = await conexionRodas
-            .query(queryMb.replace(/@Centro/gi, idCentro.toString()).replace(/@Periodo/gi, padStart(per.toString(), 2, '0')))
-            .then(res => {
-              if (res.length) {
-                _mb = this._xmlSvc.jsonToXML('MB', res);
-              }
-              return _mb;
-            })
-            .catch((err: Error) => {
-              return reject(err.message || err);
-            });
-        }
+
         if (_query) {
           // inserto los MB
           await this.dataSource
