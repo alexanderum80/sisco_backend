@@ -166,20 +166,25 @@ type CargosQueryResponse {
 }
 
 type ClasificadorCuentaReal {
+  TipoClasificador: Float!
   Cuenta: String!
   SubCuenta: String!
-  Descripcion: String!
+  Nombre: String!
   Naturaleza: String!
-  Crit1: String
-  Crit2: String
-  Crit3: String
+  Tipo_de_analisis_1: String
+  Tipo_de_analisis_2: String
+  Tipo_de_analisis_3: String
+  Tipo_de_analisis_4: String
+  Tipo_de_analisis_5: String
   Obligacion: Boolean!
-  TipoClasificador: Float!
+  Tipo_Moneda: String
+  Grupo: String!
+  Clase: String!
+  Categoria: String!
+  Clasificacion: String!
+  Tipo: String!
+  Estado: String!
   SeUtiliza: String
-  Terminal: Boolean!
-  Crit1Consolidacion: String
-  Crit2Consolidacion: String
-  Crit3Consolidacion: String
 }
 
 type ClasificadorCuentaQueryResponse {

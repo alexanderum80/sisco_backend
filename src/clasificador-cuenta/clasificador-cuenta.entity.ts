@@ -2,8 +2,12 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @ObjectType()
-@Entity()
+@Entity('Conta_ClasificadorCuentas_Real')
 export class ClasificadorCuentaReal {
+  @Field()
+  @PrimaryColumn()
+  TipoClasificador: number;
+
   @Field()
   @PrimaryColumn()
   Cuenta: string;
@@ -14,49 +18,65 @@ export class ClasificadorCuentaReal {
 
   @Field()
   @Column({ nullable: true })
-  Descripcion: string;
+  Nombre: string;
 
   @Field()
   @Column({ length: 1 })
   Naturaleza: string;
 
   @Field({ nullable: true })
-  @Column({ length: 10, nullable: true })
-  Crit1?: string;
+  @Column({ length: 3, nullable: true })
+  Tipo_de_analisis_1?: string;
 
   @Field({ nullable: true })
-  @Column({ length: 10, nullable: true })
-  Crit2?: string;
+  @Column({ length: 3, nullable: true })
+  Tipo_de_analisis_2?: string;
 
   @Field({ nullable: true })
-  @Column({ length: 10, nullable: true })
-  Crit3?: string;
+  @Column({ length: 3, nullable: true })
+  Tipo_de_analisis_3?: string;
+
+  @Field({ nullable: true })
+  @Column({ length: 3, nullable: true })
+  Tipo_de_analisis_4?: string;
+
+  @Field({ nullable: true })
+  @Column({ length: 3, nullable: true })
+  Tipo_de_analisis_5?: string;
 
   @Field({ defaultValue: false })
   @Column({ default: false })
   Obligacion: boolean;
 
+  @Field({ nullable: true })
+  @Column({ length: 3, nullable: true })
+  Tipo_Moneda?: string;
+
   @Field()
-  @PrimaryColumn()
-  TipoClasificador: number;
+  @Column({ length: 2 })
+  Grupo?: string;
+
+  @Field()
+  @Column({ length: 2 })
+  Clase?: string;
+
+  @Field()
+  @Column({ length: 8 })
+  Categoria?: string;
+
+  @Field()
+  @Column({ length: 1 })
+  Clasificacion?: string;
+
+  @Field()
+  @Column({ length: 1 })
+  Tipo?: string;
+
+  @Field()
+  @Column({ length: 1 })
+  Estado?: string;
 
   @Field({ nullable: true })
   @Column()
   SeUtiliza?: string;
-
-  @Field()
-  @Column()
-  Terminal: boolean;
-
-  @Field({ nullable: true })
-  @Column({ length: 10, nullable: true })
-  Crit1Consolidacion?: string;
-
-  @Field({ nullable: true })
-  @Column({ length: 10, nullable: true })
-  Crit2Consolidacion?: string;
-
-  @Field({ nullable: true })
-  @Column({ length: 10, nullable: true })
-  Crit3Consolidacion?: string;
 }
