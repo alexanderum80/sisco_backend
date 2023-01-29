@@ -21,6 +21,9 @@ export class ConciliaDWH {
   IdCentro: number;
 
   @Field()
+  Centro: string;
+
+  @Field()
   IdUnidad: string;
 
   @Field()

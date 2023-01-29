@@ -42,6 +42,7 @@
     "jsonwebtoken": "^9.0.0",
     "jstoxml": "^2.2.7",
     "mssql": "^6.4.1",
+    "pg": "^8.8.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",

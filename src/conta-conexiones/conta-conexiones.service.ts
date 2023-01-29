@@ -106,8 +106,8 @@ export class ContaConexionesService {
     try {
       delete conexion.Id;
 
-      const encryptedPassword = await this._cryptoService.encrypt(conexion.Contrasena);
-      conexion.Contrasena = encryptedPassword;
+      // const encryptedPassword = await this._cryptoService.encrypt(conexion.Contrasena);
+      // conexion.Contrasena = encryptedPassword;
 
       return new Promise<MutationResponse>(resolve => {
         this.conexionesRespository
@@ -128,8 +128,8 @@ export class ContaConexionesService {
 
   async update(conexion: ContaConexionInput): Promise<MutationResponse> {
     try {
-      const encryptedPassword = await this._cryptoService.encrypt(conexion.Contrasena);
-      conexion.Contrasena = encryptedPassword;
+      // const encryptedPassword = await this._cryptoService.encrypt(conexion.Contrasena);
+      // conexion.Contrasena = encryptedPassword;
 
       return new Promise<MutationResponse>(resolve => {
         this.conexionesRespository
@@ -175,14 +175,17 @@ export class ContaConexionesService {
           value: ip,
         },
         database: {
-          value: 'ADMIN',
+          value: 'r4_admin',
         },
       });
 
       const dataSource: DataSource = await new DataSource(connectionString).initialize();
       return new Promise<EntidadesRodas[]>((resolve, reject) => {
         dataSource
-          .query(`SELECT Siglas, Código + '-' + Nombre AS Entidad FROM dbo.ENTIDADES`)
+          .query(
+            `SELECT sigla, concat(codigo, '-', nombre) as entidad
+            FROM public.entidades;`,
+          )
           .then(result => {
             resolve(result);
           })

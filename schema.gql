@@ -131,8 +131,8 @@ type EstadoConexionesRodas {
 }
 
 type EntidadesRodas {
-  Siglas: String!
-  Entidad: String!
+  sigla: String!
+  entidad: String!
 }
 
 type EstadoConexionesRodasQueryResponse {
@@ -171,11 +171,11 @@ type ClasificadorCuentaReal {
   SubCuenta: String!
   Nombre: String!
   Naturaleza: String!
-  Tipo_de_analisis_1: String
-  Tipo_de_analisis_2: String
-  Tipo_de_analisis_3: String
-  Tipo_de_analisis_4: String
-  Tipo_de_analisis_5: String
+  Tipo_Analisis_1: String
+  Tipo_Analisis_2: String
+  Tipo_Analisis_3: String
+  Tipo_Analisis_4: String
+  Tipo_Analisis_5: String
   Obligacion: Boolean!
   Tipo_Moneda: String
   Grupo: String!
@@ -184,6 +184,11 @@ type ClasificadorCuentaReal {
   Clasificacion: String!
   Tipo: String!
   Estado: String!
+  Tipo_Analisis_1_Cons: String
+  Tipo_Analisis_2_Cons: String
+  Tipo_Analisis_3_Cons: String
+  Tipo_Analisis_4_Cons: String
+  Tipo_Analisis_5_Cons: String
   SeUtiliza: String
 }
 
@@ -212,6 +217,7 @@ type CuentasAgrupadasQueryResponse {
 type ConciliaDWH {
   Tipo: String!
   IdCentro: Float!
+  Centro: String!
   IdUnidad: String!
   Unidad: String!
   IdPiso: String!
@@ -663,12 +669,6 @@ type ConciliaAftData {
   DiferenciaClasificadorCNMB: [DiferenciaClasificadorCNMB!]
 }
 
-type ActFijosClasificadorCnmbEntity {
-  CNMB: String!
-  DCNMB: String!
-  TREPO: Float!
-}
-
 type ConciliaUH {
   Tipo: String!
   IdDivision: Float!
@@ -684,6 +684,8 @@ type ConciliaUH {
   Analisis1: String!
   Analisis2: String!
   Analisis3: String!
+  Analisis4: String!
+  Analisis5: String!
   SaldoUH: Float!
   SaldoRodas: Float!
   Diferencia: Float!
@@ -791,6 +793,31 @@ type ConciliaExternaEntity {
   createConcUnidadReceptor: ConciliaExternaEntreUnidadesEntity!
 }
 
+type GrupoCuentaEntity {
+  IdGrupo: String!
+  Grupo: String!
+}
+
+type ClaseCuentaEntity {
+  ID: Int!
+  IdClase: String!
+  IdGrupo: String!
+  Clase: String!
+}
+
+type CategoriaCuentaEntity {
+  IdCategoria: String!
+  IdClase: Int!
+  Categoria: String!
+}
+
+type ActFijosClasificadorSubgrupoEntity {
+  Grupo: Int!
+  Codigo: Int!
+  Descripcion: String!
+  Tasa: Float!
+}
+
 type Query {
   authenticateUsuario(usuario: String!, passw: String!): UsuarioQueryResponse!
   getAllUsuarios: UsuariosQueryResponse!
@@ -850,8 +877,6 @@ type Query {
   getComprobarValorById(id: Int!): ComprobarValorQueryResponse!
   getCajasConfiguracion: [CajaConfiguracionEntity!]!
   getCajaConfiguracion(id: Int!): CajaConfiguracionEntity!
-  getAllActFijosClasificadorCnmb: [ActFijosClasificadorCnmbEntity!]!
-  getActFijosClasificadorCnmb(cnmb: String!): ActFijosClasificadorCnmbEntity!
   conciliaAFT(conciliaAftInput: ConciliaAftInput!): ConciliaAftData!
   conciliaUH(conciliaUhInput: ConciliaUhInput!): [ConciliaUH!]!
   contaEstadistica(contaEstadisticaInput: ContaEstadisticaInput!): [ContaEstadisticaView!]!
@@ -860,6 +885,16 @@ type Query {
   conciliaExternaDWH(conciliaExternaDWHInput: ConciliaOperacionesDWHInput!): ConciliacionOperacionesDWHQueryResponse!
   getConciliacionEntreUnidades(annio: Int!, mes: Int!, unidad: Int!, unidadOD: Int!): ConciliaExternaEntreUnidadesEntity!
   getCentrosNoConciliados(annio: Int!, mes: Int!): [ConciliaExternaCentrosNoConciliados!]!
+  getAllGrupoCuenta: [GrupoCuentaEntity!]!
+  getGrupoCuentaById(id: String!): GrupoCuentaEntity!
+  getAllClaseCuenta: [ClaseCuentaEntity!]!
+  getClaseCuentaById(id: Int!): ClaseCuentaEntity!
+  getClaseCuentaByIdGrupo(idGrupo: String!): [ClaseCuentaEntity!]!
+  getAllCategoriaCuenta: [CategoriaCuentaEntity!]!
+  getCategoriaCuentaById(id: String!): CategoriaCuentaEntity!
+  getCategoriaCuentaByIdClase(idClase: Int!): [CategoriaCuentaEntity!]!
+  getAllActFijosClasificadorSubgrupo: [ActFijosClasificadorSubgrupoEntity!]!
+  getActFijosClasificadorSubgrupo(grupo: Int!, codigo: Int!): ActFijosClasificadorSubgrupoEntity!
 }
 
 input ConciliaDWHInput {
@@ -977,10 +1012,10 @@ type Mutation {
   createCajaConfiguracion(cajaConfiguracionInput: CajaConfiguracionInput!): CajaConfiguracionEntity!
   updateCajaConfiguracion(cajaConfiguracionInput: CajaConfiguracionInput!): CajaConfiguracionEntity!
   removeCajaConfiguracion(id: Int!): CajaConfiguracionEntity!
-  saveActFijosClasificadorCnmb(actfijosClasificadorCnmbInput: ActFijosClasificadorCnmbInput!): ActFijosClasificadorCnmbEntity!
-  removeActFijosClasificadorCnmb(cnmb: String!): Float!
   updateConciliaDWH(conciliaDWH: [ConciliaExternaDwhInput!]!): Int!
   updateConciliacionEntreUnidades(conciliacionUnidadesInput: ConciliacionEntreUnidadesInput!): Float!
+  saveActFijosClasificadorSubgrupo(actFijosClasificadorSubgrupoInput: ActFijosClasificadorSubgrupoInput!): ActFijosClasificadorSubgrupoEntity!
+  deleteActFijosClasificadorSubgrupo(grupo: Int!, codigo: Int!): Int!
 }
 
 input UsuarioInput {
@@ -999,8 +1034,6 @@ input ContaConexionInput {
   Consolidado: Boolean!
   IdDivision: Float!
   IpRodas: String
-  Usuario: String
-  Contrasena: String
   BaseDatos: String
 }
 
@@ -1030,20 +1063,30 @@ input ChequearCentrosInput {
 }
 
 input ClasificadorCuentaRealInput {
+  TipoClasificador: Float!
   Cuenta: String!
   SubCuenta: String!
-  Descripcion: String!
+  Nombre: String!
   Naturaleza: String!
-  Crit1: String
-  Crit2: String
-  Crit3: String
-  Obligacion: Boolean!
-  TipoClasificador: Float!
+  Tipo_Analisis_1: String
+  Tipo_Analisis_2: String
+  Tipo_Analisis_3: String
+  Tipo_Analisis_4: String
+  Tipo_Analisis_5: String
+  Obligacion: Boolean! = false
+  Tipo_Moneda: String
+  Grupo: String!
+  Clase: String!
+  Categoria: String!
+  Clasificacion: String!
+  Tipo: String!
+  Estado: String!
+  Tipo_Analisis_1_Cons: String
+  Tipo_Analisis_2_Cons: String
+  Tipo_Analisis_3_Cons: String
+  Tipo_Analisis_4_Cons: String
+  Tipo_Analisis_5_Cons: String
   SeUtiliza: String
-  Terminal: Boolean!
-  Crit1Consolidacion: String
-  Crit2Consolidacion: String
-  Crit3Consolidacion: String
 }
 
 input EmpleadoInput {
@@ -1162,12 +1205,6 @@ input CajaConfiguracionInput {
   IdUnidad: Int!
 }
 
-input ActFijosClasificadorCnmbInput {
-  CNMB: String!
-  DCNMB: String!
-  TREPO: Float!
-}
-
 input ConciliaExternaDwhInput {
   Id: Float!
   Recibido: Boolean!
@@ -1182,4 +1219,11 @@ input ConciliacionEntreUnidadesInput {
   UsuarioReceptor: Float
   UsuarioSupervisor: Float
   Nota: String
+}
+
+input ActFijosClasificadorSubgrupoInput {
+  Grupo: Int!
+  Codigo: Int!
+  Descripcion: String!
+  Tasa: Float!
 }

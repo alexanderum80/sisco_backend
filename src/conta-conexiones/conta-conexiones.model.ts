@@ -26,12 +26,6 @@ export class ContaConexionInput {
   IpRodas: string;
 
   @Field({ nullable: true })
-  Usuario: string;
-
-  @Field({ nullable: true })
-  Contrasena: string;
-
-  @Field({ nullable: true })
   BaseDatos: string;
 }
 
@@ -47,10 +41,10 @@ export class EstadoConexionesRodas {
 @ObjectType()
 export class EntidadesRodas {
   @Field()
-  Siglas: string;
+  sigla: string;
 
   @Field()
-  Entidad: string;
+  entidad: string;
 }
 
 @ObjectType()

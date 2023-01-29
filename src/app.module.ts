@@ -35,7 +35,6 @@ import { TipoUsuariosModule } from './tipo-usuarios/tipo-usuarios.module';
 import { ContaComprobarValoresModule } from './conta-comprobar-valores/conta-comprobar-valores.module';
 import { CajaConfiguracionModule } from './caja-configuracion/caja-configuracion.module';
 import { ConciliaAftModule } from './concilia-aft/concilia-aft.module';
-import { ActfijosClasificadorCnmbModule } from './actfijos-clasificador-cnmb/actfijos-clasificador-cnmb.module';
 import 'dotenv/config';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { ConciliaUhModule } from './concilia-uh/concilia-uh.module';
@@ -45,6 +44,10 @@ import { ConciliaExternaModule } from './concilia-externa/concilia-externa.modul
 import { ConciliaExternaDwhModule } from './concilia-externa-dwh/concilia-externa-dwh.module';
 import { ConciliaExternaEntreUnidadesModule } from './concilia-externa-entre-unidades/concilia-externa-entre-unidades.module';
 import { ConciliaExternaChatsModule } from './concilia-externa-chats/concilia-externa-chats.module';
+import { ContaGrupoCuentaModule } from './conta-grupo-cuenta/conta-grupo-cuenta.module';
+import { ContaClaseCuentaModule } from './conta-clase-cuenta/conta-clase-cuenta.module';
+import { ContaCategoriaCuentaModule } from './conta-categoria-cuenta/conta-categoria-cuenta.module';
+import { ActfijosClasificadorSubgruposModule } from './actfijos-clasificador-subgrupos/actfijos-clasificador-subgrupos.module';
 
 @Module({
   imports: [
@@ -109,7 +112,6 @@ import { ConciliaExternaChatsModule } from './concilia-externa-chats/concilia-ex
     TipoUsuariosModule,
     ContaComprobarValoresModule,
     CajaConfiguracionModule,
-    ActfijosClasificadorCnmbModule,
     ConciliaAftModule,
     ConciliaUhModule,
     ContaEstadisticaModule,
@@ -118,6 +120,10 @@ import { ConciliaExternaChatsModule } from './concilia-externa-chats/concilia-ex
     ConciliaExternaDwhModule,
     ConciliaExternaEntreUnidadesModule,
     ConciliaExternaChatsModule,
+    ContaGrupoCuentaModule,
+    ContaClaseCuentaModule,
+    ContaCategoriaCuentaModule,
+    ActfijosClasificadorSubgruposModule,
   ],
   controllers: [AppController],
   providers: [AppService, EmailsService],

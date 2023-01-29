@@ -2,7 +2,7 @@ import { ObjectType, Field } from '@nestjs/graphql';
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @ObjectType()
-@Entity()
+@Entity('Divisiones')
 export class DivisionesEntity {
   @Field()
   @PrimaryGeneratedColumn()

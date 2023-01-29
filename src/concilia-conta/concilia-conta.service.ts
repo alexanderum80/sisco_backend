@@ -1,4 +1,4 @@
-import { toNumber, cloneDeep } from 'lodash';
+import { toNumber } from 'lodash';
 import { Usuarios } from './../usuarios/usuarios.entity';
 import { ETipoClasificadorCuenta } from './../clasificador-cuenta/clasificador-cuenta.model';
 import { ClasificadorCuentaService } from './../clasificador-cuenta/clasificador-cuenta.service';
@@ -49,7 +49,7 @@ export class ConciliaContaService {
       const _conexionRodasQuery = await this._contaConexionesService.findByIdUnidad(idCentro, tipoCentro === 2);
 
       const _conexionConta = _conexionRodasQuery.data;
-      _conexionConta.BaseDatos = `Conta${_conexionConta.BaseDatos}${annio.toString()}`;
+      _conexionConta.BaseDatos = `r4_${_conexionConta.BaseDatos.toLowerCase()}`;
 
       // conecto al Conta del Centro
       const _contaConexionCentro: DataSource = await this._contaConexionesService.conexionRodas(_conexionConta);
@@ -136,10 +136,10 @@ export class ConciliaContaService {
         throw new Error(err.message ? err.message : err);
       });
 
-      let _clasifCuentasXML = this._xmlJsService.jsonToXML('Clasificador_de_Cuentas', {});
+      let _clasifCuentasXML = this._xmlJsService.jsonToXML('Cuentas', {});
 
       if (_queryClasifCuentasRes.length) {
-        _clasifCuentasXML = this._xmlJsService.jsonToXML('Clasificador_de_Cuentas', _queryClasifCuentasRes);
+        _clasifCuentasXML = this._xmlJsService.jsonToXML('Cuentas', _queryClasifCuentasRes);
       }
 
       let tipoClasif = '';
@@ -263,7 +263,7 @@ export class ConciliaContaService {
   }
 
   private async _chequearSaldoAcumulados(idUnidad: number, annio: number, periodo: number, cons: string, conexionRodas: DataSource): Promise<void> {
-    const _querySaldosAcumRodas = querySaldosAcumuladosRodas.replace(/@Periodo/g, periodo.toString());
+    const _querySaldosAcumRodas = querySaldosAcumuladosRodas.replace(/@anno/g, annio.toString()).replace(/@periodo/g, periodo.toString());
 
     const _querySaldoAcumRodasRes = await conexionRodas
       .query(_querySaldosAcumRodas)
@@ -277,8 +277,8 @@ export class ConciliaContaService {
     let _saldoDebito = 0;
     let _saldoCredito = 0;
     if (_querySaldoAcumRodasRes.data.length > 0) {
-      _saldoDebito = _querySaldoAcumRodasRes.data[0].Debito;
-      _saldoCredito = _querySaldoAcumRodasRes.data[0].Credito;
+      _saldoDebito = _querySaldoAcumRodasRes.data[0].debito;
+      _saldoCredito = _querySaldoAcumRodasRes.data[0].credito;
     }
 
     await this.dataSource
@@ -297,7 +297,7 @@ export class ConciliaContaService {
   }
 
   private async _importarComprobantes(idUnidad: number, annio: number, periodo: number, cons: string, rodasConexion: DataSource): Promise<void> {
-    const _queryComprobantes = queryComprobantesRodas.replace(/@Periodo/g, periodo.toString());
+    const _queryComprobantes = queryComprobantesRodas.replace(/@anno/g, annio.toString()).replace(/@periodo/g, periodo.toString());
     const _queryCompRes = await rodasConexion
       .query(_queryComprobantes)
       .then(result => {
@@ -317,7 +317,7 @@ export class ConciliaContaService {
   }
 
   private async _importarAsientos(idUnidad: number, annio: number, periodo: number, cons: string, rodasConexion: DataSource): Promise<void> {
-    const _queryAsientos = queryAsientoRodas.replace(/@Periodo/g, periodo.toString());
+    const _queryAsientos = queryAsientoRodas.replace(/@anno/g, annio.toString()).replace(/@periodo/g, periodo.toString());
 
     const _queryAsientosRes = await rodasConexion
       .query(_queryAsientos)
@@ -487,10 +487,8 @@ export class ConciliaContaService {
       // verificar si se ha definido la conexión al Rodas
       const _conexionRodasQuery = await this._contaConexionesService.findByIdUnidad(idUnidad, tipoUnidad === '2');
       const _conexionConta = _conexionRodasQuery.data;
-      const _conexionCodif = cloneDeep(_conexionConta);
 
-      _conexionConta.BaseDatos = `Conta${_conexionConta.BaseDatos}${annio.toString()}`;
-      _conexionCodif.BaseDatos = `Codif${_conexionCodif.BaseDatos}`;
+      _conexionConta.BaseDatos = `r4_${_conexionConta.BaseDatos.toLowerCase()}`;
 
       let tipoClasificador = 0;
 
@@ -513,20 +511,12 @@ export class ConciliaContaService {
 
       const _clasifCuentasReal = _clasifCuentasRealQuery.data;
 
-      const bdCodif = await this._contaConexionesService.conexionRodas(_conexionCodif);
       const bdConta = await this._contaConexionesService.conexionRodas(_conexionConta);
       // const _clasifCuentaUC = await bdConta.query('SELECT * FROM dbo.[Clasificador de Cuentas]').then(result => {
       //     return result;
       // }).catch(err => {
       //     return { success: false, error: err.message ? err.message : err };
       // });
-
-      // deshabilito el Audit
-      const _queryStopAudit = querySwitchAuditRodas.replace(/@DataBase/g, bdConta.options.database.toString()).replace(/@Accion/g, 'OFF');
-
-      await bdCodif.query(_queryStopAudit).catch(err => {
-        throw new Error(err);
-      });
 
       _clasifCuentasReal.forEach(
         async (element: {
@@ -564,11 +554,11 @@ export class ConciliaContaService {
             .replace(/@ConsAn2/g, element.Crit2Consolidacion === '@' ? idUnidad.toString() : '')
             .replace(/@ConsAn3/g, element.Crit3Consolidacion === '@' ? idUnidad.toString() : '');
 
-          await bdCodif.query(_queryInsert).catch(err => {
+          await bdConta.query(_queryInsert).catch(err => {
             // habilito el Audit
             const _queryStopAudit = querySwitchAuditRodas.replace(/@DataBase/g, bdConta.options.database.toString()).replace(/@Accion/g, 'ON');
 
-            bdCodif.query(_queryStopAudit).catch(err => {
+            bdConta.query(_queryStopAudit).catch(err => {
               throw Error(err);
             });
 
@@ -595,11 +585,11 @@ export class ConciliaContaService {
             .replace(/@ConsAn2/g, element.Crit2Consolidacion === '@' ? idUnidad.toString() : '')
             .replace(/@ConsAn3/g, element.Crit3Consolidacion === '@' ? idUnidad.toString() : '');
 
-          await bdCodif.query(_queryUpdate).catch(err => {
+          await bdConta.query(_queryUpdate).catch(err => {
             // habilito el Audit
             const _queryStopAudit = querySwitchAuditRodas.replace(/@DataBase/g, bdConta.options.database.toString()).replace(/@Accion/g, 'ON');
 
-            bdCodif.query(_queryStopAudit).catch(err => {
+            bdConta.query(_queryStopAudit).catch(err => {
               throw new Error(err);
             });
 

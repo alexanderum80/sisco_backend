@@ -26,23 +26,23 @@ export class ClasificadorCuentaReal {
 
   @Field({ nullable: true })
   @Column({ length: 3, nullable: true })
-  Tipo_de_analisis_1?: string;
+  Tipo_Analisis_1?: string;
 
   @Field({ nullable: true })
   @Column({ length: 3, nullable: true })
-  Tipo_de_analisis_2?: string;
+  Tipo_Analisis_2?: string;
 
   @Field({ nullable: true })
   @Column({ length: 3, nullable: true })
-  Tipo_de_analisis_3?: string;
+  Tipo_Analisis_3?: string;
 
   @Field({ nullable: true })
   @Column({ length: 3, nullable: true })
-  Tipo_de_analisis_4?: string;
+  Tipo_Analisis_4?: string;
 
   @Field({ nullable: true })
   @Column({ length: 3, nullable: true })
-  Tipo_de_analisis_5?: string;
+  Tipo_Analisis_5?: string;
 
   @Field({ defaultValue: false })
   @Column({ default: false })
@@ -75,6 +75,26 @@ export class ClasificadorCuentaReal {
   @Field()
   @Column({ length: 1 })
   Estado?: string;
+
+  @Field({ nullable: true })
+  @Column({ length: 3, nullable: true })
+  Tipo_Analisis_1_Cons?: string;
+
+  @Field({ nullable: true })
+  @Column({ length: 3, nullable: true })
+  Tipo_Analisis_2_Cons?: string;
+
+  @Field({ nullable: true })
+  @Column({ length: 3, nullable: true })
+  Tipo_Analisis_3_Cons?: string;
+
+  @Field({ nullable: true })
+  @Column({ length: 3, nullable: true })
+  Tipo_Analisis_4_Cons?: string;
+
+  @Field({ nullable: true })
+  @Column({ length: 3, nullable: true })
+  Tipo_Analisis_5_Cons?: string;
 
   @Field({ nullable: true })
   @Column()
