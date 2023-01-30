@@ -74,6 +74,9 @@ export class ConciliaContaService {
             ReporteValores: {
               success: true,
             },
+            CuadreSistemas: {
+              success: true,
+            },
           },
           error:
             'Usted tiene errores en el Clasificador, lo que conlleva a que no pueda terminar el análisis, ni entregar el balance a nivel superior. Vaya a la pestaña Análisis del Clasificador y Corrija estos errores.',
@@ -94,7 +97,7 @@ export class ConciliaContaService {
 
       // devuelvo el resultado de la conciliación
       return new Promise<ConciliaContabilidadQueryResponse>(resolve => {
-        this._getReportesConciliacion(idCentro, consolidado, periodo, IdDivision)
+        this._getReportesConciliacion(idCentro, consolidado, annio, periodo, IdDivision)
           .then(result => {
             if (_error) {
               result.success = false;
@@ -122,6 +125,9 @@ export class ConciliaContaService {
             success: true,
           },
           ReporteValores: {
+            success: true,
+          },
+          CuadreSistemas: {
             success: true,
           },
         },
@@ -386,14 +392,15 @@ export class ConciliaContaService {
       });
   }
 
-  private async _getReportesConciliacion(idCentro: number, consolidado: string, periodo: number, idDivision: number): Promise<ConciliaContabilidadQueryResponse> {
+  private async _getReportesConciliacion(idCentro: number, consolidado: string, annio: number, periodo: number, idDivision: number): Promise<ConciliaContabilidadQueryResponse> {
     // devuelvo el resultado de la conciliación
     const _queryReporteConsultas = this._reporteConsultas(idCentro, consolidado, periodo, 1);
     const _queryReporteExpresiones = this._reporteExpresiones(idCentro, consolidado, periodo);
     const _queryReporteValores = this._reporteValores(idCentro, consolidado, periodo, idDivision);
+    const _queryCuadreSistemas = this._reporteCuadreSistemas(idCentro, consolidado, annio, periodo);
 
     return new Promise<ConciliaContabilidadQueryResponse>(resolve => {
-      Promise.all([_queryReporteConsultas, _queryReporteExpresiones, _queryReporteValores])
+      Promise.all([_queryReporteConsultas, _queryReporteExpresiones, _queryReporteValores, _queryCuadreSistemas])
         .then(result => {
           resolve({
             success: true,
@@ -413,6 +420,10 @@ export class ConciliaContaService {
               ReporteValores: {
                 success: true,
                 data: result[2].data,
+              },
+              CuadreSistemas: {
+                success: true,
+                data: result[3].data,
               },
             },
           });
@@ -486,6 +497,23 @@ export class ConciliaContaService {
           resolve({ success: false, error: err.message ? err.message : err });
         });
     });
+  }
+
+  private async _reporteCuadreSistemas(idCentro: number, consolidado: string, annio: number, periodo: number): Promise<ConciliaContaQueryResponse> {
+    try {
+      return new Promise<ConciliaContaQueryResponse>(resolve => {
+        this.dataSource
+          .query(`EXEC dbo.pConta_CuadreSistemas @0, @1, @2, @3`, [idCentro, consolidado, annio, periodo])
+          .then(res => {
+            resolve({ success: true, data: JSON.stringify(res) });
+          })
+          .catch(err => {
+            return { success: false, error: err.message ? err.message : err };
+          });
+      });
+    } catch (err: any) {
+      return { success: false, error: err.message ? err.message : err };
+    }
   }
 
   async iniciarSaldos(iniciarSaldosInput: IniciarSaldosInput): Promise<MutationResponse> {
