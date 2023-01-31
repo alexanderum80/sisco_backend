@@ -69,7 +69,7 @@ import { ActfijosClasificadorSubgruposModule } from './actfijos-clasificador-sub
       host: 'localhost',
       username: 'sa',
       password: 'trd.2010',
-      database: 'SISCO_Web',
+      database: 'SISCO_Web_4',
       connectionTimeout: 60000,
       requestTimeout: 0,
       entities: ['**/*.entity.js'],
