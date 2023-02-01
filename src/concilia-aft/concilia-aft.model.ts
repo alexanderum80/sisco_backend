@@ -123,7 +123,7 @@ export const queryMb = `SELECT CASE WHEN C.cri1 = 'Y' THEN Inv.Anal1 WHEN C.cri2
             WHEN CAST(Conf.PeríodoA AS INT) = 9 THEN Conf.Sep
             WHEN CAST(Conf.PeríodoA AS INT) = 10 THEN Conf.Oct
             WHEN CAST(Conf.PeríodoA AS INT) = 11 THEN Conf.Nov
-            WHEN CAST(Conf.PeríodoA AS INT) = 12 THEN Conf.Dic END = 0
+            WHEN CAST(Conf.PeríodoA AS INT) = 12 THEN Conf.Dic END = 0 AND CAST(Conf.PeríodoA AS INT) = @Periodo
   ) AS Inv INNER JOIN dbo.Cuentas AS C ON C.CtaSCta COLLATE SQL_Latin1_General_CP1_CI_AS = Inv.CtaSCta COLLATE SQL_Latin1_General_CP1_CI_AS`;
 
 export const querySiscoUltimoPeriodoMB = `SELECT ISNULL(MAX(Periodo),0) as Periodo FROM ActFijos_MB WHERE IdCentro = @Centro`;

@@ -207,7 +207,7 @@ export class ConciliaAftService {
             return _mb;
           })
           .catch(err => {
-            throw new Error(err.message ? err.message : err);
+            return reject(err.message ? err.message : err);
           });
 
         if (_query) {
@@ -218,7 +218,7 @@ export class ConciliaAftService {
               return;
             })
             .catch(err => {
-              throw new Error(err.message ? err.message : err);
+              return reject(err.message ? err.message : err);
             });
         }
       }
