@@ -39,4 +39,8 @@ export class ContaConexionesEntity {
   @Field({ nullable: true })
   @Column()
   BaseDatos: string;
+
+  @Field({ nullable: true })
+  @Column('datetime')
+  FechaActualizacion?: Date;
 }

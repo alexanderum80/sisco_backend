@@ -82,7 +82,13 @@ type ContaConexionesEntity {
   Division: DivisionesEntity!
   IpRodas: String
   BaseDatos: String
+  FechaActualizacion: DateTime
 }
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
 
 type Conexiones {
   name: String!
@@ -91,26 +97,6 @@ type Conexiones {
 type ConexionesQueryResponse {
   success: Boolean!
   data: [Conexiones!]
-  error: String
-}
-
-type ConciliaContaQueryResponse {
-  success: Boolean!
-  data: String
-  error: String
-}
-
-type ConciliaContabilidad {
-  ReporteClasificador: ConciliaContaQueryResponse!
-  ReporteConsultas: ConciliaContaQueryResponse!
-  ReporteExpresiones: ConciliaContaQueryResponse!
-  ReporteValores: ConciliaContaQueryResponse!
-  CuadreSistemas: ConciliaContaQueryResponse!
-}
-
-type ConciliaContabilidadQueryResponse {
-  success: Boolean!
-  data: ConciliaContabilidad
   error: String
 }
 
@@ -126,20 +112,9 @@ type ContaConexionesQueryResponse {
   error: String
 }
 
-type EstadoConexionesRodas {
-  Unidad: String!
-  Estado: String!
-}
-
 type EntidadesRodas {
   sigla: String!
   entidad: String!
-}
-
-type EstadoConexionesRodasQueryResponse {
-  success: Boolean!
-  data: [EstadoConexionesRodas!]
-  error: String
 }
 
 type DWHConexiones {
@@ -212,6 +187,26 @@ type CuentasAgrupadas {
 type CuentasAgrupadasQueryResponse {
   success: Boolean!
   data: [CuentasAgrupadas!]
+  error: String
+}
+
+type ConciliaContaQueryResponse {
+  success: Boolean!
+  data: String
+  error: String
+}
+
+type ConciliaContabilidad {
+  ReporteClasificador: ConciliaContaQueryResponse!
+  ReporteConsultas: ConciliaContaQueryResponse!
+  ReporteExpresiones: ConciliaContaQueryResponse!
+  ReporteValores: ConciliaContaQueryResponse!
+  CuadreSistemas: ConciliaContaQueryResponse!
+}
+
+type ConciliaContabilidadQueryResponse {
+  success: Boolean!
+  data: ConciliaContabilidad
   error: String
 }
 
@@ -350,11 +345,6 @@ type ConcExtContabilidad {
   Diferencia: Float!
   Recibido: Boolean!
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 type ViewConciliaExtContabilidad {
   Id: Float!
@@ -700,12 +690,13 @@ type ContaEstadisticaView {
   Consolidado: Boolean!
   Annio: Int!
   Periodo: Int!
+  FechaActualizacion: DateTime
   FechaInicio: DateTime
   FechaFin: DateTime
   Comprobantes: Int!
   Traspasados: Int!
   SinTraspasar: Int!
-  Invalidos: Int!
+  Inconclusos: Int!
   Anulados: Int!
 }
 
@@ -829,7 +820,6 @@ type Query {
   getDivisionById(id: Int!): DivisionesQueryResponse!
   getAllContaConexiones: ContaConexionesQueryResponse!
   getContaConexionById(id: Int!): ContaConexionQueryResponse!
-  estadoContaConexiones(idDivision: Int!): EstadoConexionesRodasQueryResponse!
   entidadesRodas(ip: String!): [EntidadesRodas!]!
   getAllUnidades: AllUnidadesQueryResponse!
   getAllUnidadesByUsuario: AllUnidadesQueryResponse!

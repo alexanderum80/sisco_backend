@@ -129,20 +129,6 @@ export const queryReporteExpresiones = `SELECT Consolidado, Periodo, Tipo, Expre
 export const queryReporteValores = `SELECT Centro, Periodo, Consolidado, Expresion, Valor, Operador, ValorRodas, Estado, IdDivision
     FROM Conta_ReporteValor WHERE (Centro = @Centro) AND (ISNULL(Consolidado, 0) = @Consolidado) AND (Periodo = @Periodo) AND (IdDivision = @IdDivision)`;
 
-export const queryCentrosByConsolidado = `SELECT T.Centro FROM (
-	SELECT CASE WHEN [Tipo_Analisis_1] = 'X' THEN [Analisis_1]
-				WHEN [Tipo_Analisis_2] = 'X' THEN [Analisis_2]
-				WHEN [Tipo_Analisis_3] = 'X' THEN [Analisis_3]
-				ELSE '' END AS Centro, Cuenta, ABS(SUM(Débito - Crédito)) AS Saldo
-	FROM dbo.Asiento
-	GROUP BY CASE WHEN [Tipo_Analisis_1] = 'X' THEN [Analisis_1]
-				WHEN [Tipo_Analisis_2] = 'X' THEN [Analisis_2]
-				WHEN [Tipo_Analisis_3] = 'X' THEN [Analisis_3]
-				ELSE '' END, Cuenta
-	HAVING SUM(Débito - Crédito) NOT BETWEEN -0.0001 AND 0.0001) AS T
-    GROUP BY T.Centro
-    ORDER BY T.Centro`;
-
 export const queryInsertClasificadorUnidad = `IF NOT EXISTS (SELECT * FROM dbo.[Clasificador de Cuentas] WHERE Año = @Anio AND Cuenta = '@Cta' AND SubCuenta = '@SubCta')
     INSERT dbo.[Clasificador de Cuentas]
             (Año, Cuenta, SubCuenta, Descripción, Naturaleza, SubMayor, 
@@ -161,12 +147,3 @@ export const queryUpdateClasificadorUnidad = `UPDATE dbo.[Clasificador de Cuenta
                 [Cuenta Consolidación] = '@Cta', [SubCuenta Consolidación] = '@SubCta', [Tipo_Analisis_1 Consolidación] = '@ConsTipoAn1', [Tipo_Analisis_2 Consolidación] = '@ConsTipoAn2', [Tipo_Analisis_3 Consolidación] = '@ConsTipoAn3', 
                 [Condición Consolidación] = '@CondCons', [Analisis_1 Consolidación] = '@ConsAn1', [Analisis_2 Consolidación] = '@ConsAn2', [Analisis_3 Consolidación] = '@ConsAn2'
     WHERE Año = @Anio AND Cuenta = '@Cta' AND SubCuenta = '@SubCta'`;
-
-export const querySwitchAuditRodas = `USE master 
-    IF (CAST(PARSENAME(CAST(SERVERPROPERTY('ProductVersion') AS SYSNAME), CASE WHEN SERVERPROPERTY('ProductVersion') IS NULL THEN 3 ELSE 4 END) AS INT) > 9) 
-    BEGIN 
-        DECLARE @query NVARCHAR(255) 
-        SET @query = 'IF EXISTS(SELECT * FROM sys.server_audits WHERE name = ''@DataBase_ServerAudit'') 
-        ALTER SERVER AUDIT [@DataBase_ServerAudit] WITH (STATE=@Accion)' 
-        EXEC(@query) 
-    END`;

@@ -90,11 +90,12 @@ export class ConciliaAftInput {
   annio: number;
 }
 
-export const queryMbClanaCNMB = `SELECT CNMB, DCNMB, TREPO FROM dbo.CLANACMB`;
+export const queryMbSubgrupos = `SELECT grupo, codigo, descripcion, deprecia, tasa, cuenta_activo, subcuenta_activo, cuenta_depreciacion, subcuenta_depreciacion, anno, cuenta_gasto, subcuenta_gasto, analisis_1, analisis_2, analisis_3, analisis_1_depreciacion, analisis_2_depreciacion, analisis_3_depreciacion, analisis_1_gasto, analisis_2_gasto, analisis_3_gasto, origen_analisis_1, origen_analisis_2, origen_analisis_3, origen_analisis_1_depreciacion, origen_analisis_2_depreciacion, origen_analisis_3_depreciacion, origen_analisis_1_gasto, origen_analisis_2_gasto, origen_analisis_3_gasto, criterio_analisis_1, criterio_analisis_2, criterio_analisis_3, criterio_analisis_1_depreciacion, criterio_analisis_2_depreciacion, criterio_analisis_3_depreciacion, criterio_analisis_1_gasto, criterio_analisis_2_gasto, criterio_analisis_3_gasto
+  FROM activos.subgrupos
+  WHERE anno = @anno;`;
 
-export const queryMbUltimoPeriodo = `SELECT ISNULL(MAX(Periodo),0) as Periodo FROM MB_Periodo`;
-
-export const queryMbSinCuentas = `SELECT Inventa FROM dbo.MB WHERE CtaSCta IS NULL OR CtaSCta = '' OR CtaSCtaD IS NULL OR CtaSCtaD = ''`;
+export const queryMbSinCuentas = `SELECT codigo FROM activos.activos 
+  WHERE cuenta IS NULL OR cuenta = '' OR cuenta_depreciacion IS NULL OR cuenta_depreciacion = ''`;
 
 export const queryMb = `SELECT CASE WHEN C.cri1 = 'Y' THEN Inv.Anal1 WHEN C.cri2 = 'Y' THEN Inv.Anal2 WHEN C.cri3 = 'Y' THEN Inv.Anal3 ELSE @Centro END AS IdUnidad, Inv.periodo, Inv.Submayor, Inv.Inventa, 
   Inv.CtaSCta, Inv.Anal1, Inv.Anal2, Inv.Anal3, 
@@ -125,5 +126,3 @@ export const queryMb = `SELECT CASE WHEN C.cri1 = 'Y' THEN Inv.Anal1 WHEN C.cri2
             WHEN CAST(Conf.PeríodoA AS INT) = 11 THEN Conf.Nov
             WHEN CAST(Conf.PeríodoA AS INT) = 12 THEN Conf.Dic END = 0
   ) AS Inv INNER JOIN dbo.Cuentas AS C ON C.CtaSCta COLLATE SQL_Latin1_General_CP1_CI_AS = Inv.CtaSCta COLLATE SQL_Latin1_General_CP1_CI_AS`;
-
-export const querySiscoUltimoPeriodoMB = `SELECT ISNULL(MAX(Periodo),0) as Periodo FROM ActFijos_MB WHERE IdCentro = @Centro`;

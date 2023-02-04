@@ -1,3 +1,4 @@
+import { ContaConexionesEntity } from './../conta-conexiones/conta-conexiones.entity';
 import { toNumber } from 'lodash';
 import { Usuarios } from './../usuarios/usuarios.entity';
 import { ETipoClasificadorCuenta } from './../clasificador-cuenta/clasificador-cuenta.model';
@@ -23,7 +24,6 @@ import {
   IniciarSaldosInput,
   ChequearCentrosInput,
   queryInsertClasificadorUnidad,
-  querySwitchAuditRodas,
   queryUpdateClasificadorUnidad,
 } from './concilia-conta.model';
 import { InjectDataSource } from '@nestjs/typeorm';
@@ -46,7 +46,9 @@ export class ConciliaContaService {
       const consolidado = tipoCentro === 2 ? '1' : '0';
 
       // verificar si se ha definido la conexión al Rodas
-      const _conexionRodasQuery = await this._contaConexionesService.findByIdUnidad(idCentro, tipoCentro === 2);
+      const _conexionRodasQuery = await this._contaConexionesService.findByIdUnidad(idCentro, tipoCentro === 2).catch(err => {
+        throw new Error(err);
+      });
 
       const _conexionConta = _conexionRodasQuery.data;
       _conexionConta.BaseDatos = `r4_${_conexionConta.BaseDatos.toLowerCase()}`;
@@ -146,31 +148,33 @@ export class ConciliaContaService {
 
       if (_queryClasifCuentasRes.length) {
         _clasifCuentasXML = this._xmlJsService.jsonToXML('Cuentas', _queryClasifCuentasRes);
-      }
 
-      let tipoClasif = '';
-      switch (tipoCentro) {
-        case 0:
-          tipoClasif = '2';
-          break;
-        case 1:
-          tipoClasif = '3';
-          break;
-        case 2:
-          tipoClasif = '1';
-          break;
-      }
+        let tipoClasif = '';
+        switch (tipoCentro) {
+          case 0:
+            tipoClasif = '2';
+            break;
+          case 1:
+            tipoClasif = '3';
+            break;
+          case 2:
+            tipoClasif = '1';
+            break;
+        }
 
-      return new Promise<any>(resolve => {
-        this.dataSource
-          .query(`EXEC dbo.pConta_ImportClasifCuentaXML @0, @1, @2, @3, @4, @5`, [_clasifCuentasXML, idUnidad, tipoClasif, cons, annio, periodo])
-          .then(result => {
-            resolve({ data: result });
-          })
-          .catch(err => {
-            throw new Error(err.message ? err.message : err);
-          });
-      });
+        return new Promise<any>((resolve, reject) => {
+          this.dataSource
+            .query(`EXEC dbo.pConta_ImportClasifCuentaXML @0, @1, @2, @3, @4, @5`, [_clasifCuentasXML, idUnidad, tipoClasif, cons, annio, periodo])
+            .then(result => {
+              resolve({ data: result });
+            })
+            .catch(err => {
+              reject(err.message ? err.message : err);
+            });
+        });
+      } else {
+        throw new Error('No existe Clasificador de Cuentas para el Centro. <br>No se puede realizar la Conciliación.');
+      }
     } catch (err: any) {
       if (contaConexion && contaConexion.isInitialized) contaConexion.destroy();
 
@@ -211,6 +215,8 @@ export class ConciliaContaService {
         // importar los asientos
         await this._importarAsientos(idUnidad, annio, per, cons, contaConexion);
       }
+
+      this._updateFechaActualizacion(idUnidad, cons === '1');
     } catch (err: any) {
       if (contaConexion && contaConexion.isInitialized) contaConexion.destroy();
 
@@ -341,6 +347,22 @@ export class ConciliaContaService {
         throw new Error(err.message ? err.message : err);
       });
     }
+  }
+
+  private async _updateFechaActualizacion(idUnidad: number, cons: boolean): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      this.dataSource
+        .createQueryBuilder()
+        .update(ContaConexionesEntity)
+        .set({ FechaActualizacion: new Date() })
+        .where('IdUnidad = :idUnidad', { idUnidad: idUnidad })
+        .andWhere('Consolidado = :cons', { cons: cons })
+        .execute()
+        .then(() => resolve())
+        .catch(err => {
+          reject(err);
+        });
+    });
   }
 
   private async _calculaConciliacion(idUnidad: number, tipoClasificador: number, anio: number, periodo: number, tipoEntidad: number, idDivision: number): Promise<void> {
@@ -583,13 +605,6 @@ export class ConciliaContaService {
             .replace(/@ConsAn3/g, element.Crit3Consolidacion === '@' ? idUnidad.toString() : '');
 
           await bdConta.query(_queryInsert).catch(err => {
-            // habilito el Audit
-            const _queryStopAudit = querySwitchAuditRodas.replace(/@DataBase/g, bdConta.options.database.toString()).replace(/@Accion/g, 'ON');
-
-            bdConta.query(_queryStopAudit).catch(err => {
-              throw Error(err);
-            });
-
             throw Error(err);
           });
 
@@ -614,13 +629,6 @@ export class ConciliaContaService {
             .replace(/@ConsAn3/g, element.Crit3Consolidacion === '@' ? idUnidad.toString() : '');
 
           await bdConta.query(_queryUpdate).catch(err => {
-            // habilito el Audit
-            const _queryStopAudit = querySwitchAuditRodas.replace(/@DataBase/g, bdConta.options.database.toString()).replace(/@Accion/g, 'ON');
-
-            bdConta.query(_queryStopAudit).catch(err => {
-              throw new Error(err);
-            });
-
             throw new Error(err);
           });
         },

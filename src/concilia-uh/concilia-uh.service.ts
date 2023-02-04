@@ -100,6 +100,8 @@ export class ConciliaUhService {
               .catch(err => {
                 reject(err.message || err);
               });
+          } else {
+            resolve();
           }
         })
         .catch((err: Error) => {
@@ -124,6 +126,8 @@ export class ConciliaUhService {
               .catch(err => {
                 reject(err.message || err);
               });
+          } else {
+            resolve();
           }
         })
         .catch((err: Error) => {
@@ -155,7 +159,7 @@ export class ConciliaUhService {
                 reject(err.message ? err.message : err);
               });
           } else {
-            reject('No existen datos de Útiles y Herramientas del período seleccionado. <br/>No se puede realizar la Conciliación.');
+            reject('No existen datos de los Útiles y Herramientas del período seleccionado. <br/>No se puede realizar la Conciliación.');
           }
         })
         .catch((err: Error) => {

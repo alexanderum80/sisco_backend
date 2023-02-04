@@ -2,18 +2,10 @@ import { DEFAULT_POSTGRES_CONNECTION_STRING } from './../conexiones/conexiones.m
 import { Usuarios } from './../usuarios/usuarios.entity';
 import { UsuariosService } from './../usuarios/usuarios.service';
 import { UnidadesService } from './../unidades/unidades.service';
-import { queryCentrosByConsolidado } from './../concilia-conta/concilia-conta.model';
 import { cloneDeep } from 'lodash';
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { CryptoService } from '../shared/services/crypto/crypto.service';
-import {
-  ContaConexionQueryResponse,
-  EstadoConexionesRodasQueryResponse,
-  EstadoConexionesRodas,
-  ContaConexionesQueryResponse,
-  ContaConexionInput,
-  EntidadesRodas,
-} from './conta-conexiones.model';
+import { ContaConexionQueryResponse, ContaConexionesQueryResponse, ContaConexionInput, EntidadesRodas } from './conta-conexiones.model';
 import { ContaConexionesEntity } from './conta-conexiones.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -97,7 +89,7 @@ export class ContaConexionesService {
           }
         })
         .catch(err => {
-          resolve(err.message ? err.message : err);
+          reject(err.message ? err.message : err);
         });
     });
   }
@@ -214,45 +206,5 @@ export class ContaConexionesService {
     return new Promise<DataSource>(resolve => {
       resolve(_rodasDataSource);
     });
-  }
-
-  async estadoContaConexiones(idDivision: number): Promise<EstadoConexionesRodasQueryResponse> {
-    try {
-      const _conexionDivisionQuery = await this.findByIdUnidad(idDivision, true);
-
-      const _conexionDivision = await (await this.conexionRodas(_conexionDivisionQuery.data)).initialize();
-      const _unidades = await _conexionDivision.query(queryCentrosByConsolidado);
-
-      const _validarUnidades: EstadoConexionesRodas[] = [];
-
-      for (const _unidad of _unidades) {
-        const unidad = _unidad.Centro;
-        const _conexionUnidadQuery = await this.findByIdUnidad(unidad, false);
-
-        const datoUnidad = await (await this._unidadesSvc.getUnidadById(unidad)).data[0];
-
-        try {
-          await (await this.conexionRodas(_conexionUnidadQuery.data)).initialize();
-
-          _validarUnidades.push({
-            Unidad: datoUnidad.IdUnidad + '-' + datoUnidad.Nombre,
-            Estado: 'Correcto',
-          });
-        } catch (err: any) {
-          _validarUnidades.push({
-            Unidad: datoUnidad.IdUnidad + '-' + datoUnidad.Nombre,
-            Estado: 'Incorrecto',
-          });
-        }
-      }
-      return new Promise<EstadoConexionesRodasQueryResponse>(resolve => {
-        resolve({
-          success: true,
-          data: _validarUnidades,
-        });
-      });
-    } catch (err: any) {
-      return { success: false, error: err.message ? err.message : err };
-    }
   }
 }

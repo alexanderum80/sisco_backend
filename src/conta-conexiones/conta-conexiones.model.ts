@@ -30,15 +30,6 @@ export class ContaConexionInput {
 }
 
 @ObjectType()
-export class EstadoConexionesRodas {
-  @Field()
-  Unidad: string;
-
-  @Field()
-  Estado: string;
-}
-
-@ObjectType()
 export class EntidadesRodas {
   @Field()
   sigla: string;
@@ -46,6 +37,3 @@ export class EntidadesRodas {
   @Field()
   entidad: string;
 }
-
-@ObjectType()
-export class EstadoConexionesRodasQueryResponse extends MultipleQueryResponse(EstadoConexionesRodas) {}

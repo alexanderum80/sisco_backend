@@ -1,17 +1,8 @@
-import { cloneDeep, padStart, toNumber } from 'lodash';
+import { cloneDeep, padStart } from 'lodash';
 import { XmlJsService } from './../shared/services/xml-js/xml-js.service';
 import { ConciliaContaService } from './../concilia-conta/concilia-conta.service';
 import { ContaConexionesService } from './../conta-conexiones/conta-conexiones.service';
-import {
-  ConciliaAftInput,
-  queryMbClanaCNMB,
-  ConciliaAftData,
-  DiferenciaClasificadorCNMB,
-  queryMbUltimoPeriodo,
-  queryMbSinCuentas,
-  queryMb,
-  querySiscoUltimoPeriodoMB,
-} from './concilia-aft.model';
+import { ConciliaAftInput, queryMbSubgrupos, ConciliaAftData, DiferenciaClasificadorCNMB, queryMbSinCuentas, queryMb } from './concilia-aft.model';
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
@@ -76,8 +67,8 @@ export class ConciliaAftService {
     const mbConnection = await this._contaConexionesSvc.conexionRodas(conexionRodas);
 
     return new Promise<void | DiferenciaClasificadorCNMB[]>(async (resolve, reject) => {
-      // importo el clasificador CNMB
-      this._importarCnmbAF(idCentro, mbConnection)
+      // importo el clasificador Subgrupos
+      this._importarSubgruposAF(idCentro, mbConnection)
         .then(_clasifCNMB => {
           // compruebo si hay diferencias en el caslificador CNMB
           if (_clasifCNMB.length) return resolve(_clasifCNMB);
@@ -97,22 +88,24 @@ export class ConciliaAftService {
     });
   }
 
-  private async _importarCnmbAF(idCentro: number, conexionRodas: DataSource): Promise<DiferenciaClasificadorCNMB[]> {
+  private async _importarSubgruposAF(idCentro: number, conexionRodas: DataSource): Promise<DiferenciaClasificadorCNMB[]> {
     return new Promise<DiferenciaClasificadorCNMB[]>((resolve, reject) => {
       conexionRodas
-        .query(queryMbClanaCNMB)
+        .query(queryMbSubgrupos)
         .then(async res => {
           if (res.length) {
-            const _cnmb = this._xmlSvc.jsonToXML('CNMB', res);
+            const _subgrupos = this._xmlSvc.jsonToXML('Subgrupos', res);
 
             this.dataSource
-              .query(`EXEC dbo.pAF_ImportClanaCnmbXML @0, @1`, [_cnmb, idCentro])
+              .query(`EXEC dbo.pAF_ImportSubgruposXML @0, @1`, [_subgrupos, idCentro])
               .then(res => {
                 resolve(res);
               })
               .catch(err => {
                 reject(err.message ? err.message : err);
               });
+          } else {
+            reject('No existen Subgrupos definidos en el Rodas de este Centro. <br>No se puede realizar la Conciliación.');
           }
         })
         .catch((err: Error) => {
@@ -123,43 +116,19 @@ export class ConciliaAftService {
 
   private async _importarMbAF(idCentro: number, periodo: number, conexionRodas: DataSource): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      // chequeo si el periodo es correcto
-      this._chequeaUltimoPeriodo(periodo, conexionRodas)
+      // chequeo si todos los MB tienen cuentas
+      this._chequeaMbSinCuentas(conexionRodas)
         .then(() => {
-          // chequeo si todos los MB tienen cuentas
-          this._chequeaMbSinCuentas(conexionRodas)
+          // importo los MB
+          this._importarMb(idCentro, periodo, conexionRodas)
             .then(() => {
-              // importo los MB
-              this._importarMb(idCentro, periodo, conexionRodas)
-                .then(() => {
-                  resolve();
-                })
-                .catch(err => {
-                  reject(err.message || err);
-                });
+              resolve();
             })
             .catch(err => {
               reject(err.message || err);
             });
         })
         .catch(err => {
-          reject(err.message || err);
-        });
-    });
-  }
-
-  private async _chequeaUltimoPeriodo(periodo: number, conexionRodas: DataSource): Promise<number> {
-    return new Promise<number>((resolve, reject) => {
-      conexionRodas
-        .query(queryMbUltimoPeriodo)
-        .then(per => {
-          const periodoActual = toNumber(per[0].Periodo) + 1;
-          if (periodoActual !== 0 && periodo > periodoActual) {
-            return reject('No existen datos de los Activos Fijos para el período que está analizando. Seleccione un período anterior.');
-          }
-          resolve(periodoActual);
-        })
-        .catch((err: Error) => {
           reject(err.message || err);
         });
     });
@@ -184,46 +153,29 @@ export class ConciliaAftService {
     });
   }
 
-  private async _importarMb(idCentro: number, periodo: number, conexionRodas: DataSource): Promise<boolean> {
-    return new Promise<boolean>(async (resolve, reject) => {
-      const ultimoPeriodoResp = await this.dataSource
-        .query(querySiscoUltimoPeriodoMB.replace(/@Centro/gi, idCentro.toString()))
-        .then(async per => {
-          return per;
+  private async _importarMb(idCentro: number, periodo: number, conexionRodas: DataSource): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      conexionRodas
+        .query(queryMb.replace(/@Centro/gi, idCentro.toString()).replace(/@Periodo/gi, padStart(periodo.toString(), 2, '0')))
+        .then(res => {
+          if (res.length) {
+            const _mb = this._xmlSvc.jsonToXML('MB', res);
+
+            this.dataSource
+              .query(`EXEC dbo.pAF_ImportMbXML @0, @1, @2`, [_mb, idCentro, periodo])
+              .then(() => {
+                resolve();
+              })
+              .catch(err => {
+                reject(err.message ? err.message : err);
+              });
+          } else {
+            reject('No existen datos de los Activos Fijos del período seleccionado. <br/>No se puede realizar la Conciliación.');
+          }
         })
-        .catch(err => reject(err));
-
-      let periodoActual = toNumber(ultimoPeriodoResp[0].Periodo);
-      if (periodoActual > periodo) periodoActual = periodo;
-
-      for (let per = periodoActual; per <= periodo; per++) {
-        let _mb: string;
-        const _query = await conexionRodas
-          .query(queryMb.replace(/@Centro/gi, idCentro.toString()).replace(/@Periodo/gi, padStart(per.toString(), 2, '0')))
-          .then(res => {
-            if (res.length) {
-              _mb = this._xmlSvc.jsonToXML('MB', res);
-            }
-            return _mb;
-          })
-          .catch(err => {
-            throw new Error(err.message ? err.message : err);
-          });
-
-        if (_query) {
-          // inserto los MB
-          await this.dataSource
-            .query(`EXEC dbo.pAF_ImportMbXML @0, @1, @2`, [_query, idCentro, per])
-            .then(() => {
-              return;
-            })
-            .catch(err => {
-              throw new Error(err.message ? err.message : err);
-            });
-        }
-      }
-
-      resolve(true);
+        .catch(err => {
+          return reject(err.message ? err.message : err);
+        });
     });
   }
 
