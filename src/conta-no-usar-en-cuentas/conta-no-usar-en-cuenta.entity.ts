@@ -33,8 +33,12 @@ export class ContaNoUsarEnCuentaEntity {
   Crit3: string;
 
   @Field({ nullable: true })
-  @Column({ nullable: true })
-  TextoInicio: string;
+  @Column({ length: 10, nullable: true })
+  Crit4: string;
+
+  @Field({ nullable: true })
+  @Column({ length: 10, nullable: true })
+  Crit5: string;
 
   @Field()
   @Column()

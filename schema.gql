@@ -566,7 +566,8 @@ type ContaNoUsarEnCuentaEntity {
   Crit1: String
   Crit2: String
   Crit3: String
-  TextoInicio: String
+  Crit4: String
+  Crit5: String
   Centralizada: Boolean!
   IdDivision: Float!
 }
@@ -1173,7 +1174,8 @@ input ContaNoUsarEnCuentaInput {
   Crit1: String
   Crit2: String
   Crit3: String
-  TextoInicio: String
+  Crit4: String
+  Crit5: String
   Centralizada: Boolean!
   IdDivision: Float!
 }

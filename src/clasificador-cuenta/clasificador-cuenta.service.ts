@@ -57,6 +57,7 @@ export class ClasificadorCuentaService {
         .createQueryBuilder('Clas')
         .select('Clas.Cuenta', 'Cuenta')
         .groupBy('Clas.Cuenta')
+        .orderBy('Clas.Cuenta')
         .execute()
         .then(res => {
           resolve({ success: true, data: res });
