@@ -2,9 +2,9 @@ import { MutationResponse } from './../shared/models/mutation.response.model';
 import { ClasificadorCuentasQueryResponse, ClasificadorCuentaQueryResponse, ClasificadorCuentaRealInput, CuentasAgrupadasQueryResponse } from './clasificador-cuenta.model';
 import { ClasificadorCuentaService } from './clasificador-cuenta.service';
 import { Resolver, Query, Args, Int, Mutation } from '@nestjs/graphql';
-import { ClasificadorCuentaReal } from './clasificador-cuenta.entity';
+import { ClasificadorCuentaRealEntity } from './clasificador-cuenta.entity';
 
-@Resolver(() => ClasificadorCuentaReal)
+@Resolver(() => ClasificadorCuentaRealEntity)
 export class ClasificadorCuentaResolver {
   constructor(private clasificadorCuentaSvc: ClasificadorCuentaService) {}
 

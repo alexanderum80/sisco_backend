@@ -24,13 +24,12 @@ import {
   IniciarSaldosInput,
   ChequearCentrosInput,
   queryInsertClasificadorRodas,
-  queryUpdateClasificadorRodas,
   queryInsertCriterioConsolidacionRodas,
   queryUpdateCriterioClasificadorRodas,
+  queryUpdateClasificadorRodas,
 } from './concilia-conta.model';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { ClasificadorCuentaReal } from 'src/clasificador-cuenta/clasificador-cuenta.entity';
 
 @Injectable()
 export class ConciliaContaService {
@@ -94,24 +93,18 @@ export class ConciliaContaService {
       if (_contaConexionCentro && _contaConexionCentro.isInitialized) _contaConexionCentro.destroy();
 
       // calcular la conciliación
-      let _error = '';
       await this._calculaConciliacion(idCentro, tipoCentro, annio, periodo, tipoEntidad, IdDivision).catch(err => {
-        _error = err.message;
+        throw new Error(err);
       });
 
       // devuelvo el resultado de la conciliación
-      return new Promise<ConciliaContabilidadQueryResponse>(resolve => {
+      return new Promise<ConciliaContabilidadQueryResponse>((resolve, reject) => {
         this._getReportesConciliacion(idCentro, consolidado, annio, periodo, IdDivision)
           .then(result => {
-            if (_error) {
-              result.success = false;
-              result.error = _error;
-            }
-
             resolve(result);
           })
           .catch(err => {
-            throw new Error(err);
+            reject(err);
           });
       });
     } catch (err: any) {
@@ -143,7 +136,7 @@ export class ConciliaContaService {
   async _importarClasificador(idUnidad: number, tipoCentro: number, annio: number, cons: string, periodo: number, contaConexion: DataSource): Promise<any> {
     try {
       // inserto el clasificador del Rodas
-      const _queryClasifCuentasRes = await contaConexion.query(queryClasificadorCuentasRodas).catch(err => {
+      const _queryClasifCuentasRes = await contaConexion.query(queryClasificadorCuentasRodas.replace(/@anno/gi, annio.toString())).catch(err => {
         throw new Error(err.message ? err.message : err);
       });
 
@@ -394,9 +387,9 @@ export class ConciliaContaService {
 
   private async _getReportesConciliacion(idCentro: number, consolidado: string, annio: number, periodo: number, idDivision: number): Promise<ConciliaContabilidadQueryResponse> {
     // devuelvo el resultado de la conciliación
-    const _queryReporteConsultas = this._reporteConsultas(idCentro, consolidado, periodo, 1);
-    const _queryReporteExpresiones = this._reporteExpresiones(idCentro, consolidado, periodo);
-    const _queryReporteValores = this._reporteValores(idCentro, consolidado, periodo, idDivision);
+    const _queryReporteConsultas = this._reporteConsultas(idCentro, consolidado, annio, periodo, 1);
+    const _queryReporteExpresiones = this._reporteExpresiones(idCentro, consolidado, annio, periodo);
+    const _queryReporteValores = this._reporteValores(idCentro, consolidado, annio, periodo, idDivision);
     const _queryReporteCuadreSistemas = this._reporteCuadreSistemas(idCentro, consolidado, annio, periodo);
 
     return new Promise<ConciliaContabilidadQueryResponse>(resolve => {
@@ -434,10 +427,11 @@ export class ConciliaContaService {
     });
   }
 
-  private async _reporteConsultas(idUnidad: number, cons: string, periodo: number, idConsulta: number): Promise<ConciliaContaQueryResponse> {
+  private async _reporteConsultas(idUnidad: number, cons: string, annio: number, periodo: number, idConsulta: number): Promise<ConciliaContaQueryResponse> {
     const _query = queryReporteConsultas
       .replace(/@Centro/g, idUnidad.toString())
       .replace(/@Consolidado/g, cons)
+      .replace(/@Anio/g, annio.toString())
       .replace(/@Periodo/g, periodo.toString())
       .replace(/@IdConsulta/g, idConsulta.toString());
 
@@ -456,10 +450,11 @@ export class ConciliaContaService {
     });
   }
 
-  private async _reporteExpresiones(idUnidad: number, cons: string, periodo: number): Promise<ConciliaContaQueryResponse> {
+  private async _reporteExpresiones(idUnidad: number, cons: string, annio: number, periodo: number): Promise<ConciliaContaQueryResponse> {
     const _query = queryReporteExpresiones
       .replace(/@Centro/g, idUnidad.toString())
       .replace(/@Consolidado/g, cons)
+      .replace(/@Anio/g, annio.toString())
       .replace(/@Periodo/g, periodo.toString());
 
     return new Promise<ConciliaContaQueryResponse>(resolve => {
@@ -477,10 +472,11 @@ export class ConciliaContaService {
     });
   }
 
-  private async _reporteValores(idUnidad: number, cons: string, periodo: number, idDivision: number): Promise<ConciliaContaQueryResponse> {
+  private async _reporteValores(idUnidad: number, cons: string, annio: number, periodo: number, idDivision: number): Promise<ConciliaContaQueryResponse> {
     const _query = queryReporteValores
       .replace(/@Centro/g, idUnidad.toString())
       .replace(/@Consolidado/g, cons)
+      .replace(/@Anio/g, annio.toString())
       .replace(/@Periodo/g, periodo.toString())
       .replace(/@IdDivision/g, idDivision.toString());
 
@@ -557,64 +553,58 @@ export class ConciliaContaService {
           break;
       }
 
-      const _clasifCuentasRealQuery = await this._clasificadorCuentaSvc.getClasificadorCuentaByTipo(tipoClasificador);
-      if (!_clasifCuentasRealQuery.success) {
-        throw new Error(_clasifCuentasRealQuery.error);
-      }
-
-      const _clasifCuentasReal = _clasifCuentasRealQuery.data;
+      const _clasifCuentasReal = await this._clasificadorCuentaSvc.getClasificadorCuentaByTipo(tipoClasificador).catch(err => {
+        throw new Error(err);
+      });
 
       const bdConta = await this._contaConexionesService.conexionRodas(_conexionConta);
-      // const _clasifCuentaUC = await bdConta.query('SELECT * FROM dbo.[Clasificador de Cuentas]').then(result => {
-      //     return result;
-      // }).catch(err => {
-      //     return { success: false, error: err.message ? err.message : err };
-      // });
 
-      _clasifCuentasReal.forEach(async (element: ClasificadorCuentaReal) => {
+      for (let index = 0; index < _clasifCuentasReal.length; index++) {
+        const _clasif = _clasifCuentasReal[index];
+
         // inserto la cuenta, si no existe
         const _queryInsertCC = queryInsertClasificadorRodas
           .replace(/@Anio/g, annio)
-          .replace(/@Cta/g, element.Cuenta)
-          .replace(/@SubCta/g, element.SubCuenta)
-          .replace(/@Nombre/g, element.Nombre)
-          .replace(/@Nat/g, element.Naturaleza)
-          .replace(/@An1/g, element.Tipo_Analisis_1)
-          .replace(/@An2/g, element.Tipo_Analisis_2)
-          .replace(/@An3/g, element.Tipo_Analisis_3)
-          .replace(/@An4/g, element.Tipo_Analisis_4)
-          .replace(/@An5/g, element.Tipo_Analisis_5)
-          .replace(/@Obl/g, element.Obligacion === true ? '1' : '0')
-          .replace(/@Grupo/g, element.Grupo)
-          .replace(/@Clase/g, element.Clase)
-          .replace(/@Categ/g, element.Categoria)
-          .replace(/@Clasif/g, element.Clasificacion)
-          .replace(/@Tipo/g, element.Tipo)
-          .replace(/@Estado/g, element.Estado);
+          .replace(/@Cta/g, _clasif.Cuenta)
+          .replace(/@SubCta/g, _clasif.SubCuenta)
+          .replace(/@Nombre/g, _clasif.Nombre)
+          .replace(/@Nat/g, _clasif.Naturaleza)
+          .replace(/@An1/g, _clasif.Tipo_Analisis_1 ? `'${_clasif.Tipo_Analisis_1}'` : `null`)
+          .replace(/@An2/g, _clasif.Tipo_Analisis_2 ? `'${_clasif.Tipo_Analisis_2}'` : `null`)
+          .replace(/@An3/g, _clasif.Tipo_Analisis_3 ? `'${_clasif.Tipo_Analisis_3}'` : `null`)
+          .replace(/@An4/g, _clasif.Tipo_Analisis_4 ? `'${_clasif.Tipo_Analisis_4}'` : `null`)
+          .replace(/@An5/g, _clasif.Tipo_Analisis_5 ? `'${_clasif.Tipo_Analisis_5}'` : `null`)
+          .replace(/@Obl/g, _clasif.Obligacion ? 'true' : 'false')
+          .replace(/@Grupo/g, _clasif.Grupo)
+          .replace(/@Clase/g, _clasif.Clase)
+          .replace(/@Categ/g, _clasif.Categoria)
+          .replace(/@Clasif/g, _clasif.Clasificacion)
+          .replace(/@Tipo/g, _clasif.Tipo)
+          .replace(/@Estado/g, _clasif.Estado);
 
         await bdConta.query(_queryInsertCC).catch(err => {
-          throw Error(err);
+          throw new Error(err);
         });
 
         // actualizo la cuenta, si existe
         const _queryUpdateCC = queryUpdateClasificadorRodas
           .replace(/@Anio/g, annio)
-          .replace(/@Cta/g, element.Cuenta)
-          .replace(/@SubCta/g, element.SubCuenta)
-          .replace(/@Nombre/g, element.Nombre)
-          .replace(/@Nat/g, element.Naturaleza)
-          .replace(/@An1/g, element.Tipo_Analisis_1)
-          .replace(/@An2/g, element.Tipo_Analisis_2)
-          .replace(/@An3/g, element.Tipo_Analisis_3)
-          .replace(/@An4/g, element.Tipo_Analisis_4)
-          .replace(/@An5/g, element.Tipo_Analisis_5)
-          .replace(/@Obl/g, element.Obligacion === true ? '1' : '0')
-          .replace(/@Grupo/g, element.Grupo)
-          .replace(/@Clase/g, element.Clase)
-          .replace(/@Categ/g, element.Categoria)
-          .replace(/@Clasif/g, element.Clasificacion)
-          .replace(/@Tipo/g, element.Tipo)
-          .replace(/@Estado/g, element.Estado);
+          .replace(/@Cta/g, _clasif.Cuenta)
+          .replace(/@SubCta/g, _clasif.SubCuenta)
+          .replace(/@Nombre/g, _clasif.Nombre)
+          .replace(/@Nat/g, _clasif.Naturaleza)
+          .replace(/@An1/g, _clasif.Tipo_Analisis_1 ? `'${_clasif.Tipo_Analisis_1}'` : `null`)
+          .replace(/@An2/g, _clasif.Tipo_Analisis_2 ? `'${_clasif.Tipo_Analisis_2}'` : `null`)
+          .replace(/@An3/g, _clasif.Tipo_Analisis_3 ? `'${_clasif.Tipo_Analisis_3}'` : `null`)
+          .replace(/@An4/g, _clasif.Tipo_Analisis_4 ? `'${_clasif.Tipo_Analisis_4}'` : `null`)
+          .replace(/@An5/g, _clasif.Tipo_Analisis_5 ? `'${_clasif.Tipo_Analisis_5}'` : `null`)
+          .replace(/@Obl/g, _clasif.Obligacion ? 'true' : 'false')
+          .replace(/@Grupo/g, _clasif.Grupo)
+          .replace(/@Clase/g, _clasif.Clase)
+          .replace(/@Categ/g, _clasif.Categoria)
+          .replace(/@Clasif/g, _clasif.Clasificacion)
+          .replace(/@Tipo/g, _clasif.Tipo)
+          .replace(/@Estado/g, _clasif.Estado);
 
         await bdConta.query(_queryUpdateCC).catch(err => {
           throw new Error(err);
@@ -623,18 +613,18 @@ export class ConciliaContaService {
         // inserto los criterios de consolidacion, si no existen
         const _queryInsertCons = queryInsertCriterioConsolidacionRodas
           .replace(/@Anio/g, annio)
-          .replace(/@Cta/g, element.Cuenta)
-          .replace(/@SubCta/g, element.SubCuenta)
-          .replace(/@TipoAn1Cons/g, element.Tipo_Analisis_1_Cons)
-          .replace(/@TipoAn2Cons/g, element.Tipo_Analisis_2_Cons)
-          .replace(/@TipoAn3Cons/g, element.Tipo_Analisis_3_Cons)
-          .replace(/@TipoAn4Cons/g, element.Tipo_Analisis_4_Cons)
-          .replace(/@TipoAn5Cons/g, element.Tipo_Analisis_5_Cons)
-          .replace(/@An1Cons/g, element.Tipo_Analisis_1_Cons === '@' ? idUnidad.toString() : '')
-          .replace(/@An2Cons/g, element.Tipo_Analisis_2_Cons === '@' ? idUnidad.toString() : '')
-          .replace(/@An3Cons/g, element.Tipo_Analisis_3_Cons === '@' ? idUnidad.toString() : '')
-          .replace(/@An3Cons/g, element.Tipo_Analisis_4_Cons === '@' ? idUnidad.toString() : '')
-          .replace(/@An3Cons/g, element.Tipo_Analisis_5_Cons === '@' ? idUnidad.toString() : '');
+          .replace(/@Cta/g, _clasif.Cuenta)
+          .replace(/@SubCta/g, _clasif.SubCuenta)
+          .replace(/@TipoAn1Cons/g, _clasif.Tipo_Analisis_1_Cons ? `'${_clasif.Tipo_Analisis_1_Cons}'` : `null`)
+          .replace(/@TipoAn2Cons/g, _clasif.Tipo_Analisis_2_Cons ? `'${_clasif.Tipo_Analisis_2_Cons}'` : `null`)
+          .replace(/@TipoAn3Cons/g, _clasif.Tipo_Analisis_3_Cons ? `'${_clasif.Tipo_Analisis_3_Cons}'` : `null`)
+          .replace(/@TipoAn4Cons/g, _clasif.Tipo_Analisis_4_Cons ? `'${_clasif.Tipo_Analisis_4_Cons}'` : `null`)
+          .replace(/@TipoAn5Cons/g, _clasif.Tipo_Analisis_5_Cons ? `'${_clasif.Tipo_Analisis_5_Cons}'` : `null`)
+          .replace(/@An1Cons/g, _clasif.Tipo_Analisis_1_Cons === '@' ? idUnidad.toString() : `null`)
+          .replace(/@An2Cons/g, _clasif.Tipo_Analisis_2_Cons === '@' ? idUnidad.toString() : `null`)
+          .replace(/@An3Cons/g, _clasif.Tipo_Analisis_3_Cons === '@' ? idUnidad.toString() : `null`)
+          .replace(/@An4Cons/g, _clasif.Tipo_Analisis_4_Cons === '@' ? idUnidad.toString() : `null`)
+          .replace(/@An5Cons/g, _clasif.Tipo_Analisis_5_Cons === '@' ? idUnidad.toString() : `null`);
 
         await bdConta.query(_queryInsertCons).catch(err => {
           throw new Error(err);
@@ -642,23 +632,23 @@ export class ConciliaContaService {
 
         // inserto los criterios de consolidacion, si no existen
         const _queryUpdateCons = queryUpdateCriterioClasificadorRodas
-          .replace(/@Cta/g, element.Cuenta)
-          .replace(/@SubCta/g, element.SubCuenta)
-          .replace(/@TipoAn1Cons/g, element.Tipo_Analisis_1_Cons)
-          .replace(/@TipoAn2Cons/g, element.Tipo_Analisis_2_Cons)
-          .replace(/@TipoAn3Cons/g, element.Tipo_Analisis_3_Cons)
-          .replace(/@TipoAn4Cons/g, element.Tipo_Analisis_4_Cons)
-          .replace(/@TipoAn5Cons/g, element.Tipo_Analisis_5_Cons)
-          .replace(/@An1Cons/g, element.Tipo_Analisis_1_Cons === '@' ? idUnidad.toString() : '')
-          .replace(/@An2Cons/g, element.Tipo_Analisis_2_Cons === '@' ? idUnidad.toString() : '')
-          .replace(/@An3Cons/g, element.Tipo_Analisis_3_Cons === '@' ? idUnidad.toString() : '')
-          .replace(/@An3Cons/g, element.Tipo_Analisis_4_Cons === '@' ? idUnidad.toString() : '')
-          .replace(/@An3Cons/g, element.Tipo_Analisis_5_Cons === '@' ? idUnidad.toString() : '');
+          .replace(/@Cta/g, _clasif.Cuenta)
+          .replace(/@SubCta/g, _clasif.SubCuenta)
+          .replace(/@TipoAn1Cons/g, _clasif.Tipo_Analisis_1_Cons ? `'${_clasif.Tipo_Analisis_1_Cons}'` : `null`)
+          .replace(/@TipoAn2Cons/g, _clasif.Tipo_Analisis_2_Cons ? `'${_clasif.Tipo_Analisis_2_Cons}'` : `null`)
+          .replace(/@TipoAn3Cons/g, _clasif.Tipo_Analisis_3_Cons ? `'${_clasif.Tipo_Analisis_3_Cons}'` : `null`)
+          .replace(/@TipoAn4Cons/g, _clasif.Tipo_Analisis_4_Cons ? `'${_clasif.Tipo_Analisis_4_Cons}'` : `null`)
+          .replace(/@TipoAn5Cons/g, _clasif.Tipo_Analisis_5_Cons ? `'${_clasif.Tipo_Analisis_5_Cons}'` : `null`)
+          .replace(/@An1Cons/g, _clasif.Tipo_Analisis_1_Cons === '@' ? idUnidad.toString() : `null`)
+          .replace(/@An2Cons/g, _clasif.Tipo_Analisis_2_Cons === '@' ? idUnidad.toString() : `null`)
+          .replace(/@An3Cons/g, _clasif.Tipo_Analisis_3_Cons === '@' ? idUnidad.toString() : `null`)
+          .replace(/@An4Cons/g, _clasif.Tipo_Analisis_4_Cons === '@' ? idUnidad.toString() : `null`)
+          .replace(/@An5Cons/g, _clasif.Tipo_Analisis_5_Cons === '@' ? idUnidad.toString() : `null`);
 
         await bdConta.query(_queryUpdateCons).catch(err => {
           throw new Error(err);
         });
-      });
+      }
 
       return new Promise<boolean>(resolve => {
         resolve(true);

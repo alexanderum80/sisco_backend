@@ -3,7 +3,7 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @ObjectType()
 @Entity('Conta_ClasificadorCuentas_Real')
-export class ClasificadorCuentaReal {
+export class ClasificadorCuentaRealEntity {
   @Field()
   @PrimaryColumn()
   TipoClasificador: number;
@@ -25,23 +25,23 @@ export class ClasificadorCuentaReal {
   Naturaleza: string;
 
   @Field({ nullable: true })
-  @Column({ length: 3, nullable: true })
+  @Column('nvarchar', { nullable: true })
   Tipo_Analisis_1?: string;
 
   @Field({ nullable: true })
-  @Column({ length: 3, nullable: true })
+  @Column('nvarchar', { nullable: true })
   Tipo_Analisis_2?: string;
 
   @Field({ nullable: true })
-  @Column({ length: 3, nullable: true })
+  @Column('nvarchar', { nullable: true })
   Tipo_Analisis_3?: string;
 
   @Field({ nullable: true })
-  @Column({ length: 3, nullable: true })
+  @Column('nvarchar', { nullable: true })
   Tipo_Analisis_4?: string;
 
   @Field({ nullable: true })
-  @Column({ length: 3, nullable: true })
+  @Column('nvarchar', { nullable: true })
   Tipo_Analisis_5?: string;
 
   @Field({ defaultValue: false })
@@ -49,19 +49,19 @@ export class ClasificadorCuentaReal {
   Obligacion: boolean;
 
   @Field({ nullable: true })
-  @Column({ length: 3, nullable: true })
+  @Column('nvarchar', { nullable: true })
   Tipo_Moneda?: string;
 
   @Field()
-  @Column({ length: 2 })
+  @Column('nvarchar')
   Grupo?: string;
 
   @Field()
-  @Column({ length: 2 })
+  @Column('nvarchar')
   Clase?: string;
 
   @Field()
-  @Column({ length: 8 })
+  @Column('nvarchar')
   Categoria?: string;
 
   @Field()
@@ -77,23 +77,23 @@ export class ClasificadorCuentaReal {
   Estado?: string;
 
   @Field({ nullable: true })
-  @Column({ length: 3, nullable: true })
+  @Column('nvarchar', { nullable: true })
   Tipo_Analisis_1_Cons?: string;
 
   @Field({ nullable: true })
-  @Column({ length: 3, nullable: true })
+  @Column('nvarchar', { nullable: true })
   Tipo_Analisis_2_Cons?: string;
 
   @Field({ nullable: true })
-  @Column({ length: 3, nullable: true })
+  @Column('nvarchar', { nullable: true })
   Tipo_Analisis_3_Cons?: string;
 
   @Field({ nullable: true })
-  @Column({ length: 3, nullable: true })
+  @Column('nvarchar', { nullable: true })
   Tipo_Analisis_4_Cons?: string;
 
   @Field({ nullable: true })
-  @Column({ length: 3, nullable: true })
+  @Column('nvarchar', { nullable: true })
   Tipo_Analisis_5_Cons?: string;
 
   @Field({ nullable: true })

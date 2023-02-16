@@ -2,13 +2,16 @@ import { CuentaEntidadService } from './../cuenta-entidad/cuenta-entidad.service
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { ClasificadorCuentasQueryResponse, ClasificadorCuentaQueryResponse, ClasificadorCuentaRealInput, CuentasAgrupadasQueryResponse } from './clasificador-cuenta.model';
 import { Injectable } from '@nestjs/common';
-import { ClasificadorCuentaReal } from './clasificador-cuenta.entity';
+import { ClasificadorCuentaRealEntity } from './clasificador-cuenta.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class ClasificadorCuentaService {
-  constructor(@InjectRepository(ClasificadorCuentaReal) private clasificadorCuentaRepository: Repository<ClasificadorCuentaReal>, private cuentaEntidadSvc: CuentaEntidadService) {}
+  constructor(
+    @InjectRepository(ClasificadorCuentaRealEntity) private clasificadorCuentaRepository: Repository<ClasificadorCuentaRealEntity>,
+    private cuentaEntidadSvc: CuentaEntidadService,
+  ) {}
 
   async getAllClasificadorCuentas(tipo?: number): Promise<ClasificadorCuentasQueryResponse> {
     let _where = {};
@@ -38,15 +41,15 @@ export class ClasificadorCuentaService {
     });
   }
 
-  async getClasificadorCuentaByTipo(tipo: number): Promise<ClasificadorCuentasQueryResponse> {
-    return new Promise<ClasificadorCuentasQueryResponse>(resolve => {
+  async getClasificadorCuentaByTipo(tipo: number): Promise<ClasificadorCuentaRealEntity[]> {
+    return new Promise<ClasificadorCuentaRealEntity[]>((resolve, reject) => {
       this.clasificadorCuentaRepository
         .find({ where: [{ TipoClasificador: tipo }] })
         .then(res => {
-          resolve({ success: true, data: res });
+          resolve(res);
         })
         .catch(err => {
-          resolve({ success: false, error: err.message ? err.message : err });
+          reject(err.message || err);
         });
     });
   }

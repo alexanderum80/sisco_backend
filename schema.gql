@@ -141,7 +141,7 @@ type CargosQueryResponse {
   error: String
 }
 
-type ClasificadorCuentaReal {
+type ClasificadorCuentaRealEntity {
   TipoClasificador: Float!
   Cuenta: String!
   SubCuenta: String!
@@ -170,13 +170,13 @@ type ClasificadorCuentaReal {
 
 type ClasificadorCuentaQueryResponse {
   success: Boolean!
-  data: ClasificadorCuentaReal
+  data: ClasificadorCuentaRealEntity
   error: String
 }
 
 type ClasificadorCuentasQueryResponse {
   success: Boolean!
-  data: [ClasificadorCuentaReal!]
+  data: [ClasificadorCuentaRealEntity!]
   error: String
 }
 
