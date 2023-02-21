@@ -41,10 +41,10 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { ConciliaUhModule } from './concilia-uh/concilia-uh.module';
 import { ContaEstadisticaModule } from './conta-estadistica/conta-estadistica.module';
 import { ConciliaInternaContaModule } from './concilia-interna-conta/concilia-interna-conta.module';
-import { ConciliaExternaModule } from './concilia-externa/concilia-externa.module';
 import { ConciliaExternaDwhModule } from './concilia-externa-dwh/concilia-externa-dwh.module';
 import { ConciliaExternaEntreUnidadesModule } from './concilia-externa-entre-unidades/concilia-externa-entre-unidades.module';
 import { ConciliaExternaChatsModule } from './concilia-externa-chats/concilia-externa-chats.module';
+import { ConciliaExternaDatosConciliacionModule } from './concilia-externa-datos-conciliacion/concilia-externa-datos-conciliacion.module';
 
 @Module({
   imports: [
@@ -114,10 +114,10 @@ import { ConciliaExternaChatsModule } from './concilia-externa-chats/concilia-ex
     ConciliaUhModule,
     ContaEstadisticaModule,
     ConciliaInternaContaModule,
-    ConciliaExternaModule,
     ConciliaExternaDwhModule,
     ConciliaExternaEntreUnidadesModule,
     ConciliaExternaChatsModule,
+    ConciliaExternaDatosConciliacionModule,
   ],
   controllers: [AppController],
   providers: [AppService, EmailsService],

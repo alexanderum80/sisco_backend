@@ -1,7 +1,16 @@
 import { InputType, Field } from '@nestjs/graphql';
 
 @InputType()
-export class ConciliaExternaInput {
+export class ConciliaExternaContabilidadUpdateInput {
+  @Field()
+  Id: number;
+
+  @Field()
+  Recibido: boolean;
+}
+
+@InputType()
+export class ConciliaExternaContabilidadInput {
   @Field()
   Annio: number;
 

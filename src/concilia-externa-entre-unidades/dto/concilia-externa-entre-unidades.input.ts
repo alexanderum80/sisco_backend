@@ -1,7 +1,7 @@
 import { InputType, Field } from '@nestjs/graphql';
 
 @InputType()
-export class ConciliacionEntreUnidadesInput {
+export class ConciliacionExternaEntreUnidadesInput {
   @Field()
   Annio: number;
 

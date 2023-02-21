@@ -17,7 +17,12 @@ async function bootstrap() {
   const server = await app.listen(3000);
 
   // Socket
-  const io = new socket.Server(server);
+  const io = new socket.Server(server, {
+    cors: {
+      origin: 'http://localhost:4200',
+      methods: ['GET', 'POST'],
+    },
+  });
 
   io.on('connection', socket => {
     let IdUsuario: string;
@@ -34,7 +39,7 @@ async function bootstrap() {
       io.emit('new-message', message);
     });
 
-    socket.on('disconnect', () => {
+    socket.on('disconnect-user', () => {
       if (IdUsuario) {
         io.emit('disconnected-user', IdUsuario);
       }

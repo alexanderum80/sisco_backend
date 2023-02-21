@@ -1,12 +1,20 @@
-import { ConciliaExtContabilidadInput } from './concilia-externa-contabilidad.model';
+import { ConciliaExternaContabilidadEntity } from './concilia-externa-contabilidad.model';
 import { MutationResponse } from '../shared/models/mutation.response.model';
 import { ConciliaExtContabilidadService } from './concilia-externa-contabilidad.service';
-import { ConcExtContabilidad } from './concilia-externa-contabilidad.entity';
+import { ConcExtContabilidad } from './entities/concilia-externa-contabilidad.entity';
 import { Resolver, Query, Int, Mutation, Args } from '@nestjs/graphql';
+import { ConciliaExternaContabilidadInput, ConciliaExternaContabilidadUpdateInput } from './dto/concilia-externa-contabilidad.input';
 
 @Resolver(() => ConcExtContabilidad)
 export class ConciliaExtContabilidadResolver {
   constructor(private _conciliacionContabService: ConciliaExtContabilidadService) {}
+
+  @Query(() => ConciliaExternaContabilidadEntity)
+  async getConciliacionExternaContab(
+    @Args({ name: 'conciliaExternaInput', type: () => ConciliaExternaContabilidadInput }) conciliaExternaInput: ConciliaExternaContabilidadInput,
+  ): Promise<ConciliaExternaContabilidadEntity> {
+    return this._conciliacionContabService.getConciliacion(conciliaExternaInput);
+  }
 
   @Query(() => [ConcExtContabilidad])
   async getDiferenciasEnConciliacion(@Args({ name: 'annio', type: () => Int }) annio: number, @Args({ name: 'mes', type: () => Int }) mes: number): Promise<ConcExtContabilidad[]> {
@@ -14,7 +22,9 @@ export class ConciliaExtContabilidadResolver {
   }
 
   @Mutation(() => MutationResponse)
-  async updateConciliaContab(@Args({ name: 'data', type: () => [ConciliaExtContabilidadInput] }) data: ConciliaExtContabilidadInput[]): Promise<MutationResponse> {
+  async updateConciliaContab(
+    @Args({ name: 'data', type: () => [ConciliaExternaContabilidadUpdateInput] }) data: ConciliaExternaContabilidadUpdateInput[],
+  ): Promise<MutationResponse> {
     return this._conciliacionContabService.updateConciliaContab(data);
   }
 }

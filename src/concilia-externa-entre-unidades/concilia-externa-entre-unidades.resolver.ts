@@ -1,4 +1,4 @@
-import { ConciliacionEntreUnidadesInput } from './dto/concilia-externa-entre-unidades.input';
+import { ConciliacionExternaEntreUnidadesInput } from './dto/concilia-externa-entre-unidades.input';
 import { ConciliaExternaEntreUnidadesEntity, ConciliaExternaCentrosNoConciliados } from './entities/concilia-externa-entre-unidades.entity';
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { ConciliaExternaEntreUnidadesService } from './concilia-externa-entre-unidades.service';
@@ -27,7 +27,7 @@ export class ConciliaExternaEntreUnidadesResolver {
 
   @Mutation(() => Number)
   async updateConciliacionEntreUnidades(
-    @Args({ name: 'conciliacionUnidadesInput', type: () => ConciliacionEntreUnidadesInput }) conciliacionUnidadesInput: ConciliacionEntreUnidadesInput,
+    @Args({ name: 'conciliacionUnidadesInput', type: () => ConciliacionExternaEntreUnidadesInput }) conciliacionUnidadesInput: ConciliacionExternaEntreUnidadesInput,
   ): Promise<number> {
     return this._conciliacionUnidadesService.updateConciliacionEntreUnidades(conciliacionUnidadesInput);
   }

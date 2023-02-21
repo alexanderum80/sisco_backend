@@ -1,10 +1,10 @@
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { UsuariosQueryResponse, UsuarioInput, UsuarioQueryResponse } from './usuarios.model';
 import { UsuariosService } from './usuarios.service';
-import { Resolver, Query, Args, Int, Mutation, Context } from '@nestjs/graphql';
+import { Resolver, Query, Args, Int, Mutation } from '@nestjs/graphql';
 import { Usuarios } from './usuarios.entity';
 import { UseGuards } from '@nestjs/common';
-import { AuthGuard, DEFAULT_GRAPHQL_CONTEXT } from '../shared/helpers/auth.guard';
+import { AuthGuard } from '../shared/helpers/auth.guard';
 
 @Resolver(() => Usuarios)
 export class UsuariosResolver {
@@ -17,8 +17,14 @@ export class UsuariosResolver {
 
   @Query(() => UsuariosQueryResponse)
   @UseGuards(new AuthGuard())
-  async getAllUsuarios(@Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios): Promise<UsuariosQueryResponse> {
-    return this._usuariosService.findAll(user);
+  async getAllUsuarios(): Promise<UsuariosQueryResponse> {
+    return this._usuariosService.findAll();
+  }
+
+  @Query(() => UsuariosQueryResponse)
+  @UseGuards(new AuthGuard())
+  async getUsuariosByIdDivision(@Args({ name: 'idDivision', type: () => Int }) idDivision: number): Promise<UsuariosQueryResponse> {
+    return this._usuariosService.findAllByIdDivision(idDivision);
   }
 
   @Query(() => UsuarioQueryResponse)

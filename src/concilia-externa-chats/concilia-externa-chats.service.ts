@@ -16,7 +16,6 @@ export class ConciliaExternaChatsService {
 
   static async registerChat(messageInput: any): Promise<ConciliaExternaChatsEntity> {
     const newMessage: ConciliaExternaChatInput = {
-      IdChat: 0,
       Usuario: messageInput.idUser,
       Mensaje: messageInput.text,
     };

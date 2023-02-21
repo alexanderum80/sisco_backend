@@ -95,19 +95,31 @@ export class UsuariosService {
     return jwt.sign(userInfo, SECRET_KEY);
   }
 
-  async findAll(user: Usuarios): Promise<UsuariosQueryResponse> {
+  async findAll(): Promise<UsuariosQueryResponse> {
     try {
-      const { IdDivision, IdTipoUsuario } = user;
-
-      let _condition = {};
-
-      if (!this.isSuperAdmin(IdDivision, IdTipoUsuario)) {
-        _condition = { IdDivision: IdDivision };
-      }
-
       return new Promise<UsuariosQueryResponse>(resolve => {
         this.usuariosRepository
-          .find({ where: _condition, relations: ['TipoUsuario', 'Division'] })
+          .find({ relations: ['TipoUsuario', 'Division'] })
+          .then(result => {
+            resolve({
+              success: true,
+              data: result,
+            });
+          })
+          .catch(err => {
+            resolve({ success: false, error: err.message ? err.message : err });
+          });
+      });
+    } catch (err: any) {
+      return { success: false, error: err.message ? err.message : err };
+    }
+  }
+
+  async findAllByIdDivision(idDivision: number): Promise<UsuariosQueryResponse> {
+    try {
+      return new Promise<UsuariosQueryResponse>(resolve => {
+        this.usuariosRepository
+          .find({ where: { IdDivision: idDivision }, relations: ['TipoUsuario', 'Division'] })
           .then(result => {
             resolve({
               success: true,
