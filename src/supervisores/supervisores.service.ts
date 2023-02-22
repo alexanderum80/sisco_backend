@@ -36,6 +36,23 @@ export class SupervisoresService {
     }
   }
 
+  async findAllByIdDivision(idDivision: number): Promise<SupervisoresQueryResponse> {
+    try {
+      return new Promise<SupervisoresQueryResponse>(resolve => {
+        this.supervisorRepository
+          .find({ where: { IdDivision: idDivision }, relations: ['Cargo', 'Division'] })
+          .then(res => {
+            resolve({ success: true, data: res });
+          })
+          .catch(err => {
+            resolve({ success: false, error: err.message ? err.message : err });
+          });
+      });
+    } catch (err: any) {
+      return { success: false, error: err.message ? err.message : err };
+    }
+  }
+
   async findOne(_id: number): Promise<SupervisorQueryResponse> {
     try {
       return new Promise<SupervisorQueryResponse>(resolve => {

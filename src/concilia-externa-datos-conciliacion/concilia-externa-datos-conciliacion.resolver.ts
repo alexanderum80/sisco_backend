@@ -16,18 +16,18 @@ export class ConciliaExternaDatosConciliacionResolver {
     return this.conciliaExternaDatosConciliacionService.findAll();
   }
 
-  @Query(() => ConciliaExternaDatosConciliacionEntity, { name: 'getDatosConciliacionExterna' })
+  @Query(() => ConciliaExternaDatosConciliacionEntity, { name: 'getDatosConciliacionExterna', nullable: true })
   async findOneByAnnoMes(@Args('anno', { type: () => Int }) anno: number, @Args('mes', { type: () => Int }) mes: number): Promise<ConciliaExternaDatosConciliacionEntity> {
     return this.conciliaExternaDatosConciliacionService.findOneByAnnoMes(anno, mes);
   }
 
   @Mutation(() => Number, { name: 'cerrarConciliacion' })
-  closeConciliaExternaDatosConciliacion(@Args('anno', { type: () => Int }) anno: number, @Args('mes', { type: () => Int }) mes: number) {
+  async closeConciliaExternaDatosConciliacion(@Args('anno', { type: () => Int }) anno: number, @Args('mes', { type: () => Int }) mes: number): Promise<number> {
     return this.conciliaExternaDatosConciliacionService.updateEstado(anno, mes, false);
   }
 
   @Mutation(() => Number, { name: 'reabrirConciliacion' })
-  reopenConciliaExternaDatosConciliacion(@Args('anno', { type: () => Int }) anno: number, @Args('mes', { type: () => Int }) mes: number) {
+  async reopenConciliaExternaDatosConciliacion(@Args('anno', { type: () => Int }) anno: number, @Args('mes', { type: () => Int }) mes: number): Promise<number> {
     return this.conciliaExternaDatosConciliacionService.updateEstado(anno, mes, true);
   }
 }

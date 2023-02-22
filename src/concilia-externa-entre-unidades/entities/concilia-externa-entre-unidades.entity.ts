@@ -18,23 +18,23 @@ export class ConciliaExternaEntreUnidadesEntity {
 
   @Field()
   @Column()
-  Unidad: number;
+  IdUnidad: number;
 
   @Field()
   @Column()
-  UnidadOD: number;
+  IdUnidadOD: number;
 
   @Field({ nullable: true })
   @Column()
-  UsuarioEmisor?: number;
+  IdUsuarioEmisor?: number;
 
   @Field({ nullable: true })
   @Column()
-  UsuarioReceptor?: number;
+  IdUsuarioReceptor?: number;
 
   @Field({ nullable: true })
   @Column()
-  UsuarioSupervisor?: number;
+  IdUsuarioSupervisor?: number;
 
   @Field({ nullable: true })
   @Column()

@@ -13,11 +13,11 @@ export class ConciliaExternaEntreUnidadesService {
     private conciliaContabSvc: ConciliaExtContabilidadService,
   ) {}
 
-  async getConciliacionEntreUnidades(annio: number, mes: number, unidad: number, unidadOD: number): Promise<ConciliaExternaEntreUnidadesEntity> {
+  async getConciliacionEntreUnidades(annio: number, mes: number, unidad: number, unidadOD: number): Promise<ConciliaExternaEntreUnidadesEntity | null> {
     try {
-      return new Promise<ConciliaExternaEntreUnidadesEntity>((resolve, reject) => {
+      return new Promise<ConciliaExternaEntreUnidadesEntity | null>((resolve, reject) => {
         this.conciliacionUnidadesRepository
-          .findOne({ where: { Annio: annio, Mes: mes, Unidad: unidad, UnidadOD: unidadOD } })
+          .findOne({ where: { Annio: annio, Mes: mes, IdUnidad: unidad, IdUnidadOD: unidadOD } })
           .then(result => {
             resolve(result);
           })
@@ -34,8 +34,8 @@ export class ConciliaExternaEntreUnidadesService {
     const _concilia = this.conciliacionUnidadesRepository.create({
       Annio: annio,
       Mes: mes,
-      Unidad: unidad,
-      UnidadOD: unidadOD,
+      IdUnidad: unidad,
+      IdUnidadOD: unidadOD,
     });
 
     return new Promise<ConciliaExternaEntreUnidadesEntity>((resolve, reject) => {
@@ -67,12 +67,12 @@ export class ConciliaExternaEntreUnidadesService {
   async updateConciliacionEntreUnidades(data: ConciliacionExternaEntreUnidadesInput): Promise<number> {
     try {
       return new Promise<number>((resolve, reject) => {
-        this.getConciliacionEntreUnidades(data.Annio, data.Mes, data.Unidad, data.UnidadOD)
+        this.getConciliacionEntreUnidades(data.Annio, data.Mes, data.IdUnidad, data.IdUnidadOD)
           .then(res => {
             const stringQuery = `update ConciliacionEntreUnidades
-                        set UsuarioEmisor = ${data.UsuarioEmisor},
-                            UsuarioReceptor = ${data.UsuarioReceptor},
-                            UsuarioSupervisor = ${data.UsuarioSupervisor},
+                        set UsuarioEmisor = ${data.IdUsuarioEmisor},
+                            UsuarioReceptor = ${data.IdUsuarioReceptor},
+                            UsuarioSupervisor = ${data.IdUsuarioSupervisor},
                             Nota = '${data.Nota}'
                         where ID = ${res.ID}`;
             this.connection

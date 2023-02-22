@@ -16,6 +16,12 @@ export class SupervisoresResolver {
     return this._supervisorService.findAll(user);
   }
 
+  @Query(() => SupervisoresQueryResponse)
+  @UseGuards(new AuthGuard())
+  async getSupervisoresByIdDivision(@Args({ name: 'idDivision', type: () => Int }) idDivision: number): Promise<SupervisoresQueryResponse> {
+    return this._supervisorService.findAllByIdDivision(idDivision);
+  }
+
   @Query(() => SupervisorQueryResponse)
   @UseGuards(new AuthGuard())
   async getSupervisorById(@Args({ name: 'id', type: () => Int }) id: number): Promise<SupervisorQueryResponse> {

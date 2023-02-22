@@ -9,19 +9,19 @@ export class ConciliacionExternaEntreUnidadesInput {
   Mes: number;
 
   @Field()
-  Unidad: number;
+  IdUnidad: number;
 
   @Field()
-  UnidadOD: number;
+  IdUnidadOD: number;
 
   @Field({ nullable: true })
-  UsuarioEmisor: number;
+  IdUsuarioEmisor: number;
 
   @Field({ nullable: true })
-  UsuarioReceptor: number;
+  IdUsuarioReceptor: number;
 
   @Field({ nullable: true })
-  UsuarioSupervisor: number;
+  IdUsuarioSupervisor: number;
 
   @Field({ nullable: true })
   Nota: string;

@@ -728,11 +728,11 @@ type ConciliaExternaEntreUnidadesEntity {
   ID: Float!
   Annio: Float!
   Mes: Float!
-  Unidad: Float!
-  UnidadOD: Float!
-  UsuarioEmisor: Float
-  UsuarioReceptor: Float
-  UsuarioSupervisor: Float
+  IdUnidad: Float!
+  IdUnidadOD: Float!
+  IdUsuarioEmisor: Float
+  IdUsuarioReceptor: Float
+  IdUsuarioSupervisor: Float
   Nota: String
 }
 
@@ -773,8 +773,10 @@ type Query {
   getClasificadorCuenta(cuenta: String!, subcuenta: String!, tipo: Int!): ClasificadorCuentaQueryResponse!
   getCuentasAgrupadas: CuentasAgrupadasQueryResponse!
   getAllEmpleados: EmpleadosQueryResponse!
+  getEmpleadosByIdDivision(idDivision: Int!): EmpleadosQueryResponse!
   getEmpleadoById(id: Int!): EmpleadoQueryResponse!
   getAllSupervisores: SupervisoresQueryResponse!
+  getSupervisoresByIdDivision(idDivision: Int!): SupervisoresQueryResponse!
   getSupervisorById(id: Int!): SupervisorQueryResponse!
   parteAtrasos(idDivision: Int!): ParteAtrasosQueryResponse!
   datosIdGAM(idDivision: Int!): DatosIdGAMQueryResponse!
@@ -816,10 +818,10 @@ type Query {
   contaEstadistica(contaEstadisticaInput: ContaEstadisticaInput!): [ContaEstadisticaView!]!
   conciliaInternaConta(conciliaInternaContaInput: ConciliaInternaContaInput!): [ConciliaInternaConta!]!
   conciliaExternaDWH(conciliaExternaDWHInput: ConciliaOperacionesDWHInput!): ConciliacionOperacionesDWHQueryResponse!
-  getConciliacionEntreUnidades(annio: Int!, mes: Int!, unidad: Int!, unidadOD: Int!): ConciliaExternaEntreUnidadesEntity!
+  getConciliacionEntreUnidades(annio: Int!, mes: Int!, unidad: Int!, unidadOD: Int!): ConciliaExternaEntreUnidadesEntity
   getCentrosNoConciliados(annio: Int!, mes: Int!): [ConciliaExternaCentrosNoConciliados!]!
   getAllDatosConciliacionExterna: [ConciliaExternaDatosConciliacionEntity!]!
-  getDatosConciliacionExterna(anno: Int!, mes: Int!): ConciliaExternaDatosConciliacionEntity!
+  getDatosConciliacionExterna(anno: Int!, mes: Int!): ConciliaExternaDatosConciliacionEntity
 }
 
 input ConciliaDWHInput {
@@ -1139,10 +1141,10 @@ input ConciliaExternaDwhInput {
 input ConciliacionExternaEntreUnidadesInput {
   Annio: Float!
   Mes: Float!
-  Unidad: Float!
-  UnidadOD: Float!
-  UsuarioEmisor: Float
-  UsuarioReceptor: Float
-  UsuarioSupervisor: Float
+  IdUnidad: Float!
+  IdUnidadOD: Float!
+  IdUsuarioEmisor: Float
+  IdUsuarioReceptor: Float
+  IdUsuarioSupervisor: Float
   Nota: String
 }
