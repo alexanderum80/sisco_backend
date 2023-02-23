@@ -1,4 +1,4 @@
-import { Field, InputType, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
 export class ViewConciliaExtContabilidad {
@@ -15,58 +15,43 @@ export class ViewConciliaExtContabilidad {
   Tipo: string;
 
   @Field()
-  CuentaE: string;
+  CuentaEmisor?: string;
 
   @Field()
-  SubCuentaE: string;
+  SubCuentaEmisor?: string;
 
   @Field()
-  DivisionEmisorE: number;
+  DivisionEmisor: number;
 
   @Field()
   Emisor: number;
 
   @Field()
-  DivisionReceptorE: number;
+  CuentaReceptor?: string;
 
   @Field()
-  EmitidoA: number;
+  SubCuentaReceptor?: string;
 
   @Field()
-  DocumentoE: string;
-
-  @Field()
-  FechaE: Date;
-
-  @Field()
-  ValorE: number;
-
-  @Field()
-  CuentaR: string;
-
-  @Field()
-  SubCuentaR: string;
-
-  @Field()
-  DivisionReceptorR: number;
+  DivisionReceptor: number;
 
   @Field()
   Receptor: number;
 
   @Field()
-  DivisionEmisorR: number;
+  Documento: string;
+
+  @Field({ nullable: true })
+  FechaEmision?: string;
 
   @Field()
-  RecibidoDe: number;
+  ValorEmisor: number;
+
+  @Field({ nullable: true })
+  FechaRecepcion?: string;
 
   @Field()
-  DocumentoR: string;
-
-  @Field()
-  FechaR: Date;
-
-  @Field()
-  ValorR: number;
+  ValorReceptor: number;
 
   @Field()
   DiferenciaDias: number;
@@ -84,7 +69,7 @@ export class ActaConciliacion {
   ID: number;
 
   @Field()
-  Detalle: number;
+  Detalle: string;
 
   @Field()
   Emisor: number;
@@ -102,11 +87,11 @@ export class ActaConciliacion {
   Diferencia: number;
 }
 
-@InputType()
-export class ConciliaExtContabilidadInput {
-  @Field()
-  Id: number;
+@ObjectType()
+export class ConciliaExternaContabilidadEntity {
+  @Field(() => [ViewConciliaExtContabilidad])
+  getConciliaContab: ViewConciliaExtContabilidad[];
 
-  @Field()
-  Recibido: boolean;
+  @Field(() => [ActaConciliacion])
+  getActaConciliacion: ActaConciliacion[];
 }

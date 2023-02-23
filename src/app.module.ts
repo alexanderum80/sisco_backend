@@ -1,3 +1,4 @@
+import { ActfijosClasificadorSubgruposModule } from './actfijos-clasificador-subgrupos/actfijos-clasificador-subgrupos.module';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -40,14 +41,10 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { ConciliaUhModule } from './concilia-uh/concilia-uh.module';
 import { ContaEstadisticaModule } from './conta-estadistica/conta-estadistica.module';
 import { ConciliaInternaContaModule } from './concilia-interna-conta/concilia-interna-conta.module';
-import { ConciliaExternaModule } from './concilia-externa/concilia-externa.module';
 import { ConciliaExternaDwhModule } from './concilia-externa-dwh/concilia-externa-dwh.module';
 import { ConciliaExternaEntreUnidadesModule } from './concilia-externa-entre-unidades/concilia-externa-entre-unidades.module';
 import { ConciliaExternaChatsModule } from './concilia-externa-chats/concilia-externa-chats.module';
-import { ContaGrupoCuentaModule } from './conta-grupo-cuenta/conta-grupo-cuenta.module';
-import { ContaClaseCuentaModule } from './conta-clase-cuenta/conta-clase-cuenta.module';
-import { ContaCategoriaCuentaModule } from './conta-categoria-cuenta/conta-categoria-cuenta.module';
-import { ActfijosClasificadorSubgruposModule } from './actfijos-clasificador-subgrupos/actfijos-clasificador-subgrupos.module';
+import { ConciliaExternaDatosConciliacionModule } from './concilia-externa-datos-conciliacion/concilia-externa-datos-conciliacion.module';
 
 @Module({
   imports: [
@@ -69,7 +66,7 @@ import { ActfijosClasificadorSubgruposModule } from './actfijos-clasificador-sub
       host: 'localhost',
       username: 'sa',
       password: 'trd.2010',
-      database: 'SISCO_Web_4',
+      database: 'SISCO_Web',
       connectionTimeout: 60000,
       requestTimeout: 0,
       entities: ['**/*.entity.js'],
@@ -116,13 +113,10 @@ import { ActfijosClasificadorSubgruposModule } from './actfijos-clasificador-sub
     ConciliaUhModule,
     ContaEstadisticaModule,
     ConciliaInternaContaModule,
-    ConciliaExternaModule,
     ConciliaExternaDwhModule,
     ConciliaExternaEntreUnidadesModule,
     ConciliaExternaChatsModule,
-    ContaGrupoCuentaModule,
-    ContaClaseCuentaModule,
-    ContaCategoriaCuentaModule,
+    ConciliaExternaDatosConciliacionModule,
     ActfijosClasificadorSubgruposModule,
   ],
   controllers: [AppController],

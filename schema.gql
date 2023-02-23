@@ -2,6 +2,13 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type ActFijosClasificadorSubgrupoEntity {
+  Grupo: Int!
+  Codigo: Int!
+  Descripcion: String!
+  Tasa: Float!
+}
+
 type MutationResponse {
   success: Boolean!
   error: String
@@ -351,24 +358,19 @@ type ViewConciliaExtContabilidad {
   Annio: String!
   Mes: Float!
   Tipo: String!
-  CuentaE: String!
-  SubCuentaE: String!
-  DivisionEmisorE: Float!
+  CuentaEmisor: String!
+  SubCuentaEmisor: String!
+  DivisionEmisor: Float!
   Emisor: Float!
-  DivisionReceptorE: Float!
-  EmitidoA: Float!
-  DocumentoE: String!
-  FechaE: DateTime!
-  ValorE: Float!
-  CuentaR: String!
-  SubCuentaR: String!
-  DivisionReceptorR: Float!
+  CuentaReceptor: String!
+  SubCuentaReceptor: String!
+  DivisionReceptor: Float!
   Receptor: Float!
-  DivisionEmisorR: Float!
-  RecibidoDe: Float!
-  DocumentoR: String!
-  FechaR: DateTime!
-  ValorR: Float!
+  Documento: String!
+  FechaEmision: String
+  ValorEmisor: Float!
+  FechaRecepcion: String
+  ValorReceptor: Float!
   DiferenciaDias: Float!
   DiferenciaImporte: Float!
   Recibido: Boolean!
@@ -376,12 +378,17 @@ type ViewConciliaExtContabilidad {
 
 type ActaConciliacion {
   ID: Float!
-  Detalle: Float!
+  Detalle: String!
   Emisor: Float!
   Receptor: Float!
   SaldoEmisor: Float!
   SaldoReceptor: Float!
   Diferencia: Float!
+}
+
+type ConciliaExternaContabilidadEntity {
+  getConciliaContab: [ViewConciliaExtContabilidad!]!
+  getActaConciliacion: [ActaConciliacion!]!
 }
 
 type TipoEntidades {
@@ -725,11 +732,11 @@ type ConciliaExternaEntreUnidadesEntity {
   ID: Float!
   Annio: Float!
   Mes: Float!
-  Unidad: Float!
-  UnidadOD: Float!
-  UsuarioEmisor: Float
-  UsuarioReceptor: Float
-  UsuarioSupervisor: Float
+  IdUnidad: Float!
+  IdUnidadOD: Float!
+  IdUsuarioEmisor: Float
+  IdUsuarioReceptor: Float
+  IdUsuarioSupervisor: Float
   Nota: String
 }
 
@@ -738,77 +745,11 @@ type ConciliaExternaCentrosNoConciliados {
   Receptor: String!
 }
 
-type VConciliaExternaDWH {
-  Id: Float!
-  Annio: String!
-  Mes: Float!
-  Emisor: Float!
-  FechaEmision: DateTime!
-  Receptor: Float!
-  FechaRecepcion: DateTime!
-  Documento: String!
-  ImpEmisor: Float!
-  ImpReceptor: Float!
-  Diferencia: Float!
-  DiferenciaDias: Float!
-  Recibido: Boolean!
-}
-
-type VDifCantidadRecepcion {
-  IdDivision: Float!
-  Division: String!
-  IdUnidad: Float!
-  Unidad: String!
-  Fecha: DateTime!
-  DocumentoR: String!
-  IdCuentaFinanciera: Float!
-  DocumentoF: String!
-  Codigo: String!
-  Descripcion: String!
-  CantidadR: Float!
-  CantidadF: Float!
-  DifCantidad: Float!
-  PCostoR: Float!
-  PCostoF: Float!
-  DifPCosto: Float!
-  ImporteR: Float!
-  ImporteF: Float!
-  DifImporte: Float!
-  Afectacion: Float!
-}
-
-type ConciliaExternaEntity {
-  getRecDifCantidad: [VDifCantidadRecepcion!]!
-  getConciliaDWH: VConciliaExternaDWH!
-  getConciliaContab: ViewConciliaExtContabilidad!
-  getActaConciliacion: ActaConciliacion!
-  createConcUnidadEmisor: ConciliaExternaEntreUnidadesEntity!
-  createConcUnidadReceptor: ConciliaExternaEntreUnidadesEntity!
-}
-
-type GrupoCuentaEntity {
-  IdGrupo: String!
-  Grupo: String!
-}
-
-type ClaseCuentaEntity {
-  ID: Int!
-  IdClase: String!
-  IdGrupo: String!
-  Clase: String!
-}
-
-type CategoriaCuentaEntity {
-  IdCategoria: String!
-  IdClase: Int!
-  Categoria: String!
-}
-
-type ActFijosClasificadorSubgrupoEntity {
-  Grupo: Int!
-  Codigo: Int!
-  Descripcion: String!
-  Tasa: Float!
+type ConciliaExternaDatosConciliacionEntity {
+  IdConciliacion: Int!
+  Annio: Int!
+  Mes: Int!
+  Abierta: Boolean!
 }
 
 type Query {
@@ -834,8 +775,10 @@ type Query {
   getClasificadorCuenta(cuenta: String!, subcuenta: String!, tipo: Int!): ClasificadorCuentaQueryResponse!
   getCuentasAgrupadas: CuentasAgrupadasQueryResponse!
   getAllEmpleados: EmpleadosQueryResponse!
+  getEmpleadosByIdDivision(idDivision: Int!): EmpleadosQueryResponse!
   getEmpleadoById(id: Int!): EmpleadoQueryResponse!
   getAllSupervisores: SupervisoresQueryResponse!
+  getSupervisoresByIdDivision(idDivision: Int!): SupervisoresQueryResponse!
   getSupervisorById(id: Int!): SupervisorQueryResponse!
   parteAtrasos(idDivision: Int!): ParteAtrasosQueryResponse!
   datosIdGAM(idDivision: Int!): DatosIdGAMQueryResponse!
@@ -843,6 +786,7 @@ type Query {
   conciliaInternaDWH(conciliaInternaDWHInput: ConciliaOperacionesDWHInput!): ConciliacionOperacionesDWHQueryResponse!
   getAllSubdivisiones: SubdivisionesQueryResponse!
   getSubdivisionesByIdDivision(idDivision: Int!): SubdivisionesQueryResponse!
+  getConciliacionExternaContab(conciliaExternaInput: ConciliaExternaContabilidadInput!): ConciliaExternaContabilidadEntity!
   getDiferenciasEnConciliacion(annio: Int!, mes: Int!): [ConcExtContabilidad!]!
   getAllTipoEntidades: ContaTipoentidadesQueryResponse!
   getTipoEntidadById(id: Int!): ContaTipoentidadQueryResponse!
@@ -873,18 +817,11 @@ type Query {
   conciliaUH(conciliaUhInput: ConciliaUhInput!): [ConciliaUH!]!
   contaEstadistica(contaEstadisticaInput: ContaEstadisticaInput!): [ContaEstadisticaView!]!
   conciliaInternaConta(conciliaInternaContaInput: ConciliaInternaContaInput!): [ConciliaInternaConta!]!
-  getConciliacion(conciliaExternaInput: ConciliaExternaInput!): ConciliaExternaEntity!
   conciliaExternaDWH(conciliaExternaDWHInput: ConciliaOperacionesDWHInput!): ConciliacionOperacionesDWHQueryResponse!
-  getConciliacionEntreUnidades(annio: Int!, mes: Int!, unidad: Int!, unidadOD: Int!): ConciliaExternaEntreUnidadesEntity!
+  getConciliacionEntreUnidades(annio: Int!, mes: Int!, unidad: Int!, unidadOD: Int!): ConciliaExternaEntreUnidadesEntity
   getCentrosNoConciliados(annio: Int!, mes: Int!): [ConciliaExternaCentrosNoConciliados!]!
-  getAllGrupoCuenta: [GrupoCuentaEntity!]!
-  getGrupoCuentaById(id: String!): GrupoCuentaEntity!
-  getAllClaseCuenta: [ClaseCuentaEntity!]!
-  getClaseCuentaById(id: Int!): ClaseCuentaEntity!
-  getClaseCuentaByIdGrupo(idGrupo: String!): [ClaseCuentaEntity!]!
-  getAllCategoriaCuenta: [CategoriaCuentaEntity!]!
-  getCategoriaCuentaById(id: String!): CategoriaCuentaEntity!
-  getCategoriaCuentaByIdClase(idClase: Int!): [CategoriaCuentaEntity!]!
+  getAllDatosConciliacionExterna: [ConciliaExternaDatosConciliacionEntity!]!
+  getDatosConciliacionExterna(anno: Int!, mes: Int!): ConciliaExternaDatosConciliacionEntity
   getAllActFijosClasificadorSubgrupo: [ActFijosClasificadorSubgrupoEntity!]!
   getActFijosClasificadorSubgrupo(grupo: Int!, codigo: Int!): ActFijosClasificadorSubgrupoEntity!
 }
@@ -917,6 +854,19 @@ input ConciliaOperacionesDWHInput {
   IdUnidadOD: Float!
 }
 
+input ConciliaExternaContabilidadInput {
+  Annio: Float!
+  Mes: Float!
+  Division: Float
+  Unidad: Float!
+  DivisionOD: Float
+  UnidadOD: Float!
+  UsuarioEmisor: Float
+  UsuarioReceptor: Float
+  UsuarioSupervisor: Float
+  Nota: String
+}
+
 input ConciliaAftInput {
   idCentro: Float!
   periodo: Float!
@@ -943,19 +893,6 @@ input ConciliaInternaContaInput {
   emisorReceptor: Int!
 }
 
-input ConciliaExternaInput {
-  Annio: Float!
-  Mes: Float!
-  Division: Float
-  Unidad: Float!
-  DivisionOD: Float
-  UnidadOD: Float!
-  UsuarioEmisor: Float
-  UsuarioReceptor: Float
-  UsuarioSupervisor: Float
-  Nota: String
-}
-
 type Mutation {
   changePassword(idUsuario: Int!, password: String!): MutationResponse!
   createUsuario(usuarioInfo: UsuarioInput!): MutationResponse!
@@ -976,7 +913,7 @@ type Mutation {
   createSupervisor(supervisorInfo: SupervisorInput!): SupervisorQueryResponse!
   updateSupervisor(supervisorInfo: SupervisorInput!): SupervisorQueryResponse!
   deleteSupervisor(IDs: [Int!]!): SupervisorQueryResponse!
-  updateConciliaContab(data: [ConciliaExtContabilidadInput!]!): MutationResponse!
+  updateConciliaContab(data: [ConciliaExternaContabilidadUpdateInput!]!): MutationResponse!
   createTipoEntidad(tipoEntidadInfo: TipoEntidadInput!): MutationResponse!
   updateTipoEntidad(tipoEntidadInfo: TipoEntidadInput!): MutationResponse!
   deleteTipoEntidad(IDs: [Int!]!): MutationResponse!
@@ -1005,7 +942,10 @@ type Mutation {
   updateCajaConfiguracion(cajaConfiguracionInput: CajaConfiguracionInput!): CajaConfiguracionEntity!
   removeCajaConfiguracion(id: Int!): CajaConfiguracionEntity!
   updateConciliaDWH(conciliaDWH: [ConciliaExternaDwhInput!]!): Int!
-  updateConciliacionEntreUnidades(conciliacionUnidadesInput: ConciliacionEntreUnidadesInput!): Float!
+  updateConciliacionEntreUnidades(conciliacionUnidadesInput: ConciliacionExternaEntreUnidadesInput!): Float!
+  inicializarConciliacion(anno: Int!, mes: Int!): ConciliaExternaDatosConciliacionEntity!
+  cerrarConciliacion(anno: Int!, mes: Int!): Float!
+  reabrirConciliacion(anno: Int!, mes: Int!): Float!
   saveActFijosClasificadorSubgrupo(actFijosClasificadorSubgrupoInput: ActFijosClasificadorSubgrupoInput!): ActFijosClasificadorSubgrupoEntity!
   deleteActFijosClasificadorSubgrupo(grupo: Int!, codigo: Int!): Int!
 }
@@ -1095,7 +1035,7 @@ input SupervisorInput {
   IdDivision: Float!
 }
 
-input ConciliaExtContabilidadInput {
+input ConciliaExternaContabilidadUpdateInput {
   Id: Float!
   Recibido: Boolean!
 }
@@ -1203,14 +1143,14 @@ input ConciliaExternaDwhInput {
   Recibido: Boolean!
 }
 
-input ConciliacionEntreUnidadesInput {
+input ConciliacionExternaEntreUnidadesInput {
   Annio: Float!
   Mes: Float!
-  Unidad: Float!
-  UnidadOD: Float!
-  UsuarioEmisor: Float
-  UsuarioReceptor: Float
-  UsuarioSupervisor: Float
+  IdUnidad: Float!
+  IdUnidadOD: Float!
+  IdUsuarioEmisor: Float
+  IdUsuarioReceptor: Float
+  IdUsuarioSupervisor: Float
   Nota: String
 }
 

@@ -36,6 +36,23 @@ export class EmpleadosService {
     }
   }
 
+  async findAllByIdDivision(idDivision: number): Promise<EmpleadosQueryResponse> {
+    try {
+      return new Promise<EmpleadosQueryResponse>(resolve => {
+        this.empleadoRepository
+          .find({ where: { IdDivision: idDivision }, relations: ['Cargo', 'Division'] })
+          .then(res => {
+            resolve({ success: true, data: res });
+          })
+          .catch(err => {
+            resolve({ success: false, error: err.message ? err.message : err });
+          });
+      });
+    } catch (err: any) {
+      return { success: false, error: err.message ? err.message : err };
+    }
+  }
+
   async findOne(_id: number): Promise<EmpleadoQueryResponse> {
     try {
       return new Promise<EmpleadoQueryResponse>(resolve => {

@@ -17,6 +17,12 @@ export class EmpleadosResolver {
     return this._empleadosService.findAll(user);
   }
 
+  @Query(() => EmpleadosQueryResponse)
+  @UseGuards(new AuthGuard())
+  async getEmpleadosByIdDivision(@Args({ name: 'idDivision', type: () => Int }) _idDivision: number): Promise<EmpleadosQueryResponse> {
+    return this._empleadosService.findAllByIdDivision(_idDivision);
+  }
+
   @Query(() => EmpleadoQueryResponse)
   @UseGuards(new AuthGuard())
   async getEmpleadoById(@Args({ name: 'id', type: () => Int }) _id: number): Promise<EmpleadoQueryResponse> {

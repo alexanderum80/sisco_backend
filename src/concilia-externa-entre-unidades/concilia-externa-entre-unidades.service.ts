@@ -2,7 +2,7 @@ import { ConciliaExtContabilidadService } from './../concilia-externa-contabilid
 import { ConciliaExternaEntreUnidadesEntity, ConciliaExternaCentrosNoConciliados } from './entities/concilia-externa-entre-unidades.entity';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
-import { ConciliacionEntreUnidadesInput } from './dto/concilia-externa-entre-unidades.input';
+import { ConciliacionExternaEntreUnidadesInput } from './dto/concilia-externa-entre-unidades.input';
 import { DataSource, Repository } from 'typeorm';
 
 @Injectable()
@@ -13,11 +13,11 @@ export class ConciliaExternaEntreUnidadesService {
     private conciliaContabSvc: ConciliaExtContabilidadService,
   ) {}
 
-  async getConciliacionEntreUnidades(annio: number, mes: number, unidad: number, unidadOD: number): Promise<ConciliaExternaEntreUnidadesEntity> {
+  async getConciliacionEntreUnidades(annio: number, mes: number, unidad: number, unidadOD: number): Promise<ConciliaExternaEntreUnidadesEntity | null> {
     try {
-      return new Promise<ConciliaExternaEntreUnidadesEntity>((resolve, reject) => {
+      return new Promise<ConciliaExternaEntreUnidadesEntity | null>((resolve, reject) => {
         this.conciliacionUnidadesRepository
-          .findOne({ where: { Annio: annio, Mes: mes, Unidad: unidad, UnidadOD: unidadOD } })
+          .findOne({ where: { Annio: annio, Mes: mes, IdUnidad: unidad, IdUnidadOD: unidadOD } })
           .then(result => {
             resolve(result);
           })
@@ -31,13 +31,12 @@ export class ConciliaExternaEntreUnidadesService {
   }
 
   async createConciliacionEntreUnidades(annio, mes, unidad, unidadOD): Promise<ConciliaExternaEntreUnidadesEntity> {
-    const _concilia: ConciliaExternaEntreUnidadesEntity = {
-      ID: 0,
+    const _concilia = this.conciliacionUnidadesRepository.create({
       Annio: annio,
       Mes: mes,
-      Unidad: unidad,
-      UnidadOD: unidadOD,
-    };
+      IdUnidad: unidad,
+      IdUnidadOD: unidadOD,
+    });
 
     return new Promise<ConciliaExternaEntreUnidadesEntity>((resolve, reject) => {
       if (unidad === 0 || unidadOD === 0) {
@@ -65,15 +64,15 @@ export class ConciliaExternaEntreUnidadesService {
     });
   }
 
-  async updateConciliacionEntreUnidades(data: ConciliacionEntreUnidadesInput): Promise<number> {
+  async updateConciliacionEntreUnidades(data: ConciliacionExternaEntreUnidadesInput): Promise<number> {
     try {
       return new Promise<number>((resolve, reject) => {
-        this.getConciliacionEntreUnidades(data.Annio, data.Mes, data.Unidad, data.UnidadOD)
+        this.getConciliacionEntreUnidades(data.Annio, data.Mes, data.IdUnidad, data.IdUnidadOD)
           .then(res => {
             const stringQuery = `update ConciliacionEntreUnidades
-                        set UsuarioEmisor = ${data.UsuarioEmisor},
-                            UsuarioReceptor = ${data.UsuarioReceptor},
-                            UsuarioSupervisor = ${data.UsuarioSupervisor},
+                        set UsuarioEmisor = ${data.IdUsuarioEmisor},
+                            UsuarioReceptor = ${data.IdUsuarioReceptor},
+                            UsuarioSupervisor = ${data.IdUsuarioSupervisor},
                             Nota = '${data.Nota}'
                         where ID = ${res.ID}`;
             this.connection

@@ -235,10 +235,10 @@ export class ConciliaContaService {
         let _asientoIni = 0;
 
         result.forEach((asiento: any) => {
-          _asientoIni = toNumber(asiento.Ini);
+          _asientoIni = toNumber(asiento.ini);
 
           if (_asientoIni < _asientoAnt) {
-            const _periodo = toNumber(asiento.Período) - 1;
+            const _periodo = toNumber(asiento.periodo) - 1;
             // const _unidad = _unidadInfo.IdUnidad + '-' + _unidadInfo.Nombre;
             // const _division = _unidadInfo.IdDivision + '-' + _unidadInfo.Division;
 
@@ -337,7 +337,7 @@ export class ConciliaContaService {
       });
 
     if (_queryAsientosRes.length) {
-      const _asientos = this._xmlJsService.jsonToXML('Asiento', _queryAsientosRes);
+      const _asientos = this._xmlJsService.jsonToXML('Asiento', _queryAsientosRes).replace(/&nbsp;/gi, '');
 
       await this.dataSource.query(`EXEC dbo.pConta_ImportAsientoXML @0, @1, @2, @3, @4`, [_asientos, idUnidad, cons, annio, periodo]).catch(err => {
         throw new Error(err.message ? err.message : err);

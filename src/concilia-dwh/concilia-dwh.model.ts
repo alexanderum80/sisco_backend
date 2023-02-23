@@ -137,7 +137,7 @@ export const queryInventarioDWH = `SELECT @Centro as IdCentro, GAM.IdGerencia as
     FROM            ExistenciasP AS EP INNER JOIN
     Gerencia_Ano_Mes AS GAM ON GAM.IdGAM = EP.IdGAM INNER JOIN
     UnidadesComerciales.dbo.Almacenes AS A ON GAM.IdGerencia = A.IdUnidad AND A.IdAlmacen = EP.IdPiso
-    WHERE        (GAM.Ano = ISNULL(@Anio, GAM.Ano)) AND (GAM.Mes = ISNULL(@Mes, GAM.Mes)) AND (GAM.IdGerencia = CASE WHEN @Unidad = 100 THEN GAM.IdGerencia ELSE @Unidad END) AND A.Consignacion = 0
+    WHERE        (GAM.Ano = ISNULL(@Anio, GAM.Ano)) AND (GAM.Mes = ISNULL(@Mes, GAM.Mes)) AND (GAM.IdGerencia = CASE WHEN @Unidad = 100 THEN GAM.IdGerencia ELSE @Unidad END) AND A.Consignacion = 0 AND (SELECT TOP 1 CONVERT(INT, Valor) FROM ConvertSplitStringToTable(A.EContable, '-')) >= 100 
     GROUP BY GAM.IdGerencia, CASE WHEN @Cons = 1 THEN 0 ELSE EP.IdPiso END, GAM.Mes
     ORDER BY GAM.IdGerencia`;
 
