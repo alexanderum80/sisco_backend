@@ -10,8 +10,8 @@ import { AuthGuard } from '../shared/helpers/auth.guard';
 export class UsuariosResolver {
   constructor(protected readonly _usuariosService: UsuariosService) {}
 
-  @Query(() => UsuarioQueryResponse)
-  async authenticateUsuario(@Args('usuario') usuario: string, @Args('passw') passw: string): Promise<UsuarioQueryResponse> {
+  @Query(() => Usuarios)
+  async authenticateUsuario(@Args('usuario') usuario: string, @Args('passw') passw: string): Promise<Usuarios> {
     return this._usuariosService.authenticate(usuario, passw);
   }
 

@@ -12,7 +12,7 @@ import { SECRET_KEY } from '../shared/helpers/auth.guard';
 export class UsuariosService {
   constructor(@InjectDataSource() private readonly dataSource: DataSource, @InjectRepository(Usuarios) private readonly usuariosRepository: Repository<Usuarios>) {}
 
-  async authenticate(usuario: string, passw: string): Promise<UsuarioQueryResponse> {
+  async authenticate(usuario: string, passw: string): Promise<Usuarios> {
     try {
       const usuarioInfo: Usuarios = {
         IdUsuario: 0,
@@ -35,22 +35,16 @@ export class UsuariosService {
         const res = bcrypt.compareSync(passw, '$2a$12$8yqzwWjBYUmMDRhWJ91xTuwt5ne735hiyTYx4MQCV9quetIXJv8BC');
         if (res) {
           const token = this.createToken(usuarioInfo);
-          return {
-            success: true,
-            data: { ...usuarioInfo, Token: token },
-          };
+          return { ...usuarioInfo, Token: token };
         }
       }
 
-      return new Promise<UsuarioQueryResponse>(resolve => {
+      return new Promise<Usuarios>((resolve, reject) => {
         this.usuariosRepository
           .findOne({ where: { Usuario: usuario }, relations: ['TipoUsuario', 'Division'] })
           .then(async response => {
             if (!response) {
-              resolve({
-                success: false,
-                error: 'Usuario o contraseña incorrecta.',
-              });
+              reject('Usuario o contraseña incorrecta.');
             } else {
               // if (result.Activo === false) {
               //     resolve({
@@ -70,24 +64,18 @@ export class UsuariosService {
                 usuarioInfo.IdDivision = response.IdDivision;
                 usuarioInfo.Token = await this.createToken(usuarioInfo);
 
-                resolve({
-                  success: true,
-                  data: usuarioInfo,
-                });
+                resolve(usuarioInfo);
               } else {
-                resolve({
-                  success: false,
-                  error: 'Usuario o contraseña incorrecta.',
-                });
+                reject('Usuario o contraseña incorrecta.');
               }
             }
           })
           .catch(err => {
-            resolve({ success: false, error: err });
+            reject(err);
           });
       });
     } catch (err: any) {
-      return { success: false, error: err.message ? err.message : err };
+      return Promise.reject(err.message || err);
     }
   }
 

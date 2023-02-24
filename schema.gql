@@ -753,7 +753,7 @@ type ConciliaExternaDatosConciliacionEntity {
 }
 
 type Query {
-  authenticateUsuario(usuario: String!, passw: String!): UsuarioQueryResponse!
+  authenticateUsuario(usuario: String!, passw: String!): Usuarios!
   getAllUsuarios: UsuariosQueryResponse!
   getUsuariosByIdDivision(idDivision: Int!): UsuariosQueryResponse!
   getUsuarioById(id: Int!): UsuarioQueryResponse!
