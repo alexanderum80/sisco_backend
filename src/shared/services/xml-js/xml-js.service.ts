@@ -12,7 +12,7 @@ export class XmlJsService {
     try {
       const content = [json.map((el: any) => this.createXmlElement({ name: _name, content: el }))];
 
-      return toXML(
+      const xml = toXML(
         {
           _name: 'myRoot',
           _attrs: {
@@ -22,6 +22,14 @@ export class XmlJsService {
         },
         xmlOptions,
       );
+
+      return xml
+        .replace(/&nbsp;/gi, '')
+        .replace(/&#x/gi, '_')
+        .replace(/&amp;/gi, ' and ')
+        .replace(/&quot;/gi, "''")
+        .replace(/&gt/gi, '')
+        .replace(/&lt/gi, '');
     } catch (err: any) {
       return '';
     }

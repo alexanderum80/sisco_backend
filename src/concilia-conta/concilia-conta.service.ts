@@ -337,7 +337,7 @@ export class ConciliaContaService {
       });
 
     if (_queryAsientosRes.length) {
-      const _asientos = this._xmlJsService.jsonToXML('Asiento', _queryAsientosRes).replace(/&nbsp;/gi, '');
+      const _asientos = this._xmlJsService.jsonToXML('Asiento', _queryAsientosRes);
 
       await this.dataSource.query(`EXEC dbo.pConta_ImportAsientoXML @0, @1, @2, @3, @4`, [_asientos, idUnidad, cons, annio, periodo]).catch(err => {
         throw new Error(err.message ? err.message : err);
