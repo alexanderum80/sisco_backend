@@ -1,5 +1,4 @@
 import { ContaConexionesEntity } from './../conta-conexiones/conta-conexiones.entity';
-import { cloneDeep } from 'lodash';
 import { ConciliaUhInput, ConciliaUH, queryUhCategorias, queryUhProductos, queryUh } from './concilia-uh.model';
 import { XmlJsService } from './../shared/services/xml-js/xml-js.service';
 import { ConciliaContaService } from './../concilia-conta/concilia-conta.service';
@@ -24,14 +23,11 @@ export class ConciliaUhService {
       // verificar si se ha definido la conexión al Rodas
       const _conexionRodasQuery = await this._contaConexionesSvc.findByIdUnidad(idCentro, false);
       const _conexionConta = _conexionRodasQuery.data;
-      _conexionConta.BaseDatos = `Conta${_conexionConta.BaseDatos}${annio.toString()}`;
-
-      const _conexionUH = cloneDeep(_conexionConta);
-      _conexionUH.BaseDatos = _conexionUH.BaseDatos.replace(/Conta/gi, 'Util');
+      _conexionConta.BaseDatos = `r4_${_conexionConta.BaseDatos.toLowerCase()}`;
 
       return new Promise<ConciliaUH[]>((resolve, reject) => {
         // importo los datos de los Utiles
-        this._importarDatosUH(idCentro, periodo, _conexionUH)
+        this._importarDatosUH(idCentro, annio, periodo, _conexionConta)
           .then(() => {
             // importo los datos de la contabilidad
             this._importarDatosRodas(annio, periodo, idCentro, 0, _conexionConta)
@@ -58,19 +54,19 @@ export class ConciliaUhService {
     }
   }
 
-  private async _importarDatosUH(idCentro: number, periodo: number, conexionRodas: ContaConexionesEntity): Promise<void> {
+  private async _importarDatosUH(idCentro: number, anno: number, periodo: number, conexionRodas: ContaConexionesEntity): Promise<void> {
     // try {
     const mbConnection = await this._contaConexionesSvc.conexionRodas(conexionRodas);
 
     return new Promise<void>((resolve, reject) => {
       // importo las Categorias
-      this._importarCategoriaUH(idCentro, mbConnection)
+      this._importarCategoriaUH(idCentro, anno, mbConnection)
         .then(() => {
           // importo los Productos
-          this._importarProductosUH(idCentro, mbConnection)
+          this._importarProductosUH(idCentro, anno, mbConnection)
             .then(() => {
               // importo los UH
-              this._importarUH(idCentro, periodo, mbConnection)
+              this._importarUH(idCentro, anno, periodo, mbConnection)
                 .then(() => {
                   resolve();
                 })
@@ -88,10 +84,10 @@ export class ConciliaUhService {
     });
   }
 
-  private async _importarCategoriaUH(idCentro: number, conexionRodas: DataSource): Promise<void> {
+  private async _importarCategoriaUH(idCentro: number, anno: number, conexionRodas: DataSource): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       conexionRodas
-        .query(queryUhCategorias)
+        .query(queryUhCategorias.replace(/@anno/gi, anno.toString()))
         .then(async res => {
           if (res.length) {
             const _categoria = this._xmlSvc.jsonToXML('Categoria', res);
@@ -104,6 +100,8 @@ export class ConciliaUhService {
               .catch(err => {
                 reject(err.message || err);
               });
+          } else {
+            resolve();
           }
         })
         .catch((err: Error) => {
@@ -112,10 +110,10 @@ export class ConciliaUhService {
     });
   }
 
-  private async _importarProductosUH(idCentro: number, conexionRodas: DataSource): Promise<void> {
+  private async _importarProductosUH(idCentro: number, anno: number, conexionRodas: DataSource): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       conexionRodas
-        .query(queryUhProductos)
+        .query(queryUhProductos.replace(/@anno/gi, anno.toString()))
         .then(async res => {
           if (res.length) {
             const _productos = this._xmlSvc.jsonToXML('Producto', res);
@@ -128,6 +126,8 @@ export class ConciliaUhService {
               .catch(err => {
                 reject(err.message || err);
               });
+          } else {
+            resolve();
           }
         })
         .catch((err: Error) => {
@@ -136,10 +136,15 @@ export class ConciliaUhService {
     });
   }
 
-  private async _importarUH(idCentro: number, periodo: number, conexionRodas: DataSource): Promise<void> {
+  private async _importarUH(idCentro: number, anno: number, periodo: number, conexionRodas: DataSource): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       conexionRodas
-        .query(queryUh.replace(/@Centro/gi, idCentro.toString()).replace(/@Periodo/gi, periodo.toString()))
+        .query(
+          queryUh
+            .replace(/@centro/gi, idCentro.toString())
+            .replace(/@anno/gi, anno.toString())
+            .replace(/@periodo/gi, periodo.toString()),
+        )
         .then(res => {
           if (res.length) {
             const _uh = this._xmlSvc.jsonToXML('UH', res);
@@ -154,7 +159,7 @@ export class ConciliaUhService {
                 reject(err.message ? err.message : err);
               });
           } else {
-            reject('No existen datos de Útiles y Herramientas del período seleccionado. <br/>No se puede realizar la Conciliación.');
+            reject('No existen datos de los Útiles y Herramientas del período seleccionado. <br/>No se puede realizar la Conciliación.');
           }
         })
         .catch((err: Error) => {

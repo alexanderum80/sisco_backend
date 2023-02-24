@@ -32,7 +32,10 @@ export class ContaNoUsarEnCuentaInput {
   Crit3: string;
 
   @Field({ nullable: true })
-  TextoInicio?: string;
+  Crit4: string;
+
+  @Field({ nullable: true })
+  Crit5: string;
 
   @Field()
   Centralizada: boolean;

@@ -1,4 +1,5 @@
-import { toNumber, cloneDeep } from 'lodash';
+import { ContaConexionesEntity } from './../conta-conexiones/conta-conexiones.entity';
+import { toNumber } from 'lodash';
 import { Usuarios } from './../usuarios/usuarios.entity';
 import { ETipoClasificadorCuenta } from './../clasificador-cuenta/clasificador-cuenta.model';
 import { ClasificadorCuentaService } from './../clasificador-cuenta/clasificador-cuenta.service';
@@ -11,7 +12,6 @@ import {
   queryUltimoPeriodo,
   queryComprobantesRodas,
   queryAsientoRodas,
-  queryMayorRodas,
   queryRangoAsientosMesRodas,
   querySaldosAcumuladosRodas,
   ConciliaContaInput,
@@ -23,9 +23,10 @@ import {
   queryReporteValores,
   IniciarSaldosInput,
   ChequearCentrosInput,
-  queryInsertClasificadorUnidad,
-  querySwitchAuditRodas,
-  queryUpdateClasificadorUnidad,
+  queryInsertClasificadorRodas,
+  queryInsertCriterioConsolidacionRodas,
+  queryUpdateCriterioClasificadorRodas,
+  queryUpdateClasificadorRodas,
 } from './concilia-conta.model';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
@@ -47,10 +48,12 @@ export class ConciliaContaService {
       const consolidado = tipoCentro === 2 ? '1' : '0';
 
       // verificar si se ha definido la conexión al Rodas
-      const _conexionRodasQuery = await this._contaConexionesService.findByIdUnidad(idCentro, tipoCentro === 2);
+      const _conexionRodasQuery = await this._contaConexionesService.findByIdUnidad(idCentro, tipoCentro === 2).catch(err => {
+        throw new Error(err);
+      });
 
       const _conexionConta = _conexionRodasQuery.data;
-      _conexionConta.BaseDatos = `Conta${_conexionConta.BaseDatos}${annio.toString()}`;
+      _conexionConta.BaseDatos = `r4_${_conexionConta.BaseDatos.toLowerCase()}`;
 
       // conecto al Conta del Centro
       const _contaConexionCentro: DataSource = await this._contaConexionesService.conexionRodas(_conexionConta);
@@ -90,24 +93,18 @@ export class ConciliaContaService {
       if (_contaConexionCentro && _contaConexionCentro.isInitialized) _contaConexionCentro.destroy();
 
       // calcular la conciliación
-      let _error = '';
       await this._calculaConciliacion(idCentro, tipoCentro, annio, periodo, tipoEntidad, IdDivision).catch(err => {
-        _error = err.message;
+        throw new Error(err);
       });
 
       // devuelvo el resultado de la conciliación
-      return new Promise<ConciliaContabilidadQueryResponse>(resolve => {
+      return new Promise<ConciliaContabilidadQueryResponse>((resolve, reject) => {
         this._getReportesConciliacion(idCentro, consolidado, annio, periodo, IdDivision)
           .then(result => {
-            if (_error) {
-              result.success = false;
-              result.error = _error;
-            }
-
             resolve(result);
           })
           .catch(err => {
-            throw new Error(err);
+            reject(err);
           });
       });
     } catch (err: any) {
@@ -139,39 +136,41 @@ export class ConciliaContaService {
   async _importarClasificador(idUnidad: number, tipoCentro: number, annio: number, cons: string, periodo: number, contaConexion: DataSource): Promise<any> {
     try {
       // inserto el clasificador del Rodas
-      const _queryClasifCuentasRes = await contaConexion.query(queryClasificadorCuentasRodas).catch(err => {
+      const _queryClasifCuentasRes = await contaConexion.query(queryClasificadorCuentasRodas.replace(/@anno/gi, annio.toString())).catch(err => {
         throw new Error(err.message ? err.message : err);
       });
 
-      let _clasifCuentasXML = this._xmlJsService.jsonToXML('Clasificador_de_Cuentas', {});
+      let _clasifCuentasXML = this._xmlJsService.jsonToXML('Cuentas', {});
 
       if (_queryClasifCuentasRes.length) {
-        _clasifCuentasXML = this._xmlJsService.jsonToXML('Clasificador_de_Cuentas', _queryClasifCuentasRes);
-      }
+        _clasifCuentasXML = this._xmlJsService.jsonToXML('Cuentas', _queryClasifCuentasRes);
 
-      let tipoClasif = '';
-      switch (tipoCentro) {
-        case 0:
-          tipoClasif = '2';
-          break;
-        case 1:
-          tipoClasif = '3';
-          break;
-        case 2:
-          tipoClasif = '1';
-          break;
-      }
+        let tipoClasif = '';
+        switch (tipoCentro) {
+          case 0:
+            tipoClasif = '2';
+            break;
+          case 1:
+            tipoClasif = '3';
+            break;
+          case 2:
+            tipoClasif = '1';
+            break;
+        }
 
-      return new Promise<any>(resolve => {
-        this.dataSource
-          .query(`EXEC dbo.pConta_ImportClasifCuentaXML @0, @1, @2, @3, @4, @5`, [_clasifCuentasXML, idUnidad, tipoClasif, cons, annio, periodo])
-          .then(result => {
-            resolve({ data: result });
-          })
-          .catch(err => {
-            throw new Error(err.message ? err.message : err);
-          });
-      });
+        return new Promise<any>((resolve, reject) => {
+          this.dataSource
+            .query(`EXEC dbo.pConta_ImportClasifCuentaXML @0, @1, @2, @3, @4, @5`, [_clasifCuentasXML, idUnidad, tipoClasif, cons, annio, periodo])
+            .then(result => {
+              resolve({ data: result });
+            })
+            .catch(err => {
+              reject(err.message ? err.message : err);
+            });
+        });
+      } else {
+        throw new Error('No existe Clasificador de Cuentas para el Centro. <br>No se puede realizar la Conciliación.');
+      }
     } catch (err: any) {
       if (contaConexion && contaConexion.isInitialized) contaConexion.destroy();
 
@@ -211,10 +210,9 @@ export class ConciliaContaService {
 
         // importar los asientos
         await this._importarAsientos(idUnidad, annio, per, cons, contaConexion);
-
-        // importar mayor
-        await this._importarMayor(idUnidad, annio, periodo, cons, contaConexion);
       }
+
+      this._updateFechaActualizacion(idUnidad, cons === '1');
     } catch (err: any) {
       if (contaConexion && contaConexion.isInitialized) contaConexion.destroy();
 
@@ -229,7 +227,6 @@ export class ConciliaContaService {
     if (!_unidadRes.success) {
       throw new Error(_unidadRes.error.toString());
     }
-    // const _unidadInfo = _unidadRes.data;
 
     await conexionRodas
       .query(_queryAsientos)
@@ -238,10 +235,10 @@ export class ConciliaContaService {
         let _asientoIni = 0;
 
         result.forEach((asiento: any) => {
-          _asientoIni = toNumber(asiento.Ini);
+          _asientoIni = toNumber(asiento.ini);
 
           if (_asientoIni < _asientoAnt) {
-            const _periodo = toNumber(asiento.Período) - 1;
+            const _periodo = toNumber(asiento.periodo) - 1;
             // const _unidad = _unidadInfo.IdUnidad + '-' + _unidadInfo.Nombre;
             // const _division = _unidadInfo.IdDivision + '-' + _unidadInfo.Division;
 
@@ -274,7 +271,7 @@ export class ConciliaContaService {
   }
 
   private async _chequearSaldoAcumulados(idUnidad: number, annio: number, periodo: number, cons: string, conexionRodas: DataSource): Promise<void> {
-    const _querySaldosAcumRodas = querySaldosAcumuladosRodas.replace(/@Periodo/g, periodo.toString());
+    const _querySaldosAcumRodas = querySaldosAcumuladosRodas.replace(/@anno/g, annio.toString()).replace(/@periodo/g, periodo.toString());
 
     const _querySaldoAcumRodasRes = await conexionRodas
       .query(_querySaldosAcumRodas)
@@ -288,8 +285,8 @@ export class ConciliaContaService {
     let _saldoDebito = 0;
     let _saldoCredito = 0;
     if (_querySaldoAcumRodasRes.data.length > 0) {
-      _saldoDebito = _querySaldoAcumRodasRes.data[0].Debito;
-      _saldoCredito = _querySaldoAcumRodasRes.data[0].Credito;
+      _saldoDebito = _querySaldoAcumRodasRes.data[0].debito;
+      _saldoCredito = _querySaldoAcumRodasRes.data[0].credito;
     }
 
     await this.dataSource
@@ -308,7 +305,7 @@ export class ConciliaContaService {
   }
 
   private async _importarComprobantes(idUnidad: number, annio: number, periodo: number, cons: string, rodasConexion: DataSource): Promise<void> {
-    const _queryComprobantes = queryComprobantesRodas.replace(/@Periodo/g, periodo.toString());
+    const _queryComprobantes = queryComprobantesRodas.replace(/@anno/g, annio.toString()).replace(/@periodo/g, periodo.toString());
     const _queryCompRes = await rodasConexion
       .query(_queryComprobantes)
       .then(result => {
@@ -328,7 +325,7 @@ export class ConciliaContaService {
   }
 
   private async _importarAsientos(idUnidad: number, annio: number, periodo: number, cons: string, rodasConexion: DataSource): Promise<void> {
-    const _queryAsientos = queryAsientoRodas.replace(/@Periodo/g, periodo.toString());
+    const _queryAsientos = queryAsientoRodas.replace(/@anno/g, annio.toString()).replace(/@periodo/g, periodo.toString());
 
     const _queryAsientosRes = await rodasConexion
       .query(_queryAsientos)
@@ -340,7 +337,7 @@ export class ConciliaContaService {
       });
 
     if (_queryAsientosRes.length) {
-      const _asientos = this._xmlJsService.jsonToXML('Asiento', _queryAsientosRes);
+      const _asientos = this._xmlJsService.jsonToXML('Asiento', _queryAsientosRes).replace(/&nbsp;/gi, '');
 
       await this.dataSource.query(`EXEC dbo.pConta_ImportAsientoXML @0, @1, @2, @3, @4`, [_asientos, idUnidad, cons, annio, periodo]).catch(err => {
         throw new Error(err.message ? err.message : err);
@@ -348,24 +345,20 @@ export class ConciliaContaService {
     }
   }
 
-  private async _importarMayor(idUnidad: number, annio: number, periodo: number, cons: string, rodasConexion: DataSource): Promise<void> {
-    const _queryMayor = queryMayorRodas.replace(/@Periodo/g, periodo.toString());
-    const _queryMayorRes = await rodasConexion
-      .query(_queryMayor)
-      .then(result => {
-        return result;
-      })
-      .catch(err => {
-        throw new Error(err.message ? err.message : err);
-      });
-
-    if (_queryMayorRes.length) {
-      const _mayor = this._xmlJsService.jsonToXML('Mayor', _queryMayorRes);
-
-      await this.dataSource.query(`EXEC dbo.pConta_ImportMayorXML @0, @1, @2, @3, @4`, [_mayor, idUnidad, cons, annio, periodo]).catch(err => {
-        throw new Error(err.message ? err.message : err);
-      });
-    }
+  private async _updateFechaActualizacion(idUnidad: number, cons: boolean): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      this.dataSource
+        .createQueryBuilder()
+        .update(ContaConexionesEntity)
+        .set({ FechaActualizacion: new Date() })
+        .where('IdUnidad = :idUnidad', { idUnidad: idUnidad })
+        .andWhere('Consolidado = :cons', { cons: cons })
+        .execute()
+        .then(() => resolve())
+        .catch(err => {
+          reject(err);
+        });
+    });
   }
 
   private async _calculaConciliacion(idUnidad: number, tipoClasificador: number, anio: number, periodo: number, tipoEntidad: number, idDivision: number): Promise<void> {
@@ -394,13 +387,13 @@ export class ConciliaContaService {
 
   private async _getReportesConciliacion(idCentro: number, consolidado: string, annio: number, periodo: number, idDivision: number): Promise<ConciliaContabilidadQueryResponse> {
     // devuelvo el resultado de la conciliación
-    const _queryReporteConsultas = this._reporteConsultas(idCentro, consolidado, periodo, 1);
-    const _queryReporteExpresiones = this._reporteExpresiones(idCentro, consolidado, periodo);
-    const _queryReporteValores = this._reporteValores(idCentro, consolidado, periodo, idDivision);
-    const _queryCuadreSistemas = this._reporteCuadreSistemas(idCentro, consolidado, annio, periodo);
+    const _queryReporteConsultas = this._reporteConsultas(idCentro, consolidado, annio, periodo, 1);
+    const _queryReporteExpresiones = this._reporteExpresiones(idCentro, consolidado, annio, periodo);
+    const _queryReporteValores = this._reporteValores(idCentro, consolidado, annio, periodo, idDivision);
+    const _queryReporteCuadreSistemas = this._reporteCuadreSistemas(idCentro, consolidado, annio, periodo);
 
     return new Promise<ConciliaContabilidadQueryResponse>(resolve => {
-      Promise.all([_queryReporteConsultas, _queryReporteExpresiones, _queryReporteValores, _queryCuadreSistemas])
+      Promise.all([_queryReporteConsultas, _queryReporteExpresiones, _queryReporteValores, _queryReporteCuadreSistemas])
         .then(result => {
           resolve({
             success: true,
@@ -434,10 +427,11 @@ export class ConciliaContaService {
     });
   }
 
-  private async _reporteConsultas(idUnidad: number, cons: string, periodo: number, idConsulta: number): Promise<ConciliaContaQueryResponse> {
+  private async _reporteConsultas(idUnidad: number, cons: string, annio: number, periodo: number, idConsulta: number): Promise<ConciliaContaQueryResponse> {
     const _query = queryReporteConsultas
       .replace(/@Centro/g, idUnidad.toString())
       .replace(/@Consolidado/g, cons)
+      .replace(/@Anio/g, annio.toString())
       .replace(/@Periodo/g, periodo.toString())
       .replace(/@IdConsulta/g, idConsulta.toString());
 
@@ -456,10 +450,11 @@ export class ConciliaContaService {
     });
   }
 
-  private async _reporteExpresiones(idUnidad: number, cons: string, periodo: number): Promise<ConciliaContaQueryResponse> {
+  private async _reporteExpresiones(idUnidad: number, cons: string, annio: number, periodo: number): Promise<ConciliaContaQueryResponse> {
     const _query = queryReporteExpresiones
       .replace(/@Centro/g, idUnidad.toString())
       .replace(/@Consolidado/g, cons)
+      .replace(/@Anio/g, annio.toString())
       .replace(/@Periodo/g, periodo.toString());
 
     return new Promise<ConciliaContaQueryResponse>(resolve => {
@@ -477,10 +472,11 @@ export class ConciliaContaService {
     });
   }
 
-  private async _reporteValores(idUnidad: number, cons: string, periodo: number, idDivision: number): Promise<ConciliaContaQueryResponse> {
+  private async _reporteValores(idUnidad: number, cons: string, annio: number, periodo: number, idDivision: number): Promise<ConciliaContaQueryResponse> {
     const _query = queryReporteValores
       .replace(/@Centro/g, idUnidad.toString())
       .replace(/@Consolidado/g, cons)
+      .replace(/@Anio/g, annio.toString())
       .replace(/@Periodo/g, periodo.toString())
       .replace(/@IdDivision/g, idDivision.toString());
 
@@ -540,10 +536,8 @@ export class ConciliaContaService {
       // verificar si se ha definido la conexión al Rodas
       const _conexionRodasQuery = await this._contaConexionesService.findByIdUnidad(idUnidad, tipoUnidad === '2');
       const _conexionConta = _conexionRodasQuery.data;
-      const _conexionCodif = cloneDeep(_conexionConta);
 
-      _conexionConta.BaseDatos = `Conta${_conexionConta.BaseDatos}${annio.toString()}`;
-      _conexionCodif.BaseDatos = `Codif${_conexionCodif.BaseDatos}`;
+      _conexionConta.BaseDatos = `r4_${_conexionConta.BaseDatos.toLowerCase()}`;
 
       let tipoClasificador = 0;
 
@@ -559,107 +553,102 @@ export class ConciliaContaService {
           break;
       }
 
-      const _clasifCuentasRealQuery = await this._clasificadorCuentaSvc.getClasificadorCuentaByTipo(tipoClasificador);
-      if (!_clasifCuentasRealQuery.success) {
-        throw new Error(_clasifCuentasRealQuery.error);
-      }
-
-      const _clasifCuentasReal = _clasifCuentasRealQuery.data;
-
-      const bdCodif = await this._contaConexionesService.conexionRodas(_conexionCodif);
-      const bdConta = await this._contaConexionesService.conexionRodas(_conexionConta);
-      // const _clasifCuentaUC = await bdConta.query('SELECT * FROM dbo.[Clasificador de Cuentas]').then(result => {
-      //     return result;
-      // }).catch(err => {
-      //     return { success: false, error: err.message ? err.message : err };
-      // });
-
-      // deshabilito el Audit
-      const _queryStopAudit = querySwitchAuditRodas.replace(/@DataBase/g, bdConta.options.database.toString()).replace(/@Accion/g, 'OFF');
-
-      await bdCodif.query(_queryStopAudit).catch(err => {
+      const _clasifCuentasReal = await this._clasificadorCuentaSvc.getClasificadorCuentaByTipo(tipoClasificador).catch(err => {
         throw new Error(err);
       });
 
-      _clasifCuentasReal.forEach(
-        async (element: {
-          Cuenta: string;
-          SubCuenta: string;
-          Descripcion: string;
-          Naturaleza: string;
-          Terminal: boolean;
-          Crit1: string;
-          Crit2: string;
-          Crit3: string;
-          Obligacion: boolean;
-          Crit1Consolidacion: string;
-          Crit2Consolidacion: string;
-          Crit3Consolidacion: string;
-        }) => {
-          // inserto la cuenta, si no existe
-          const _queryInsert = queryInsertClasificadorUnidad
-            .replace(/@Anio/g, annio)
-            .replace(/@Cta/g, element.Cuenta)
-            .replace(/@SubCta/g, element.SubCuenta)
-            .replace(/@Desc/g, element.Descripcion)
-            .replace(/@Nat/g, element.Naturaleza)
-            .replace(/@Subm/g, element.Terminal === true ? '1' : '0')
-            .replace(/@An1/g, element.Crit1)
-            .replace(/@An2/g, element.Crit2)
-            .replace(/@An3/g, element.Crit3)
-            .replace(/@Obl/g, element.Obligacion === true ? '1' : '0')
-            .replace(/@Term/g, element.Terminal === true ? '1' : '0')
-            .replace(/@ConsTipoAn1/g, element.Crit1Consolidacion)
-            .replace(/@ConsTipoAn2/g, element.Crit2Consolidacion)
-            .replace(/@ConsTipoAn3/g, element.Crit3Consolidacion)
-            .replace(/@CondCons/g, element.Terminal === true ? 'X' : '')
-            .replace(/@ConsAn1/g, element.Crit1Consolidacion === '@' ? idUnidad.toString() : '')
-            .replace(/@ConsAn2/g, element.Crit2Consolidacion === '@' ? idUnidad.toString() : '')
-            .replace(/@ConsAn3/g, element.Crit3Consolidacion === '@' ? idUnidad.toString() : '');
+      const bdConta = await this._contaConexionesService.conexionRodas(_conexionConta);
 
-          await bdCodif.query(_queryInsert).catch(err => {
-            // habilito el Audit
-            const _queryStopAudit = querySwitchAuditRodas.replace(/@DataBase/g, bdConta.options.database.toString()).replace(/@Accion/g, 'ON');
+      for (let index = 0; index < _clasifCuentasReal.length; index++) {
+        const _clasif = _clasifCuentasReal[index];
 
-            bdCodif.query(_queryStopAudit).catch(err => {
-              throw Error(err);
-            });
+        // inserto la cuenta, si no existe
+        const _queryInsertCC = queryInsertClasificadorRodas
+          .replace(/@Anio/g, annio)
+          .replace(/@Cta/g, _clasif.Cuenta)
+          .replace(/@SubCta/g, _clasif.SubCuenta)
+          .replace(/@Nombre/g, _clasif.Nombre)
+          .replace(/@Nat/g, _clasif.Naturaleza)
+          .replace(/@An1/g, _clasif.Tipo_Analisis_1 ? `'${_clasif.Tipo_Analisis_1}'` : `null`)
+          .replace(/@An2/g, _clasif.Tipo_Analisis_2 ? `'${_clasif.Tipo_Analisis_2}'` : `null`)
+          .replace(/@An3/g, _clasif.Tipo_Analisis_3 ? `'${_clasif.Tipo_Analisis_3}'` : `null`)
+          .replace(/@An4/g, _clasif.Tipo_Analisis_4 ? `'${_clasif.Tipo_Analisis_4}'` : `null`)
+          .replace(/@An5/g, _clasif.Tipo_Analisis_5 ? `'${_clasif.Tipo_Analisis_5}'` : `null`)
+          .replace(/@Obl/g, _clasif.Obligacion ? 'true' : 'false')
+          .replace(/@Grupo/g, _clasif.Grupo)
+          .replace(/@Clase/g, _clasif.Clase)
+          .replace(/@Categ/g, _clasif.Categoria)
+          .replace(/@Clasif/g, _clasif.Clasificacion)
+          .replace(/@Tipo/g, _clasif.Tipo)
+          .replace(/@Estado/g, _clasif.Estado);
 
-            throw Error(err);
-          });
+        await bdConta.query(_queryInsertCC).catch(err => {
+          throw new Error(err);
+        });
 
-          const _queryUpdate = queryUpdateClasificadorUnidad
-            .replace(/@Anio/g, annio)
-            .replace(/@Cta/g, element.Cuenta)
-            .replace(/@SubCta/g, element.SubCuenta)
-            .replace(/@Desc/g, element.Descripcion)
-            .replace(/@Nat/g, element.Naturaleza)
-            .replace(/@Subm/g, element.Terminal === true ? '1' : '0')
-            .replace(/@An1/g, element.Crit1)
-            .replace(/@An2/g, element.Crit2)
-            .replace(/@An3/g, element.Crit3)
-            .replace(/@Obl/g, element.Obligacion === true ? '1' : '0')
-            .replace(/@Term/g, element.Terminal === true ? '1' : '0')
-            .replace(/@ConsTipoAn1/g, element.Crit1Consolidacion)
-            .replace(/@ConsTipoAn2/g, element.Crit2Consolidacion)
-            .replace(/@ConsTipoAn3/g, element.Crit3Consolidacion)
-            .replace(/@CondCons/g, element.Terminal === true ? 'X' : '')
-            .replace(/@ConsAn1/g, element.Crit1Consolidacion === '@' ? idUnidad.toString() : '')
-            .replace(/@ConsAn2/g, element.Crit2Consolidacion === '@' ? idUnidad.toString() : '')
-            .replace(/@ConsAn3/g, element.Crit3Consolidacion === '@' ? idUnidad.toString() : '');
+        // actualizo la cuenta, si existe
+        const _queryUpdateCC = queryUpdateClasificadorRodas
+          .replace(/@Anio/g, annio)
+          .replace(/@Cta/g, _clasif.Cuenta)
+          .replace(/@SubCta/g, _clasif.SubCuenta)
+          .replace(/@Nombre/g, _clasif.Nombre)
+          .replace(/@Nat/g, _clasif.Naturaleza)
+          .replace(/@An1/g, _clasif.Tipo_Analisis_1 ? `'${_clasif.Tipo_Analisis_1}'` : `null`)
+          .replace(/@An2/g, _clasif.Tipo_Analisis_2 ? `'${_clasif.Tipo_Analisis_2}'` : `null`)
+          .replace(/@An3/g, _clasif.Tipo_Analisis_3 ? `'${_clasif.Tipo_Analisis_3}'` : `null`)
+          .replace(/@An4/g, _clasif.Tipo_Analisis_4 ? `'${_clasif.Tipo_Analisis_4}'` : `null`)
+          .replace(/@An5/g, _clasif.Tipo_Analisis_5 ? `'${_clasif.Tipo_Analisis_5}'` : `null`)
+          .replace(/@Obl/g, _clasif.Obligacion ? 'true' : 'false')
+          .replace(/@Grupo/g, _clasif.Grupo)
+          .replace(/@Clase/g, _clasif.Clase)
+          .replace(/@Categ/g, _clasif.Categoria)
+          .replace(/@Clasif/g, _clasif.Clasificacion)
+          .replace(/@Tipo/g, _clasif.Tipo)
+          .replace(/@Estado/g, _clasif.Estado);
 
-          await bdCodif.query(_queryUpdate).catch(err => {
-            // habilito el Audit
-            const _queryStopAudit = querySwitchAuditRodas.replace(/@DataBase/g, bdConta.options.database.toString()).replace(/@Accion/g, 'ON');
+        await bdConta.query(_queryUpdateCC).catch(err => {
+          throw new Error(err);
+        });
 
-            bdCodif.query(_queryStopAudit).catch(err => {
-              throw new Error(err);
-            });
+        // inserto los criterios de consolidacion, si no existen
+        const _queryInsertCons = queryInsertCriterioConsolidacionRodas
+          .replace(/@Anio/g, annio)
+          .replace(/@Cta/g, _clasif.Cuenta)
+          .replace(/@SubCta/g, _clasif.SubCuenta)
+          .replace(/@TipoAn1Cons/g, _clasif.Tipo_Analisis_1_Cons ? `'${_clasif.Tipo_Analisis_1_Cons}'` : `null`)
+          .replace(/@TipoAn2Cons/g, _clasif.Tipo_Analisis_2_Cons ? `'${_clasif.Tipo_Analisis_2_Cons}'` : `null`)
+          .replace(/@TipoAn3Cons/g, _clasif.Tipo_Analisis_3_Cons ? `'${_clasif.Tipo_Analisis_3_Cons}'` : `null`)
+          .replace(/@TipoAn4Cons/g, _clasif.Tipo_Analisis_4_Cons ? `'${_clasif.Tipo_Analisis_4_Cons}'` : `null`)
+          .replace(/@TipoAn5Cons/g, _clasif.Tipo_Analisis_5_Cons ? `'${_clasif.Tipo_Analisis_5_Cons}'` : `null`)
+          .replace(/@An1Cons/g, _clasif.Tipo_Analisis_1_Cons === '@' ? idUnidad.toString() : `null`)
+          .replace(/@An2Cons/g, _clasif.Tipo_Analisis_2_Cons === '@' ? idUnidad.toString() : `null`)
+          .replace(/@An3Cons/g, _clasif.Tipo_Analisis_3_Cons === '@' ? idUnidad.toString() : `null`)
+          .replace(/@An4Cons/g, _clasif.Tipo_Analisis_4_Cons === '@' ? idUnidad.toString() : `null`)
+          .replace(/@An5Cons/g, _clasif.Tipo_Analisis_5_Cons === '@' ? idUnidad.toString() : `null`);
 
-            throw new Error(err);
-          });
-        },
-      );
+        await bdConta.query(_queryInsertCons).catch(err => {
+          throw new Error(err);
+        });
+
+        // inserto los criterios de consolidacion, si no existen
+        const _queryUpdateCons = queryUpdateCriterioClasificadorRodas
+          .replace(/@Cta/g, _clasif.Cuenta)
+          .replace(/@SubCta/g, _clasif.SubCuenta)
+          .replace(/@TipoAn1Cons/g, _clasif.Tipo_Analisis_1_Cons ? `'${_clasif.Tipo_Analisis_1_Cons}'` : `null`)
+          .replace(/@TipoAn2Cons/g, _clasif.Tipo_Analisis_2_Cons ? `'${_clasif.Tipo_Analisis_2_Cons}'` : `null`)
+          .replace(/@TipoAn3Cons/g, _clasif.Tipo_Analisis_3_Cons ? `'${_clasif.Tipo_Analisis_3_Cons}'` : `null`)
+          .replace(/@TipoAn4Cons/g, _clasif.Tipo_Analisis_4_Cons ? `'${_clasif.Tipo_Analisis_4_Cons}'` : `null`)
+          .replace(/@TipoAn5Cons/g, _clasif.Tipo_Analisis_5_Cons ? `'${_clasif.Tipo_Analisis_5_Cons}'` : `null`)
+          .replace(/@An1Cons/g, _clasif.Tipo_Analisis_1_Cons === '@' ? idUnidad.toString() : `null`)
+          .replace(/@An2Cons/g, _clasif.Tipo_Analisis_2_Cons === '@' ? idUnidad.toString() : `null`)
+          .replace(/@An3Cons/g, _clasif.Tipo_Analisis_3_Cons === '@' ? idUnidad.toString() : `null`)
+          .replace(/@An4Cons/g, _clasif.Tipo_Analisis_4_Cons === '@' ? idUnidad.toString() : `null`)
+          .replace(/@An5Cons/g, _clasif.Tipo_Analisis_5_Cons === '@' ? idUnidad.toString() : `null`);
+
+        await bdConta.query(_queryUpdateCons).catch(err => {
+          throw new Error(err);
+        });
+      }
 
       return new Promise<boolean>(resolve => {
         resolve(true);

@@ -1,15 +1,18 @@
 import { MultipleQueryResponse, SingleQueryResponse } from './../shared/models/query.response.model';
-import { ClasificadorCuentaReal } from './clasificador-cuenta.entity';
+import { ClasificadorCuentaRealEntity } from './clasificador-cuenta.entity';
 import { Field, ObjectType, InputType } from '@nestjs/graphql';
 
 @ObjectType()
-export class ClasificadorCuentaQueryResponse extends SingleQueryResponse(ClasificadorCuentaReal) {}
+export class ClasificadorCuentaQueryResponse extends SingleQueryResponse(ClasificadorCuentaRealEntity) {}
 
 @ObjectType()
-export class ClasificadorCuentasQueryResponse extends MultipleQueryResponse(ClasificadorCuentaReal) {}
+export class ClasificadorCuentasQueryResponse extends MultipleQueryResponse(ClasificadorCuentaRealEntity) {}
 
 @InputType()
 export class ClasificadorCuentaRealInput {
+  @Field()
+  TipoClasificador: number;
+
   @Field()
   Cuenta: string;
 
@@ -17,40 +20,67 @@ export class ClasificadorCuentaRealInput {
   SubCuenta: string;
 
   @Field()
-  Descripcion: string;
+  Nombre: string;
 
   @Field()
   Naturaleza: string;
 
   @Field({ nullable: true })
-  Crit1: string;
+  Tipo_Analisis_1?: string;
 
   @Field({ nullable: true })
-  Crit2: string;
+  Tipo_Analisis_2?: string;
 
   @Field({ nullable: true })
-  Crit3: string;
+  Tipo_Analisis_3?: string;
 
-  @Field()
+  @Field({ nullable: true })
+  Tipo_Analisis_4?: string;
+
+  @Field({ nullable: true })
+  Tipo_Analisis_5?: string;
+
+  @Field({ defaultValue: false })
   Obligacion: boolean;
 
-  @Field()
-  TipoClasificador: number;
-
   @Field({ nullable: true })
-  SeUtiliza: string;
+  Tipo_Moneda?: string;
 
   @Field()
-  Terminal: boolean;
+  Grupo?: string;
+
+  @Field()
+  Clase?: string;
+
+  @Field()
+  Categoria?: string;
+
+  @Field()
+  Clasificacion?: string;
+
+  @Field()
+  Tipo?: string;
+
+  @Field()
+  Estado?: string;
 
   @Field({ nullable: true })
-  Crit1Consolidacion: string;
+  Tipo_Analisis_1_Cons?: string;
 
   @Field({ nullable: true })
-  Crit2Consolidacion: string;
+  Tipo_Analisis_2_Cons?: string;
 
   @Field({ nullable: true })
-  Crit3Consolidacion: string;
+  Tipo_Analisis_3_Cons?: string;
+
+  @Field({ nullable: true })
+  Tipo_Analisis_4_Cons?: string;
+
+  @Field({ nullable: true })
+  Tipo_Analisis_5_Cons?: string;
+
+  @Field({ nullable: true })
+  SeUtiliza?: string;
 }
 
 @ObjectType()

@@ -1,3 +1,4 @@
+import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { SqlServerConnectionOptions } from 'typeorm/driver/sqlserver/SqlServerConnectionOptions';
 
@@ -19,7 +20,7 @@ export class ConexionesQueryResponse {
   error?: string;
 }
 
-export const DEFAULT_CONNECTION_STRING: SqlServerConnectionOptions = {
+export const DEFAULT_SQL_CONNECTION_STRING: SqlServerConnectionOptions = {
   type: 'mssql',
   host: '',
   username: '',
@@ -35,6 +36,17 @@ export const DEFAULT_CONNECTION_STRING: SqlServerConnectionOptions = {
     },
     encrypt: true,
   },
+};
+
+export const DEFAULT_POSTGRES_CONNECTION_STRING: PostgresConnectionOptions = {
+  type: 'postgres',
+  host: '',
+  username: 'r4_sisco',
+  password: 'aqntjstE.2008',
+  database: '',
+  connectTimeoutMS: 60000,
+  maxQueryExecutionTime: 60000,
+  synchronize: false,
 };
 
 export const dataBasesQuery = `SELECT name FROM sysdatabases ORDER BY name`;

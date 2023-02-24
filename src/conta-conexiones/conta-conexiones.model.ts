@@ -26,32 +26,14 @@ export class ContaConexionInput {
   IpRodas: string;
 
   @Field({ nullable: true })
-  Usuario: string;
-
-  @Field({ nullable: true })
-  Contrasena: string;
-
-  @Field({ nullable: true })
   BaseDatos: string;
-}
-
-@ObjectType()
-export class EstadoConexionesRodas {
-  @Field()
-  Unidad: string;
-
-  @Field()
-  Estado: string;
 }
 
 @ObjectType()
 export class EntidadesRodas {
   @Field()
-  Siglas: string;
+  sigla: string;
 
   @Field()
-  Entidad: string;
+  entidad: string;
 }
-
-@ObjectType()
-export class EstadoConexionesRodasQueryResponse extends MultipleQueryResponse(EstadoConexionesRodas) {}

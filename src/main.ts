@@ -19,7 +19,7 @@ async function bootstrap() {
   // Socket
   const io = new socket.Server(server, {
     cors: {
-      origin: 'http://localhost:4200',
+      origin: ['http://localhost:4200', 'http://sisco.trd.gae.com.cu'],
       methods: ['GET', 'POST'],
     },
   });

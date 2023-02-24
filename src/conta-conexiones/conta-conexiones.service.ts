@@ -1,21 +1,11 @@
-import { CentrosView } from './../unidades/unidades.entity';
-import { Divisiones } from './../divisiones/divisiones.entity';
+import { DEFAULT_POSTGRES_CONNECTION_STRING } from './../conexiones/conexiones.model';
 import { Usuarios } from './../usuarios/usuarios.entity';
 import { UsuariosService } from './../usuarios/usuarios.service';
 import { UnidadesService } from './../unidades/unidades.service';
-import { queryCentrosByConsolidado } from './../concilia-conta/concilia-conta.model';
-import { DEFAULT_CONNECTION_STRING } from '../conexiones/conexiones.model';
 import { cloneDeep } from 'lodash';
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { CryptoService } from '../shared/services/crypto/crypto.service';
-import {
-  ContaConexionQueryResponse,
-  EstadoConexionesRodasQueryResponse,
-  EstadoConexionesRodas,
-  ContaConexionesQueryResponse,
-  ContaConexionInput,
-  EntidadesRodas,
-} from './conta-conexiones.model';
+import { ContaConexionQueryResponse, ContaConexionesQueryResponse, ContaConexionInput, EntidadesRodas } from './conta-conexiones.model';
 import { ContaConexionesEntity } from './conta-conexiones.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -42,20 +32,13 @@ export class ContaConexionesService {
 
       return new Promise<ContaConexionesQueryResponse>(resolve => {
         this.conexionesRespository
-          .createQueryBuilder('con')
-          .select('con.Id', 'Id')
-          .addSelect('con.IdUnidad', 'IdUnidad')
-          .addSelect('con.IdDivision', 'IdDivision')
-          .addSelect('con.Consolidado', 'Consolidado')
-          .addSelect('con.IpRodas', 'IpRodas')
-          .addSelect('con.Usuario', 'Usuario')
-          .addSelect('con.BaseDatos', 'BaseDatos')
-          .addSelect("Concat(centros.IdUnidad, '-', centros.Nombre)", 'Unidad')
-          .addSelect("Concat(div.IdDivision, '-', div.Division)", 'Division')
-          .innerJoin(CentrosView, 'centros', 'centros.IdUnidad = con.IdUnidad')
-          .innerJoin(Divisiones, 'div', 'div.IdDivision = centros.IdDivision')
-          .where(_condition)
-          .execute()
+          .find({
+            where: _condition,
+            relations: {
+              Division: true,
+              Unidad: true,
+            },
+          })
           .then(result => {
             resolve({
               success: true,
@@ -77,19 +60,10 @@ export class ContaConexionesService {
         this.conexionesRespository
           .findOne({ where: [{ Id: id }] })
           .then(result => {
-            this._cryptoService
-              .decrypt(result.Contrasena)
-              .then(res => {
-                result.Contrasena = res;
-
-                resolve({
-                  success: true,
-                  data: result,
-                });
-              })
-              .catch(err => {
-                resolve({ success: false, error: err.message ? err.message : err });
-              });
+            resolve({
+              success: true,
+              data: result,
+            });
           })
           .catch(err => {
             resolve({ success: false, error: err.message ? err.message : err });
@@ -115,7 +89,7 @@ export class ContaConexionesService {
           }
         })
         .catch(err => {
-          resolve(err.message ? err.message : err);
+          reject(err.message ? err.message : err);
         });
     });
   }
@@ -124,8 +98,8 @@ export class ContaConexionesService {
     try {
       delete conexion.Id;
 
-      const encryptedPassword = await this._cryptoService.encrypt(conexion.Contrasena);
-      conexion.Contrasena = encryptedPassword;
+      // const encryptedPassword = await this._cryptoService.encrypt(conexion.Contrasena);
+      // conexion.Contrasena = encryptedPassword;
 
       return new Promise<MutationResponse>(resolve => {
         this.conexionesRespository
@@ -146,8 +120,8 @@ export class ContaConexionesService {
 
   async update(conexion: ContaConexionInput): Promise<MutationResponse> {
     try {
-      const encryptedPassword = await this._cryptoService.encrypt(conexion.Contrasena);
-      conexion.Contrasena = encryptedPassword;
+      // const encryptedPassword = await this._cryptoService.encrypt(conexion.Contrasena);
+      // conexion.Contrasena = encryptedPassword;
 
       return new Promise<MutationResponse>(resolve => {
         this.conexionesRespository
@@ -185,28 +159,25 @@ export class ContaConexionesService {
     }
   }
 
-  async getEntidadesRodas(ip: string, ususario: string, password: string): Promise<EntidadesRodas[]> {
+  async getEntidadesRodas(ip: string): Promise<EntidadesRodas[]> {
     try {
-      const connectionString = cloneDeep(DEFAULT_CONNECTION_STRING);
+      const connectionString = cloneDeep(DEFAULT_POSTGRES_CONNECTION_STRING);
       Object.defineProperties(connectionString, {
         host: {
           value: ip,
         },
-        username: {
-          value: ususario,
-        },
-        password: {
-          value: password,
-        },
         database: {
-          value: 'ADMIN',
+          value: 'r4_admin',
         },
       });
 
       const dataSource: DataSource = await new DataSource(connectionString).initialize();
       return new Promise<EntidadesRodas[]>((resolve, reject) => {
         dataSource
-          .query(`SELECT Siglas, Código + '-' + Nombre AS Entidad FROM dbo.ENTIDADES`)
+          .query(
+            `SELECT sigla, concat(codigo, '-', nombre) as entidad
+            FROM public.entidades;`,
+          )
           .then(result => {
             resolve(result);
           })
@@ -220,16 +191,10 @@ export class ContaConexionesService {
   }
 
   async conexionRodas(contaConexion: ContaConexionesEntity): Promise<DataSource> {
-    const _conexionOptions = cloneDeep(DEFAULT_CONNECTION_STRING);
+    const _conexionOptions = cloneDeep(DEFAULT_POSTGRES_CONNECTION_STRING);
     Object.defineProperties(_conexionOptions, {
       host: {
         value: contaConexion.IpRodas,
-      },
-      username: {
-        value: contaConexion.Usuario,
-      },
-      password: {
-        value: await this._cryptoService.decrypt(contaConexion.Contrasena),
       },
       database: {
         value: contaConexion.BaseDatos,
@@ -241,45 +206,5 @@ export class ContaConexionesService {
     return new Promise<DataSource>(resolve => {
       resolve(_rodasDataSource);
     });
-  }
-
-  async estadoContaConexiones(idDivision: number): Promise<EstadoConexionesRodasQueryResponse> {
-    try {
-      const _conexionDivisionQuery = await this.findByIdUnidad(idDivision, true);
-
-      const _conexionDivision = await (await this.conexionRodas(_conexionDivisionQuery.data)).initialize();
-      const _unidades = await _conexionDivision.query(queryCentrosByConsolidado);
-
-      const _validarUnidades: EstadoConexionesRodas[] = [];
-
-      for (const _unidad of _unidades) {
-        const unidad = _unidad.Centro;
-        const _conexionUnidadQuery = await this.findByIdUnidad(unidad, false);
-
-        const datoUnidad = await (await this._unidadesSvc.getUnidadById(unidad)).data[0];
-
-        try {
-          await (await this.conexionRodas(_conexionUnidadQuery.data)).initialize();
-
-          _validarUnidades.push({
-            Unidad: datoUnidad.IdUnidad + '-' + datoUnidad.Nombre,
-            Estado: 'Correcto',
-          });
-        } catch (err: any) {
-          _validarUnidades.push({
-            Unidad: datoUnidad.IdUnidad + '-' + datoUnidad.Nombre,
-            Estado: 'Incorrecto',
-          });
-        }
-      }
-      return new Promise<EstadoConexionesRodasQueryResponse>(resolve => {
-        resolve({
-          success: true,
-          data: _validarUnidades,
-        });
-      });
-    } catch (err: any) {
-      return { success: false, error: err.message ? err.message : err };
-    }
   }
 }

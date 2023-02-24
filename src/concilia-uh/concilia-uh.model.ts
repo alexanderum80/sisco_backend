@@ -45,6 +45,12 @@ export class ConciliaUH {
   Analisis3: string;
 
   @Field()
+  Analisis4: string;
+
+  @Field()
+  Analisis5: string;
+
+  @Field()
   SaldoUH: number;
 
   @Field()
@@ -66,40 +72,32 @@ export class ConciliaUhInput {
   annio: number;
 }
 
-export const queryUhCategorias = `SELECT CodCategoria, Categoria, CuentaMN, SubCuentaMN, Analisis1MN, Analisis2MN, Analisis3MN, CuentaMLC, SubCuentaMLC, Analisis1MLC, Analisis2MLC, Analisis3MLC, CuentaMND, SubCuentaMND, Analisis1MND, 
-    Analisis2MND, Analisis3MND, CuentaMLCD, SubCuentaMLCD, Analisis1MLCD, Analisis2MLCD, Analisis3MLCD, CuentaMNG, SubCuentaMNG, Analisis1MNG, Analisis2MNG, Analisis3MNG, CuentaMLCG, SubCuentaMLCG, 
-    Analisis1MLCG, Analisis2MLCG, Analisis3MLCG
-    FROM TbCategorias`;
+export const queryUhCategorias = `SELECT p.codigo_categoria, categoria, cuenta_u, subcuenta_u, analisis_1_u, analisis_2_u, analisis_3_u, analisis_4_u, analisis_5_u, cuenta_u_cuc, subcuenta_u_cuc, analisis_1_u_cuc, analisis_2_u_cuc, analisis_3_u_cuc, analisis_4_u_cuc, analisis_5_u_cuc, cuenta_d, subcuenta_d, analisis_1_d, analisis_2_d, analisis_3_d, analisis_4_d, analisis_5_d, cuenta_d_cuc, subcuenta_d_cuc, analisis_1_d_cuc, analisis_2_d_cuc, analisis_3_d_cuc, analisis_4_d_cuc, analisis_5_d_cuc, cuenta_g, subcuenta_g, analisis_1_g, analisis_2_g, analisis_3_g, analisis_4_g, analisis_5_g, cuenta_g_cuc, subcuenta_g_cuc, analisis_1_g_cuc, analisis_2_g_cuc, analisis_3_g_cuc, analisis_4_g_cuc, analisis_5_g_cuc
+    FROM utileshrr.parametros_categorias as p inner join utileshrr.tipos_categorias as c on c.codigo_categoria = p.codigo_categoria and c.anno = p.anno
+    WHERE p.anno = @anno;`;
 
-export const queryUhProductos = `SELECT Codig_PRODUCTO, DESCRIP_PRODUCTO, UM, Per_Propuesto, Per_Chequeado, CodCategoria 
-    FROM dbo.TbProducto`;
+export const queryUhProductos = `SELECT codigo_util, descripcion, codigo_categoria, um, periodo_propuesta, periodo_chequeado, elemento, elemento_cuc
+    FROM utileshrr.utiles
+    WHERE anno = @anno;`;
 
-export const queryUh = `SELECT CASE WHEN Cat.Analisis1MN = 'CCOSTO' OR Cat.Analisis2MN = 'CCOSTO' OR Cat.Analisis3MN = 'CCOSTO' THEN Trab.Codig_CCosto ELSE @Centro END AS IdUnidad, 
-    Inv.Periodo AS Periodo, Inv.Codig_Producto, Inv.Codig_Trabajador, Inv.Codig_Area, Inv.Existencia,
-    Inv.Importe_MN_p, Inv.Importe_MLC_p, Inv.Depreciacion_MN_p, Inv.Depreciacion_MLC_p
+export const queryUh = `SELECT CASE WHEN Cat.analisis_1_u = 'CCOSTO' OR Cat.analisis_2_u = 'CCOSTO' OR Cat.analisis_3_u = 'CCOSTO' OR Cat.analisis_4_u = 'CCOSTO' OR Cat.analisis_5_u = 'CCOSTO' THEN Trab.codigo_ccosto ELSE '@centro' END AS Id_Unidad, 
+    inv.anno, Inv.periodo AS periodo, Inv.codigo_util, Inv.codigo_trabajador, Inv.codigo_area, Inv.existencia,
+	Inv.importe, Inv.importe_cuc, Inv.desgaste, Inv.desgaste_cuc
     FROM (
-        SELECT Inv.Per AS Periodo, Inv.Codig_Producto, Inv.Codig_Trabajador, Inv.Codig_Area, Inv.Existencia,
-            Inv.Importe_MN_p, Inv.Importe_MLC_p, Inv.Depreciacion_MN_p, Inv.Depreciacion_MLC_p
-            FROM dbo.TbHistorial AS Inv 
+        SELECT inv.anno, Inv.periodo AS periodo, Inv.codigo_util, Inv.codigo_trabajador, Inv.codigo_area, Inv.existencia,
+            Inv.importe, Inv.importe_cuc, Inv.desgaste, Inv.desgaste_cuc
+            FROM utileshrr.historial AS Inv 
+			WHERE inv.anno = @anno and inv.periodo = @periodo
         UNION ALL
-        SELECT Conf.Periodo AS Periodo, Inv.Codig_Producto, Inv.Codig_Trabajador, Inv.Codig_Area, Inv.Existencia, 
-            Inv.Importe_MN_p, Inv.Importe_MLC_p, Inv.Depreciacion_MN_p, Inv.Depreciacion_MLC_p
-            FROM TbActa AS Inv CROSS JOIN
-            dbo.TbConfiguracion AS Conf
-            WHERE CASE  WHEN Conf.Periodo = 1 THEN Conf.P1 
-                        WHEN Conf.Periodo = 2 THEN Conf.P2
-                        WHEN Conf.Periodo = 3 THEN Conf.P3 
-                        WHEN Conf.Periodo = 4 THEN Conf.P4
-                        WHEN Conf.Periodo = 5 THEN Conf.P5
-                        WHEN Conf.Periodo = 6 THEN Conf.P6
-                        WHEN Conf.Periodo = 7 THEN Conf.P7
-                        WHEN Conf.Periodo = 8 THEN Conf.P8
-                        WHEN Conf.Periodo = 9 THEN Conf.P9
-                        WHEN Conf.Periodo = 10 THEN Conf.P10
-                        WHEN Conf.Periodo = 11 THEN Conf.P11
-                        WHEN Conf.Periodo = 12 THEN Conf.P12 END = 'A'
+        SELECT inv.anno, conf.periodo AS periodo, Inv.codigo_util, Inv.codigo_trabajador, Inv.codigo_area, Inv.existencia,
+            Inv.importe, Inv.importe_cuc, Inv.desgaste, Inv.desgaste_cuc
+            FROM utileshrr.acta_responsabilidad AS Inv CROSS JOIN
+            utileshrr.configuracion AS Conf left join 
+			utileshrr.historial as hist on hist.anno = conf.anno and hist.periodo = conf.periodo and 
+				inv.anno = hist.anno and inv.codigo_trabajador = hist.codigo_trabajador and 
+				inv.codigo_area = hist.codigo_area and inv.codigo_util = hist.codigo_util
+		where hist.existencia is null and conf.anno = @anno and conf.periodo = @periodo
     ) AS Inv INNER JOIN
-    TbProducto AS Prod ON Prod.Codig_PRODUCTO = Inv.Codig_Producto INNER JOIN
-    TbCategorias AS Cat ON Cat.CodCategoria = Prod.CodCategoria INNER JOIN
-    TbTrabajador AS Trab ON Trab.Codig_Trabajador = Inv.Codig_Trabajador AND Trab.Codig_Area = Inv.Codig_Area 
-    WHERE Inv.Periodo = @Periodo`;
+    utileshrr.utiles AS Prod ON Prod.codigo_util = Inv.codigo_util and inv.anno = prod.anno INNER JOIN
+    utileshrr.parametros_categorias AS Cat ON Cat.codigo_categoria = Prod.codigo_categoria and cat.anno = prod.anno INNER JOIN
+    utileshrr.responsables AS Trab ON Trab.codigo_trabajador = Inv.codigo_trabajador AND Trab.codigo_area = Inv.codigo_area;`;

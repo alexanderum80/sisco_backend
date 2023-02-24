@@ -2,12 +2,19 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type ActFijosClasificadorSubgrupoEntity {
+  Grupo: Int!
+  Codigo: Int!
+  Descripcion: String!
+  Tasa: Float!
+}
+
 type MutationResponse {
   success: Boolean!
   error: String
 }
 
-type Divisiones {
+type DivisionesEntity {
   IdDivision: Float!
   Division: String!
 }
@@ -25,7 +32,7 @@ type Usuarios {
   TipoUsuario: TipoUsuarios!
   CambiarContrasena: Boolean!
   IdDivision: Float!
-  Division: Divisiones!
+  Division: DivisionesEntity!
   Token: String!
 }
 
@@ -43,7 +50,7 @@ type UsuariosQueryResponse {
 
 type DivisionesQueryResponse {
   success: Boolean!
-  data: [Divisiones!]
+  data: [DivisionesEntity!]
   error: String
 }
 
@@ -76,35 +83,19 @@ type AllUnidadesQueryResponse {
 type ContaConexionesEntity {
   Id: Float!
   IdUnidad: Float!
-  Unidad: String!
+  Unidad: CentrosView!
   Consolidado: Boolean!
   IdDivision: Float!
-  Division: String!
+  Division: DivisionesEntity!
   IpRodas: String
-  Usuario: String
-  Contrasena: String
   BaseDatos: String
+  FechaActualizacion: DateTime
 }
 
-type ConciliaContaQueryResponse {
-  success: Boolean!
-  data: String
-  error: String
-}
-
-type ConciliaContabilidad {
-  ReporteClasificador: ConciliaContaQueryResponse!
-  ReporteConsultas: ConciliaContaQueryResponse!
-  ReporteExpresiones: ConciliaContaQueryResponse!
-  ReporteValores: ConciliaContaQueryResponse!
-  CuadreSistemas: ConciliaContaQueryResponse!
-}
-
-type ConciliaContabilidadQueryResponse {
-  success: Boolean!
-  data: ConciliaContabilidad
-  error: String
-}
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
 
 type Conexiones {
   name: String!
@@ -128,20 +119,9 @@ type ContaConexionesQueryResponse {
   error: String
 }
 
-type EstadoConexionesRodas {
-  Unidad: String!
-  Estado: String!
-}
-
 type EntidadesRodas {
-  Siglas: String!
-  Entidad: String!
-}
-
-type EstadoConexionesRodasQueryResponse {
-  success: Boolean!
-  data: [EstadoConexionesRodas!]
-  error: String
+  sigla: String!
+  entidad: String!
 }
 
 type DWHConexiones {
@@ -168,32 +148,42 @@ type CargosQueryResponse {
   error: String
 }
 
-type ClasificadorCuentaReal {
+type ClasificadorCuentaRealEntity {
+  TipoClasificador: Float!
   Cuenta: String!
   SubCuenta: String!
-  Descripcion: String!
+  Nombre: String!
   Naturaleza: String!
-  Crit1: String
-  Crit2: String
-  Crit3: String
+  Tipo_Analisis_1: String
+  Tipo_Analisis_2: String
+  Tipo_Analisis_3: String
+  Tipo_Analisis_4: String
+  Tipo_Analisis_5: String
   Obligacion: Boolean!
-  TipoClasificador: Float!
+  Tipo_Moneda: String
+  Grupo: String!
+  Clase: String!
+  Categoria: String!
+  Clasificacion: String!
+  Tipo: String!
+  Estado: String!
+  Tipo_Analisis_1_Cons: String
+  Tipo_Analisis_2_Cons: String
+  Tipo_Analisis_3_Cons: String
+  Tipo_Analisis_4_Cons: String
+  Tipo_Analisis_5_Cons: String
   SeUtiliza: String
-  Terminal: Boolean!
-  Crit1Consolidacion: String
-  Crit2Consolidacion: String
-  Crit3Consolidacion: String
 }
 
 type ClasificadorCuentaQueryResponse {
   success: Boolean!
-  data: ClasificadorCuentaReal
+  data: ClasificadorCuentaRealEntity
   error: String
 }
 
 type ClasificadorCuentasQueryResponse {
   success: Boolean!
-  data: [ClasificadorCuentaReal!]
+  data: [ClasificadorCuentaRealEntity!]
   error: String
 }
 
@@ -207,9 +197,30 @@ type CuentasAgrupadasQueryResponse {
   error: String
 }
 
+type ConciliaContaQueryResponse {
+  success: Boolean!
+  data: String
+  error: String
+}
+
+type ConciliaContabilidad {
+  ReporteClasificador: ConciliaContaQueryResponse!
+  ReporteConsultas: ConciliaContaQueryResponse!
+  ReporteExpresiones: ConciliaContaQueryResponse!
+  ReporteValores: ConciliaContaQueryResponse!
+  CuadreSistemas: ConciliaContaQueryResponse!
+}
+
+type ConciliaContabilidadQueryResponse {
+  success: Boolean!
+  data: ConciliaContabilidad
+  error: String
+}
+
 type ConciliaDWH {
   Tipo: String!
   IdCentro: Float!
+  Centro: String!
   IdUnidad: String!
   Unidad: String!
   IdPiso: String!
@@ -253,7 +264,7 @@ type Empleado {
   IdCargo: Float!
   Cargo: Cargos!
   IdDivision: Float!
-  Division: Divisiones!
+  Division: DivisionesEntity!
 }
 
 type EmpleadoQueryResponse {
@@ -274,7 +285,7 @@ type Supervisor {
   IdCargo: Float!
   Cargo: Cargos!
   IdDivision: Float!
-  Division: Divisiones!
+  Division: DivisionesEntity!
 }
 
 type SupervisorQueryResponse {
@@ -341,11 +352,6 @@ type ConcExtContabilidad {
   Diferencia: Float!
   Recibido: Boolean!
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 type ViewConciliaExtContabilidad {
   Id: Float!
@@ -567,7 +573,8 @@ type ContaNoUsarEnCuentaEntity {
   Crit1: String
   Crit2: String
   Crit3: String
-  TextoInicio: String
+  Crit4: String
+  Crit5: String
   Centralizada: Boolean!
   IdDivision: Float!
 }
@@ -661,12 +668,6 @@ type ConciliaAftData {
   DiferenciaClasificadorCNMB: [DiferenciaClasificadorCNMB!]
 }
 
-type ActFijosClasificadorCnmbEntity {
-  CNMB: String!
-  DCNMB: String!
-  TREPO: Float!
-}
-
 type ConciliaUH {
   Tipo: String!
   IdDivision: Float!
@@ -682,6 +683,8 @@ type ConciliaUH {
   Analisis1: String!
   Analisis2: String!
   Analisis3: String!
+  Analisis4: String!
+  Analisis5: String!
   SaldoUH: Float!
   SaldoRodas: Float!
   Diferencia: Float!
@@ -695,12 +698,13 @@ type ContaEstadisticaView {
   Consolidado: Boolean!
   Annio: Int!
   Periodo: Int!
+  FechaActualizacion: DateTime
   FechaInicio: DateTime
   FechaFin: DateTime
   Comprobantes: Int!
   Traspasados: Int!
   SinTraspasar: Int!
-  Invalidos: Int!
+  Inconclusos: Int!
   Anulados: Int!
 }
 
@@ -759,8 +763,7 @@ type Query {
   getDivisionById(id: Int!): DivisionesQueryResponse!
   getAllContaConexiones: ContaConexionesQueryResponse!
   getContaConexionById(id: Int!): ContaConexionQueryResponse!
-  estadoContaConexiones(idDivision: Int!): EstadoConexionesRodasQueryResponse!
-  entidadesRodas(ip: String!, usuario: String!, password: String!): [EntidadesRodas!]!
+  entidadesRodas(ip: String!): [EntidadesRodas!]!
   getAllUnidades: AllUnidadesQueryResponse!
   getAllUnidadesByUsuario: AllUnidadesQueryResponse!
   getUnidadesByIdSubdivision(idSubdivision: Int!): AllUnidadesQueryResponse!
@@ -811,8 +814,6 @@ type Query {
   getComprobarValorById(id: Int!): ComprobarValorQueryResponse!
   getCajasConfiguracion: [CajaConfiguracionEntity!]!
   getCajaConfiguracion(id: Int!): CajaConfiguracionEntity!
-  getAllActFijosClasificadorCnmb: [ActFijosClasificadorCnmbEntity!]!
-  getActFijosClasificadorCnmb(cnmb: String!): ActFijosClasificadorCnmbEntity!
   conciliaAFT(conciliaAftInput: ConciliaAftInput!): ConciliaAftData!
   conciliaUH(conciliaUhInput: ConciliaUhInput!): [ConciliaUH!]!
   contaEstadistica(contaEstadisticaInput: ContaEstadisticaInput!): [ContaEstadisticaView!]!
@@ -822,6 +823,8 @@ type Query {
   getCentrosNoConciliados(annio: Int!, mes: Int!): [ConciliaExternaCentrosNoConciliados!]!
   getAllDatosConciliacionExterna: [ConciliaExternaDatosConciliacionEntity!]!
   getDatosConciliacionExterna(anno: Int!, mes: Int!): ConciliaExternaDatosConciliacionEntity
+  getAllActFijosClasificadorSubgrupo: [ActFijosClasificadorSubgrupoEntity!]!
+  getActFijosClasificadorSubgrupo(grupo: Int!, codigo: Int!): ActFijosClasificadorSubgrupoEntity!
 }
 
 input ConciliaDWHInput {
@@ -939,13 +942,13 @@ type Mutation {
   createCajaConfiguracion(cajaConfiguracionInput: CajaConfiguracionInput!): CajaConfiguracionEntity!
   updateCajaConfiguracion(cajaConfiguracionInput: CajaConfiguracionInput!): CajaConfiguracionEntity!
   removeCajaConfiguracion(id: Int!): CajaConfiguracionEntity!
-  saveActFijosClasificadorCnmb(actfijosClasificadorCnmbInput: ActFijosClasificadorCnmbInput!): ActFijosClasificadorCnmbEntity!
-  removeActFijosClasificadorCnmb(cnmb: String!): Float!
   updateConciliaDWH(conciliaDWH: [ConciliaExternaDwhInput!]!): Int!
   updateConciliacionEntreUnidades(conciliacionUnidadesInput: ConciliacionExternaEntreUnidadesInput!): Float!
   inicializarConciliacion(anno: Int!, mes: Int!): ConciliaExternaDatosConciliacionEntity!
   cerrarConciliacion(anno: Int!, mes: Int!): Float!
   reabrirConciliacion(anno: Int!, mes: Int!): Float!
+  saveActFijosClasificadorSubgrupo(actFijosClasificadorSubgrupoInput: ActFijosClasificadorSubgrupoInput!): ActFijosClasificadorSubgrupoEntity!
+  deleteActFijosClasificadorSubgrupo(grupo: Int!, codigo: Int!): Int!
 }
 
 input UsuarioInput {
@@ -964,8 +967,6 @@ input ContaConexionInput {
   Consolidado: Boolean!
   IdDivision: Float!
   IpRodas: String
-  Usuario: String
-  Contrasena: String
   BaseDatos: String
 }
 
@@ -995,20 +996,30 @@ input ChequearCentrosInput {
 }
 
 input ClasificadorCuentaRealInput {
+  TipoClasificador: Float!
   Cuenta: String!
   SubCuenta: String!
-  Descripcion: String!
+  Nombre: String!
   Naturaleza: String!
-  Crit1: String
-  Crit2: String
-  Crit3: String
-  Obligacion: Boolean!
-  TipoClasificador: Float!
+  Tipo_Analisis_1: String
+  Tipo_Analisis_2: String
+  Tipo_Analisis_3: String
+  Tipo_Analisis_4: String
+  Tipo_Analisis_5: String
+  Obligacion: Boolean! = false
+  Tipo_Moneda: String
+  Grupo: String!
+  Clase: String!
+  Categoria: String!
+  Clasificacion: String!
+  Tipo: String!
+  Estado: String!
+  Tipo_Analisis_1_Cons: String
+  Tipo_Analisis_2_Cons: String
+  Tipo_Analisis_3_Cons: String
+  Tipo_Analisis_4_Cons: String
+  Tipo_Analisis_5_Cons: String
   SeUtiliza: String
-  Terminal: Boolean!
-  Crit1Consolidacion: String
-  Crit2Consolidacion: String
-  Crit3Consolidacion: String
 }
 
 input EmpleadoInput {
@@ -1104,7 +1115,8 @@ input ContaNoUsarEnCuentaInput {
   Crit1: String
   Crit2: String
   Crit3: String
-  TextoInicio: String
+  Crit4: String
+  Crit5: String
   Centralizada: Boolean!
   IdDivision: Float!
 }
@@ -1127,12 +1139,6 @@ input CajaConfiguracionInput {
   IdUnidad: Int!
 }
 
-input ActFijosClasificadorCnmbInput {
-  CNMB: String!
-  DCNMB: String!
-  TREPO: Float!
-}
-
 input ConciliaExternaDwhInput {
   Id: Float!
   Recibido: Boolean!
@@ -1147,4 +1153,11 @@ input ConciliacionExternaEntreUnidadesInput {
   IdUsuarioReceptor: Float
   IdUsuarioSupervisor: Float
   Nota: String
+}
+
+input ActFijosClasificadorSubgrupoInput {
+  Grupo: Int!
+  Codigo: Int!
+  Descripcion: String!
+  Tasa: Float!
 }

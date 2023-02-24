@@ -1,3 +1,4 @@
+import { ActfijosClasificadorSubgruposModule } from './actfijos-clasificador-subgrupos/actfijos-clasificador-subgrupos.module';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -35,7 +36,6 @@ import { TipoUsuariosModule } from './tipo-usuarios/tipo-usuarios.module';
 import { ContaComprobarValoresModule } from './conta-comprobar-valores/conta-comprobar-valores.module';
 import { CajaConfiguracionModule } from './caja-configuracion/caja-configuracion.module';
 import { ConciliaAftModule } from './concilia-aft/concilia-aft.module';
-import { ActfijosClasificadorCnmbModule } from './actfijos-clasificador-cnmb/actfijos-clasificador-cnmb.module';
 import 'dotenv/config';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { ConciliaUhModule } from './concilia-uh/concilia-uh.module';
@@ -109,7 +109,6 @@ import { ConciliaExternaDatosConciliacionModule } from './concilia-externa-datos
     TipoUsuariosModule,
     ContaComprobarValoresModule,
     CajaConfiguracionModule,
-    ActfijosClasificadorCnmbModule,
     ConciliaAftModule,
     ConciliaUhModule,
     ContaEstadisticaModule,
@@ -118,6 +117,7 @@ import { ConciliaExternaDatosConciliacionModule } from './concilia-externa-datos
     ConciliaExternaEntreUnidadesModule,
     ConciliaExternaChatsModule,
     ConciliaExternaDatosConciliacionModule,
+    ActfijosClasificadorSubgruposModule,
   ],
   controllers: [AppController],
   providers: [AppService, EmailsService],

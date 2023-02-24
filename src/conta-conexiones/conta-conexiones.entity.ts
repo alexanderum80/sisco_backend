@@ -1,5 +1,7 @@
+import { CentrosView } from './../unidades/unidades.entity';
+import { DivisionesEntity } from './../divisiones/divisiones.entity';
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @ObjectType()
 @Entity({ name: 'Conta_Conexiones' })
@@ -12,8 +14,10 @@ export class ContaConexionesEntity {
   @Column()
   IdUnidad: number;
 
-  @Field()
-  Unidad: string;
+  @Field(() => CentrosView)
+  @ManyToOne(() => CentrosView, centros => centros.IdUnidad)
+  @JoinColumn({ name: 'IdUnidad', referencedColumnName: 'IdUnidad' })
+  Unidad: CentrosView;
 
   @Field()
   @Column()
@@ -23,8 +27,10 @@ export class ContaConexionesEntity {
   @Column()
   IdDivision: number;
 
-  @Field()
-  Division: string;
+  @Field(() => DivisionesEntity)
+  @ManyToOne(() => DivisionesEntity, divisiones => divisiones.IdDivision)
+  @JoinColumn({ name: 'IdDivision', referencedColumnName: 'IdDivision' })
+  Division: DivisionesEntity;
 
   @Field({ nullable: true })
   @Column()
@@ -32,13 +38,9 @@ export class ContaConexionesEntity {
 
   @Field({ nullable: true })
   @Column()
-  Usuario: string;
-
-  @Field({ nullable: true })
-  @Column()
-  Contrasena: string;
-
-  @Field({ nullable: true })
-  @Column()
   BaseDatos: string;
+
+  @Field({ nullable: true })
+  @Column('datetime')
+  FechaActualizacion?: Date;
 }

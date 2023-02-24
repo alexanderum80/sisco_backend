@@ -4,7 +4,7 @@ import { ContaCuentaentidad } from './cuenta-entidad.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ClasificadorCuentaReal } from './../clasificador-cuenta/clasificador-cuenta.entity';
+import { ClasificadorCuentaRealEntity } from './../clasificador-cuenta/clasificador-cuenta.entity';
 
 @Injectable()
 export class CuentaEntidadService {
@@ -62,7 +62,7 @@ export class CuentaEntidadService {
     });
   }
 
-  async actualizaCuentaEntidad(clasificadorCuenta: ClasificadorCuentaReal): Promise<MutationResponse> {
+  async actualizaCuentaEntidad(clasificadorCuenta: ClasificadorCuentaRealEntity): Promise<MutationResponse> {
     await this.deleteCuentaEntidad(clasificadorCuenta.Cuenta, clasificadorCuenta.SubCuenta, clasificadorCuenta.TipoClasificador);
 
     const seUtiliza = clasificadorCuenta.SeUtiliza.split(', ');
