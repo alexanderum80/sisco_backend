@@ -2,6 +2,24 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type GrupoCuentaEntity {
+  IdGrupo: String!
+  Grupo: String!
+}
+
+type CategoriaCuentaEntity {
+  IdCategoria: String!
+  IdClase: Int!
+  Categoria: String!
+}
+
+type ClaseCuentaEntity {
+  ID: Int!
+  IdClase: String!
+  IdGrupo: String!
+  Clase: String!
+}
+
 type ActFijosClasificadorSubgrupoEntity {
   Grupo: Int!
   Codigo: Int!
@@ -818,6 +836,14 @@ type Query {
   conciliaUH(conciliaUhInput: ConciliaUhInput!): [ConciliaUH!]!
   contaEstadistica(contaEstadisticaInput: ContaEstadisticaInput!): [ContaEstadisticaView!]!
   conciliaInternaConta(conciliaInternaContaInput: ConciliaInternaContaInput!): [ConciliaInternaConta!]!
+  getAllClaseCuenta: [ClaseCuentaEntity!]!
+  getClaseCuentaById(id: Int!): ClaseCuentaEntity!
+  getClaseCuentaByIdGrupo(idGrupo: String!): [ClaseCuentaEntity!]!
+  getAllCategoriaCuenta: [CategoriaCuentaEntity!]!
+  getCategoriaCuentaById(id: String!): CategoriaCuentaEntity!
+  getCategoriaCuentaByIdClase(idClase: Int!): [CategoriaCuentaEntity!]!
+  getAllGrupoCuenta: [GrupoCuentaEntity!]!
+  getGrupoCuentaById(id: String!): GrupoCuentaEntity!
   conciliaExternaDWH(conciliaExternaDWHInput: ConciliaOperacionesDWHInput!): ConciliacionOperacionesDWHQueryResponse!
   getConciliacionEntreUnidades(annio: Int!, mes: Int!, unidad: Int!, unidadOD: Int!): ConciliaExternaEntreUnidadesEntity
   getCentrosNoConciliados(annio: Int!, mes: Int!): [ConciliaExternaCentrosNoConciliados!]!

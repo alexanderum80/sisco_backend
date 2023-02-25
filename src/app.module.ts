@@ -1,3 +1,6 @@
+import { ContaGrupoCuentaModule } from './conta-grupo-cuenta/conta-grupo-cuenta.module';
+import { ContaCategoriaCuentaModule } from './conta-categoria-cuenta/conta-categoria-cuenta.module';
+import { ContaClaseCuentaModule } from './conta-clase-cuenta/conta-clase-cuenta.module';
 import { ActfijosClasificadorSubgruposModule } from './actfijos-clasificador-subgrupos/actfijos-clasificador-subgrupos.module';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
@@ -113,6 +116,9 @@ import { ConciliaExternaDatosConciliacionModule } from './concilia-externa-datos
     ConciliaUhModule,
     ContaEstadisticaModule,
     ConciliaInternaContaModule,
+    ContaClaseCuentaModule,
+    ContaCategoriaCuentaModule,
+    ContaGrupoCuentaModule,
     ConciliaExternaDwhModule,
     ConciliaExternaEntreUnidadesModule,
     ConciliaExternaChatsModule,

@@ -122,7 +122,7 @@ export const queryReporteConsultas = `SELECT Periodo, Centro, IdConsulta, Consul
     WHERE (Consolidado = @Consolidado) AND (Centro = @Centro) AND (Anno = @Anio) AND (Periodo = @Periodo) AND (IdConsulta = @IdConsulta)
     GROUP BY Periodo, Centro, IdConsulta, Consulta, Cuenta, SubCuenta, [Analisis_1], [Analisis_2], [Analisis_3], [Analisis_4], [Analisis_5], Consolidado`;
 
-export const queryReporteExpresiones = `SELECT Consolidado, Periodo, Tipo, Expresion, Valor, Operador, ExpresionC, ValorC, Resultado
+export const queryReporteExpresiones = `SELECT Consolidado, Periodo, Expresion, Valor, Operador, ExpresionC, ValorC, Resultado
     FROM Conta_ReporteExpresiones
     WHERE (Centro = @Centro) AND (ISNULL(Consolidado, 0) = @Consolidado) AND (Anno = @Anio) AND (Periodo = @Periodo)`;
 

@@ -96,8 +96,8 @@ export const queryUh = `SELECT CASE WHEN Cat.analisis_1_u = 'CCOSTO' OR Cat.anal
 			utileshrr.historial as hist on hist.anno = conf.anno and hist.periodo = conf.periodo and 
 				inv.anno = hist.anno and inv.codigo_trabajador = hist.codigo_trabajador and 
 				inv.codigo_area = hist.codigo_area and inv.codigo_util = hist.codigo_util
-		where hist.existencia is null and conf.anno = @anno and conf.periodo = @periodo
+		where hist.existencia is null and inv.anno = @anno and conf.anno = @anno and conf.periodo = @periodo
     ) AS Inv INNER JOIN
     utileshrr.utiles AS Prod ON Prod.codigo_util = Inv.codigo_util and inv.anno = prod.anno INNER JOIN
     utileshrr.parametros_categorias AS Cat ON Cat.codigo_categoria = Prod.codigo_categoria and cat.anno = prod.anno INNER JOIN
-    utileshrr.responsables AS Trab ON Trab.codigo_trabajador = Inv.codigo_trabajador AND Trab.codigo_area = Inv.codigo_area;`;
+    utileshrr.responsables AS Trab ON Trab.codigo_trabajador = Inv.codigo_trabajador AND Trab.codigo_area = Inv.codigo_area and trab.anno = inv.anno;`;
