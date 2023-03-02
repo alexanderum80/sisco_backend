@@ -18,6 +18,7 @@ export class ContaComprobarExpresionesResolver {
   }
 
   @Query(() => ContaComprobarExpresionQueryResponse)
+  @UseGuards(new AuthGuard())
   async getComprobarExpresionById(@Args({ name: 'id', type: () => Int }) id: number): Promise<ContaComprobarExpresionQueryResponse> {
     return this._comprobarExpresionesSvc.findOne(id);
   }
@@ -32,6 +33,7 @@ export class ContaComprobarExpresionesResolver {
   }
 
   @Mutation(() => MutationResponse)
+  @UseGuards(new AuthGuard())
   async updateComprobarExpresion(
     @Args({ name: 'comprobarExpresionInput', type: () => ContaComprobarExpresionesInput }) comprobarExpresionInput: ContaComprobarExpresionesInput,
   ): Promise<MutationResponse> {
@@ -39,6 +41,7 @@ export class ContaComprobarExpresionesResolver {
   }
 
   @Mutation(() => MutationResponse)
+  @UseGuards(new AuthGuard())
   async deleteComprobarExpresion(@Args({ name: 'IDs', type: () => [Int] }) IDs: number[]): Promise<MutationResponse> {
     return this._comprobarExpresionesSvc.delete(IDs);
   }

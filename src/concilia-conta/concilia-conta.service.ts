@@ -1,12 +1,12 @@
+import { LogsService } from './../logs/logs.service';
 import { ContaConexionesEntity } from './../conta-conexiones/conta-conexiones.entity';
-import { toNumber } from 'lodash';
+import { reject, toNumber } from 'lodash';
 import { Usuarios } from './../usuarios/usuarios.entity';
 import { ETipoClasificadorCuenta } from './../clasificador-cuenta/clasificador-cuenta.model';
 import { ClasificadorCuentaService } from './../clasificador-cuenta/clasificador-cuenta.service';
 import { XmlJsService } from './../shared/services/xml-js/xml-js.service';
 import { UnidadesService } from './../unidades/unidades.service';
 import { ContaConexionesService } from './../conta-conexiones/conta-conexiones.service';
-import { MutationResponse } from './../shared/models/mutation.response.model';
 import { Injectable } from '@nestjs/common';
 import {
   queryUltimoPeriodo,
@@ -39,6 +39,7 @@ export class ConciliaContaService {
     private _unidadesService: UnidadesService,
     private _xmlJsService: XmlJsService,
     private _clasificadorCuentaSvc: ClasificadorCuentaService,
+    private _logsSvc: LogsService,
   ) {}
 
   async conciliaContabilidad(user: Usuarios, conciliaContaInput: ConciliaContaInput): Promise<ConciliaContabilidadQueryResponse> {
@@ -512,26 +513,33 @@ export class ConciliaContaService {
     }
   }
 
-  async iniciarSaldos(iniciarSaldosInput: IniciarSaldosInput): Promise<MutationResponse> {
+  async iniciarSaldos(user: Usuarios, iniciarSaldosInput: IniciarSaldosInput): Promise<boolean> {
     try {
       const { idCentro, consolidado, annio } = iniciarSaldosInput;
 
-      return new Promise<MutationResponse>(resolve => {
+      return new Promise<boolean>(resolve => {
         this.dataSource
           .query(`EXEC dbo.pConta_InicializarDatos @0, @1, @2`, [idCentro, consolidado, annio])
           .then(() => {
-            resolve({ success: true });
+            this._logsSvc
+              .insert(idCentro, consolidado, `Iniciar Saldo (${annio})`, user.Usuario)
+              .then(() => {
+                resolve(true);
+              })
+              .catch(err => {
+                reject(err);
+              });
           })
           .catch(err => {
-            return { success: false, error: err.message ? err.message : err };
+            reject(err.message || err);
           });
       });
     } catch (err: any) {
-      return { success: false, error: err.message ? err.message : err };
+      return Promise.reject(err.message || err);
     }
   }
 
-  async arreglaClasificadorCuenta(idUnidad: number, tipoUnidad: string, annio: string): Promise<boolean> {
+  async arreglaClasificadorCuenta(user: Usuarios, idUnidad: number, tipoUnidad: string, annio: string): Promise<boolean> {
     try {
       // verificar si se ha definido la conexión al Rodas
       const _conexionRodasQuery = await this._contaConexionesService.findByIdUnidad(idUnidad, tipoUnidad === '2');
@@ -651,7 +659,21 @@ export class ConciliaContaService {
       }
 
       return new Promise<boolean>(resolve => {
-        resolve(true);
+        this._logsSvc
+          .insert(
+            idUnidad,
+            tipoClasificador === ETipoClasificadorCuenta.Consolidado,
+            `Arregla Clasificador Rodas (${
+              tipoClasificador === ETipoClasificadorCuenta.Centro ? 'Centro' : tipoClasificador === ETipoClasificadorCuenta.Complejo ? 'Complejo' : 'Consolidado'
+            }/${annio})`,
+            user.Usuario,
+          )
+          .then(() => {
+            resolve(true);
+          })
+          .catch(err => {
+            reject(err);
+          });
       });
     } catch (err: any) {
       return Promise.reject(err.message || err);

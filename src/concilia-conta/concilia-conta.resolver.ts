@@ -18,22 +18,29 @@ export class ConciliaContaResolver {
     return this.conciliaContaSvc.conciliaContabilidad(user, conciliaContaInput);
   }
 
-  @Mutation(() => ConciliaContabilidadQueryResponse)
-  async iniciarSaldos(@Args({ name: 'iniciarSaldosInput', type: () => IniciarSaldosInput }) iniciarSaldosInput: IniciarSaldosInput): Promise<ConciliaContabilidadQueryResponse> {
-    return this.conciliaContaSvc.iniciarSaldos(iniciarSaldosInput);
+  @Mutation(() => Boolean)
+  @UseGuards(new AuthGuard())
+  async iniciarSaldos(
+    @Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios,
+    @Args({ name: 'iniciarSaldosInput', type: () => IniciarSaldosInput }) iniciarSaldosInput: IniciarSaldosInput,
+  ): Promise<boolean> {
+    return this.conciliaContaSvc.iniciarSaldos(user, iniciarSaldosInput);
   }
 
   @Mutation(() => ConciliaContaQueryResponse)
+  @UseGuards(new AuthGuard())
   async chequearCentros(@Args({ name: 'chequearCentrosInput', type: () => ChequearCentrosInput }) chequearCentrosInput: ChequearCentrosInput): Promise<ConciliaContaQueryResponse> {
     return this.conciliaContaSvc.chequearCentro(chequearCentrosInput);
   }
 
   @Mutation(() => Boolean)
+  @UseGuards(new AuthGuard())
   async arreglaClasificadorCuenta(
+    @Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios,
     @Args({ name: 'idUnidad', type: () => Int }) idUnidad: number,
     @Args({ name: 'tipoUnidad', type: () => String }) tipoUnidad: string,
     @Args({ name: 'annio', type: () => String }) annio: string,
   ): Promise<boolean> {
-    return this.conciliaContaSvc.arreglaClasificadorCuenta(idUnidad, tipoUnidad, annio);
+    return this.conciliaContaSvc.arreglaClasificadorCuenta(user, idUnidad, tipoUnidad, annio);
   }
 }

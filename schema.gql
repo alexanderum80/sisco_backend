@@ -929,7 +929,7 @@ type Mutation {
   updateContaConexion(conexionInfo: ContaConexionInput!): MutationResponse!
   deleteContaConexion(IDs: [Int!]!): MutationResponse!
   updateDWhConexion(dwhConexionInput: DWHConexionesInput!): MutationResponse!
-  iniciarSaldos(iniciarSaldosInput: IniciarSaldosInput!): ConciliaContabilidadQueryResponse!
+  iniciarSaldos(iniciarSaldosInput: IniciarSaldosInput!): Boolean!
   chequearCentros(chequearCentrosInput: ChequearCentrosInput!): ConciliaContaQueryResponse!
   arreglaClasificadorCuenta(idUnidad: Int!, tipoUnidad: String!, annio: String!): Boolean!
   saveClasificadorCuenta(clasificadorInfo: ClasificadorCuentaRealInput!): MutationResponse!

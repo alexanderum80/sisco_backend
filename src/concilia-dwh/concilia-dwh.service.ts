@@ -139,13 +139,13 @@ export class ConciliaDwhService {
       for (let index = 0; index < unidades.length; index++) {
         const unidadInfo = unidades[index];
 
-        // importo los almacenes
+        // importo los almacenes de la división
         let _importarAlmacenesRes = await this._importarAlmacenesDWH(unidadInfo.IdUnidad, dwhConnectionDivision);
         if (!_importarAlmacenesRes.success) {
           throw new Error(_importarAlmacenesRes.error + ' No se pudo importar Almacenes de la Unidad ' + unidadInfo.IdUnidad);
         }
 
-        // importo el inventario
+        // importo el inventario de la división
         let _importarInventarioRes = await this._importarInventarioDWH(idCentro, annio, mes, unidadInfo.IdUnidad, tipoCentro, dwhConnectionDivision);
         if (!_importarInventarioRes.success) {
           throw new Error(_importarInventarioRes.error + ' No se pudo importar Inventario DWH de la Unidad ' + unidadInfo.IdUnidad);
@@ -156,7 +156,7 @@ export class ConciliaDwhService {
           throw new Error(_importarInventarioRes.error + ' No se pudo importar Inventario DWH de la Unidad ' + unidadInfo.IdUnidad);
         }
 
-        // importo las ventas
+        // importo las ventas de la división
         let _importarVentasRes = await this._importarVentasDWH(idCentro, annio, mes, unidadInfo, tipoCentro, ventasAcumuladas, dwhConnectionDivision);
         if (!_importarVentasRes.success) {
           throw new Error(_importarVentasRes.error + ' No se pudo importar Ventas DWH de la Unidad ' + unidadInfo.IdUnidad);
@@ -251,7 +251,6 @@ export class ConciliaDwhService {
         .replace(/@Cons/g, tipoCentro.toString());
 
       return new Promise<MutationResponse>(resolve => {
-        resolve({ success: true });
         dataSource
           .query(query)
           .then(async result => {
@@ -303,7 +302,6 @@ export class ConciliaDwhService {
         .replace(/@Cons/g, tipoCentro.toString());
 
       return new Promise<MutationResponse>(resolve => {
-        resolve({ success: true });
         dataSource.query(query).then(async result => {
           if (result) {
             const _ventas = this._xmlSvc.jsonToXML('DWH', result);

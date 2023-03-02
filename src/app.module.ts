@@ -48,6 +48,7 @@ import { ConciliaExternaDwhModule } from './concilia-externa-dwh/concilia-extern
 import { ConciliaExternaEntreUnidadesModule } from './concilia-externa-entre-unidades/concilia-externa-entre-unidades.module';
 import { ConciliaExternaChatsModule } from './concilia-externa-chats/concilia-externa-chats.module';
 import { ConciliaExternaDatosConciliacionModule } from './concilia-externa-datos-conciliacion/concilia-externa-datos-conciliacion.module';
+import { LogsModule } from './logs/logs.module';
 
 @Module({
   imports: [
@@ -124,6 +125,7 @@ import { ConciliaExternaDatosConciliacionModule } from './concilia-externa-datos
     ConciliaExternaChatsModule,
     ConciliaExternaDatosConciliacionModule,
     ActfijosClasificadorSubgruposModule,
+    LogsModule,
   ],
   controllers: [AppController],
   providers: [AppService, EmailsService],
