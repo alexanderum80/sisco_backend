@@ -27,7 +27,7 @@ export class ContaComprobarValoresService {
           .addSelect('v.Valor', 'Valor')
           .addSelect('v.Consolidado', 'Consolidado')
           .addSelect('v.Activo', 'Activo')
-          .addSelect("Concat(c.IdUnidad, '-', c.Nombre)", 'Centro')
+          .addSelect('c.Nombre', 'Centro')
           .addSelect('e.Expresion', 'Expresion')
           .addSelect('o.Operador', 'Operador')
           .innerJoin(CentrosView, 'c', 'c.IdUnidad = v.IdCentro')

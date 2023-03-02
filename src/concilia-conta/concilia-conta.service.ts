@@ -218,7 +218,7 @@ export class ConciliaContaService {
         await this._importarAsientos(idUnidad, annio, per, cons, contaConexion);
       }
 
-      this._updateFechaActualizacion(idUnidad, cons === '1');
+      await this._updateFechaActualizacion(idUnidad, cons === '1');
     } catch (err: any) {
       if (contaConexion && contaConexion.isInitialized) contaConexion.destroy();
 
@@ -352,19 +352,16 @@ export class ConciliaContaService {
   }
 
   private async _updateFechaActualizacion(idUnidad: number, cons: boolean): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.dataSource
-        .createQueryBuilder()
-        .update(ContaConexionesEntity)
-        .set({ FechaActualizacion: new Date() })
-        .where('IdUnidad = :idUnidad', { idUnidad: idUnidad })
-        .andWhere('Consolidado = :cons', { cons: cons })
-        .execute()
-        .then(() => resolve())
-        .catch(err => {
-          reject(err);
-        });
-    });
+    await this.dataSource
+      .createQueryBuilder()
+      .update(ContaConexionesEntity)
+      .set({ FechaActualizacion: new Date() })
+      .where('IdUnidad = :idUnidad', { idUnidad: idUnidad })
+      .andWhere('Consolidado = :cons', { cons: cons })
+      .execute()
+      .catch(err => {
+        throw new Error(err.message ? err.message : err);
+      });
   }
 
   private async _calculaConciliacion(idUnidad: number, tipoClasificador: number, anio: number, periodo: number, tipoEntidad: number, idDivision: number): Promise<void> {
