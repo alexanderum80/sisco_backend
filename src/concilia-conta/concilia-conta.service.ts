@@ -198,6 +198,11 @@ export class ConciliaContaService {
       // chequear los datos adulterados
       await this._chequeaDatosAdulterados(idUnidad, contaConexion);
 
+      // arregla asientos
+      await this._arreglaAsientos(contaConexion).catch(err => {
+        throw new Error(err);
+      });
+
       if (_ultimoPeriodo > 0) {
         // chequear saldos acumulados hasta el periodo anterior
         await this._chequearSaldoAcumulados(idUnidad, annio, _ultimoPeriodo, cons, contaConexion);
@@ -678,6 +683,30 @@ export class ConciliaContaService {
     } catch (err: any) {
       return Promise.reject(err.message || err);
     }
+  }
+
+  private async _arreglaAsientos(bdConta: DataSource): Promise<void> {
+    const _querysArray = [
+      `UPDATE contabilidad.asientos
+      SET analisis_1 = case when tipo_analisis_1 is NULL then NULL else analisis_1 end,
+        analisis_2 = case when tipo_analisis_2 is NULL then NULL else analisis_2 end,
+        analisis_3 = case when tipo_analisis_3 is NULL then NULL else analisis_3 end,
+        analisis_4 = case when tipo_analisis_4 is NULL then NULL else analisis_4 end,
+        analisis_5 = case when tipo_analisis_5 is NULL then NULL else analisis_5 end
+    WHERE anno_comprobante = 2023;`,
+    ];
+
+    for (let index = 0; index < _querysArray.length; index++) {
+      const _query = _querysArray[index];
+
+      await bdConta.query(_query).catch(err => {
+        throw new Error(err);
+      });
+    }
+
+    return new Promise<void>(async resolve => {
+      resolve();
+    });
   }
 
   async chequearCentro(chequearCentrosInput: ChequearCentrosInput): Promise<ConciliaContaQueryResponse> {
