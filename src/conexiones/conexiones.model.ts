@@ -45,7 +45,7 @@ export const DEFAULT_POSTGRES_CONNECTION_STRING: PostgresConnectionOptions = {
   password: 'aqntjstE.2008',
   database: '',
   connectTimeoutMS: 60000,
-  maxQueryExecutionTime: 60000,
+  maxQueryExecutionTime: 180000,
   synchronize: false,
 };
 
