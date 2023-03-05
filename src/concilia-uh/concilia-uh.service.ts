@@ -50,7 +50,7 @@ export class ConciliaUhService {
           });
       });
     } catch (err) {
-      throw new Error(err.message || err);
+      return Promise.reject(err.message || err);
     }
   }
 

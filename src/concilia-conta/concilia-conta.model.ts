@@ -28,6 +28,9 @@ export class ConciliaContabilidad {
 
   @Field(() => ConciliaContaQueryResponse)
   CuadreSistemas: ConciliaContaQueryResponse;
+
+  @Field(() => ConciliaContaQueryResponse)
+  Informacion: ConciliaContaQueryResponse;
 }
 
 @ObjectType()

@@ -227,6 +227,7 @@ type ConciliaContabilidad {
   ReporteExpresiones: ConciliaContaQueryResponse!
   ReporteValores: ConciliaContaQueryResponse!
   CuadreSistemas: ConciliaContaQueryResponse!
+  Informacion: ConciliaContaQueryResponse!
 }
 
 type ConciliaContabilidadQueryResponse {

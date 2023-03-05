@@ -78,16 +78,14 @@ export class ConciliaDwhService {
         const _unidades = _unidadesQuery.data;
 
         // importar datos del DWH
-        const _importarDatosDWH = await this._importarDatosDWH(idCentro, annio, periodo, tipoCentro, ventasAcumuladas, _unidades, _conexionDWH);
-        if (!_importarDatosDWH.success) {
-          return { success: false, error: _importarDatosDWH.error };
-        }
+        await this._importarDatosDWH(idCentro, annio, periodo, tipoCentro, ventasAcumuladas, _unidades, _conexionDWH).catch(err => {
+          return { success: false, error: err };
+        });
 
         // importar datos del Rodas
-        const _importarDatosRodas = await this._importarDatosRodas(annio, periodo, idCentro, tipoCentro, _conexionRodas);
-        if (!_importarDatosRodas.success) {
-          return { success: false, error: _importarDatosRodas.error };
-        }
+        await this._importarDatosRodas(annio, periodo, idCentro, tipoCentro, _conexionRodas).catch(err => {
+          return { success: false, error: err };
+        });
       }
 
       // // obtener la información con los resultados de la conciliación
@@ -122,7 +120,7 @@ export class ConciliaDwhService {
     ventasAcumuladas: boolean,
     unidades: Unidades[],
     dwhConexiones: DWHConexiones,
-  ): Promise<MutationResponse> {
+  ): Promise<void> {
     let dwhConnectionDivision: DataSource;
     let dwhConnectionRestaurador: DataSource;
     let dwhConnectionEmpresa: DataSource;
@@ -187,12 +185,8 @@ export class ConciliaDwhService {
       // if (dwhConnectionDivision && dwhConnectionDivision.isInitialized) dwhConnectionDivision.destroy();
       // if (dwhConnectionDivision && dwhConnectionRestaurador.isInitialized) dwhConnectionRestaurador.destroy();
       // if (dwhConnectionDivision && dwhConnectionEmpresa.isInitialized) dwhConnectionEmpresa.destroy();
-
-      return new Promise<MutationResponse>(resolve => {
-        resolve({ success: true });
-      });
     } catch (err: any) {
-      return { success: false, error: err.message ? err.message : err };
+      throw new Error(err.message || err);
     }
   }
 
@@ -219,7 +213,7 @@ export class ConciliaDwhService {
                   resolve({ success: true });
                 })
                 .catch(err => {
-                  throw new Error(err.message ? err.message : err);
+                  throw new Error(err.message || err);
                 });
             }
           })
@@ -250,7 +244,7 @@ export class ConciliaDwhService {
         .replace(/@Unidad/g, idUnidad.toString())
         .replace(/@Cons/g, tipoCentro.toString());
 
-      return new Promise<MutationResponse>(resolve => {
+      return new Promise<MutationResponse>((resolve, reject) => {
         dataSource
           .query(query)
           .then(async result => {
@@ -263,12 +257,12 @@ export class ConciliaDwhService {
                   resolve({ success: true });
                 })
                 .catch(err => {
-                  throw new Error(err.message ? err.message : err);
+                  reject(err.message || err);
                 });
             }
           })
           .catch(err => {
-            return { success: false, error: err.message ? err.message : err };
+            reject(err.message || err);
           });
       });
     } catch (err: any) {
@@ -312,7 +306,7 @@ export class ConciliaDwhService {
                 resolve({ success: true });
               })
               .catch(err => {
-                throw new Error(err.message ? err.message : err);
+                throw new Error(err.message || err);
               });
           }
         });
@@ -324,7 +318,7 @@ export class ConciliaDwhService {
     }
   }
 
-  private async _importarDatosRodas(annio: number, periodo: number, idUnidad: number, tipoCentro: number, contaConexion: ContaConexionesEntity): Promise<MutationResponse> {
+  private async _importarDatosRodas(annio: number, periodo: number, idUnidad: number, tipoCentro: number, contaConexion: ContaConexionesEntity): Promise<void> {
     try {
       const cons = tipoCentro === 1 ? '1' : '0';
 
@@ -337,12 +331,9 @@ export class ConciliaDwhService {
       //     return { success: false, error: _importarAsientoRodas.error + ' No se pudo importar Asientos del Rodas de la Unidad ' + idUnidad };
       // }
 
-      return new Promise<MutationResponse>(resolve => {
-        if (rodasConnection.isInitialized) rodasConnection.destroy();
-        resolve({ success: true });
-      });
+      if (rodasConnection.isInitialized) rodasConnection.destroy();
     } catch (err: any) {
-      return { success: false, error: err.message ? err.message : err };
+      throw new Error(err.message || err);
     }
   }
 

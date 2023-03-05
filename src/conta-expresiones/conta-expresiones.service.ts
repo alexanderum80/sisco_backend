@@ -104,7 +104,7 @@ export class ContaExpresionesService {
             });
           })
           .catch(err => {
-            throw new Error(err.message ? err.message : err);
+            throw new Error(err.message || err);
           });
       });
     } catch (err: any) {
@@ -124,7 +124,7 @@ export class ContaExpresionesService {
             });
           })
           .catch(err => {
-            throw new Error(err.message ? err.message : err);
+            throw new Error(err.message || err);
           });
       });
     } catch (err: any) {
@@ -154,7 +154,7 @@ export class ContaExpresionesService {
             resolve({ success: true, data: result });
           })
           .catch(err => {
-            throw new Error(err.message ? err.message : err);
+            throw new Error(err.message || err);
           });
       });
     } catch (err: any) {
@@ -171,7 +171,7 @@ export class ContaExpresionesService {
             resolve({ success: true });
           })
           .catch(err => {
-            throw new Error(err.message ? err.message : err);
+            throw new Error(err.message || err);
           });
       });
     } catch (err: any) {
@@ -192,7 +192,7 @@ export class ContaExpresionesService {
             });
           })
           .catch(err => {
-            throw new Error(err.message ? err.message : err);
+            throw new Error(err.message || err);
           });
       });
     } catch (err: any) {
@@ -212,7 +212,7 @@ export class ContaExpresionesService {
             });
           })
           .catch(err => {
-            throw new Error(err.message ? err.message : err);
+            throw new Error(err.message || err);
           });
       });
     } catch (err: any) {
@@ -232,7 +232,7 @@ export class ContaExpresionesService {
             });
           })
           .catch(err => {
-            throw new Error(err.message ? err.message : err);
+            throw new Error(err.message || err);
           });
       });
     } catch (err: any) {
@@ -251,7 +251,7 @@ export class ContaExpresionesService {
             resolve({ success: true });
           })
           .catch(err => {
-            throw new Error(err.message ? err.message : err);
+            throw new Error(err.message || err);
           });
       });
     } catch (err: any) {
@@ -268,7 +268,7 @@ export class ContaExpresionesService {
             resolve({ success: true });
           })
           .catch(err => {
-            throw new Error(err.message ? err.message : err);
+            throw new Error(err.message || err);
           });
       });
     } catch (err: any) {
@@ -285,7 +285,7 @@ export class ContaExpresionesService {
             resolve({ success: true });
           })
           .catch(err => {
-            throw new Error(err.message ? err.message : err);
+            throw new Error(err.message || err);
           });
       });
     } catch (err: any) {

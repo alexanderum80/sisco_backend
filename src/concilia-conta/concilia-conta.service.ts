@@ -62,6 +62,9 @@ export class ConciliaContaService {
       // importar y chequear el clasificador de cuentas
       const _chequeaClasifRes = await this._importarClasificador(idCentro, tipoCentro, annio, consolidado, periodo, _contaConexionCentro);
       if (_chequeaClasifRes.data.length) {
+        // cierro la conexión al Rodas del Centro
+        if (_contaConexionCentro && _contaConexionCentro.isInitialized) _contaConexionCentro.destroy();
+
         return {
           success: false,
           data: {
@@ -81,6 +84,9 @@ export class ConciliaContaService {
             CuadreSistemas: {
               success: true,
             },
+            Informacion: {
+              success: true,
+            },
           },
           error:
             'Usted tiene errores en el Clasificador, lo que conlleva a que no pueda terminar el análisis, ni entregar el balance a nivel superior. Vaya a la pestaña Análisis del Clasificador y Corrija estos errores.',
@@ -89,9 +95,6 @@ export class ConciliaContaService {
 
       // importar los comprobantes, asientos, etc.
       await this.importarContabilidad(idCentro, annio, periodo, consolidado, _contaConexionCentro);
-
-      // cierro la conexión al Rodas del Centro
-      if (_contaConexionCentro && _contaConexionCentro.isInitialized) _contaConexionCentro.destroy();
 
       // calcular la conciliación
       await this._calculaConciliacion(idCentro, tipoCentro, annio, periodo, tipoEntidad, IdDivision).catch(err => {
@@ -128,6 +131,9 @@ export class ConciliaContaService {
           CuadreSistemas: {
             success: true,
           },
+          Informacion: {
+            success: true,
+          },
         },
         error: err.message ? err.message : err,
       };
@@ -138,7 +144,7 @@ export class ConciliaContaService {
     try {
       // inserto el clasificador del Rodas
       const _queryClasifCuentasRes = await contaConexion.query(queryClasificadorCuentasRodas.replace(/@anno/gi, annio.toString())).catch(err => {
-        throw new Error(err.message ? err.message : err);
+        throw new Error(err.message || err);
       });
 
       let _clasifCuentasXML = this._xmlJsService.jsonToXML('Cuentas', {});
@@ -175,7 +181,7 @@ export class ConciliaContaService {
     } catch (err: any) {
       if (contaConexion && contaConexion.isInitialized) contaConexion.destroy();
 
-      throw new Error(err.message ? err.message : err);
+      throw new Error(err.message || err);
     }
   }
 
@@ -218,11 +224,16 @@ export class ConciliaContaService {
         await this._importarAsientos(idUnidad, annio, per, cons, contaConexion);
       }
 
-      await this._updateFechaActualizacion(idUnidad, cons === '1');
+      // cierro la conexión al Rodas del Centro
+      if (contaConexion && contaConexion.isInitialized) contaConexion.destroy();
+
+      await this._updateFechaActualizacion(idUnidad, cons === '1').catch(err => {
+        throw new Error(err.message || err);
+      });
     } catch (err: any) {
       if (contaConexion && contaConexion.isInitialized) contaConexion.destroy();
 
-      throw new Error(err.message ? err.message : err);
+      throw new Error(err.message || err);
     }
   }
 
@@ -272,7 +283,7 @@ export class ConciliaContaService {
         });
       })
       .catch(err => {
-        throw new Error(err.message ? err.message : err);
+        throw new Error(err.message || err);
       });
   }
 
@@ -285,7 +296,7 @@ export class ConciliaContaService {
         return { data: result };
       })
       .catch(err => {
-        throw new Error(err.message ? err.message : err);
+        throw new Error(err.message || err);
       });
 
     let _saldoDebito = 0;
@@ -306,7 +317,7 @@ export class ConciliaContaService {
         }
       })
       .catch(err => {
-        throw new Error(err.message ? err.message : err);
+        throw new Error(err.message || err);
       });
   }
 
@@ -318,14 +329,14 @@ export class ConciliaContaService {
         return result;
       })
       .catch(err => {
-        throw new Error(err.message ? err.message : err);
+        throw new Error(err.message || err);
       });
 
     if (_queryCompRes.length) {
       const _comprobantes = this._xmlJsService.jsonToXML('Comprobantes', _queryCompRes);
 
       await this.dataSource.query(`EXEC dbo.pConta_ImportComprobanteXML @0, @1, @2, @3, @4`, [_comprobantes, idUnidad, cons, annio, periodo]).catch(err => {
-        throw new Error(err.message ? err.message : err);
+        throw new Error(err.message || err);
       });
     }
   }
@@ -339,14 +350,14 @@ export class ConciliaContaService {
         return result;
       })
       .catch(err => {
-        throw new Error(err.message ? err.message : err);
+        throw new Error(err.message || err);
       });
 
     if (_queryAsientosRes.length) {
       const _asientos = this._xmlJsService.jsonToXML('Asiento', _queryAsientosRes);
 
       await this.dataSource.query(`EXEC dbo.pConta_ImportAsientoXML @0, @1, @2, @3, @4`, [_asientos, idUnidad, cons, annio, periodo]).catch(err => {
-        throw new Error(err.message ? err.message : err);
+        throw new Error(err.message || err);
       });
     }
   }
@@ -360,7 +371,7 @@ export class ConciliaContaService {
       .andWhere('Consolidado = :cons', { cons: cons })
       .execute()
       .catch(err => {
-        throw new Error(err.message ? err.message : err);
+        throw new Error(err.message || err);
       });
   }
 
@@ -384,7 +395,7 @@ export class ConciliaContaService {
     await this.dataSource
       .query(`EXEC dbo.pConta_CalculaConciliacion @0, @1, @2, @3, @4, @5, @6`, [idUnidad, tipoClasificador, tipoEntidad, cons, anio, periodo, idDivision])
       .catch(err => {
-        throw new Error(err.message ? err.message : err);
+        throw new Error(err.message || err);
       });
   }
 
@@ -394,9 +405,10 @@ export class ConciliaContaService {
     const _queryReporteExpresiones = this._reporteExpresiones(idCentro, consolidado, annio, periodo);
     const _queryReporteValores = this._reporteValores(idCentro, consolidado, annio, periodo, idDivision);
     const _queryReporteCuadreSistemas = this._reporteCuadreSistemas(idCentro, consolidado, annio, periodo);
+    const _queryReporteInformacion = this._reporteInformacionContabilidad(idCentro, consolidado, annio, periodo);
 
     return new Promise<ConciliaContabilidadQueryResponse>(resolve => {
-      Promise.all([_queryReporteConsultas, _queryReporteExpresiones, _queryReporteValores, _queryReporteCuadreSistemas])
+      Promise.all([_queryReporteConsultas, _queryReporteExpresiones, _queryReporteValores, _queryReporteCuadreSistemas, _queryReporteInformacion])
         .then(result => {
           resolve({
             success: true,
@@ -420,6 +432,10 @@ export class ConciliaContaService {
               CuadreSistemas: {
                 success: true,
                 data: result[3].data,
+              },
+              Informacion: {
+                success: true,
+                data: result[4].data,
               },
             },
           });
@@ -503,6 +519,23 @@ export class ConciliaContaService {
       return new Promise<ConciliaContaQueryResponse>(resolve => {
         this.dataSource
           .query(`EXEC dbo.pConta_CuadreSistemas @0, @1, @2, @3`, [idCentro, consolidado, annio, periodo])
+          .then(res => {
+            resolve({ success: true, data: JSON.stringify(res) });
+          })
+          .catch(err => {
+            return { success: false, error: err.message ? err.message : err };
+          });
+      });
+    } catch (err: any) {
+      return { success: false, error: err.message ? err.message : err };
+    }
+  }
+
+  private async _reporteInformacionContabilidad(idCentro: number, consolidado: string, annio: number, periodo: number): Promise<ConciliaContaQueryResponse> {
+    try {
+      return new Promise<ConciliaContaQueryResponse>(resolve => {
+        this.dataSource
+          .query(`EXEC dbo.pConta_InformacionContabilidad @0, @1, @2, @3`, [idCentro, consolidado, annio, periodo])
           .then(res => {
             resolve({ success: true, data: JSON.stringify(res) });
           })
@@ -685,12 +718,12 @@ export class ConciliaContaService {
   private async _arreglaAsientos(bdConta: DataSource): Promise<void> {
     const _querysArray = [
       `UPDATE contabilidad.asientos
-      SET analisis_1 = case when tipo_analisis_1 is NULL then NULL else analisis_1 end,
-        analisis_2 = case when tipo_analisis_2 is NULL then NULL else analisis_2 end,
-        analisis_3 = case when tipo_analisis_3 is NULL then NULL else analisis_3 end,
-        analisis_4 = case when tipo_analisis_4 is NULL then NULL else analisis_4 end,
-        analisis_5 = case when tipo_analisis_5 is NULL then NULL else analisis_5 end
-    WHERE anno_comprobante = 2023;`,
+      SET analisis_1 = case when tipo_analisis_1 is null then null else analisis_1 end,
+        analisis_2 = case when tipo_analisis_2 is null then null else analisis_2 end,
+        analisis_3 = case when tipo_analisis_3 is null then null else analisis_3 end,
+        analisis_4 = case when tipo_analisis_4 is null then null else analisis_4 end,
+        analisis_5 = case when tipo_analisis_5 is null then NULL else analisis_5 end
+      WHERE anno_comprobante = 2023;`,
     ];
 
     for (let index = 0; index < _querysArray.length; index++) {
@@ -716,7 +749,7 @@ export class ConciliaContaService {
         const centroChe = centrosAChequear[index];
 
         await this.dataSource.query(`EXEC dbo.InsertChequeoCentroVsConsolidado @0, @1, @2, @3, @4`, [idCentro, cons, annio, periodo, centroChe]).catch(err => {
-          throw new Error(err.message ? err.message : err);
+          throw new Error(err.message || err);
         });
       }
 
