@@ -45,6 +45,12 @@ async function bootstrap() {
       }
     });
 
+    socket.on('disconnect', () => {
+      if (IdUsuario) {
+        io.emit('disconnected-user', IdUsuario);
+      }
+    });
+
     socket.on('concilia-status-change', status => {
       io.emit('concilia-status', status);
     });
