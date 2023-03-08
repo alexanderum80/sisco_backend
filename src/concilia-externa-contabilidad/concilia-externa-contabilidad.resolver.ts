@@ -1,4 +1,4 @@
-import { ConciliaExternaContabilidadEntity } from './concilia-externa-contabilidad.model';
+import { ConciliaExternaContabilidadEntity, ViewConciliaExtContabilidadResumen } from './concilia-externa-contabilidad.model';
 import { MutationResponse } from '../shared/models/mutation.response.model';
 import { ConciliaExtContabilidadService } from './concilia-externa-contabilidad.service';
 import { ConcExtContabilidad } from './entities/concilia-externa-contabilidad.entity';
@@ -14,6 +14,14 @@ export class ConciliaExtContabilidadResolver {
     @Args({ name: 'conciliaExternaInput', type: () => ConciliaExternaContabilidadInput }) conciliaExternaInput: ConciliaExternaContabilidadInput,
   ): Promise<ConciliaExternaContabilidadEntity> {
     return this._conciliacionContabService.getConciliacion(conciliaExternaInput);
+  }
+
+  @Query(() => [ViewConciliaExtContabilidadResumen])
+  async getConciliacionExternaContabResumen(
+    @Args({ name: 'annio', type: () => Int }) annio: number,
+    @Args({ name: 'mes', type: () => Int }) mes: number,
+  ): Promise<ViewConciliaExtContabilidadResumen[]> {
+    return this._conciliacionContabService.getDeudasResumen(annio, mes);
   }
 
   @Query(() => [ConcExtContabilidad])

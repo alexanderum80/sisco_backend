@@ -95,3 +95,27 @@ export class ConciliaExternaContabilidadEntity {
   @Field(() => [ActaConciliacion])
   getActaConciliacion: ActaConciliacion[];
 }
+
+@ObjectType()
+export class ViewConciliaExtContabilidadResumen {
+  @Field()
+  Annio: number;
+
+  @Field()
+  Mes: number;
+
+  @Field()
+  DivisionEmisor: string;
+
+  @Field()
+  ValorEmisor: number;
+
+  @Field()
+  DivisionReceptor: string;
+
+  @Field()
+  ValorReceptor: number;
+
+  @Field()
+  Diferencia: number;
+}

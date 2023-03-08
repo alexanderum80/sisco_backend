@@ -410,6 +410,16 @@ type ConciliaExternaContabilidadEntity {
   getActaConciliacion: [ActaConciliacion!]!
 }
 
+type ViewConciliaExtContabilidadResumen {
+  Annio: Float!
+  Mes: Float!
+  DivisionEmisor: String!
+  ValorEmisor: Float!
+  DivisionReceptor: String!
+  ValorReceptor: Float!
+  Diferencia: Float!
+}
+
 type TipoEntidades {
   Id: Float!
   Entidades: String!
@@ -727,6 +737,21 @@ type ContaEstadisticaView {
   Anulados: Int!
 }
 
+type ContaInformeCtasCobrarPagarView {
+  Division: String!
+  Grupo: String!
+  Cuenta: String!
+  SubCuenta: String!
+  Descripcion: String!
+  ProveedorCliente: String!
+  Organismo: String!
+  Saldo: Float!
+  Hasta30: Float!
+  De30a60: Float!
+  De60a90: Float!
+  MasDe90: Float!
+}
+
 type ConciliaInternaConta {
   Division: String!
   Annio: String!
@@ -807,6 +832,7 @@ type Query {
   getAllSubdivisiones: SubdivisionesQueryResponse!
   getSubdivisionesByIdDivision(idDivision: Int!): SubdivisionesQueryResponse!
   getConciliacionExternaContab(conciliaExternaInput: ConciliaExternaContabilidadInput!): ConciliaExternaContabilidadEntity!
+  getConciliacionExternaContabResumen(annio: Int!, mes: Int!): [ViewConciliaExtContabilidadResumen!]!
   getDiferenciasEnConciliacion(annio: Int!, mes: Int!): [ConcExtContabilidad!]!
   getAllTipoEntidades: ContaTipoentidadesQueryResponse!
   getTipoEntidadById(id: Int!): ContaTipoentidadQueryResponse!
@@ -852,6 +878,7 @@ type Query {
   getDatosConciliacionExterna(anno: Int!, mes: Int!): ConciliaExternaDatosConciliacionEntity
   getAllActFijosClasificadorSubgrupo: [ActFijosClasificadorSubgrupoEntity!]!
   getActFijosClasificadorSubgrupo(grupo: Int!, codigo: Int!): ActFijosClasificadorSubgrupoEntity!
+  contaInformeCtasCobrarPagar(idDivision: Int!, annio: Int!, periodo: Int!): [ContaInformeCtasCobrarPagarView!]!
 }
 
 input ConciliaDWHInput {

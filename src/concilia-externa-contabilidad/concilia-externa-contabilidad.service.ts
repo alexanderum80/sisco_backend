@@ -1,4 +1,4 @@
-import { ActaConciliacion, ConciliaExternaContabilidadEntity } from './concilia-externa-contabilidad.model';
+import { ActaConciliacion, ConciliaExternaContabilidadEntity, ViewConciliaExtContabilidadResumen } from './concilia-externa-contabilidad.model';
 import { ConcExtContabilidad } from './entities/concilia-externa-contabilidad.entity';
 import { MutationResponse } from '../shared/models/mutation.response.model';
 import { Injectable } from '@nestjs/common';
@@ -38,16 +38,8 @@ export class ConciliaExtContabilidadService {
   async conciliacionContab(annio: number, mes: number, division: number, unidad: number, divisionOD: number, unidadOD: number): Promise<ConcExtContabilidad> {
     try {
       return new Promise<ConcExtContabilidad>((resolve, reject) => {
-        const _query = `SELECT * FROM dbo.vConcExt_ConciliaContabilidad
-          WHERE Annio = ${annio} AND Mes = ${mes}
-          AND ((DivisionEmisor = CASE WHEN ${division} = 0 THEN DivisionEmisor ELSE ${division} END AND Emisor = CASE WHEN ${unidad} = 0 THEN Emisor ELSE ${unidad} END 
-              AND DivisionReceptor = CASE WHEN ${divisionOD} = 0 THEN DivisionReceptor ELSE ${divisionOD} END AND Receptor = CASE WHEN ${unidadOD} = 0 THEN Receptor ELSE ${unidadOD} END)
-          OR (DivisionEmisor = CASE WHEN ${divisionOD} = 0 THEN DivisionEmisor ELSE ${divisionOD} END AND Emisor = CASE WHEN ${unidadOD} = 0 THEN Emisor ELSE ${unidadOD} END
-            AND DivisionReceptor = CASE WHEN ${division} = 0 THEN DivisionReceptor ELSE ${division} END AND Receptor = CASE WHEN ${unidad} = 0 THEN Receptor ELSE ${unidad} END))
-          ORDER BY DivisionEmisor, Emisor, Documento, DivisionReceptor, Receptor`;
-
         this.dataSource
-          .query(_query)
+          .query('EXEC pConcExt_ConciliacionContabilidad @0, @1, @2, @3, @4, @5', [annio, mes, division, unidad, divisionOD, unidadOD])
           .then(result => {
             resolve(result);
           })
@@ -91,7 +83,7 @@ export class ConciliaExtContabilidadService {
 
     return new Promise<ActaConciliacion[]>((resolve, reject) => {
       this.dataSource
-        .query('EXEC p_ConcExt_ActaConciliacion @0, @1, @2, @3', [annio, mes, unidad, unidadOD])
+        .query('EXEC pConcExt_ActaConciliacion @0, @1, @2, @3', [annio, mes, unidad, unidadOD])
         .then(result => {
           resolve(result);
         })
@@ -150,6 +142,27 @@ export class ConciliaExtContabilidadService {
       });
     } catch (err) {
       return Promise.reject(err.message || err);
+    }
+  }
+
+  async getDeudasResumen(annio: number, mes: number): Promise<ViewConciliaExtContabilidadResumen[]> {
+    try {
+      return new Promise<ViewConciliaExtContabilidadResumen[]>((resolve, reject) => {
+        const _query = `SELECT * FROM dbo.vConcExt_ConciliaContabilidadResumen
+          WHERE Annio = ${annio} AND Mes = ${mes}
+          ORDER BY DivisionEmisor, DivisionReceptor`;
+
+        this.dataSource
+          .query(_query)
+          .then(result => {
+            resolve(result);
+          })
+          .catch(err => {
+            return reject(err.message || err);
+          });
+      });
+    } catch (err: any) {
+      return Promise.reject(err.message);
     }
   }
 }
