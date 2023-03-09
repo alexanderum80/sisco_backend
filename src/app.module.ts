@@ -43,6 +43,7 @@ import 'dotenv/config';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { ConciliaUhModule } from './concilia-uh/concilia-uh.module';
 import { ContaEstadisticaModule } from './conta-estadistica/conta-estadistica.module';
+import { ContaInformeCtasCobrarPagarModule } from './conta-informe-ctas-cobrar-pagar/conta-informe-ctas-cobrar-pagar.module';
 import { ConciliaInternaContaModule } from './concilia-interna-conta/concilia-interna-conta.module';
 import { ConciliaExternaDwhModule } from './concilia-externa-dwh/concilia-externa-dwh.module';
 import { ConciliaExternaEntreUnidadesModule } from './concilia-externa-entre-unidades/concilia-externa-entre-unidades.module';
@@ -126,6 +127,7 @@ import { LogsModule } from './logs/logs.module';
     ConciliaExternaDatosConciliacionModule,
     ActfijosClasificadorSubgruposModule,
     LogsModule,
+    ContaInformeCtasCobrarPagarModule,
   ],
   controllers: [AppController],
   providers: [AppService, EmailsService],
