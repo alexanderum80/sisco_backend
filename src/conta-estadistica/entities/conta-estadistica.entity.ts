@@ -23,8 +23,8 @@ export class ContaEstadisticaView {
   @Field(() => Int)
   Periodo: number;
 
-  // @Field(() => Date, { nullable: true })
-  // FechaActualizacion?: Date;
+  @Field(() => Date, { nullable: true })
+  FechaActualizacion?: Date;
 
   @Field(() => Date, { nullable: true })
   FechaInicio?: Date;

@@ -43,6 +43,7 @@ export class ContaEstadisticaService {
                 IdCentro: _conexionRodas.IdUnidad,
                 Centro: _conexionRodas.Unidad.Nombre,
                 Consolidado: _conexionRodas.Consolidado,
+                FechaActualizacion: _conexionRodas.FechaActualizacion,
                 FechaInicio: result?.fecha_inicio || null,
                 FechaFin: result?.fecha_fin || null,
                 Comprobantes: result?.comprobantes || 0,
