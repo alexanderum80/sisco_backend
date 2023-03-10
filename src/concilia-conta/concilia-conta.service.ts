@@ -54,7 +54,7 @@ export class ConciliaContaService {
       });
 
       const _conexionConta = _conexionRodasQuery.data;
-      _conexionConta.BaseDatos = `r4_${_conexionConta.BaseDatos.toLowerCase()}`;
+      // _conexionConta.BaseDatos = `r4_${_conexionConta.BaseDatos.toLowerCase()}`;
 
       // conecto al Conta del Centro
       const _contaConexionCentro: DataSource = await this._contaConexionesService.conexionRodas(_conexionConta);
@@ -580,7 +580,7 @@ export class ConciliaContaService {
       const _conexionRodasQuery = await this._contaConexionesService.findByIdUnidad(idUnidad, tipoUnidad === '2');
       const _conexionConta = _conexionRodasQuery.data;
 
-      _conexionConta.BaseDatos = `r4_${_conexionConta.BaseDatos.toLowerCase()}`;
+      // _conexionConta.BaseDatos = `r4_${_conexionConta.BaseDatos.toLowerCase()}`;
 
       let tipoClasificador = 0;
 

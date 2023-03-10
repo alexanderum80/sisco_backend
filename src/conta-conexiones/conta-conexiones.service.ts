@@ -94,6 +94,23 @@ export class ContaConexionesService {
     });
   }
 
+  async findByIdDivision(idDivision: number): Promise<ContaConexionesEntity[]> {
+    return new Promise<ContaConexionesEntity[]>((resolve, reject) => {
+      this.conexionesRespository
+        .find({ where: { IdDivision: idDivision }, relations: ['Division', 'Unidad'] })
+        .then(result => {
+          if (result) {
+            resolve(result);
+          } else {
+            reject(`No se han definido las conexiones a los Rodas de la División: ${idDivision}`);
+          }
+        })
+        .catch(err => {
+          reject(err.message ? err.message : err);
+        });
+    });
+  }
+
   async create(conexion: ContaConexionInput): Promise<MutationResponse> {
     try {
       delete conexion.Id;
@@ -197,7 +214,7 @@ export class ContaConexionesService {
         value: contaConexion.IpRodas,
       },
       database: {
-        value: contaConexion.BaseDatos,
+        value: `r4_${contaConexion.BaseDatos.toLowerCase()}`,
       },
     });
 

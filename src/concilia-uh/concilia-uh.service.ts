@@ -23,7 +23,7 @@ export class ConciliaUhService {
       // verificar si se ha definido la conexión al Rodas
       const _conexionRodasQuery = await this._contaConexionesSvc.findByIdUnidad(idCentro, false);
       const _conexionConta = _conexionRodasQuery.data;
-      _conexionConta.BaseDatos = `r4_${_conexionConta.BaseDatos.toLowerCase()}`;
+      // _conexionConta.BaseDatos = `r4_${_conexionConta.BaseDatos.toLowerCase()}`;
 
       return new Promise<ConciliaUH[]>((resolve, reject) => {
         // importo los datos de los Utiles

@@ -727,7 +727,6 @@ type ContaEstadisticaView {
   Consolidado: Boolean!
   Annio: Int!
   Periodo: Int!
-  FechaActualizacion: DateTime
   FechaInicio: DateTime
   FechaFin: DateTime
   Comprobantes: Int!
