@@ -31,11 +31,11 @@ export class ContaEstadisticaService {
 
         await this.contaConexionesSvc
           .conexionRodas(_conexionRodas)
-          .then(con => {
-            con.query(ESTADISTICA_QUERY.replace(/@annio/gi, annio.toString()).replace(/@periodo/gi, periodo.toString())).then(res => {
+          .then(async con => {
+            await con.query(ESTADISTICA_QUERY.replace(/@annio/gi, annio.toString()).replace(/@periodo/gi, periodo.toString())).then(async res => {
               const result = res[0] || null;
 
-              contaEstadisticas.push({
+              await contaEstadisticas.push({
                 Annio: annio,
                 Periodo: periodo,
                 IdDivision: _conexionRodas.IdDivision,
@@ -64,13 +64,6 @@ export class ContaEstadisticaService {
 
       return new Promise<ContaEstadisticaView[]>(resolve => {
         resolve(contaEstadisticas);
-        // this.dataSource.manager
-        //   .query('EXEC pConta_Estadistica @0, @1, @2', [idDivision, annio, periodo])
-        //   .then(res => {
-        //   })
-        //   .catch(err => {
-        //     reject(err);
-        //   });
       });
     } catch (err) {
       return Promise.reject(err.message || err);
