@@ -420,6 +420,20 @@ type ViewConciliaExtContabilidadResumen {
   Diferencia: Float!
 }
 
+type ViewConciliaExtContabilidadDeudasPorEdades {
+  TipoOperacion: String!
+  Annio: Float!
+  Mes: Float!
+  IdDivision: Float!
+  Division: String!
+  Valor: Float!
+  De0a30: Float!
+  De30a60: Float!
+  De60a90: Float!
+  De90a365: Float!
+  MasDe1Anno: Float!
+}
+
 type TipoEntidades {
   Id: Float!
   Entidades: String!
@@ -833,6 +847,7 @@ type Query {
   getSubdivisionesByIdDivision(idDivision: Int!): SubdivisionesQueryResponse!
   getConciliacionExternaContab(conciliaExternaInput: ConciliaExternaContabilidadInput!): ConciliaExternaContabilidadEntity!
   getConciliacionExternaContabResumen(annio: Int!, mes: Int!): [ViewConciliaExtContabilidadResumen!]!
+  getConciliacionExternaContabDeudasPorEdades(annio: Int!, mes: Int!): [ViewConciliaExtContabilidadDeudasPorEdades!]!
   getDiferenciasEnConciliacion(annio: Int!, mes: Int!): [ConcExtContabilidad!]!
   getAllTipoEntidades: ContaTipoentidadesQueryResponse!
   getTipoEntidadById(id: Int!): ContaTipoentidadQueryResponse!

@@ -1,4 +1,9 @@
-import { ActaConciliacion, ConciliaExternaContabilidadEntity, ViewConciliaExtContabilidadResumen } from './concilia-externa-contabilidad.model';
+import {
+  ActaConciliacion,
+  ConciliaExternaContabilidadEntity,
+  ViewConciliaExtContabilidadResumen,
+  ViewConciliaExtContabilidadDeudasPorEdades,
+} from './concilia-externa-contabilidad.model';
 import { ConcExtContabilidad } from './entities/concilia-externa-contabilidad.entity';
 import { MutationResponse } from '../shared/models/mutation.response.model';
 import { Injectable } from '@nestjs/common';
@@ -154,6 +159,23 @@ export class ConciliaExtContabilidadService {
 
         this.dataSource
           .query(_query)
+          .then(result => {
+            resolve(result);
+          })
+          .catch(err => {
+            return reject(err.message || err);
+          });
+      });
+    } catch (err: any) {
+      return Promise.reject(err.message);
+    }
+  }
+
+  async getDeudasPorEdades(annio: number, mes: number): Promise<ViewConciliaExtContabilidadDeudasPorEdades[]> {
+    try {
+      return new Promise<ViewConciliaExtContabilidadDeudasPorEdades[]>((resolve, reject) => {
+        this.dataSource
+          .query('EXEC pConcExt_DeudasPorEdades @0, @1', [annio, mes])
           .then(result => {
             resolve(result);
           })

@@ -119,3 +119,39 @@ export class ViewConciliaExtContabilidadResumen {
   @Field()
   Diferencia: number;
 }
+
+@ObjectType()
+export class ViewConciliaExtContabilidadDeudasPorEdades {
+  @Field()
+  TipoOperacion: string;
+
+  @Field()
+  Annio: number;
+
+  @Field()
+  Mes: number;
+
+  @Field()
+  IdDivision: number;
+
+  @Field()
+  Division: string;
+
+  @Field()
+  Valor: number;
+
+  @Field()
+  De0a30: number;
+
+  @Field()
+  De30a60: number;
+
+  @Field()
+  De60a90: number;
+
+  @Field()
+  De90a365: number;
+
+  @Field()
+  MasDe1Anno: number;
+}
