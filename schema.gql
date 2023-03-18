@@ -753,12 +753,10 @@ type ContaEstadisticaView {
 
 type ContaInformeCtasCobrarPagarView {
   Division: String!
+  Organismo: String!
   Grupo: String!
   Cuenta: String!
-  SubCuenta: String!
-  Descripcion: String!
   ProveedorCliente: String!
-  Organismo: String!
   Saldo: Float!
   Hasta30: Float!
   De30a60: Float!

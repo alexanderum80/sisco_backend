@@ -6,22 +6,16 @@ export class ContaInformeCtasCobrarPagarView {
   Division: string;
 
   @Field()
+  Organismo: string;
+
+  @Field()
   Grupo: string;
 
   @Field()
   Cuenta: string;
 
   @Field()
-  SubCuenta: string;
-
-  @Field()
-  Descripcion: string;
-
-  @Field()
   ProveedorCliente: string;
-
-  @Field()
-  Organismo: string;
 
   @Field()
   Saldo: number;
