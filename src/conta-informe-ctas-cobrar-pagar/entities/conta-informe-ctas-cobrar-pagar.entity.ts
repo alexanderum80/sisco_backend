@@ -14,8 +14,8 @@ export class ContaInformeCtasCobrarPagarView {
   @Field()
   Cuenta: string;
 
-  @Field()
-  ProveedorCliente: string;
+  @Field({ nullable: true })
+  ProveedorCliente?: string;
 
   @Field()
   Saldo: number;
