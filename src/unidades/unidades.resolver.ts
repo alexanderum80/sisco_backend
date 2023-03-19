@@ -1,10 +1,11 @@
+import { DEFAULT_GRAPHQL_CONTEXT } from './../shared/models/jwt.model';
 import { Usuarios } from './../usuarios/usuarios.entity';
 import { AllUnidadesQueryResponse } from './unidades.model';
 import { UnidadesService } from './unidades.service';
 import { Unidades } from './unidades.entity';
 import { Args, Context, Int, Query, Resolver } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
-import { AuthGuard, DEFAULT_GRAPHQL_CONTEXT } from '../shared/helpers/auth.guard';
+import { AuthGuard } from '../shared/helpers/auth.guard';
 
 @Resolver(() => Unidades)
 export class UnidadesResolver {

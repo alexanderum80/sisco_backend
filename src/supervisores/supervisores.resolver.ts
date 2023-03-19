@@ -1,10 +1,11 @@
+import { DEFAULT_GRAPHQL_CONTEXT } from './../shared/models/jwt.model';
 import { Usuarios } from './../usuarios/usuarios.entity';
 import { SupervisoresQueryResponse, SupervisorQueryResponse, SupervisorInput } from './supervisores.model';
 import { SupervisoresService } from './supervisores.service';
 import { Supervisor } from './supervisores.entity';
 import { Args, Context, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
-import { AuthGuard, DEFAULT_GRAPHQL_CONTEXT } from './../shared/helpers/auth.guard';
+import { AuthGuard } from './../shared/helpers/auth.guard';
 
 @Resolver(() => Supervisor)
 export class SupervisoresResolver {

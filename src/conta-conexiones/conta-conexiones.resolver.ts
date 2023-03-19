@@ -1,3 +1,4 @@
+import { DEFAULT_GRAPHQL_CONTEXT } from './../shared/models/jwt.model';
 import { Usuarios } from './../usuarios/usuarios.entity';
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { ContaConexionesService } from './conta-conexiones.service';
@@ -5,7 +6,7 @@ import { ContaConexionesEntity } from './conta-conexiones.entity';
 import { Args, Mutation, Query, Resolver, Int, Context } from '@nestjs/graphql';
 import { ContaConexionQueryResponse, ContaConexionesQueryResponse, ContaConexionInput, EntidadesRodas } from './conta-conexiones.model';
 import { UseGuards } from '@nestjs/common';
-import { AuthGuard, DEFAULT_GRAPHQL_CONTEXT } from '../shared/helpers/auth.guard';
+import { AuthGuard } from '../shared/helpers/auth.guard';
 
 @Resolver(() => ContaConexionesEntity)
 export class ContaConexionesResolver {

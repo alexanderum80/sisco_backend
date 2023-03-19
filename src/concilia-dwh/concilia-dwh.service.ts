@@ -6,7 +6,7 @@ import { DWHConexiones } from './../dwh-conexiones/dwh-conexiones.entity';
 import { Unidades } from './../unidades/unidades.entity';
 import { DwhConexionesService } from './../dwh-conexiones/dwh-conexiones.service';
 import { UnidadesService } from './../unidades/unidades.service';
-import { ConciliaDWHInput, queryInventarioDWH, queryVentasDWH } from './concilia-dwh.model';
+import { ConciliaDWH, ConciliaDWHInput, queryInventarioDWH, queryVentasDWH } from './concilia-dwh.model';
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { Injectable } from '@nestjs/common';
 import { UnidadesQueryResponse } from './../unidades/unidades.model';
@@ -26,7 +26,7 @@ export class ConciliaDwhService {
     private _xmlSvc: XmlJsService,
   ) {}
 
-  async conciliaDWH(conciliaDWHInput: ConciliaDWHInput): Promise<any> {
+  async conciliaDWH(conciliaDWHInput: ConciliaDWHInput): Promise<ConciliaDWH[]> {
     try {
       const { idDivision, idCentro, annio, periodo, tipoCentro, ventasAcumuladas } = conciliaDWHInput;
 
@@ -34,7 +34,7 @@ export class ConciliaDwhService {
       const _divisionesQuery =
         idCentro === 100 && tipoCentro === 1 ? await this._divisionesService.getDivisionesActivas() : await this._divisionesService.getDivisionById(idDivision);
       if (!_divisionesQuery.success) {
-        return { success: false, error: _divisionesQuery.error };
+        throw new Error(_divisionesQuery.error);
       }
       const _divisiones = _divisionesQuery.data;
 
@@ -44,17 +44,17 @@ export class ConciliaDwhService {
         // verificar si se ha definido la conexion al DWH
         const _conexionDWHQuery = await this._dwhConexionesService.DWHConexion(divisionInfo.IdDivision);
         if (!_conexionDWHQuery.success) {
-          return { success: false, error: _conexionDWHQuery.error + ' No se pudo obtener la Conexión al DWH de la División ' + divisionInfo.IdDivision };
+          throw new Error(_conexionDWHQuery.error + ' No se pudo obtener la Conexión al DWH de la División ' + divisionInfo.IdDivision);
         }
         if (!_conexionDWHQuery.data) {
-          return { success: false, error: `No se ha definido ninguna conexión de la División ${divisionInfo.IdDivision} a los DWH.` };
+          throw new Error(`No se ha definido ninguna conexión de la División ${divisionInfo.IdDivision} a los DWH.`);
         }
         const _conexionDWH = _conexionDWHQuery.data;
         if (_conexionDWH.ConexionDWH === '') {
-          return { success: false, error: `No se ha definido la conexión al DWH de la División ${divisionInfo.IdDivision}.` };
+          throw new Error(`No se ha definido la conexión al DWH de la División ${divisionInfo.IdDivision}.`);
         }
         if (_conexionDWH.ConexionRest === '') {
-          return { success: false, error: `No se ha definido la conexión al DWH de Restaura de la División ${divisionInfo.IdDivision}.` };
+          throw new Error(`No se ha definido la conexión al DWH de Restaura de la División ${divisionInfo.IdDivision}.`);
         }
 
         // verificar si se ha definido la conexión al Rodas
@@ -73,42 +73,33 @@ export class ConciliaDwhService {
             break;
         }
         if (!_unidadesQuery.success) {
-          return { success: false, error: _unidadesQuery.error };
+          throw new Error(_unidadesQuery.error);
         }
         const _unidades = _unidadesQuery.data;
 
         // importar datos del DWH
         await this._importarDatosDWH(idCentro, annio, periodo, tipoCentro, ventasAcumuladas, _unidades, _conexionDWH).catch(err => {
-          return { success: false, error: err };
+          throw new Error(err);
         });
 
         // importar datos del Rodas
         await this._importarDatosRodas(annio, periodo, idCentro, tipoCentro, _conexionRodas).catch(err => {
-          return { success: false, error: err };
+          throw new Error(err);
         });
       }
 
-      // // obtener la información con los resultados de la conciliación
-      // const _queryRodasDWHInventarioVentas = this._rodasDWHInventarioVentas(idCentro, tipoCentro, periodo);
-      // const _queryRodasDWHAlmacenes = this._rodasDWHAlmacenes(idCentro, tipoCentro, periodo);
-      // const _queryRodasDWHNota = this._rodasDWHNota(idCentro, annio, periodo);
-
-      return new Promise<any>(resolve => {
+      return new Promise<ConciliaDWH[]>((resolve, reject) => {
         // calculo la conciliacion
         this._calculaConciliacion(idCentro, annio, periodo, tipoCentro, ventasAcumuladas)
-          // Promise.all([_queryRodasDWHInventarioVentas, _queryRodasDWHAlmacenes, _queryRodasDWHNota])
           .then(results => {
-            resolve({
-              success: true,
-              data: results,
-            });
+            resolve(results);
           })
           .catch(err => {
-            resolve({ success: false, error: err.message ? err.message : err });
+            reject(err.message || err);
           });
       });
     } catch (err: any) {
-      return { success: false, error: err.message ? err.message : err };
+      return Promise.reject(err.message || err);
     }
   }
 

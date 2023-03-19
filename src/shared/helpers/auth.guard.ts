@@ -1,10 +1,8 @@
-import { CanActivate, ExecutionContext, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { Observable } from 'rxjs';
 import * as jwt from 'jsonwebtoken';
-
-export const DEFAULT_GRAPHQL_CONTEXT = 'usuario';
-export const SECRET_KEY = 'TiendasCaribe1994';
+import { DEFAULT_GRAPHQL_CONTEXT, SECRET_KEY } from '../models/jwt.model';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -14,22 +12,22 @@ export class AuthGuard implements CanActivate {
       return false;
     }
 
-    this.validateToken(ctx.req.headers.authorization).then(token => {
-      ctx[DEFAULT_GRAPHQL_CONTEXT] = token;
-    });
-    return true;
-  }
+    const auth = ctx.req.headers.authorization;
 
-  async validateToken(auth: string): Promise<any> {
-    if (auth.split(' ')[0] !== 'Bearer') {
-      throw new HttpException('Token Inválido', HttpStatus.UNAUTHORIZED);
-    }
+    if (auth.split(' ')[0] !== 'Bearer') return false;
 
     const token = auth.split(' ')[1];
+
+    let decryptedToken;
+
     try {
-      return jwt.verify(token, SECRET_KEY);
+      decryptedToken = jwt.verify(token, SECRET_KEY);
     } catch (err: any) {
-      throw new HttpException('Token Inválido', HttpStatus.UNAUTHORIZED);
+      return false;
     }
+
+    ctx[DEFAULT_GRAPHQL_CONTEXT] = decryptedToken;
+
+    return true;
   }
 }

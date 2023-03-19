@@ -1,18 +1,6 @@
 import { ObjectType, Field, InputType } from '@nestjs/graphql';
 
 @ObjectType()
-export class RodasDWHQueryResponse {
-  @Field()
-  success: boolean;
-
-  @Field({ nullable: true })
-  data?: string;
-
-  @Field(() => String, { nullable: true })
-  error?: string;
-}
-
-@ObjectType()
 export class ConciliaDWH {
   @Field()
   Tipo: string;
@@ -73,18 +61,6 @@ export class ConciliaDWH {
 
   @Field({ nullable: true })
   Nota?: string;
-}
-
-@ObjectType()
-export class ConciliaDWHQueryResponse {
-  @Field()
-  success: boolean;
-
-  @Field(() => [ConciliaDWH], { nullable: true })
-  data?: ConciliaDWH[];
-
-  @Field(() => String, { nullable: true })
-  error?: string;
 }
 
 @ObjectType()

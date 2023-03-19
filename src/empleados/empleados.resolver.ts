@@ -1,3 +1,4 @@
+import { DEFAULT_GRAPHQL_CONTEXT } from './../shared/models/jwt.model';
 import { Usuarios } from './../usuarios/usuarios.entity';
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { EmpleadosQueryResponse, EmpleadoQueryResponse, EmpleadoInput } from './empleados.model';
@@ -5,7 +6,7 @@ import { EmpleadosService } from './empleados.service';
 import { Empleado } from './empleados.entity';
 import { Args, Query, Resolver, Int, Mutation, Context } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
-import { AuthGuard, DEFAULT_GRAPHQL_CONTEXT } from './../shared/helpers/auth.guard';
+import { AuthGuard } from './../shared/helpers/auth.guard';
 
 @Resolver(() => Empleado)
 export class EmpleadosResolver {

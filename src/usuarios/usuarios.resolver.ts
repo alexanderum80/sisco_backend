@@ -15,6 +15,11 @@ export class UsuariosResolver {
     return this._usuariosService.authenticate(usuario, passw);
   }
 
+  @Query(() => Usuarios)
+  async refreshToken(@Args('token') token: string): Promise<Usuarios> {
+    return this._usuariosService.refreshToken(token);
+  }
+
   @Query(() => UsuariosQueryResponse)
   @UseGuards(new AuthGuard())
   async getAllUsuarios(): Promise<UsuariosQueryResponse> {

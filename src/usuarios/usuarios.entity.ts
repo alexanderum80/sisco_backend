@@ -42,4 +42,7 @@ export class Usuarios {
 
   @Field()
   Token: string;
+
+  @Field()
+  RefreshToken: string;
 }

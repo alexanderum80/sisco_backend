@@ -14,7 +14,7 @@ async function bootstrap() {
     next();
   });
 
-  const server = await app.listen(3000);
+  const server = await app.listen(process.env.PORT || '3000');
 
   // Socket
   const io = new socket.Server(server, {

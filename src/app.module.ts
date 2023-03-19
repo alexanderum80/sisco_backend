@@ -68,12 +68,12 @@ import { LogsModule } from './logs/logs.module';
     }),
     TypeOrmModule.forRoot({
       type: 'mssql',
-      host: 'localhost',
-      username: 'sa',
-      password: 'trd.2010',
-      database: 'SISCO_Web',
-      connectionTimeout: 60000,
-      requestTimeout: 0,
+      host: process.env.HOST_NAME,
+      username: process.env.USER_NAME,
+      password: process.env.PASSWORD,
+      database: process.env.DATABASE_NAME,
+      connectionTimeout: parseInt(process.env.CONNECTION_TIMEOUT),
+      requestTimeout: parseInt(process.env.REQUEST_TIMEOUT),
       entities: ['**/*.entity.js'],
       synchronize: false,
       options: {

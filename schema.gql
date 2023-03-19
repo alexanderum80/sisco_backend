@@ -52,6 +52,7 @@ type Usuarios {
   IdDivision: Float!
   Division: DivisionesEntity!
   Token: String!
+  RefreshToken: String!
 }
 
 type UsuarioQueryResponse {
@@ -257,12 +258,6 @@ type ConciliaDWH {
   Division: String!
   CuentaR: String
   Nota: String
-}
-
-type ConciliaDWHQueryResponse {
-  success: Boolean!
-  data: [ConciliaDWH!]
-  error: String
 }
 
 type ParteAtrasosQueryResponse {
@@ -756,7 +751,7 @@ type ContaInformeCtasCobrarPagarView {
   Organismo: String!
   Grupo: String!
   Cuenta: String!
-  ProveedorCliente: String!
+  ProveedorCliente: String
   Saldo: Float!
   Hasta30: Float!
   De30a60: Float!
@@ -810,6 +805,7 @@ type ConciliaExternaDatosConciliacionEntity {
 
 type Query {
   authenticateUsuario(usuario: String!, passw: String!): Usuarios!
+  refreshToken(token: String!): Usuarios!
   getAllUsuarios: UsuariosQueryResponse!
   getUsuariosByIdDivision(idDivision: Int!): UsuariosQueryResponse!
   getUsuarioById(id: Int!): UsuarioQueryResponse!
@@ -826,7 +822,7 @@ type Query {
   getUnidadesByIdDivision(idDivision: Int!): AllUnidadesQueryResponse!
   getDWHConexion(idDivision: Int!): DWHConexionQueryResponse!
   getAllCargos: CargosQueryResponse!
-  conciliaDWH(conciliaDWHInput: ConciliaDWHInput!): ConciliaDWHQueryResponse!
+  conciliaDWH(conciliaDWHInput: ConciliaDWHInput!): [ConciliaDWH!]!
   conciliaContabilidad(conciliaContaInput: ConciliaContaInput!): ConciliaContabilidadQueryResponse!
   getAllClasificadorCuentas(tipo: Int): ClasificadorCuentasQueryResponse!
   getClasificadorCuenta(cuenta: String!, subcuenta: String!, tipo: Int!): ClasificadorCuentaQueryResponse!

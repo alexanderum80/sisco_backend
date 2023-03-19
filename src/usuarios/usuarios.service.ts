@@ -1,3 +1,6 @@
+import { SECRET_KEY, SECRET_REFRESH } from './../shared/models/jwt.model';
+import { GraphQLErrorOptions } from 'graphql';
+import { GraphQLError } from 'graphql';
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { UsuariosQueryResponse, UsuarioInput, ETipoUsuarios, UsuarioQueryResponse } from './usuarios.model';
 import { Usuarios } from './usuarios.entity';
@@ -6,7 +9,6 @@ import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
-import { SECRET_KEY } from '../shared/helpers/auth.guard';
 
 @Injectable()
 export class UsuariosService {
@@ -29,13 +31,15 @@ export class UsuariosService {
           Division: 'OFICINA CENTRAL DE LA CADENA',
         },
         Token: '',
+        RefreshToken: '',
       };
 
       if (usuario === 'alexanderu') {
         const res = bcrypt.compareSync(passw, '$2a$12$8yqzwWjBYUmMDRhWJ91xTuwt5ne735hiyTYx4MQCV9quetIXJv8BC');
         if (res) {
-          const token = this.createToken(usuarioInfo);
-          return { ...usuarioInfo, Token: token };
+          const token = await this.createToken(usuarioInfo);
+          const refreshToken = await this.createRefreshToken(usuarioInfo);
+          return { ...usuarioInfo, Token: token, RefreshToken: refreshToken };
         }
       }
 
@@ -63,6 +67,7 @@ export class UsuariosService {
                 usuarioInfo.CambiarContrasena = response.CambiarContrasena;
                 usuarioInfo.IdDivision = response.IdDivision;
                 usuarioInfo.Token = await this.createToken(usuarioInfo);
+                usuarioInfo.RefreshToken = await this.createRefreshToken(usuarioInfo);
 
                 resolve(usuarioInfo);
               } else {
@@ -79,8 +84,51 @@ export class UsuariosService {
     }
   }
 
+  async refreshToken(token): Promise<Usuarios> {
+    try {
+      let decryptedToken;
+
+      try {
+        decryptedToken = jwt.verify(token, process.env.SECRET_KEY);
+      } catch (err: any) {
+        const graphqlErr: GraphQLErrorOptions = {};
+        Object.assign(graphqlErr, {
+          extensions: {
+            code: 'FORBIDDEN',
+          },
+        });
+
+        throw new GraphQLError('Forbidden resource', graphqlErr);
+      }
+
+      decryptedToken.Token = '';
+      decryptedToken.RefreshToken = '';
+
+      decryptedToken.Token = await this.createToken(decryptedToken);
+      decryptedToken.RefreshToken = await this.createRefreshToken(decryptedToken);
+
+      return new Promise<Usuarios>(resolve => {
+        resolve(decryptedToken);
+      });
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  }
+
   private createToken(userInfo: Usuarios) {
-    return jwt.sign(userInfo, SECRET_KEY);
+    return jwt.sign(
+      userInfo,
+      SECRET_KEY,
+      // { expiresIn: JWT_EXPIRES_IN }
+    );
+  }
+
+  private createRefreshToken(userInfo: Usuarios) {
+    return jwt.sign(
+      userInfo,
+      SECRET_REFRESH,
+      // { expiresIn: JWT_EXPIRES_IN }
+    );
   }
 
   async findAll(): Promise<UsuariosQueryResponse> {

@@ -1,5 +1,6 @@
+import { DEFAULT_GRAPHQL_CONTEXT } from './../shared/models/jwt.model';
 import { Usuarios } from './../usuarios/usuarios.entity';
-import { AuthGuard, DEFAULT_GRAPHQL_CONTEXT } from './../shared/helpers/auth.guard';
+import { AuthGuard } from './../shared/helpers/auth.guard';
 import { ConciliaContaInput, ConciliaContabilidadQueryResponse, IniciarSaldosInput, ChequearCentrosInput, ConciliaContaQueryResponse } from './concilia-conta.model';
 import { ConciliaContaService } from './concilia-conta.service';
 import { Args, Context, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
