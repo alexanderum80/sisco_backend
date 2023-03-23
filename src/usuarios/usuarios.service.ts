@@ -16,7 +16,7 @@ export class UsuariosService {
 
   async authenticate(usuario: string, passw: string): Promise<Usuarios> {
     try {
-      const usuarioInfo = UsuarioInfo;
+      const usuarioInfo = { ...UsuarioInfo };
 
       if (usuario === 'alexanderu') {
         const res = bcrypt.compareSync(passw, '$2a$12$8yqzwWjBYUmMDRhWJ91xTuwt5ne735hiyTYx4MQCV9quetIXJv8BC');
