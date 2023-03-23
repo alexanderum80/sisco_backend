@@ -1,6 +1,5 @@
 import { Usuarios } from './../usuarios/usuarios.entity';
 import { UsuariosService } from './../usuarios/usuarios.service';
-import { DivisionesQueryResponse } from './divisiones.model';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DivisionesEntity } from './divisiones.entity';
@@ -10,7 +9,7 @@ import { Repository } from 'typeorm';
 export class DivisionesService {
   constructor(@InjectRepository(DivisionesEntity) private readonly divisionesRepository: Repository<DivisionesEntity>, private _usuariosSvc: UsuariosService) {}
 
-  async getAllDivisiones(user?: Usuarios): Promise<DivisionesQueryResponse> {
+  async getAllDivisiones(user?: Usuarios): Promise<DivisionesEntity[]> {
     try {
       let criteria = {};
 
@@ -22,63 +21,54 @@ export class DivisionesService {
         }
       }
 
-      return new Promise<DivisionesQueryResponse>(resolve => {
+      return new Promise<DivisionesEntity[]>((resolve, reject) => {
         this.divisionesRepository
           .find({ where: criteria })
           .then(result => {
-            resolve({
-              success: true,
-              data: result,
-            });
+            resolve(result);
           })
           .catch(err => {
-            resolve({ success: false, error: err.message ? err.message : err });
+            reject(err.message || err);
           });
       });
     } catch (err: any) {
-      return { success: false, error: err.message ? err.message : err };
+      return Promise.reject(err.message || err);
     }
   }
 
-  async getDivisionesActivas(): Promise<DivisionesQueryResponse> {
+  async getDivisionesActivas(): Promise<DivisionesEntity[]> {
     try {
-      return new Promise<DivisionesQueryResponse>(resolve => {
+      return new Promise<DivisionesEntity[]>((resolve, reject) => {
         this.divisionesRepository
           .createQueryBuilder()
           .where('IdDivision NOT IN (100, 120, 124)')
           .getMany()
           .then(result => {
-            resolve({
-              success: true,
-              data: result,
-            });
+            resolve(result);
           })
           .catch(err => {
-            resolve({ success: false, error: err.message ? err.message : err });
+            reject(err.message || err);
           });
       });
     } catch (err: any) {
-      return { success: false, error: err.message ? err.message : err };
+      return Promise.reject(err.message || err);
     }
   }
 
-  async getDivisionById(_id: number): Promise<DivisionesQueryResponse> {
+  async getDivisionById(_id: number): Promise<DivisionesEntity[]> {
     try {
-      return new Promise<DivisionesQueryResponse>(resolve => {
+      return new Promise<DivisionesEntity[]>((resolve, reject) => {
         this.divisionesRepository
           .find({ where: [{ IdDivision: _id }] })
           .then(result => {
-            resolve({
-              success: true,
-              data: result,
-            });
+            resolve(result);
           })
           .catch(err => {
-            resolve({ success: false, error: err.message ? err.message : err });
+            reject(err.message || err);
           });
       });
     } catch (err: any) {
-      return { success: false, error: err.message ? err.message : err };
+      return Promise.reject(err.message || err);
     }
   }
 }

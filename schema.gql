@@ -67,12 +67,6 @@ type UsuariosQueryResponse {
   error: String
 }
 
-type DivisionesQueryResponse {
-  success: Boolean!
-  data: [DivisionesEntity!]
-  error: String
-}
-
 type Unidades {
   IdUnidad: Float!
   Nombre: String
@@ -810,9 +804,9 @@ type Query {
   getUsuariosByIdDivision(idDivision: Int!): UsuariosQueryResponse!
   getUsuarioById(id: Int!): UsuarioQueryResponse!
   getUsuarioByName(name: String!): UsuariosQueryResponse!
-  getAllDivisiones: DivisionesQueryResponse!
-  getAllDivisionesByUsuario: DivisionesQueryResponse!
-  getDivisionById(id: Int!): DivisionesQueryResponse!
+  getAllDivisiones: [DivisionesEntity!]!
+  getAllDivisionesByUsuario: [DivisionesEntity!]!
+  getDivisionById(id: Int!): [DivisionesEntity!]!
   getAllContaConexiones: ContaConexionesQueryResponse!
   getContaConexionById(id: Int!): ContaConexionQueryResponse!
   entidadesRodas(ip: String!): [EntidadesRodas!]!

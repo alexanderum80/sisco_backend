@@ -2,7 +2,7 @@ import { SECRET_KEY, SECRET_REFRESH } from './../shared/models/jwt.model';
 import { GraphQLErrorOptions } from 'graphql';
 import { GraphQLError } from 'graphql';
 import { MutationResponse } from './../shared/models/mutation.response.model';
-import { UsuariosQueryResponse, UsuarioInput, ETipoUsuarios, UsuarioQueryResponse } from './usuarios.model';
+import { UsuariosQueryResponse, UsuarioInput, ETipoUsuarios, UsuarioQueryResponse, UsuarioInfo } from './usuarios.model';
 import { Usuarios } from './usuarios.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
@@ -16,27 +16,12 @@ export class UsuariosService {
 
   async authenticate(usuario: string, passw: string): Promise<Usuarios> {
     try {
-      const usuarioInfo: Usuarios = {
-        IdUsuario: 0,
-        Usuario: usuario,
-        IdTipoUsuario: 1,
-        CambiarContrasena: false,
-        IdDivision: 100,
-        TipoUsuario: {
-          IdTipo: 1,
-          TipoUsuario: 'Administrador',
-        },
-        Division: {
-          IdDivision: 100,
-          Division: 'OFICINA CENTRAL DE LA CADENA',
-        },
-        Token: '',
-        RefreshToken: '',
-      };
+      const usuarioInfo = UsuarioInfo;
 
       if (usuario === 'alexanderu') {
         const res = bcrypt.compareSync(passw, '$2a$12$8yqzwWjBYUmMDRhWJ91xTuwt5ne735hiyTYx4MQCV9quetIXJv8BC');
         if (res) {
+          usuarioInfo.Usuario = usuario;
           const token = await this.createToken(usuarioInfo);
           const refreshToken = await this.createRefreshToken(usuarioInfo);
           return { ...usuarioInfo, Token: token, RefreshToken: refreshToken };

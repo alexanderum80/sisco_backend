@@ -3,6 +3,24 @@ import { ObjectType, Field, InputType } from '@nestjs/graphql';
 import { MultipleQueryResponse } from '../shared/models/query.response.model';
 import { SingleQueryResponse } from '../shared/models/query.response.model';
 
+export const UsuarioInfo: Usuarios = {
+  IdUsuario: 0,
+  Usuario: '',
+  IdTipoUsuario: 1,
+  CambiarContrasena: false,
+  IdDivision: 100,
+  TipoUsuario: {
+    IdTipo: 1,
+    TipoUsuario: 'Administrador',
+  },
+  Division: {
+    IdDivision: 100,
+    Division: 'OFICINA CENTRAL DE LA CADENA',
+  },
+  Token: '',
+  RefreshToken: '',
+};
+
 export enum ETipoUsuarios {
   'Administrador' = 1,
   'Usuario' = 2,

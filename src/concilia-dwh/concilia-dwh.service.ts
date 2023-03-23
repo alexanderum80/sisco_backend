@@ -31,12 +31,14 @@ export class ConciliaDwhService {
       const { idDivision, idCentro, annio, periodo, tipoCentro, ventasAcumuladas } = conciliaDWHInput;
 
       // obtener listado de las divisiones
-      const _divisionesQuery =
-        idCentro === 100 && tipoCentro === 1 ? await this._divisionesService.getDivisionesActivas() : await this._divisionesService.getDivisionById(idDivision);
-      if (!_divisionesQuery.success) {
-        throw new Error(_divisionesQuery.error);
-      }
-      const _divisiones = _divisionesQuery.data;
+      const _divisiones =
+        idCentro === 100 && tipoCentro === 1
+          ? await this._divisionesService.getDivisionesActivas().catch(err => {
+              throw new Error(err);
+            })
+          : await this._divisionesService.getDivisionById(idDivision).catch(err => {
+              throw new Error(err);
+            });
 
       for (let i = 0; i < _divisiones.length; i++) {
         const divisionInfo = _divisiones[i];
