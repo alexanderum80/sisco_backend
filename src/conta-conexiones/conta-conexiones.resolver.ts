@@ -6,7 +6,7 @@ import { ContaConexionesEntity } from './conta-conexiones.entity';
 import { Args, Mutation, Query, Resolver, Int, Context } from '@nestjs/graphql';
 import { ContaConexionQueryResponse, ContaConexionesQueryResponse, ContaConexionInput, EntidadesRodas } from './conta-conexiones.model';
 import { UseGuards } from '@nestjs/common';
-import { AuthGuard } from '../shared/helpers/auth.guard';
+import { AuthGuard } from '../shared/guards/auth.guard';
 
 @Resolver(() => ContaConexionesEntity)
 export class ContaConexionesResolver {

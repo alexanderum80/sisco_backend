@@ -1,6 +1,6 @@
 import { DEFAULT_GRAPHQL_CONTEXT } from './../shared/models/jwt.model';
 import { Usuarios } from './../usuarios/usuarios.entity';
-import { AuthGuard } from './../shared/helpers/auth.guard';
+import { AuthGuard } from '../shared/guards/auth.guard';
 import { UseGuards } from '@nestjs/common';
 import { Args, Context, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { MutationResponse } from './../shared/models/mutation.response.model';

@@ -1,7 +1,7 @@
 import { DEFAULT_GRAPHQL_CONTEXT } from './../shared/models/jwt.model';
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { Usuarios } from './../usuarios/usuarios.entity';
-import { AuthGuard } from './../shared/helpers/auth.guard';
+import { AuthGuard } from '../shared/guards/auth.guard';
 import { Resolver, Query, Mutation, Args, Int, Context } from '@nestjs/graphql';
 import { ContaComprobarValoresService } from './conta-comprobar-valores.service';
 import { ComprobarValoresEntity } from './conta-comprobar-valores.entity';

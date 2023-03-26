@@ -23,8 +23,8 @@ import {
   queryReporteValores,
   IniciarSaldosInput,
   ChequearCentrosInput,
-  queryInsertClasificadorRodas,
-  queryInsertCriterioConsolidacionRodas,
+  // queryInsertClasificadorRodas,
+  // queryInsertCriterioConsolidacionRodas,
   queryUpdateCriterioClasificadorRodas,
   queryUpdateClasificadorRodas,
 } from './concilia-conta.model';
@@ -548,6 +548,29 @@ export class ConciliaContaService {
     }
   }
 
+  private async _arreglaAsientos(bdConta: DataSource): Promise<void> {
+    const _querysArray = [
+      `UPDATE contabilidad.asientos
+      SET analisis_1 = case when tipo_analisis_1 is null then null else analisis_1 end,
+        analisis_2 = case when tipo_analisis_2 is null then null else analisis_2 end,
+        analisis_3 = case when tipo_analisis_3 is null then null else analisis_3 end,
+        analisis_4 = case when tipo_analisis_4 is null then null else analisis_4 end,
+        analisis_5 = case when tipo_analisis_5 is null then NULL else analisis_5 end;`,
+    ];
+
+    for (let index = 0; index < _querysArray.length; index++) {
+      const _query = _querysArray[index];
+
+      await bdConta.query(_query).catch(err => {
+        throw new Error(err);
+      });
+    }
+
+    return new Promise<void>(async resolve => {
+      resolve();
+    });
+  }
+
   async iniciarSaldos(user: Usuarios, iniciarSaldosInput: IniciarSaldosInput): Promise<boolean> {
     try {
       const { idCentro, consolidado, annio } = iniciarSaldosInput;
@@ -605,31 +628,7 @@ export class ConciliaContaService {
       for (let index = 0; index < _clasifCuentasReal.length; index++) {
         const _clasif = _clasifCuentasReal[index];
 
-        // inserto la cuenta, si no existe
-        const _queryInsertCC = queryInsertClasificadorRodas
-          .replace(/@Anio/g, annio)
-          .replace(/@Cta/g, _clasif.Cuenta)
-          .replace(/@SubCta/g, _clasif.SubCuenta)
-          .replace(/@Nombre/g, _clasif.Nombre)
-          .replace(/@Nat/g, _clasif.Naturaleza)
-          .replace(/@An1/g, _clasif.Tipo_Analisis_1 ? `'${_clasif.Tipo_Analisis_1}'` : `null`)
-          .replace(/@An2/g, _clasif.Tipo_Analisis_2 ? `'${_clasif.Tipo_Analisis_2}'` : `null`)
-          .replace(/@An3/g, _clasif.Tipo_Analisis_3 ? `'${_clasif.Tipo_Analisis_3}'` : `null`)
-          .replace(/@An4/g, _clasif.Tipo_Analisis_4 ? `'${_clasif.Tipo_Analisis_4}'` : `null`)
-          .replace(/@An5/g, _clasif.Tipo_Analisis_5 ? `'${_clasif.Tipo_Analisis_5}'` : `null`)
-          .replace(/@Obl/g, _clasif.Obligacion ? 'true' : 'false')
-          .replace(/@Grupo/g, _clasif.Grupo)
-          .replace(/@Clase/g, _clasif.Clase)
-          .replace(/@Categ/g, _clasif.Categoria)
-          .replace(/@Clasif/g, _clasif.Clasificacion)
-          .replace(/@Tipo/g, _clasif.Tipo)
-          .replace(/@Estado/g, _clasif.Estado);
-
-        await bdConta.query(_queryInsertCC).catch(err => {
-          throw new Error(err);
-        });
-
-        // actualizo la cuenta, si existe
+        // inserto o actualizo la cuenta
         const _queryUpdateCC = queryUpdateClasificadorRodas
           .replace(/@Anio/g, annio)
           .replace(/@Cta/g, _clasif.Cuenta)
@@ -653,27 +652,7 @@ export class ConciliaContaService {
           throw new Error(err);
         });
 
-        // inserto los criterios de consolidacion, si no existen
-        const _queryInsertCons = queryInsertCriterioConsolidacionRodas
-          .replace(/@Anio/g, annio)
-          .replace(/@Cta/g, _clasif.Cuenta)
-          .replace(/@SubCta/g, _clasif.SubCuenta)
-          .replace(/@TipoAn1Cons/g, _clasif.Tipo_Analisis_1_Cons ? `'${_clasif.Tipo_Analisis_1_Cons}'` : `null`)
-          .replace(/@TipoAn2Cons/g, _clasif.Tipo_Analisis_2_Cons ? `'${_clasif.Tipo_Analisis_2_Cons}'` : `null`)
-          .replace(/@TipoAn3Cons/g, _clasif.Tipo_Analisis_3_Cons ? `'${_clasif.Tipo_Analisis_3_Cons}'` : `null`)
-          .replace(/@TipoAn4Cons/g, _clasif.Tipo_Analisis_4_Cons ? `'${_clasif.Tipo_Analisis_4_Cons}'` : `null`)
-          .replace(/@TipoAn5Cons/g, _clasif.Tipo_Analisis_5_Cons ? `'${_clasif.Tipo_Analisis_5_Cons}'` : `null`)
-          .replace(/@An1Cons/g, _clasif.Tipo_Analisis_1_Cons === '@' ? idUnidad.toString() : `null`)
-          .replace(/@An2Cons/g, _clasif.Tipo_Analisis_2_Cons === '@' ? idUnidad.toString() : `null`)
-          .replace(/@An3Cons/g, _clasif.Tipo_Analisis_3_Cons === '@' ? idUnidad.toString() : `null`)
-          .replace(/@An4Cons/g, _clasif.Tipo_Analisis_4_Cons === '@' ? idUnidad.toString() : `null`)
-          .replace(/@An5Cons/g, _clasif.Tipo_Analisis_5_Cons === '@' ? idUnidad.toString() : `null`);
-
-        await bdConta.query(_queryInsertCons).catch(err => {
-          throw new Error(err);
-        });
-
-        // inserto los criterios de consolidacion, si no existen
+        // inserto o modifico los criterios de consolidación
         const _queryUpdateCons = queryUpdateCriterioClasificadorRodas
           .replace(/@Cta/g, _clasif.Cuenta)
           .replace(/@SubCta/g, _clasif.SubCuenta)
@@ -692,6 +671,11 @@ export class ConciliaContaService {
           throw new Error(err);
         });
       }
+
+      // arregla Codificadores del Rodas
+      await this._arreglaCodificadoresRodas(bdConta).catch(err => {
+        throw new Error(err);
+      });
 
       return new Promise<boolean>(resolve => {
         this._logsSvc
@@ -715,15 +699,11 @@ export class ConciliaContaService {
     }
   }
 
-  private async _arreglaAsientos(bdConta: DataSource): Promise<void> {
+  private async _arreglaCodificadoresRodas(bdConta: DataSource): Promise<void> {
     const _querysArray = [
-      `UPDATE contabilidad.asientos
-      SET analisis_1 = case when tipo_analisis_1 is null then null else analisis_1 end,
-        analisis_2 = case when tipo_analisis_2 is null then null else analisis_2 end,
-        analisis_3 = case when tipo_analisis_3 is null then null else analisis_3 end,
-        analisis_4 = case when tipo_analisis_4 is null then null else analisis_4 end,
-        analisis_5 = case when tipo_analisis_5 is null then NULL else analisis_5 end
-      WHERE anno_comprobante = 2023;`,
+      `UPDATE contabilidad.tipos_analisis
+      set nemo = 'SUBELE'
+      WHERE codigo = 'L';`,
     ];
 
     for (let index = 0; index < _querysArray.length; index++) {

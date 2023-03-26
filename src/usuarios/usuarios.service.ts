@@ -1,4 +1,4 @@
-import { SECRET_KEY, SECRET_REFRESH } from './../shared/models/jwt.model';
+import { SECRET_KEY, SECRET_REFRESH, JWT_EXPIRES_IN, JWT_REFRESH_EXPIRES_IN } from './../shared/models/jwt.model';
 import { GraphQLErrorOptions } from 'graphql';
 import { GraphQLError } from 'graphql';
 import { MutationResponse } from './../shared/models/mutation.response.model';
@@ -112,7 +112,7 @@ export class UsuariosService {
     return jwt.sign(
       userInfo,
       SECRET_REFRESH,
-      // { expiresIn: JWT_EXPIRES_IN }
+      // { expiresIn: REFRESH_TOKEN_EXPIRES_IN }
     );
   }
 

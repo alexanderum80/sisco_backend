@@ -4,7 +4,7 @@ import { UsuariosService } from './usuarios.service';
 import { Resolver, Query, Args, Int, Mutation } from '@nestjs/graphql';
 import { Usuarios } from './usuarios.entity';
 import { UseGuards } from '@nestjs/common';
-import { AuthGuard } from '../shared/helpers/auth.guard';
+import { AuthGuard } from '../shared/guards/auth.guard';
 
 @Resolver(() => Usuarios)
 export class UsuariosResolver {

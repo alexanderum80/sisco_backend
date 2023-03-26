@@ -4,7 +4,7 @@ import { DivisionesService } from './divisiones.service';
 import { DivisionesEntity } from './divisiones.entity';
 import { Resolver, Query, Args, Int, Context } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
-import { AuthGuard } from '../shared/helpers/auth.guard';
+import { AuthGuard } from '../shared/guards/auth.guard';
 
 @Resolver(() => DivisionesEntity)
 export class DivisionesResolver {

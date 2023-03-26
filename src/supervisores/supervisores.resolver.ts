@@ -5,7 +5,7 @@ import { SupervisoresService } from './supervisores.service';
 import { Supervisor } from './supervisores.entity';
 import { Args, Context, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
-import { AuthGuard } from './../shared/helpers/auth.guard';
+import { AuthGuard } from '../shared/guards/auth.guard';
 
 @Resolver(() => Supervisor)
 export class SupervisoresResolver {

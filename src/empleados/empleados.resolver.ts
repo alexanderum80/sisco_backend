@@ -6,7 +6,7 @@ import { EmpleadosService } from './empleados.service';
 import { Empleado } from './empleados.entity';
 import { Args, Query, Resolver, Int, Mutation, Context } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
-import { AuthGuard } from './../shared/helpers/auth.guard';
+import { AuthGuard } from '../shared/guards/auth.guard';
 
 @Resolver(() => Empleado)
 export class EmpleadosResolver {
