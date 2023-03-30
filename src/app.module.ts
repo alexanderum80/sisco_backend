@@ -50,7 +50,6 @@ import { ConciliaExternaEntreUnidadesModule } from './concilia-externa-entre-uni
 import { ConciliaExternaChatsModule } from './concilia-externa-chats/concilia-externa-chats.module';
 import { ConciliaExternaDatosConciliacionModule } from './concilia-externa-datos-conciliacion/concilia-externa-datos-conciliacion.module';
 import { LogsModule } from './logs/logs.module';
-import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -85,7 +84,6 @@ import { ScheduleModule } from '@nestjs/schedule';
         },
       },
     }),
-    ScheduleModule.forRoot(),
 
     SharedModule,
     UsuariosModule,

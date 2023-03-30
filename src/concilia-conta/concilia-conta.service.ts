@@ -205,7 +205,7 @@ export class ConciliaContaService {
       await this._chequeaDatosAdulterados(idUnidad, contaConexion);
 
       // arregla asientos
-      await this._arreglaAsientos(contaConexion).catch(err => {
+      await this._arreglaAsientosRodas(contaConexion).catch(err => {
         throw new Error(err);
       });
 
@@ -548,29 +548,6 @@ export class ConciliaContaService {
     }
   }
 
-  private async _arreglaAsientos(bdConta: DataSource): Promise<void> {
-    const _querysArray = [
-      `UPDATE contabilidad.asientos
-      SET analisis_1 = case when tipo_analisis_1 is null then null else analisis_1 end,
-        analisis_2 = case when tipo_analisis_2 is null then null else analisis_2 end,
-        analisis_3 = case when tipo_analisis_3 is null then null else analisis_3 end,
-        analisis_4 = case when tipo_analisis_4 is null then null else analisis_4 end,
-        analisis_5 = case when tipo_analisis_5 is null then NULL else analisis_5 end;`,
-    ];
-
-    for (let index = 0; index < _querysArray.length; index++) {
-      const _query = _querysArray[index];
-
-      await bdConta.query(_query).catch(err => {
-        throw new Error(err);
-      });
-    }
-
-    return new Promise<void>(async resolve => {
-      resolve();
-    });
-  }
-
   async iniciarSaldos(user: Usuarios, iniciarSaldosInput: IniciarSaldosInput): Promise<boolean> {
     try {
       const { idCentro, consolidado, annio } = iniciarSaldosInput;
@@ -677,6 +654,11 @@ export class ConciliaContaService {
         throw new Error(err);
       });
 
+      // arregla asientos del Rodas
+      await this._arreglaAsientosRodas(bdConta).catch(err => {
+        throw new Error(err);
+      });
+
       return new Promise<boolean>(resolve => {
         this._logsSvc
           .insert(
@@ -704,6 +686,41 @@ export class ConciliaContaService {
       `UPDATE contabilidad.tipos_analisis
       set nemo = 'SUBELE'
       WHERE codigo = 'L';`,
+    ];
+
+    for (let index = 0; index < _querysArray.length; index++) {
+      const _query = _querysArray[index];
+
+      await bdConta.query(_query).catch(err => {
+        throw new Error(err);
+      });
+    }
+
+    return new Promise<void>(async resolve => {
+      resolve();
+    });
+  }
+
+  private async _arreglaAsientosRodas(bdConta: DataSource): Promise<void> {
+    const _querysArray = [
+      // insertar un trabajador en la cuenta 350/0060 cuando el análisis estuviera en NULL
+      `UPDATE contabilidad.asientos
+        SET analisis_1 = CASE WHEN tipo_analisis_1 = 'N' AND analisis_1 IS NULL THEN
+            (SELECT codigo FROM contabilidad.analisis WHERE anno = 2023 and tipo = 'N' LIMIT 1)
+          ELSE
+            analisis_1
+          END,
+        analisis_2 = CASE WHEN tipo_analisis_2 = 'N' AND analisis_2 IS NULL THEN
+            (SELECT codigo FROM contabilidad.analisis WHERE anno = 2023 and tipo = 'N' LIMIT 1)
+          ELSE
+            analisis_2
+          END,
+        analisis_3 = CASE WHEN tipo_analisis_3 = 'N' AND analisis_3 IS NULL THEN
+            (SELECT codigo FROM contabilidad.analisis WHERE anno = 2023 and tipo = 'N' LIMIT 1)
+          ELSE
+            analisis_3
+          END
+      WHERE cuenta = '350' and subcuenta = '0060'`,
     ];
 
     for (let index = 0; index < _querysArray.length; index++) {

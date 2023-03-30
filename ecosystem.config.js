@@ -4,10 +4,11 @@ module.exports = {
     script: 'main.js',
 
     // Options reference: https://pm2.io/doc/en/runtime/reference/ecosystem-file/
-    args: 'one two',
+	node_args: '--max-old-space-size=2048 --trace-warnings',
     autorestart: true,
     watch: false,
-    max_memory_restart: '1G',
+    instances: "max",
+    exec_mode: "cluster",
     env: {
       NODE_ENV: 'development'
     },
