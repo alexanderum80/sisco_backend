@@ -1,0 +1,8 @@
+export const DATASOURCE = {
+  HOST_NAME: 'localhost',
+  DATABASE_NAME: 'SISCO_WEB',
+  USER_NAME: 'sa',
+  PASSWORD: 'trd.2010',
+  CONNECTION_TIMEOUT: '6000',
+  REQUEST_TIMEOUT: '0',
+};

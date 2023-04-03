@@ -136,12 +136,16 @@ export const queryReporteValores = `SELECT Centro, Periodo, Consolidado, Expresi
     WHERE (Centro = @Centro) AND (ISNULL(Consolidado, 0) = @Consolidado) AND (Anno = @Anio) AND (Periodo = @Periodo) AND (IdDivision = @IdDivision)`;
 
 // query para actualizar el clasificador de cuentas en el rodas
-export const queryUpdateClasificadorRodas = `INSERT INTO contabilidad.cuentas(anno, cuenta, subcuenta, nombre, naturaleza, tipo_analisis_1, tipo_analisis_2, tipo_analisis_3, tipo_analisis_4, tipo_analisis_5, obligacion, grupo, clase, categoria, clasificacion, tipo, estado)
-  SELECT @Anio, '@Cta', '@SubCta', '@Nombre', '@Nat', @An1, @An2, @An3, @An4, @An5, @Obl, '@Grupo', '@Clase', '@Categ', '@Clasif', '@Tipo', '@Estado' 
-  ON CONFLICT ON CONSTRAINT cuentas_pk DO
-  UPDATE 
-  SET anno = EXCLUDED.anno, cuenta = EXCLUDED.cuenta, subcuenta = EXCLUDED.subcuenta, nombre = EXCLUDED.nombre, naturaleza = EXCLUDED.naturaleza, tipo_analisis_1 = EXCLUDED.tipo_analisis_1, tipo_analisis_2 = EXCLUDED.tipo_analisis_2, tipo_analisis_3 = EXCLUDED.tipo_analisis_3, tipo_analisis_4 = EXCLUDED.tipo_analisis_4, tipo_analisis_5 = EXCLUDED.tipo_analisis_5,
-    obligacion = EXCLUDED.obligacion, grupo = EXCLUDED.grupo, clase = EXCLUDED.clase, categoria = EXCLUDED.categoria, clasificacion = EXCLUDED.clasificacion, tipo = EXCLUDED.tipo, estado = EXCLUDED.estado`;
+export const queryUpdateClasificadorRodas = `WITH updclas as (
+  UPDATE contabilidad.cuentas
+    SET anno = @Anio, cuenta = '@Cta', subcuenta = '@SubCta', nombre = '@Nombre', naturaleza = '@Nat', tipo_analisis_1 = @An1, tipo_analisis_2 = @An2, tipo_analisis_3 = @An3, tipo_analisis_4 = @An4, tipo_analisis_5 = @An5,
+      obligacion = '@Obl', grupo = '@Grupo', clase = '@Clase', categoria = '@Categ', clasificacion = '@Clasif', tipo = '@Tipo', estado = '@Estado'
+    WHERE anno = @Anio AND cuenta = '@Cta' AND subcuenta = '@SubCta'
+  RETURNING *)	
+  INSERT INTO contabilidad.cuentas(
+      anno, cuenta, subcuenta, nombre, naturaleza, tipo_analisis_1, tipo_analisis_2, tipo_analisis_3, tipo_analisis_4, tipo_analisis_5, obligacion, grupo, clase, categoria, clasificacion, tipo, estado)
+    SELECT @Anio, '@Cta', '@SubCta', '@Nombre', '@Nat', @An1, @An2, @An3, @An4, @An5, @Obl, '@Grupo', '@Clase', '@Categ', '@Clasif', '@Tipo', '@Estado' 
+    WHERE NOT EXISTS (select * from updclas)`;
 
 export const queryUpdateCriterioClasificadorRodas = `WITH updversus as (
 	  UPDATE contabilidad.cuentas_versus

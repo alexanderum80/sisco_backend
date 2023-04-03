@@ -703,24 +703,36 @@ export class ConciliaContaService {
 
   private async _arreglaAsientosRodas(bdConta: DataSource): Promise<void> {
     const _querysArray = [
-      // insertar un trabajador en la cuenta 350/0060 cuando el análisis estuviera en NULL
+      // elimino los criterios que sobran en los asientos
       `UPDATE contabilidad.asientos
-        SET analisis_1 = CASE WHEN tipo_analisis_1 = 'N' AND analisis_1 IS NULL THEN
-            (SELECT codigo FROM contabilidad.analisis WHERE anno = 2023 and tipo = 'N' LIMIT 1)
-          ELSE
-            analisis_1
-          END,
-        analisis_2 = CASE WHEN tipo_analisis_2 = 'N' AND analisis_2 IS NULL THEN
-            (SELECT codigo FROM contabilidad.analisis WHERE anno = 2023 and tipo = 'N' LIMIT 1)
-          ELSE
-            analisis_2
-          END,
-        analisis_3 = CASE WHEN tipo_analisis_3 = 'N' AND analisis_3 IS NULL THEN
-            (SELECT codigo FROM contabilidad.analisis WHERE anno = 2023 and tipo = 'N' LIMIT 1)
-          ELSE
-            analisis_3
-          END
-      WHERE cuenta = '350' and subcuenta = '0060'`,
+      SET analisis_1 = case when tipo_analisis_1 is null then null else analisis_1 end,
+          analisis_2 = case when tipo_analisis_2 is null then null else analisis_2 end,
+          analisis_3 = case when tipo_analisis_3 is null then null else analisis_3 end,
+          analisis_4 = case when tipo_analisis_4 is null then null else analisis_4 end,
+          analisis_5 = case when tipo_analisis_5 is null then NULL else analisis_5 end;`,
+      // insertar un trabajador en la cuenta 350/0060 cuando el análisis estuviera en NULL
+      `UPDATE contabilidad.asientos as a
+      SET tipo_analisis_1 = c.tipo_analisis_1,
+          analisis_1 = CASE WHEN c.tipo_analisis_1 = 'N' AND analisis_1 IS NULL THEN
+          (SELECT codigo FROM contabilidad.analisis WHERE anno = 2023 and tipo = 'N' LIMIT 1)
+        ELSE
+          analisis_1
+        END,
+      tipo_analisis_2 = c.tipo_analisis_2,
+      analisis_2 = CASE WHEN c.tipo_analisis_2 = 'N' AND analisis_2 IS NULL THEN
+          (SELECT codigo FROM contabilidad.analisis WHERE anno = 2023 and tipo = 'N' LIMIT 1)
+        ELSE
+          analisis_2
+        END,
+      tipo_analisis_3 = c.tipo_analisis_3,
+      analisis_3 = CASE WHEN c.tipo_analisis_3 = 'N' AND analisis_3 IS NULL THEN
+          (SELECT codigo FROM contabilidad.analisis WHERE anno = 2023 and tipo = 'N' LIMIT 1)
+        ELSE
+          analisis_3
+        END
+      from contabilidad.cuentas as c 
+      WHERE a.anno_comprobante = c.anno and a.cuenta = c.cuenta and a.subcuenta = c.subcuenta 
+        and c.anno = 2023 and c.cuenta = '350' and c.subcuenta = '0060';`,
     ];
 
     for (let index = 0; index < _querysArray.length; index++) {

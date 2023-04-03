@@ -1,3 +1,4 @@
+import { DATASOURCE } from './datasource';
 import { ContaGrupoCuentaModule } from './conta-grupo-cuenta/conta-grupo-cuenta.module';
 import { ContaCategoriaCuentaModule } from './conta-categoria-cuenta/conta-categoria-cuenta.module';
 import { ContaClaseCuentaModule } from './conta-clase-cuenta/conta-clase-cuenta.module';
@@ -68,14 +69,19 @@ import { LogsModule } from './logs/logs.module';
     }),
     TypeOrmModule.forRoot({
       type: 'mssql',
-      host: process.env.HOST_NAME,
-      username: process.env.USER_NAME,
-      password: process.env.PASSWORD,
-      database: process.env.DATABASE_NAME,
-      connectionTimeout: parseInt(process.env.CONNECTION_TIMEOUT),
-      requestTimeout: parseInt(process.env.REQUEST_TIMEOUT),
+      host: DATASOURCE.HOST_NAME,
+      username: DATASOURCE.USER_NAME,
+      password: DATASOURCE.PASSWORD,
+      database: DATASOURCE.DATABASE_NAME,
+      connectionTimeout: parseInt(DATASOURCE.CONNECTION_TIMEOUT),
+      requestTimeout: parseInt(DATASOURCE.REQUEST_TIMEOUT),
       entities: ['**/*.entity.js'],
       synchronize: false,
+      pool: {
+        max: 10,
+        min: 0,
+        idleTimeoutMillis: 30000,
+      },
       options: {
         appName: 'SISCO',
         enableArithAbort: true,
