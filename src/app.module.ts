@@ -78,9 +78,8 @@ import { LogsModule } from './logs/logs.module';
       entities: ['**/*.entity.js'],
       synchronize: false,
       pool: {
-        max: 10,
-        min: 0,
-        idleTimeoutMillis: 30000,
+        max: 20,
+        idleTimeoutMillis: 60000,
       },
       options: {
         appName: 'SISCO',
