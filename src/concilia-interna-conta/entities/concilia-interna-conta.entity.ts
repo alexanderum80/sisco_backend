@@ -12,19 +12,19 @@ export class ConciliaInternaConta {
   Periodo: string;
 
   @Field()
+  Tipo: string;
+
+  @Field()
+  Emisor: string;
+
+  @Field()
+  Receptor: string;
+
+  @Field()
   CuentaE: string;
 
   @Field()
   SubCuentaE: string;
-
-  @Field()
-  TipoE: string;
-
-  @Field()
-  EmisorE: string;
-
-  @Field()
-  ReceptorE: string;
 
   @Field()
   ValorE: number;
@@ -37,15 +37,6 @@ export class ConciliaInternaConta {
 
   @Field()
   SubCuentaR: string;
-
-  @Field()
-  TipoR: string;
-
-  @Field()
-  EmisorR: string;
-
-  @Field()
-  ReceptorR: string;
 
   @Field()
   ValorR: number;

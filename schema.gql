@@ -757,18 +757,15 @@ type ConciliaInternaConta {
   Division: String!
   Annio: String!
   Periodo: String!
+  Tipo: String!
+  Emisor: String!
+  Receptor: String!
   CuentaE: String!
   SubCuentaE: String!
-  TipoE: String!
-  EmisorE: String!
-  ReceptorE: String!
   ValorE: Float!
   Operador: String!
   CuentaR: String!
   SubCuentaR: String!
-  TipoR: String!
-  EmisorR: String!
-  ReceptorR: String!
   ValorR: Float!
   Diferencia: Float!
 }
