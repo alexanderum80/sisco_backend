@@ -5,10 +5,10 @@ import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 @Entity('Divisiones')
 export class DivisionesEntity {
   @Field()
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ name: 'id_division' })
   IdDivision: number;
 
   @Field()
-  @Column()
+  @Column({ name: 'division' })
   Division: string;
 }

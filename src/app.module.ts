@@ -68,26 +68,15 @@ import { LogsModule } from './logs/logs.module';
       },
     }),
     TypeOrmModule.forRoot({
-      type: 'mssql',
+      type: 'postgres',
       host: DATASOURCE.HOST_NAME,
       username: DATASOURCE.USER_NAME,
       password: DATASOURCE.PASSWORD,
       database: DATASOURCE.DATABASE_NAME,
-      connectionTimeout: parseInt(DATASOURCE.CONNECTION_TIMEOUT),
-      requestTimeout: parseInt(DATASOURCE.REQUEST_TIMEOUT),
+      connectTimeoutMS: parseInt(DATASOURCE.CONNECTION_TIMEOUT),
+      maxQueryExecutionTime: parseInt(DATASOURCE.REQUEST_TIMEOUT),
       entities: ['**/*.entity.js'],
       synchronize: false,
-      pool: {
-        max: 20,
-        idleTimeoutMillis: 60000,
-      },
-      options: {
-        appName: 'SISCO',
-        enableArithAbort: true,
-        cryptoCredentialsDetails: {
-          minVersion: 'TLSv1',
-        },
-      },
     }),
 
     SharedModule,

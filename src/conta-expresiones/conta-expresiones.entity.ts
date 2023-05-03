@@ -45,31 +45,31 @@ export class ExpresionesDetalleEntity {
   IdExpresion: number;
 
   @Field({ nullable: true })
-  @Column({ type: 'nvarchar', length: 3 })
+  @Column({ type: 'varchar', length: 3 })
   Centro: string;
 
   @Field({ nullable: true })
-  @Column({ type: 'nvarchar', length: 8 })
+  @Column({ type: 'varchar', length: 8 })
   Cta: string;
 
   @Field({ nullable: true })
-  @Column({ type: 'nvarchar', length: 8 })
+  @Column({ type: 'varchar', length: 8 })
   SubCta: string;
 
   @Field({ nullable: true })
-  @Column({ type: 'nvarchar', length: 10 })
+  @Column({ type: 'varchar', length: 10 })
   Crit1: string;
 
   @Field({ nullable: true })
-  @Column({ type: 'nvarchar', length: 10 })
+  @Column({ type: 'varchar', length: 10 })
   Crit2: string;
 
   @Field({ nullable: true })
-  @Column({ type: 'nvarchar', length: 10 })
+  @Column({ type: 'varchar', length: 10 })
   Crit3: string;
 
   @Field()
-  @Column({ type: 'nvarchar', length: 1 })
+  @Column({ type: 'varchar', length: 1 })
   Signo: string;
 
   @Field()

@@ -4,22 +4,22 @@ import { ObjectType, Field } from '@nestjs/graphql';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 
 @ObjectType()
-@Entity()
+@Entity('usuarios')
 export class Usuarios {
   @Field()
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ name: 'id_usuario' })
   IdUsuario: number;
 
   @Field()
-  @Column()
+  @Column({ name: 'usuario' })
   Usuario: string;
 
   @Field()
-  @Column()
+  @Column({ name: 'contrasena' })
   Contrasena?: string;
 
   @Field()
-  @Column()
+  @Column({ name: 'id_tipo_usuario' })
   IdTipoUsuario: number;
 
   @Field(() => TipoUsuarios)
@@ -28,11 +28,11 @@ export class Usuarios {
   TipoUsuario?: TipoUsuarios;
 
   @Field()
-  @Column()
+  @Column({ name: 'cambiar_contrasena' })
   CambiarContrasena: boolean;
 
   @Field()
-  @Column()
+  @Column({ name: 'id_division' })
   IdDivision: number;
 
   @Field(() => DivisionesEntity)

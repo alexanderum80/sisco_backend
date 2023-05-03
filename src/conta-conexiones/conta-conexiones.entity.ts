@@ -41,6 +41,6 @@ export class ContaConexionesEntity {
   BaseDatos: string;
 
   @Field({ nullable: true })
-  @Column('datetime')
+  @Column('timestamp')
   FechaActualizacion?: Date;
 }

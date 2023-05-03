@@ -13,7 +13,7 @@ export class ActFijosClasificadorSubgrupoEntity {
   Codigo: number;
 
   @Field()
-  @Column('nvarchar', { name: 'Descripcion', length: 64 })
+  @Column('varchar', { name: 'Descripcion', length: 64 })
   Descripcion: string;
 
   @Field(() => Float)
