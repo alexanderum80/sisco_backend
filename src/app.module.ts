@@ -78,7 +78,7 @@ import { LogsModule } from './logs/logs.module';
       entities: ['**/*.entity.js'],
       synchronize: false,
       pool: {
-        max: 20,
+        max: 200,
         idleTimeoutMillis: 60000,
       },
       options: {
