@@ -1,6 +1,6 @@
 import { LogsService } from './../logs/logs.service';
 import { ContaConexionesEntity } from './../conta-conexiones/conta-conexiones.entity';
-import { reject, toNumber } from 'lodash';
+import { toNumber } from 'lodash';
 import { Usuarios } from './../usuarios/usuarios.entity';
 import { ETipoClasificadorCuenta } from './../clasificador-cuenta/clasificador-cuenta.model';
 import { ClasificadorCuentaService } from './../clasificador-cuenta/clasificador-cuenta.service';
@@ -10,7 +10,6 @@ import { ContaConexionesService } from './../conta-conexiones/conta-conexiones.s
 import { Injectable } from '@nestjs/common';
 import {
   queryUltimoPeriodo,
-  queryComprobantesRodas,
   queryAsientoRodas,
   queryRangoAsientosMesRodas,
   querySaldosAcumuladosRodas,
@@ -27,6 +26,7 @@ import {
   // queryInsertCriterioConsolidacionRodas,
   queryUpdateCriterioClasificadorRodas,
   queryUpdateClasificadorRodas,
+  queryObligacionesRodas,
 } from './concilia-conta.model';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
@@ -217,11 +217,11 @@ export class ConciliaContaService {
       const _periodoInicial = _ultimoPeriodo < periodo ? _ultimoPeriodo : periodo;
 
       for (let per = _periodoInicial; per <= periodo; per++) {
-        // importar los comprobantes
-        await this._importarComprobantes(idUnidad, annio, per, cons, contaConexion);
-
         // importar los asientos
         await this._importarAsientos(idUnidad, annio, per, cons, contaConexion);
+
+        // importar las obligaciones
+        await this._importarObligaciones(idUnidad, annio, per, cons, contaConexion);
       }
 
       // cierro la conexión al Rodas del Centro
@@ -321,26 +321,6 @@ export class ConciliaContaService {
       });
   }
 
-  private async _importarComprobantes(idUnidad: number, annio: number, periodo: number, cons: string, rodasConexion: DataSource): Promise<void> {
-    const _queryComprobantes = queryComprobantesRodas.replace(/@anno/g, annio.toString()).replace(/@periodo/g, periodo.toString());
-    const _queryCompRes = await rodasConexion
-      .query(_queryComprobantes)
-      .then(result => {
-        return result;
-      })
-      .catch(err => {
-        throw new Error(err.message || err);
-      });
-
-    if (_queryCompRes.length) {
-      const _comprobantes = this._xmlJsService.jsonToXML('Comprobantes', _queryCompRes);
-
-      await this.dataSource.query(`EXEC dbo.pConta_ImportComprobanteXML @0, @1, @2, @3, @4`, [_comprobantes, idUnidad, cons, annio, periodo]).catch(err => {
-        throw new Error(err.message || err);
-      });
-    }
-  }
-
   private async _importarAsientos(idUnidad: number, annio: number, periodo: number, cons: string, rodasConexion: DataSource): Promise<void> {
     const _queryAsientos = queryAsientoRodas.replace(/@anno/g, annio.toString()).replace(/@periodo/g, periodo.toString());
 
@@ -357,6 +337,27 @@ export class ConciliaContaService {
       const _asientos = this._xmlJsService.jsonToXML('Asiento', _queryAsientosRes);
 
       await this.dataSource.query(`EXEC dbo.pConta_ImportAsientoXML @0, @1, @2, @3, @4`, [_asientos, idUnidad, cons, annio, periodo]).catch(err => {
+        throw new Error(err.message || err);
+      });
+    }
+  }
+
+  private async _importarObligaciones(idUnidad: number, annio: number, periodo: number, cons: string, rodasConexion: DataSource): Promise<void> {
+    const _queryAsientos = queryObligacionesRodas.replace(/@anno/g, annio.toString()).replace(/@periodo/g, periodo.toString());
+
+    const _queryAsientosRes = await rodasConexion
+      .query(_queryAsientos)
+      .then(result => {
+        return result;
+      })
+      .catch(err => {
+        throw new Error(err.message || err);
+      });
+
+    if (_queryAsientosRes.length) {
+      const _obl = this._xmlJsService.jsonToXML('Obligaciones', _queryAsientosRes);
+
+      await this.dataSource.query(`EXEC dbo.pConta_ImportObligacionesXML @0, @1, @2, @3, @4`, [_obl, idUnidad, cons, annio, periodo]).catch(err => {
         throw new Error(err.message || err);
       });
     }
@@ -552,17 +553,17 @@ export class ConciliaContaService {
     try {
       const { idCentro, consolidado, annio } = iniciarSaldosInput;
 
-      return new Promise<boolean>(resolve => {
+      return new Promise<boolean>((resolve, reject) => {
         this.dataSource
           .query(`EXEC dbo.pConta_InicializarDatos @0, @1, @2`, [idCentro, consolidado, annio])
-          .then(() => {
-            this._logsSvc
+          .then(async () => {
+            await this._logsSvc
               .insert(idCentro, consolidado, `Iniciar Saldo (${annio})`, user.Usuario)
               .then(() => {
                 resolve(true);
               })
               .catch(err => {
-                reject(err);
+                reject(err.message || err);
               });
           })
           .catch(err => {
@@ -659,7 +660,7 @@ export class ConciliaContaService {
         throw new Error(err);
       });
 
-      return new Promise<boolean>(resolve => {
+      return new Promise<boolean>((resolve, reject) => {
         this._logsSvc
           .insert(
             idUnidad,

@@ -92,7 +92,7 @@ export class ChequearCentrosInput {
 
 // utilitarios para el rodas
 export const queryUltimoPeriodo = `SELECT ISNULL(MAX(Periodo), -1) as Periodo 
-    FROM dbo.Conta_Comprobantes
+    FROM dbo.Conta_Asiento
     WHERE Centro = @Centro and isnull(Consolidado, 0) = @Cons and Anno = @Anio`;
 
 export const queryRangoAsientosMesRodas = `SELECT periodo, min(id) as ini, max(id) as fin
@@ -107,14 +107,20 @@ export const queryClasificadorCuentasRodas = `SELECT anno, cuenta, subcuenta, no
     where anno = @anno
     order by anno asc, cuenta asc, subcuenta asc`;
 
-export const queryComprobantesRodas = `SELECT anno, tipo, numero, periodo, estado, descripcion, to_char(fecha_hora, 'YYYY/MM/DD HH12:MI:SS') as fecha_hora, usuario, to_char(fecha_hora_actualizacion, 'YYYY/MM/DD HH12:MI:SS') as fecha_hora_actualizacion, usuario_actualizacion, to_char(fecha_hora_traspaso, 'YYYY/MM/DD HH12:MI:SS') as fecha_hora_traspaso, usuario_traspaso, modo, origen, entidad, tipo_, numero_, archivo, debito, credito
-    FROM contabilidad.comprobantes
-    where anno = @anno and periodo = @periodo;`;
+export const queryAsientoRodas = `SELECT a.anno_comprobante as anno, c.periodo, a.cuenta, a.subcuenta, coalesce(a.tipo_analisis_1, '') as tipo_analisis_1, coalesce(a.analisis_1, '') as analisis_1, coalesce(a.tipo_analisis_2, '') as tipo_analisis_2, coalesce(a.analisis_2, '') as analisis_2, coalesce(a.tipo_analisis_3, '') as tipo_analisis_3, coalesce(a.analisis_3, '') as analisis_3, coalesce(a.tipo_analisis_4, '') as tipo_analisis_4, coalesce(a.analisis_4, '') as analisis_4, coalesce(a.tipo_analisis_5, '') as tipo_analisis_5, coalesce(a.analisis_5, '') as analisis_5,
+    sum(a.debito) as debito, sum(a.credito) as credito
+    FROM contabilidad.asientos as a inner join 
+      contabilidad.comprobantes as c on a.anno_comprobante = c.anno and a.tipo_comprobante = c.tipo and a.numero_comprobante = c.numero
+    where a.anno_comprobante = @anno and c.periodo = @periodo and c.estado <> 'I'
+    group by a.anno_comprobante, c.periodo, a.cuenta, a.subcuenta, coalesce(a.tipo_analisis_1, ''), coalesce(a.analisis_1, ''), coalesce(a.tipo_analisis_2, ''), coalesce(a.analisis_2, ''), coalesce(a.tipo_analisis_3, ''), coalesce(a.analisis_3, ''), coalesce(a.tipo_analisis_4, ''), coalesce(a.analisis_4, ''), coalesce(a.tipo_analisis_5, ''), coalesce(a.analisis_5, '');`;
 
-export const queryAsientoRodas = `SELECT a.anno_comprobante, a.tipo_comprobante, a.numero_comprobante, a.tipo_documento, a.documento, a.id, a.cuenta, a.subcuenta, a.tipo_analisis_1, a.analisis_1, a.tipo_analisis_2, a.analisis_2, a.tipo_analisis_3, a.analisis_3, a.tipo_analisis_4, a.analisis_4, a.tipo_analisis_5, a.analisis_5, a.naturaleza, a.debito, a.credito, a.tipo_moneda, a.tasa_cambio, a.debito_moneda, a.credito_moneda, a.tipo_documento_obligacion, a.documento_obligacion, to_char(a.fecha_documento_obligacion, 'YYYY/MM/DD HH12:MI:SS') as fecha_documento_obligacion, a.detalle, to_char(a.fecha_compromiso_documento_obligacion, 'YYYY/MM/DD HH12:MI:SS') as fecha_compromiso_documento_obligacion, a.codigo_almacen
-    FROM contabilidad.asientos as a inner join contabilidad.comprobantes as c on a.anno_comprobante = c.anno and 
-        a.tipo_comprobante = c.tipo and a.numero_comprobante = c.numero
-    where a.anno_comprobante = @anno and c.periodo = @periodo;`;
+export const queryObligacionesRodas = `SELECT a.anno_comprobante, c.periodo, a.cuenta, a.subcuenta, coalesce(a.tipo_analisis_1, '') as tipo_analisis_1, coalesce(a.analisis_1, '') as analisis_1, coalesce(a.tipo_analisis_2, '') as tipo_analisis_2, coalesce(a.analisis_2, '') as analisis_2, coalesce(a.tipo_analisis_3, '') as tipo_analisis_3, coalesce(a.analisis_3, '') as analisis_3, coalesce(a.tipo_analisis_4, '') as tipo_analisis_4, coalesce(a.analisis_4, '') as analisis_4, coalesce(a.tipo_analisis_5, '') as tipo_analisis_5, coalesce(a.analisis_5, '') as analisis_5,
+    sum(a.debito) as debito, sum(a.credito) as credito, a.documento_obligacion, to_char(min(a.fecha_documento_obligacion), 'YYYY/MM/DD HH12:MI:SS') as fecha_documento_obligacion
+    FROM contabilidad.asientos as a inner join 
+    	contabilidad.comprobantes as c on a.anno_comprobante = c.anno and a.tipo_comprobante = c.tipo and a.numero_comprobante = c.numero inner join 
+    	contabilidad.cuentas cta on cta.anno = a.anno_comprobante and cta.cuenta = a.cuenta and cta.subcuenta = a.subcuenta 
+    where a.anno_comprobante = @anno and c.periodo = @periodo and c.estado <> 'I' and cta.obligacion = true
+    group by a.anno_comprobante, c.periodo, a.cuenta, a.subcuenta, coalesce(a.tipo_analisis_1, ''), coalesce(a.analisis_1, ''), coalesce(a.tipo_analisis_2, ''), coalesce(a.analisis_2, ''), coalesce(a.tipo_analisis_3, ''), coalesce(a.analisis_3, ''), coalesce(a.tipo_analisis_4, ''), coalesce(a.analisis_4, ''), coalesce(a.tipo_analisis_5, ''), coalesce(a.analisis_5, ''), a.documento_obligacion;`;
 
 export const querySaldosAcumuladosRodas = `SELECT COALESCE(ROUND(SUM(ROUND(a.debito, 2)), 2), 0) AS debito, COALESCE(ROUND(SUM(ROUND(a.credito, 2)), 2), 0) AS credito
     FROM contabilidad.asientos as a inner join contabilidad.comprobantes as c on a.anno_comprobante = c.anno and 
