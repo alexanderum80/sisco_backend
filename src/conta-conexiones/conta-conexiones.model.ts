@@ -1,12 +1,4 @@
-import { MultipleQueryResponse, SingleQueryResponse } from '../shared/models/query.response.model';
-import { ContaConexionesEntity } from './conta-conexiones.entity';
 import { ObjectType, Field, InputType } from '@nestjs/graphql';
-
-@ObjectType()
-export class ContaConexionQueryResponse extends SingleQueryResponse(ContaConexionesEntity) {}
-
-@ObjectType()
-export class ContaConexionesQueryResponse extends MultipleQueryResponse(ContaConexionesEntity) {}
 
 @InputType()
 export class ContaConexionInput {

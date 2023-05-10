@@ -2,21 +2,17 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @ObjectType()
-@Entity()
+@Entity('dwh_conexiones')
 export class DWHConexiones {
   @Field()
-  @PrimaryColumn()
+  @PrimaryColumn({ name: 'id_unidad' })
   IdUnidad: number;
 
   @Field({ nullable: true })
-  @Column()
+  @Column({ name: 'conexion_rest' })
   ConexionRest?: string;
 
   @Field({ nullable: true })
-  @Column()
+  @Column({ name: 'conexion_dwh' })
   ConexionDWH?: string;
-
-  @Field({ nullable: true })
-  @Column()
-  ServidorDist?: string;
 }

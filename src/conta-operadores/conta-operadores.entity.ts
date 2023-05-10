@@ -5,10 +5,10 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 @Entity('Conta_Operadores')
 export class ContaOperadoresEntity {
   @Field()
-  @PrimaryColumn()
+  @PrimaryColumn({ name: 'id' })
   Id: string;
 
   @Field()
-  @Column()
+  @Column({ name: 'operador' })
   Operador: string;
 }

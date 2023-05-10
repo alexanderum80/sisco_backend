@@ -5,10 +5,10 @@ import { ObjectType, Field } from '@nestjs/graphql';
 @Entity('Conta_Grupo_Cuenta')
 export class GrupoCuentaEntity {
   @Field(() => String)
-  @PrimaryColumn('varchar', { length: 2 })
+  @PrimaryColumn('varchar', { name: 'id_grupo', length: 2 })
   IdGrupo: string;
 
   @Field(() => String)
-  @Column('varchar', { length: 250 })
+  @Column('varchar', { name: 'grupo', length: 250 })
   Grupo: string;
 }

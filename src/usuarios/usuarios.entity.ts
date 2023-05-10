@@ -24,7 +24,7 @@ export class Usuarios {
 
   @Field(() => TipoUsuarios)
   @ManyToOne(() => TipoUsuarios, tipoUsuarios => tipoUsuarios.IdTipo)
-  @JoinColumn({ name: 'IdTipoUsuario', referencedColumnName: 'IdTipo' })
+  @JoinColumn({ name: 'id_tipo_usuario', referencedColumnName: 'IdTipo' })
   TipoUsuario?: TipoUsuarios;
 
   @Field()
@@ -37,7 +37,7 @@ export class Usuarios {
 
   @Field(() => DivisionesEntity)
   @ManyToOne(() => DivisionesEntity, divisiones => divisiones.IdDivision)
-  @JoinColumn({ name: 'IdDivision', referencedColumnName: 'IdDivision' })
+  @JoinColumn({ name: 'id_division', referencedColumnName: 'IdDivision' })
   Division?: DivisionesEntity;
 
   @Field()

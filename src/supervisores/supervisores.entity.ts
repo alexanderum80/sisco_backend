@@ -4,31 +4,31 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, PrimaryGeneratedColumn, JoinColumn, ManyToOne } from 'typeorm';
 
 @ObjectType()
-@Entity()
+@Entity('supervisor')
 export class Supervisor {
   @Field()
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ name: 'id_supervisor' })
   IdSupervisor: number;
 
   @Field()
-  @Column()
+  @Column({ name: 'supervisor' })
   Supervisor: string;
 
   @Field()
-  @Column()
+  @Column({ name: 'id_cargo' })
   IdCargo: number;
 
   @Field(() => Cargos)
   @ManyToOne(() => Cargos, cargos => cargos.IdCargo)
-  @JoinColumn({ name: 'IdCargo', referencedColumnName: 'IdCargo' })
+  @JoinColumn({ name: 'id_cargo', referencedColumnName: 'IdCargo' })
   Cargo: Cargos;
 
   @Field()
-  @Column()
+  @Column({ name: 'id_division' })
   IdDivision: number;
 
   @Field(() => DivisionesEntity)
   @ManyToOne(() => DivisionesEntity, divisiones => divisiones.IdDivision)
-  @JoinColumn({ name: 'IdDivision', referencedColumnName: 'IdDivision' })
+  @JoinColumn({ name: 'id_division', referencedColumnName: 'IdDivision' })
   Division: DivisionesEntity;
 }

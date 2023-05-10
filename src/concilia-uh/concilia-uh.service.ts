@@ -21,8 +21,9 @@ export class ConciliaUhService {
       const { idCentro, annio, periodo } = conciliaUhInput;
 
       // verificar si se ha definido la conexión al Rodas
-      const _conexionRodasQuery = await this._contaConexionesSvc.findByIdUnidad(idCentro, false);
-      const _conexionConta = _conexionRodasQuery.data;
+      const _conexionConta = await this._contaConexionesSvc.findByIdUnidad(idCentro, false).catch(err => {
+        throw new Error(err);
+      });
       // _conexionConta.BaseDatos = `r4_${_conexionConta.BaseDatos.toLowerCase()}`;
 
       return new Promise<ConciliaUH[]>((resolve, reject) => {
@@ -169,7 +170,7 @@ export class ConciliaUhService {
   }
 
   private async _importarDatosRodas(annio: number, periodo: number, idUnidad: number, tipoCentro: number, contaConexion: ContaConexionesEntity): Promise<boolean> {
-    const cons = tipoCentro === 1 ? '1' : '0';
+    const cons = tipoCentro === 1;
 
     return new Promise<boolean>(resolve => {
       // me conecto al Rodas del Centro

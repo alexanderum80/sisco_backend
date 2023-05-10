@@ -67,17 +67,6 @@ type UsuariosQueryResponse {
   error: String
 }
 
-type Unidades {
-  IdUnidad: Float!
-  Nombre: String
-  IdComplejo: Float
-  IdSubdivision: Float
-  IdDivision: Float
-  Provincia: String
-  Tipo: Float
-  Abierta: Boolean
-}
-
 type CentrosView {
   IdUnidad: Float!
   Nombre: String!
@@ -85,12 +74,6 @@ type CentrosView {
   Subdivision: String!
   IdDivision: Float!
   Division: String!
-}
-
-type AllUnidadesQueryResponse {
-  success: Boolean!
-  data: [CentrosView!]
-  error: String
 }
 
 type ContaConexionesEntity {
@@ -120,18 +103,6 @@ type ConexionesQueryResponse {
   error: String
 }
 
-type ContaConexionQueryResponse {
-  success: Boolean!
-  data: ContaConexionesEntity
-  error: String
-}
-
-type ContaConexionesQueryResponse {
-  success: Boolean!
-  data: [ContaConexionesEntity!]
-  error: String
-}
-
 type EntidadesRodas {
   sigla: String!
   entidad: String!
@@ -141,7 +112,6 @@ type DWHConexiones {
   IdUnidad: Float!
   ConexionRest: String
   ConexionDWH: String
-  ServidorDist: String
 }
 
 type DWHConexionQueryResponse {
@@ -185,7 +155,7 @@ type ClasificadorCuentaRealEntity {
   Tipo_Analisis_3_Cons: String
   Tipo_Analisis_4_Cons: String
   Tipo_Analisis_5_Cons: String
-  SeUtiliza: String
+  se_utiliza: String
 }
 
 type ClasificadorCuentaQueryResponse {
@@ -325,16 +295,10 @@ type ConciliacionOperacionesDWHQueryResponse {
   error: String
 }
 
-type Subdivisiones {
+type SubdivisionesEntity {
   IdSubdivision: Float!
   Subdivision: String!
   IdDivision: Float!
-}
-
-type SubdivisionesQueryResponse {
-  success: Boolean!
-  data: [Subdivisiones!]
-  error: String
 }
 
 type ConcExtContabilidad {
@@ -481,11 +445,11 @@ type ElementoGastoQueryResponse {
 
 type ClasificarEntidades {
   IdUnidad: Float!
-  Unidad: String
+  unidad: String
   IdTipoEntidad: Float!
-  TipoEntidad: String!
-  Division: String!
-  SubDivision: String!
+  tipo_entidad: String!
+  division: String!
+  subdivision: String!
 }
 
 type ClasificadorEntidadesQueryResponse {
@@ -638,9 +602,9 @@ type TipoUsuarioQueryResponse {
 type ComprobarValoresEntity {
   Id: Float!
   IdCentro: Float!
-  Centro: String!
+  centro: String!
   IdExpresion: Float!
-  Expresion: String!
+  expresion: String!
   IdOperador: String!
   Operador: String!
   Valor: Float!
@@ -804,13 +768,13 @@ type Query {
   getAllDivisiones: [DivisionesEntity!]!
   getAllDivisionesByUsuario: [DivisionesEntity!]!
   getDivisionById(id: Int!): [DivisionesEntity!]!
-  getAllContaConexiones: ContaConexionesQueryResponse!
-  getContaConexionById(id: Int!): ContaConexionQueryResponse!
+  getAllContaConexiones: [ContaConexionesEntity!]!
+  getContaConexionById(id: Int!): ContaConexionesEntity!
   entidadesRodas(ip: String!): [EntidadesRodas!]!
-  getAllUnidades: AllUnidadesQueryResponse!
-  getAllUnidadesByUsuario: AllUnidadesQueryResponse!
-  getUnidadesByIdSubdivision(idSubdivision: Int!): AllUnidadesQueryResponse!
-  getUnidadesByIdDivision(idDivision: Int!): AllUnidadesQueryResponse!
+  getAllUnidades: [CentrosView!]!
+  getAllUnidadesByUsuario: [CentrosView!]!
+  getUnidadesByIdSubdivision(idSubdivision: Int!): [CentrosView!]!
+  getUnidadesByIdDivision(idDivision: Int!): [CentrosView!]!
   getDWHConexion(idDivision: Int!): DWHConexionQueryResponse!
   getAllCargos: CargosQueryResponse!
   conciliaDWH(conciliaDWHInput: ConciliaDWHInput!): [ConciliaDWH!]!
@@ -828,8 +792,8 @@ type Query {
   datosIdGAM(idDivision: Int!): DatosIdGAMQueryResponse!
   getDataBases(ip: String!, ususario: String!, password: String!): ConexionesQueryResponse!
   conciliaInternaDWH(conciliaInternaDWHInput: ConciliaOperacionesDWHInput!): ConciliacionOperacionesDWHQueryResponse!
-  getAllSubdivisiones: SubdivisionesQueryResponse!
-  getSubdivisionesByIdDivision(idDivision: Int!): SubdivisionesQueryResponse!
+  getAllSubdivisiones: [SubdivisionesEntity!]!
+  getSubdivisionesByIdDivision(idDivision: Int!): [SubdivisionesEntity!]!
   getConciliacionExternaContab(conciliaExternaInput: ConciliaExternaContabilidadInput!): ConciliaExternaContabilidadEntity!
   getConciliacionExternaContabResumen(annio: Int!, mes: Int!): [ViewConciliaExtContabilidadResumen!]!
   getConciliacionExternaContabDeudasPorEdades(annio: Int!, mes: Int!): [ViewConciliaExtContabilidadDeudasPorEdades!]!

@@ -45,10 +45,10 @@ export class ParteAtrasoService {
         for (let i = 0; i < _unidades.length; i++) {
           const unidad = _unidades[i];
           const parteUnidad = {
-            IdUnidad: unidad.IdUnidad,
-            Unidad: unidad.IdUnidad + '-' + unidad.Nombre,
-            IdDivision: unidad.IdDivision,
-            Division: unidad.IdDivision + '-' + unidad.Division,
+            IdUnidad: unidad.Id_Unidad,
+            Unidad: unidad.Id_Unidad + '-' + unidad.Nombre,
+            IdDivision: unidad.Id_Division,
+            Division: unidad.Id_Division + '-' + unidad.Division,
             AtrasoRest: 0,
             AtrasoDWH: 0,
             AtrasoDist: 0,
@@ -95,7 +95,7 @@ export class ParteAtrasoService {
       const _query =
         queryParteAtrasos +
         ` HAVING UC.IdUnidad IN (${join(
-          unidades.map((u: { IdUnidad: number }) => u.IdUnidad),
+          unidades.map((u: { id_unidad: number }) => u.id_unidad),
           ', ',
         )})`;
 
