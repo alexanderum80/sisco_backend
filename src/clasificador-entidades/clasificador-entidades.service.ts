@@ -1,19 +1,19 @@
 import { TipoEntidades } from './../tipo-entidades/tipo-entidades.entity';
 import { CentrosView } from './../unidades/unidades.entity';
 import { MutationResponse } from '../shared/models/mutation.response.model';
-import { ClasificarEntidades } from './clasificador-entidades.entity';
+import { ClasificarEntidadesEntity } from './clasificador-entidades.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ClasificadorEntidadQueryResponse, ClasificadorEntidadInput, ClasificadorEntidadesQueryResponse } from './clasificador-entidades.model';
+import { ClasificadorEntidadInput } from './clasificador-entidades.model';
 
 @Injectable()
 export class ClasificadorEntidadesService {
-  constructor(@InjectRepository(ClasificarEntidades) private readonly clasificarEntidadesRepository: Repository<ClasificarEntidades>) {}
+  constructor(@InjectRepository(ClasificarEntidadesEntity) private readonly clasificarEntidadesRepository: Repository<ClasificarEntidadesEntity>) {}
 
-  async findAll(): Promise<ClasificadorEntidadesQueryResponse> {
+  async findAll(): Promise<ClasificarEntidadesEntity[]> {
     try {
-      return new Promise<ClasificadorEntidadesQueryResponse>(resolve => {
+      return new Promise<ClasificarEntidadesEntity[]>((resolve, reject) => {
         this.clasificarEntidadesRepository
           .createQueryBuilder('clas')
           .select('clas.IdUnidad', 'IdUnidad')
@@ -26,37 +26,31 @@ export class ClasificadorEntidadesService {
           .innerJoin(TipoEntidades, 'tipo', 'tipo.Id = clas.IdTipoEntidad')
           .execute()
           .then(result => {
-            resolve({
-              success: true,
-              data: result,
-            });
+            resolve(result);
           })
           .catch(err => {
-            return { success: false, error: err.message ? err.message : err };
+            reject(err.message || err);
           });
       });
     } catch (err: any) {
-      return { success: false, error: err.message ? err.message : err };
+      return Promise.reject(err.message || err);
     }
   }
 
-  async findOne(idUnidad: number): Promise<ClasificadorEntidadQueryResponse> {
+  async findOne(idUnidad: number): Promise<ClasificarEntidadesEntity> {
     try {
-      return new Promise<ClasificadorEntidadQueryResponse>(resolve => {
+      return new Promise<ClasificarEntidadesEntity>((resolve, reject) => {
         this.clasificarEntidadesRepository
           .findOne({ where: [{ IdUnidad: idUnidad }] })
           .then(result => {
-            resolve({
-              success: true,
-              data: result,
-            });
+            resolve(result);
           })
           .catch(err => {
-            return { success: false, error: err.message ? err.message : err };
+            reject(err.message || err);
           });
       });
     } catch (err: any) {
-      return { success: false, error: err.message ? err.message : err };
+      return Promise.reject(err.message || err);
     }
   }
 

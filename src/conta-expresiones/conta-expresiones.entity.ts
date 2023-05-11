@@ -2,7 +2,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @ObjectType()
-@Entity('Conta_ExpresionesResumen')
+@Entity('Conta_Expresiones_Resumen')
 export class ExpresionesResumenEntity {
   @Field()
   @PrimaryGeneratedColumn()
@@ -34,7 +34,7 @@ export class ExpresionesResumenEntity {
 }
 
 @ObjectType()
-@Entity('Conta_ExpresionesDetalle')
+@Entity('Conta_Expresiones_Detalle')
 export class ExpresionesDetalleEntity {
   @Field()
   @PrimaryGeneratedColumn()

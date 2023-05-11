@@ -180,25 +180,102 @@ type CuentasAgrupadasQueryResponse {
   error: String
 }
 
+type IConciliaReporteClasificador {
+  Cuenta: String!
+  SubCuenta: String!
+  Descripcion: String!
+  Crt1Clasif: String
+  Crt2Clasif: String
+  Crt3Clasif: String
+  Crt4Clasif: String
+  Crt5Clasif: String
+  NatClasif: String
+  OblClasif: Boolean
+  grupo_clasif: String
+  clase_clasif: String
+  categ_clasif: String
+  clasif_clasif: String
+  tipo_clasif: String
+  estado_clasif: String
+  Crt1Rodas: String
+  Crt2Rodas: String
+  Crt3Rodas: String
+  Crt4Rodas: String
+  Crt5Rodas: String
+  NatRodas: String
+  OblRodas: Boolean
+  grupo_rodas: String
+  clase_rodas: String
+  categ_rodas: String
+  clasif_rodas: String
+  tipo_rodas: String
+  estado_rodas: String
+}
+
+type IConciliaReporteConsulta {
+  Periodo: Float!
+  Centro: String!
+  IdConsulta: String!
+  Consulta: String!
+  Cuenta: String
+  SubCuenta: String
+  Analisis1: String
+  Analisis2: String
+  Analisis3: String
+  Analisis4: String
+  Analisis5: String
+  Total: Float!
+  Consolidado: Boolean!
+}
+
+type IConciliaReporteExpresiones {
+  Centro: Float!
+  Consolidado: Boolean!
+  Periodo: Float!
+  Expresion: String!
+  Valor: Float!
+  Operador: String!
+  ExpresionC: String!
+  ValorC: Float!
+  Resultado: String!
+}
+
+type IConciliaReporteValores {
+  Centro: String!
+  Periodo: Float!
+  Consolidado: Boolean!
+  Expresion: String!
+  Valor: Float!
+  Operador: String!
+  ValorRodas: Float!
+  Estado: String!
+  Division: String!
+}
+
+type IConciliaCuadreSistemas {
+  Centro: Float!
+  Sistema: String!
+  Estado: String!
+}
+
+type IConciliaInformacionContabilidad {
+  Criterio: String!
+  Saldo: Float!
+}
+
 type ConciliaContaQueryResponse {
   success: Boolean!
   data: String
   error: String
 }
 
-type ConciliaContabilidad {
-  ReporteClasificador: ConciliaContaQueryResponse!
-  ReporteConsultas: ConciliaContaQueryResponse!
-  ReporteExpresiones: ConciliaContaQueryResponse!
-  ReporteValores: ConciliaContaQueryResponse!
-  CuadreSistemas: ConciliaContaQueryResponse!
-  Informacion: ConciliaContaQueryResponse!
-}
-
 type ConciliaContabilidadQueryResponse {
-  success: Boolean!
-  data: ConciliaContabilidad
-  error: String
+  ReporteClasificador: [IConciliaReporteClasificador!]!
+  ReporteConsultas: [IConciliaReporteConsulta!]!
+  ReporteExpresiones: [IConciliaReporteExpresiones!]!
+  ReporteValores: [IConciliaReporteValores!]!
+  CuadreSistemas: [IConciliaCuadreSistemas!]!
+  Informacion: [IConciliaInformacionContabilidad!]!
 }
 
 type ConciliaDWH {
@@ -443,25 +520,13 @@ type ElementoGastoQueryResponse {
   error: String
 }
 
-type ClasificarEntidades {
+type ClasificarEntidadesEntity {
   IdUnidad: Float!
   unidad: String
   IdTipoEntidad: Float!
   tipo_entidad: String!
   division: String!
   subdivision: String!
-}
-
-type ClasificadorEntidadesQueryResponse {
-  success: Boolean!
-  data: [ClasificarEntidades!]
-  error: String
-}
-
-type ClasificadorEntidadQueryResponse {
-  success: Boolean!
-  data: ClasificarEntidades
-  error: String
 }
 
 type ExpresionesResumenEntity {
@@ -804,8 +869,8 @@ type Query {
   getEpigrafeById(id: Int!): EpigrafeQueryResponse!
   getAllElementosGastos: ElementosGastosQueryResponse!
   getElementoGastoById(id: String!): ElementoGastoQueryResponse!
-  getAllClasificadorEntidades: ClasificadorEntidadesQueryResponse!
-  getClasificadorEntidad(idUnidad: Int!): ClasificadorEntidadQueryResponse!
+  getAllClasificadorEntidades: [ClasificarEntidadesEntity!]!
+  getClasificadorEntidad(idUnidad: Int!): ClasificarEntidadesEntity!
   getAllExpresionesResumen: ContaExpresionesResumenQueryResponse!
   getExpresionResumenById(id: Int!): ContaExpresionResumenQueryResponse!
   getAllExpresionesDetalle: ContaExpresionesDetalleQueryResponse!

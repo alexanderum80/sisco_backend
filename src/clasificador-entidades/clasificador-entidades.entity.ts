@@ -2,8 +2,8 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @ObjectType()
-@Entity('Conta_Clasificar_Unidades')
-export class ClasificarEntidades {
+@Entity('conta_clasificar_unidades')
+export class ClasificarEntidadesEntity {
   @Field()
   @PrimaryColumn({ name: 'id_unidad' })
   IdUnidad: number;

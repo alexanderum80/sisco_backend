@@ -1,20 +1,20 @@
 import { MutationResponse } from '../shared/models/mutation.response.model';
-import { ClasificadorEntidadQueryResponse, ClasificadorEntidadInput, ClasificadorEntidadesQueryResponse } from './clasificador-entidades.model';
-import { ClasificarEntidades } from './clasificador-entidades.entity';
+import { ClasificadorEntidadInput } from './clasificador-entidades.model';
+import { ClasificarEntidadesEntity } from './clasificador-entidades.entity';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { ClasificadorEntidadesService } from './clasificador-entidades.service';
 
-@Resolver(() => ClasificarEntidades)
+@Resolver(() => ClasificarEntidadesEntity)
 export class ClasificadorEntidadesResolver {
   constructor(private clasificadorEntidadesSvc: ClasificadorEntidadesService) {}
 
-  @Query(() => ClasificadorEntidadesQueryResponse)
-  async getAllClasificadorEntidades(): Promise<ClasificadorEntidadesQueryResponse> {
+  @Query(() => [ClasificarEntidadesEntity])
+  async getAllClasificadorEntidades(): Promise<ClasificarEntidadesEntity[]> {
     return this.clasificadorEntidadesSvc.findAll();
   }
 
-  @Query(() => ClasificadorEntidadQueryResponse)
-  async getClasificadorEntidad(@Args({ name: 'idUnidad', type: () => Int }) idUnidad: number): Promise<ClasificadorEntidadQueryResponse> {
+  @Query(() => ClasificarEntidadesEntity)
+  async getClasificadorEntidad(@Args({ name: 'idUnidad', type: () => Int }) idUnidad: number): Promise<ClasificarEntidadesEntity> {
     return this.clasificadorEntidadesSvc.findOne(idUnidad);
   }
 
