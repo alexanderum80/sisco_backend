@@ -8,19 +8,19 @@ export class ClasificarEntidadesEntity {
   @PrimaryColumn({ name: 'id_unidad' })
   IdUnidad: number;
 
-  @Field({ name: 'unidad', nullable: true })
+  @Field({ nullable: true })
   Unidad: string;
 
   @Field()
   @Column({ name: 'id_tipo_entidad' })
   IdTipoEntidad: number;
 
-  @Field({ name: 'tipo_entidad' })
+  @Field()
   TipoEntidad: string;
 
-  @Field({ name: 'division' })
+  @Field()
   Division: string;
 
-  @Field({ name: 'subdivision' })
+  @Field()
   SubDivision: string;
 }

@@ -1,12 +1,4 @@
-import { MultipleQueryResponse, SingleQueryResponse } from '../shared/models/query.response.model';
-import { ObjectType, Field, InputType } from '@nestjs/graphql';
-import { ContaComprobarExpresionesEntity } from './conta-comprobar-expresiones.entity';
-
-@ObjectType()
-export class ContaComprobarExpresionesQueryResponse extends MultipleQueryResponse(ContaComprobarExpresionesEntity) {}
-
-@ObjectType()
-export class ContaComprobarExpresionQueryResponse extends SingleQueryResponse(ContaComprobarExpresionesEntity) {}
+import { Field, InputType } from '@nestjs/graphql';
 
 @InputType()
 export class ContaComprobarExpresionesInput {

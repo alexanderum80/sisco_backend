@@ -2,33 +2,33 @@ import { ObjectType, Field } from '@nestjs/graphql';
 
 @ObjectType()
 export class ContaInformeCtasCobrarPagarView {
-  @Field()
-  Division: string;
+  @Field({ name: 'Division' })
+  division: string;
 
-  @Field()
-  Organismo: string;
+  @Field({ name: 'Organismo' })
+  organismo: string;
 
-  @Field()
-  Grupo: string;
+  @Field({ name: 'Grupo' })
+  grupo: string;
 
-  @Field()
-  Cuenta: string;
+  @Field({ name: 'Cuenta' })
+  cuenta: string;
 
-  @Field({ nullable: true })
-  ProveedorCliente?: string;
+  @Field({ name: 'ProveedorCliente', nullable: true })
+  proveedor_cliente?: string;
 
-  @Field()
-  Saldo: number;
+  @Field({ name: 'Saldo' })
+  saldo: number;
 
-  @Field()
-  Hasta30: number;
+  @Field({ name: 'Hasta30' })
+  hasta30: number;
 
-  @Field()
-  De30a60: number;
+  @Field({ name: 'De30a60' })
+  de30a60: number;
 
-  @Field()
-  De60a90: number;
+  @Field({ name: 'De60a90' })
+  de60a90: number;
 
-  @Field()
-  MasDe90: number;
+  @Field({ name: 'MasDe90' })
+  mas90: number;
 }

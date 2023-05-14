@@ -2,7 +2,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @ObjectType()
-@Entity('Conta_Clasificador_Cuentas_Real')
+@Entity('conta_clasificador_cuentas_real')
 export class ClasificadorCuentaRealEntity {
   @Field()
   @PrimaryColumn({ name: 'tipo_clasificador' })
@@ -96,7 +96,7 @@ export class ClasificadorCuentaRealEntity {
   @Column('varchar', { name: 'tipo_analisis_5_cons', nullable: true })
   Tipo_Analisis_5_Cons?: string;
 
-  @Field({ name: 'se_utiliza', nullable: true })
-  @Column()
+  @Field({ nullable: true })
+  @Column({ name: 'se_utiliza', nullable: true })
   SeUtiliza?: string;
 }

@@ -106,15 +106,15 @@ export class ConciliaExternaEntreUnidadesService {
 
               const stringQuery = `SELECT * FROM dbo.ConciliacionEntreUnidades
                             WHERE Annio = ${annio} AND Mes = ${mes} AND
-                            ((Unidad = ${element.Emisor} AND UnidadOD = ${element.Receptor}) OR (Unidad = ${element.Receptor} AND UnidadOD = ${element.Emisor}))`;
+                            ((Unidad = ${element.emisor} AND UnidadOD = ${element.receptor}) OR (Unidad = ${element.receptor} AND UnidadOD = ${element.emisor}))`;
               const result = await this.connection.query(stringQuery).catch(err => {
                 reject(err.message || err);
               });
 
               if (result.length === 0) {
                 centros.push({
-                  Emisor: element.Emisor.toString(),
-                  Receptor: element.Receptor.toString(),
+                  Emisor: element.emisor.toString(),
+                  Receptor: element.receptor.toString(),
                 });
               }
             }

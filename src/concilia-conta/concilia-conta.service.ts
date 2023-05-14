@@ -1,6 +1,6 @@
 import { LogsService } from './../logs/logs.service';
 import { ContaConexionesEntity } from './../conta-conexiones/conta-conexiones.entity';
-import { reject, toNumber } from 'lodash';
+import { toNumber } from 'lodash';
 import { Usuarios } from './../usuarios/usuarios.entity';
 import { ETipoClasificadorCuenta } from './../clasificador-cuenta/clasificador-cuenta.model';
 import { ClasificadorCuentaService } from './../clasificador-cuenta/clasificador-cuenta.service';
@@ -545,7 +545,9 @@ export class ConciliaContaService {
         throw new Error(err);
       });
 
-      const bdConta = await this._contaConexionesService.conexionRodas(_conexionConta);
+      const bdConta = await this._contaConexionesService.conexionRodas(_conexionConta).catch(err => {
+        throw new Error(err);
+      });
 
       for (let index = 0; index < _clasifCuentasReal.length; index++) {
         const _clasif = _clasifCuentasReal[index];
@@ -604,7 +606,7 @@ export class ConciliaContaService {
         throw new Error(err);
       });
 
-      return new Promise<boolean>(resolve => {
+      return new Promise<boolean>((resolve, reject) => {
         this._logsSvc
           .insert(
             idUnidad,

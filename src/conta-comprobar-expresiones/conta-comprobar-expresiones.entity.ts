@@ -19,7 +19,7 @@ export class ContaComprobarExpresionesEntity {
   IdOperador: string;
 
   @Field()
-  @Column({ name: 'id_expresionC' })
+  @Column({ name: 'id_expresionc' })
   IdExpresionC: number;
 
   @Field()
@@ -49,7 +49,7 @@ export class ContaComprobarExpresionesEntity {
 
   @Field(() => ExpresionesResumenEntity)
   @ManyToOne(() => ExpresionesResumenEntity, expresion => expresion.IdExpresion)
-  @JoinColumn({ name: 'id_expresionC', referencedColumnName: 'IdExpresion' })
+  @JoinColumn({ name: 'id_expresionc', referencedColumnName: 'IdExpresion' })
   ExpresionC: ExpresionesResumenEntity;
 
   @Field(() => ContaOperadoresEntity)

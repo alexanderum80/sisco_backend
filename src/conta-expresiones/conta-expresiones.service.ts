@@ -4,15 +4,7 @@ import { ExpresionesResumenEntity, ExpresionesDetalleEntity } from './conta-expr
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import {
-  ContaExpresionesResumenQueryResponse,
-  ContaExpresionResumenInput,
-  ContaExpresionesDetalleQueryResponse,
-  ContaExpresionDetalleQueryResponse,
-  ContaExpresionDetalleInput,
-  ContaExpresionResumenQueryResponse,
-  ContaExpresionInput,
-} from './conta-expresiones.model';
+import { ContaExpresionResumenInput, ContaExpresionDetalleInput, ContaExpresionInput } from './conta-expresiones.model';
 import { differenceBy } from 'lodash';
 import { ETipoUsuarios } from './../usuarios/usuarios.model';
 
@@ -59,11 +51,11 @@ export class ContaExpresionesService {
           throw new Error(err);
         });
 
-        const originalExpresionDetalle = await this.findOneDetalleByResumen(saveExpresionResumen.data.IdExpresion).catch(err => {
+        const originalExpresionDetalle = await this.findOneDetalleByResumen(saveExpresionResumen.IdExpresion).catch(err => {
           throw new Error(err);
         });
 
-        const borrarExpresionDetalle = differenceBy(originalExpresionDetalle.data, ExpresionesDetalle, 'id');
+        const borrarExpresionDetalle = differenceBy(originalExpresionDetalle, ExpresionesDetalle, 'id');
 
         if (borrarExpresionDetalle.length) {
           const IDs = borrarExpresionDetalle.map((e: any) => e.id);
@@ -74,7 +66,7 @@ export class ContaExpresionesService {
         }
 
         ExpresionesDetalle.forEach(expr => {
-          expr.IdExpresion = saveExpresionResumen.data.IdExpresion;
+          expr.IdExpresion = saveExpresionResumen.IdExpresion;
           this.updateDetalle(expr).catch(err => {
             throw new Error(err);
           });
@@ -88,47 +80,41 @@ export class ContaExpresionesService {
   }
 
   // Expresiones Resumen
-  async findAllResumen(user: Usuarios): Promise<ContaExpresionesResumenQueryResponse> {
+  async findAllResumen(user: Usuarios): Promise<ExpresionesResumenEntity[]> {
     try {
       const { IdDivision } = user;
 
       const criteria = [{ IdDivision: IdDivision }, { Centralizada: true }];
 
-      return new Promise<ContaExpresionesResumenQueryResponse>(resolve => {
+      return new Promise<ExpresionesResumenEntity[]>((resolve, reject) => {
         this.contaExpresionesResumenRepository
           .find({ where: criteria })
           .then(result => {
-            resolve({
-              success: true,
-              data: result,
-            });
+            resolve(result);
           })
           .catch(err => {
-            throw new Error(err.message || err);
+            reject(err.message || err);
           });
       });
     } catch (err: any) {
-      return { success: false, error: err.message ? err.message : err };
+      return Promise.reject(err.message || err);
     }
   }
 
-  async findOneResumen(idExpresion: number): Promise<ContaExpresionResumenQueryResponse> {
+  async findOneResumen(idExpresion: number): Promise<ExpresionesResumenEntity> {
     try {
-      return new Promise<ContaExpresionResumenQueryResponse>(resolve => {
+      return new Promise<ExpresionesResumenEntity>((resolve, reject) => {
         this.contaExpresionesResumenRepository
           .findOne({ where: [{ IdExpresion: idExpresion }] })
           .then(result => {
-            resolve({
-              success: true,
-              data: result,
-            });
+            resolve(result);
           })
           .catch(err => {
-            throw new Error(err.message || err);
+            reject(err.message || err);
           });
       });
     } catch (err: any) {
-      return { success: false, error: err.message ? err.message : err };
+      return Promise.reject(err.message || err);
     }
   }
 
@@ -145,20 +131,20 @@ export class ContaExpresionesService {
     });
   }
 
-  async updateResumen(ExpresionesResumenInput: ContaExpresionResumenInput): Promise<ContaExpresionResumenQueryResponse> {
+  async updateResumen(ExpresionesResumenInput: ContaExpresionResumenInput): Promise<ExpresionesResumenEntity> {
     try {
-      return new Promise<ContaExpresionResumenQueryResponse>(resolve => {
+      return new Promise<ExpresionesResumenEntity>((resolve, reject) => {
         this.contaExpresionesResumenRepository
           .save(ExpresionesResumenInput)
           .then(result => {
-            resolve({ success: true, data: result });
+            resolve(result);
           })
           .catch(err => {
-            throw new Error(err.message || err);
+            reject(err.message ? err.message : err);
           });
       });
     } catch (err: any) {
-      return { success: false, error: err.message ? err.message : err };
+      return Promise.reject(err.message || err);
     }
   }
 
@@ -180,63 +166,54 @@ export class ContaExpresionesService {
   }
 
   // Expresiones Detalle
-  async findAllDetalle(): Promise<ContaExpresionesDetalleQueryResponse> {
+  async findAllDetalle(): Promise<ExpresionesDetalleEntity[]> {
     try {
-      return new Promise<ContaExpresionesDetalleQueryResponse>(resolve => {
+      return new Promise<ExpresionesDetalleEntity[]>((resolve, reject) => {
         this.contaExpresionDetalleRepository
           .find()
           .then(result => {
-            resolve({
-              success: true,
-              data: result,
-            });
+            resolve(result);
           })
           .catch(err => {
-            throw new Error(err.message || err);
+            reject(err.message ? err.message : err);
           });
       });
     } catch (err: any) {
-      return { success: false, error: err.message ? err.message : err };
+      return Promise.reject(err.message || err);
     }
   }
 
-  async findOneDetalleByResumen(idExpresion: number): Promise<ContaExpresionesDetalleQueryResponse> {
+  async findOneDetalleByResumen(idExpresion: number): Promise<ExpresionesDetalleEntity[]> {
     try {
-      return new Promise<ContaExpresionesDetalleQueryResponse>(resolve => {
+      return new Promise<ExpresionesDetalleEntity[]>((resolve, reject) => {
         this.contaExpresionDetalleRepository
           .find({ where: [{ IdExpresion: idExpresion }] })
           .then(result => {
-            resolve({
-              success: true,
-              data: result,
-            });
+            resolve(result);
           })
           .catch(err => {
-            throw new Error(err.message || err);
+            reject(err.message ? err.message : err);
           });
       });
     } catch (err: any) {
-      return { success: false, error: err.message ? err.message : err };
+      return Promise.reject(err.message || err);
     }
   }
 
-  async findOneDetalle(idExpresion: number): Promise<ContaExpresionDetalleQueryResponse> {
+  async findOneDetalle(idExpresion: number): Promise<ExpresionesDetalleEntity> {
     try {
-      return new Promise<ContaExpresionDetalleQueryResponse>(resolve => {
+      return new Promise<ExpresionesDetalleEntity>((resolve, reject) => {
         this.contaExpresionDetalleRepository
           .findOne({ where: [{ IdExpresion: idExpresion }] })
           .then(result => {
-            resolve({
-              success: true,
-              data: result,
-            });
+            resolve(result);
           })
           .catch(err => {
-            throw new Error(err.message || err);
+            reject(err.message ? err.message : err);
           });
       });
     } catch (err: any) {
-      return { success: false, error: err.message ? err.message : err };
+      return Promise.reject(err.message || err);
     }
   }
 

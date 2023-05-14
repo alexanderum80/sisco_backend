@@ -1,20 +1,20 @@
 import { ElementosGastosService } from './elementos-gastos.service';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { ContaElementosGastos } from './elementos-gastos.entity';
-import { ElementosGastosQueryResponse, ElementoGastoQueryResponse, ElementoGastoInput } from './elementos-gastos.model';
+import { ContaElementosGastosEntity } from './elementos-gastos.entity';
+import { ElementoGastoInput } from './elementos-gastos.model';
 import { MutationResponse } from './../shared/models/mutation.response.model';
 
-@Resolver(() => ContaElementosGastos)
+@Resolver(() => ContaElementosGastosEntity)
 export class ElementosGastosResolver {
   constructor(private _elementoGastoSvc: ElementosGastosService) {}
 
-  @Query(() => ElementosGastosQueryResponse)
-  async getAllElementosGastos(): Promise<ElementosGastosQueryResponse> {
+  @Query(() => [ContaElementosGastosEntity])
+  async getAllElementosGastos(): Promise<ContaElementosGastosEntity[]> {
     return this._elementoGastoSvc.getAllElementoGastos();
   }
 
-  @Query(() => ElementoGastoQueryResponse)
-  async getElementoGastoById(@Args('id') id: string): Promise<ElementoGastoQueryResponse> {
+  @Query(() => ContaElementosGastosEntity)
+  async getElementoGastoById(@Args('id') id: string): Promise<ContaElementosGastosEntity> {
     return this._elementoGastoSvc.getElementoGastoById(id);
   }
 

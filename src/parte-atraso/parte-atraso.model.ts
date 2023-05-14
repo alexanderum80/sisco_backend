@@ -12,4 +12,6 @@ export const queryParteAtrasos = `SELECT UC.IdUnidad, MIN(UC.Nombre) AS Nombre, 
     WHERE UC.Abierta = 1
     GROUP BY UC.IdUnidad`;
 
-export const queryDatosIdGAM = `SELECT IdGerencia AS IdUnidad, RTRIM(UC.IdUnidad) + '-' + UC.Nombre AS Unidad, Ano, Mes, Fecha, Version, UltimaCircular, PeriodoRestaurado, vUtilnet FROM dbo.Gerencia_Ano_Mes AS GAM INNER JOIN UnidadesComerciales.dbo.UnidadesComerciales AS UC ON UC.IdUnidad = GAM.IdGerencia WHERE Ano = @Annio`;
+export const queryDatosIdGAM = `SELECT IdGerencia AS IdUnidad, RTRIM(UC.IdUnidad) + '-' + UC.Nombre AS Unidad, Ano, Mes, Fecha, Version, UltimaCircular, PeriodoRestaurado, vUtilnet 
+    FROM dbo.Gerencia_Ano_Mes AS GAM INNER JOIN UnidadesComerciales.dbo.UnidadesComerciales AS UC ON UC.IdUnidad = GAM.IdGerencia 
+    WHERE Ano = @Annio`;

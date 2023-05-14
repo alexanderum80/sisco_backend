@@ -2,13 +2,13 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @ObjectType()
-@Entity()
-export class ContaEpigrafes {
+@Entity('conta_epigrafes')
+export class ContaEpigrafesEntity {
   @Field()
-  @PrimaryGeneratedColumn()
-  IdEpigafre: number;
+  @PrimaryGeneratedColumn({ name: 'id_epigrafe' })
+  IdEpigrafe: number;
 
   @Field()
-  @Column()
+  @Column({ name: 'epigrafe' })
   Epigrafe: string;
 }

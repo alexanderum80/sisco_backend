@@ -2,21 +2,21 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { ObjectType, Field, Int } from '@nestjs/graphql';
 
 @ObjectType()
-@Entity('ConcExt_DatosConciliacion')
+@Entity('concext_datos_conciliacion')
 export class ConciliaExternaDatosConciliacionEntity {
   @Field(() => Int)
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ name: 'id_conciliacion' })
   IdConciliacion: number;
 
   @Field(() => Int)
-  @Column()
+  @Column({ name: 'anno' })
   Annio: number;
 
   @Field(() => Int)
-  @Column()
+  @Column({ name: 'mes' })
   Mes: number;
 
   @Field(() => Boolean)
-  @Column({ default: true })
+  @Column({ name: 'abierta', default: true })
   Abierta: boolean;
 }

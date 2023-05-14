@@ -1,6 +1,5 @@
-import { CuentaEntidadService } from './../cuenta-entidad/cuenta-entidad.service';
 import { MutationResponse } from './../shared/models/mutation.response.model';
-import { ClasificadorCuentasQueryResponse, ClasificadorCuentaQueryResponse, ClasificadorCuentaRealInput, CuentasAgrupadasQueryResponse } from './clasificador-cuenta.model';
+import { ClasificadorCuentaRealInput, CuentasAgrupadas } from './clasificador-cuenta.model';
 import { Injectable } from '@nestjs/common';
 import { ClasificadorCuentaRealEntity } from './clasificador-cuenta.entity';
 import { Repository } from 'typeorm';
@@ -8,35 +7,33 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class ClasificadorCuentaService {
-  constructor(
-    @InjectRepository(ClasificadorCuentaRealEntity) private clasificadorCuentaRepository: Repository<ClasificadorCuentaRealEntity>,
-    private cuentaEntidadSvc: CuentaEntidadService,
-  ) {}
+  constructor(@InjectRepository(ClasificadorCuentaRealEntity) private clasificadorCuentaRepository: Repository<ClasificadorCuentaRealEntity>) {}
 
-  async getAllClasificadorCuentas(tipo?: number): Promise<ClasificadorCuentasQueryResponse> {
+  async getAllClasificadorCuentas(tipo?: number): Promise<ClasificadorCuentaRealEntity[]> {
     let _where = {};
     if (tipo) _where = { TipoClasificador: tipo };
-    return new Promise<ClasificadorCuentasQueryResponse>(resolve => {
+
+    return new Promise<ClasificadorCuentaRealEntity[]>((resolve, reject) => {
       this.clasificadorCuentaRepository
         .find({ where: _where })
         .then(res => {
-          resolve({ success: true, data: res });
+          resolve(res);
         })
         .catch(err => {
-          resolve({ success: false, error: err.message ? err.message : err });
+          reject(err.message || err);
         });
     });
   }
 
-  async getClasificadorCuenta(cuenta: string, subcuenta: string, tipo: number): Promise<ClasificadorCuentaQueryResponse> {
-    return new Promise<ClasificadorCuentaQueryResponse>(resolve => {
+  async getClasificadorCuenta(cuenta: string, subcuenta: string, tipo: number): Promise<ClasificadorCuentaRealEntity> {
+    return new Promise<ClasificadorCuentaRealEntity>((resolve, reject) => {
       this.clasificadorCuentaRepository
         .findOne({ where: [{ Cuenta: cuenta, SubCuenta: subcuenta, TipoClasificador: tipo }] })
         .then(res => {
-          resolve({ success: true, data: res });
+          resolve(res);
         })
         .catch(err => {
-          resolve({ success: false, error: err.message ? err.message : err });
+          reject(err.message || err);
         });
     });
   }
@@ -54,8 +51,8 @@ export class ClasificadorCuentaService {
     });
   }
 
-  async getCuentasAgrupadas(): Promise<CuentasAgrupadasQueryResponse> {
-    return new Promise<CuentasAgrupadasQueryResponse>(resolve => {
+  async getCuentasAgrupadas(): Promise<CuentasAgrupadas[]> {
+    return new Promise<CuentasAgrupadas[]>((resolve, reject) => {
       this.clasificadorCuentaRepository
         .createQueryBuilder('Clas')
         .select('Clas.Cuenta', 'Cuenta')
@@ -63,25 +60,23 @@ export class ClasificadorCuentaService {
         .orderBy('Clas.Cuenta')
         .execute()
         .then(res => {
-          resolve({ success: true, data: res });
+          resolve(res);
         })
         .catch(err => {
-          resolve({ success: false, error: err.message ? err.message : err });
+          reject(err.message || err);
         });
     });
   }
 
   async saveClasificadorCuenta(clasificadorInfo: ClasificadorCuentaRealInput): Promise<MutationResponse> {
-    return new Promise<MutationResponse>(resolve => {
+    return new Promise<MutationResponse>((resolve, reject) => {
       this.clasificadorCuentaRepository
         .save(clasificadorInfo)
-        .then(res => {
-          this.cuentaEntidadSvc.actualizaCuentaEntidad(res).then(() => {
-            resolve({ success: true });
-          });
+        .then(() => {
+          resolve({ success: true });
         })
         .catch(err => {
-          resolve({ success: false, error: err.message ? err.message : err });
+          reject(err.message || err);
         });
     });
   }
@@ -91,13 +86,7 @@ export class ClasificadorCuentaService {
       this.clasificadorCuentaRepository
         .delete({ Cuenta: cuenta, SubCuenta: subcuenta, TipoClasificador: tipo })
         .then(() => {
-          this.cuentaEntidadSvc.deleteCuentaEntidad(cuenta, subcuenta, tipo).then(res => {
-            if (!res.success) {
-              resolve({ success: false, error: res.error });
-            } else {
-              resolve({ success: true });
-            }
-          });
+          resolve({ success: true });
         })
         .catch(err => {
           resolve({ success: err.message ? err.message : err });

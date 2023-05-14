@@ -2,89 +2,89 @@ import { Field, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
 export class ViewConciliaExtContabilidad {
-  @Field()
-  Id: number;
+  @Field({ name: 'Id' })
+  id: number;
 
-  @Field()
-  Annio: string;
+  @Field({ name: 'Anno' })
+  anno: string;
 
-  @Field()
-  Mes: number;
+  @Field({ name: 'Mes' })
+  mes: number;
 
-  @Field()
-  Tipo: string;
+  @Field({ name: 'Tipo' })
+  tipo: string;
 
-  @Field()
-  CuentaEmisor?: string;
+  @Field({ name: 'CuentaEmisor' })
+  cuenta_emisor?: string;
 
-  @Field()
-  SubCuentaEmisor?: string;
+  @Field({ name: 'SubCuentaEmisor' })
+  subcuenta_emisor?: string;
 
-  @Field()
-  DivisionEmisor: number;
+  @Field({ name: 'DivisionEmisor' })
+  division_emisor: number;
 
-  @Field()
-  Emisor: number;
+  @Field({ name: 'Emisor' })
+  emisor: number;
 
-  @Field()
-  CuentaReceptor?: string;
+  @Field({ name: 'CuentaReceptor' })
+  cuenta_receptor?: string;
 
-  @Field()
-  SubCuentaReceptor?: string;
+  @Field({ name: 'SubCuentaReceptor' })
+  subcuenta_receptor?: string;
 
-  @Field()
-  DivisionReceptor: number;
+  @Field({ name: 'DivisionReceptor' })
+  division_receptor?: number;
 
-  @Field()
-  Receptor: number;
+  @Field({ name: 'Receptor' })
+  receptor: number;
 
-  @Field()
-  Documento: string;
+  @Field({ name: 'Documento' })
+  documento: string;
 
-  @Field({ nullable: true })
-  FechaEmision?: string;
+  @Field({ name: 'FechaEmision', nullable: true })
+  fecha_emision?: string;
 
-  @Field()
-  ValorEmisor: number;
+  @Field({ name: 'ValorEmisor' })
+  valor_emisor: number;
 
-  @Field({ nullable: true })
-  FechaRecepcion?: string;
+  @Field({ name: 'FechaRecepcion', nullable: true })
+  fecha_recepcion?: string;
 
-  @Field()
-  ValorReceptor: number;
+  @Field({ name: 'ValorReceptor' })
+  valor_receptor: number;
 
-  @Field()
-  DiferenciaDias: number;
+  @Field({ name: 'DiferenciaDias', nullable: true })
+  diferencia_dias?: number;
 
-  @Field()
-  DiferenciaImporte: number;
+  @Field({ name: 'DiferenciaImporte' })
+  diferencia_importe: number;
 
-  @Field()
-  Recibido: boolean;
+  @Field({ name: 'Recibido' })
+  recibido: boolean;
 }
 
 @ObjectType()
 export class ActaConciliacion {
-  @Field()
-  ID: number;
+  @Field({ name: 'ID' })
+  id: number;
 
-  @Field()
-  Detalle: string;
+  @Field({ name: 'Detalle' })
+  detalle: string;
 
-  @Field()
-  Emisor: number;
+  @Field({ name: 'Emisor' })
+  emisor: number;
 
-  @Field()
-  Receptor: number;
+  @Field({ name: 'Receptor' })
+  receptor: number;
 
-  @Field()
-  SaldoEmisor: number;
+  @Field({ name: 'SaldoEmisor' })
+  saldo_emisor: number;
 
-  @Field()
-  SaldoReceptor: number;
+  @Field({ name: 'SaldoReceptor' })
+  saldo_receptor: number;
 
-  @Field()
-  Diferencia: number;
+  @Field({ name: 'Diferencia' })
+  diferencia: number;
 }
 
 @ObjectType()
@@ -98,60 +98,60 @@ export class ConciliaExternaContabilidadEntity {
 
 @ObjectType()
 export class ViewConciliaExtContabilidadResumen {
-  @Field()
-  Annio: number;
+  @Field({ name: 'Anno' })
+  anno: number;
 
-  @Field()
-  Mes: number;
+  @Field({ name: 'Mes' })
+  mes: number;
 
-  @Field()
-  DivisionEmisor: string;
+  @Field({ name: 'DivisionEmisor' })
+  division_emisor: string;
 
-  @Field()
-  ValorEmisor: number;
+  @Field({ name: 'ValorEmisor' })
+  valor_emisor: number;
 
-  @Field()
-  DivisionReceptor: string;
+  @Field({ name: 'DivisionReceptor' })
+  division_receptor: string;
 
-  @Field()
-  ValorReceptor: number;
+  @Field({ name: 'ValorReceptor' })
+  valor_receptor: number;
 
-  @Field()
-  Diferencia: number;
+  @Field({ name: 'Diferencia' })
+  diferencia: number;
 }
 
 @ObjectType()
 export class ViewConciliaExtContabilidadDeudasPorEdades {
-  @Field()
-  TipoOperacion: string;
+  @Field({ name: 'TipoOperacion' })
+  tipo_operacion: string;
 
-  @Field()
-  Annio: number;
+  @Field({ name: 'Anno' })
+  anno: number;
 
-  @Field()
-  Mes: number;
+  @Field({ name: 'Mes' })
+  mes: number;
 
-  @Field()
-  IdDivision: number;
+  @Field({ name: 'IdDivision' })
+  id_division: number;
 
-  @Field()
-  Division: string;
+  @Field({ name: 'Division' })
+  division: string;
 
-  @Field()
-  Valor: number;
+  @Field({ name: 'Valor' })
+  valor: number;
 
-  @Field()
-  De0a30: number;
+  @Field({ name: 'De0a30' })
+  de0a30: number;
 
-  @Field()
-  De30a60: number;
+  @Field({ name: 'De30a60' })
+  de30a60: number;
 
-  @Field()
-  De60a90: number;
+  @Field({ name: 'De60a90' })
+  de60a90: number;
 
-  @Field()
-  De90a365: number;
+  @Field({ name: 'De90a365' })
+  de90a365: number;
 
-  @Field()
-  MasDe1Anno: number;
+  @Field({ name: 'MasDe1Anno' })
+  mas1anno: number;
 }

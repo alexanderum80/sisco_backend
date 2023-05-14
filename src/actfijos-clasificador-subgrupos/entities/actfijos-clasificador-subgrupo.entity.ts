@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryColumn } from 'typeorm';
 import { ObjectType, Field, Int, Float } from '@nestjs/graphql';
 
 @ObjectType()
-@Entity('ActFijos_Clasificador_Subgrupos')
+@Entity('actfijos_clasificador_subgrupos')
 export class ActFijosClasificadorSubgrupoEntity {
   @Field(() => Int)
   @PrimaryColumn('int', { name: 'grupo' })

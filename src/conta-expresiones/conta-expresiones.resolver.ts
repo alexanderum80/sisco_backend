@@ -3,13 +3,7 @@ import { Usuarios } from './../usuarios/usuarios.entity';
 import { AuthGuard } from '../shared/guards/auth.guard';
 import { ExpresionesResumenEntity, ExpresionesDetalleEntity } from './conta-expresiones.entity';
 import { Args, Int, Mutation, Query, Resolver, Context } from '@nestjs/graphql';
-import {
-  ContaExpresionDetalleQueryResponse,
-  ContaExpresionesDetalleQueryResponse,
-  ContaExpresionesResumenQueryResponse,
-  ContaExpresionInput,
-  ContaExpresionResumenQueryResponse,
-} from './conta-expresiones.model';
+import { ContaExpresionInput } from './conta-expresiones.model';
 import { ContaExpresionesService } from './conta-expresiones.service';
 import { MutationResponse } from '../shared/models/mutation.response.model';
 import { UseGuards } from '@nestjs/common';
@@ -18,14 +12,14 @@ import { UseGuards } from '@nestjs/common';
 export class ContaExpresionesResumenResolver {
   constructor(private expresionesSvc: ContaExpresionesService) {}
 
-  @Query(() => ContaExpresionesResumenQueryResponse)
+  @Query(() => [ExpresionesResumenEntity])
   @UseGuards(new AuthGuard())
-  async getAllExpresionesResumen(@Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios): Promise<ContaExpresionesResumenQueryResponse> {
+  async getAllExpresionesResumen(@Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios): Promise<ExpresionesResumenEntity[]> {
     return this.expresionesSvc.findAllResumen(user);
   }
 
-  @Query(() => ContaExpresionResumenQueryResponse)
-  async getExpresionResumenById(@Args({ name: 'id', type: () => Int }) id: number): Promise<ContaExpresionResumenQueryResponse> {
+  @Query(() => ExpresionesResumenEntity)
+  async getExpresionResumenById(@Args({ name: 'id', type: () => Int }) id: number): Promise<ExpresionesResumenEntity> {
     return this.expresionesSvc.findOneResumen(id);
   }
 
@@ -53,18 +47,18 @@ export class ContaExpresionesResumenResolver {
 export class ContaExpresionesDetalleResolver {
   constructor(private expresionesSvc: ContaExpresionesService) {}
 
-  @Query(() => ContaExpresionesDetalleQueryResponse)
-  async getAllExpresionesDetalle(): Promise<ContaExpresionesDetalleQueryResponse> {
+  @Query(() => [ExpresionesDetalleEntity])
+  async getAllExpresionesDetalle(): Promise<ExpresionesDetalleEntity[]> {
     return this.expresionesSvc.findAllDetalle();
   }
 
-  @Query(() => ContaExpresionesDetalleQueryResponse)
-  async getExpresionesDetalleByIdResumen(@Args({ name: 'idResumen', type: () => Int }) idResumen: number): Promise<ContaExpresionesDetalleQueryResponse> {
+  @Query(() => [ExpresionesDetalleEntity])
+  async getExpresionesDetalleByIdResumen(@Args({ name: 'idResumen', type: () => Int }) idResumen: number): Promise<ExpresionesDetalleEntity[]> {
     return this.expresionesSvc.findOneDetalleByResumen(idResumen);
   }
 
-  @Query(() => ContaExpresionDetalleQueryResponse)
-  async getExpresionDetalleById(@Args({ name: 'id', type: () => Int }) id: number): Promise<ContaExpresionDetalleQueryResponse> {
+  @Query(() => ExpresionesDetalleEntity)
+  async getExpresionDetalleById(@Args({ name: 'id', type: () => Int }) id: number): Promise<ExpresionesDetalleEntity> {
     return this.expresionesSvc.findOneDetalle(id);
   }
 

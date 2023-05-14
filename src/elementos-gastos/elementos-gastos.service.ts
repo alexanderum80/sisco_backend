@@ -1,51 +1,45 @@
 import { MutationResponse } from './../shared/models/mutation.response.model';
-import { ElementosGastosQueryResponse, ElementoGastoQueryResponse, ElementoGastoInput } from './elementos-gastos.model';
-import { ContaElementosGastos } from './elementos-gastos.entity';
+import { ElementoGastoInput } from './elementos-gastos.model';
+import { ContaElementosGastosEntity } from './elementos-gastos.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class ElementosGastosService {
-  constructor(@InjectRepository(ContaElementosGastos) private readonly elementosGastosRepository: Repository<ContaElementosGastos>) {}
+  constructor(@InjectRepository(ContaElementosGastosEntity) private readonly elementosGastosRepository: Repository<ContaElementosGastosEntity>) {}
 
-  async getAllElementoGastos(): Promise<ElementosGastosQueryResponse> {
+  async getAllElementoGastos(): Promise<ContaElementosGastosEntity[]> {
     try {
-      return new Promise<ElementosGastosQueryResponse>(resolve => {
+      return new Promise<ContaElementosGastosEntity[]>((resolve, reject) => {
         this.elementosGastosRepository
-          .find()
+          .find({ order: { Egasto: 'ASC' } })
           .then(result => {
-            resolve({
-              success: true,
-              data: result,
-            });
+            resolve(result);
           })
           .catch(err => {
-            resolve({ success: false, error: err.message ? err.message : err });
+            reject(err.message || err);
           });
       });
     } catch (err: any) {
-      return { success: false, error: err.message ? err.message : err };
+      return Promise.reject(err.message || err);
     }
   }
 
-  async getElementoGastoById(id: string): Promise<ElementoGastoQueryResponse> {
+  async getElementoGastoById(id: string): Promise<ContaElementosGastosEntity> {
     try {
-      return new Promise<ElementoGastoQueryResponse>(resolve => {
+      return new Promise<ContaElementosGastosEntity>((resolve, reject) => {
         this.elementosGastosRepository
           .findOne({ where: [{ Egasto: id }] })
           .then(result => {
-            resolve({
-              success: true,
-              data: result,
-            });
+            resolve(result);
           })
           .catch(err => {
-            resolve({ success: false, error: err.message ? err.message : err });
+            reject(err.message || err);
           });
       });
     } catch (err: any) {
-      return { success: false, error: err.message ? err.message : err };
+      return Promise.reject(err.message || err);
     }
   }
 

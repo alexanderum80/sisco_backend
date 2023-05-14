@@ -12,7 +12,7 @@ export class ConciliaInternaContaService {
     const { annio, periodo, centro, unidad, emisorReceptor } = conciliaInternaContaInput;
     return new Promise<ConciliaInternaConta>((resolve, reject) => {
       this.dataSource
-        .query('EXEC p_CuadreOperacionesDependencias @0, @1, @2, @3, @4', [annio, periodo, centro, unidad, emisorReceptor])
+        .query('select * from conta_cuadre_operaciones_dependencias ($1, $2, $3, $4, $5)', [annio, periodo, centro, unidad, emisorReceptor])
         .then(res => {
           resolve(res);
         })

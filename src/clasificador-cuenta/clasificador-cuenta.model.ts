@@ -1,12 +1,4 @@
-import { MultipleQueryResponse, SingleQueryResponse } from './../shared/models/query.response.model';
-import { ClasificadorCuentaRealEntity } from './clasificador-cuenta.entity';
 import { Field, ObjectType, InputType } from '@nestjs/graphql';
-
-@ObjectType()
-export class ClasificadorCuentaQueryResponse extends SingleQueryResponse(ClasificadorCuentaRealEntity) {}
-
-@ObjectType()
-export class ClasificadorCuentasQueryResponse extends MultipleQueryResponse(ClasificadorCuentaRealEntity) {}
 
 @InputType()
 export class ClasificadorCuentaRealInput {
@@ -88,9 +80,6 @@ export class CuentasAgrupadas {
   @Field()
   Cuenta: string;
 }
-
-@ObjectType()
-export class CuentasAgrupadasQueryResponse extends MultipleQueryResponse(CuentasAgrupadas) {}
 
 export enum ETipoClasificadorCuenta {
   Consolidado = 1,

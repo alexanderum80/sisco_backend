@@ -2,81 +2,84 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @ObjectType()
-@Entity('Conta_Expresiones_Resumen')
+@Entity('conta_expresiones_resumen')
 export class ExpresionesResumenEntity {
   @Field()
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ name: 'id_expresion' })
   IdExpresion: number;
 
   @Field()
-  @Column()
+  @Column({ name: 'expresion' })
   Expresion: string;
 
   @Field({ nullable: true })
-  @Column()
+  @Column({ name: 'descripcion' })
   Descripcion: string;
 
   @Field()
-  @Column()
+  @Column({ name: 'acumulado' })
   Acumulado: boolean;
 
   @Field()
-  @Column()
+  @Column({ name: 'operaciones_internas' })
   OperacionesInternas: boolean;
 
   @Field()
-  @Column()
+  @Column({ name: 'centralizada' })
   Centralizada: boolean;
 
   @Field()
-  @Column()
+  @Column({ name: 'id_division' })
   IdDivision: number;
 }
 
 @ObjectType()
-@Entity('Conta_Expresiones_Detalle')
+@Entity('conta_expresiones_detalle')
 export class ExpresionesDetalleEntity {
   @Field()
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn({ name: 'id' })
+  Id: number;
 
   @Field()
-  @Column()
+  @Column({ name: 'id_expresion' })
   IdExpresion: number;
 
   @Field({ nullable: true })
-  @Column({ type: 'varchar', length: 3 })
+  @Column({ name: 'centro', type: 'varchar', length: 3 })
   Centro: string;
 
   @Field({ nullable: true })
-  @Column({ type: 'varchar', length: 8 })
+  @Column({ name: 'cta', type: 'varchar', length: 8 })
   Cta: string;
 
   @Field({ nullable: true })
-  @Column({ type: 'varchar', length: 8 })
+  @Column({ name: 'subcta', type: 'varchar', length: 8 })
   SubCta: string;
 
   @Field({ nullable: true })
-  @Column({ type: 'varchar', length: 10 })
+  @Column({ name: 'crit1', type: 'varchar', length: 10 })
   Crit1: string;
 
   @Field({ nullable: true })
-  @Column({ type: 'varchar', length: 10 })
+  @Column({ name: 'crit2', type: 'varchar', length: 10 })
   Crit2: string;
 
   @Field({ nullable: true })
-  @Column({ type: 'varchar', length: 10 })
+  @Column({ name: 'crit3', type: 'varchar', length: 10 })
   Crit3: string;
 
   @Field()
-  @Column({ type: 'varchar', length: 1 })
+  @Column({ name: 'signo', type: 'varchar', length: 1 })
   Signo: string;
 
   @Field()
-  @Column()
+  @Column({ name: 'por_ciento' })
   PorCiento: number;
 
   @Field()
-  @Column()
+  @Column({ name: 'tipo_valor' })
   TipoValor: number;
+
+  @Field({ nullable: true })
+  TipoValorDesc?: string;
 }

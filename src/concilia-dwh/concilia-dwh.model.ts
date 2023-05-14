@@ -63,30 +63,6 @@ export class ConciliaDWH {
   nota?: string;
 }
 
-@ObjectType()
-export class ParteAtrasosQueryResponse {
-  @Field()
-  success: boolean;
-
-  @Field({ nullable: true })
-  data?: string;
-
-  @Field(() => String, { nullable: true })
-  error?: string;
-}
-
-@ObjectType()
-export class DatosIdGAMQueryResponse {
-  @Field()
-  success: boolean;
-
-  @Field({ nullable: true })
-  data?: string;
-
-  @Field(() => String, { nullable: true })
-  error?: string;
-}
-
 @InputType()
 export class ConciliaDWHInput {
   @Field()

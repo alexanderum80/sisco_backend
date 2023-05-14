@@ -28,7 +28,6 @@ import { ClasificadorCuentaModule } from './clasificador-cuenta/clasificador-cue
 import { ConciliaExtContabilidadModule } from './concilia-externa-contabilidad/concilia-externa-contabilidad.module';
 import { TipoEntidadesModule } from './tipo-entidades/tipo-entidades.module';
 import { EpigrafesModule } from './epigrafes/epigrafes.module';
-import { CuentaEntidadModule } from './cuenta-entidad/cuenta-entidad.module';
 import { ElementosGastosModule } from './elementos-gastos/elementos-gastos.module';
 import { ClasificadorEntidadesModule } from './clasificador-entidades/clasificador-entidades.module';
 import { ContaExpresionesModule } from './conta-expresiones/conta-expresiones.module';
@@ -98,7 +97,6 @@ import { LogsModule } from './logs/logs.module';
     ConciliaExtContabilidadModule,
     TipoEntidadesModule,
     EpigrafesModule,
-    CuentaEntidadModule,
     ElementosGastosModule,
     ClasificadorEntidadesModule,
     ContaExpresionesModule,

@@ -2,7 +2,7 @@ import { ObjectType, Field } from '@nestjs/graphql';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @ObjectType()
-@Entity('Conta_Comprobar_Valores')
+@Entity('conta_comprobar_valores')
 export class ComprobarValoresEntity {
   @Field()
   @PrimaryGeneratedColumn({ name: 'id' })
@@ -12,14 +12,14 @@ export class ComprobarValoresEntity {
   @Column({ name: 'id_centro' })
   IdCentro: number;
 
-  @Field({ name: 'centro' })
+  @Field()
   Centro?: string;
 
   @Field()
   @Column({ name: 'id_expresion' })
   IdExpresion: number;
 
-  @Field({ name: 'expresion' })
+  @Field()
   Expresion?: string;
 
   @Field()

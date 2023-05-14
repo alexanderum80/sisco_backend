@@ -5,21 +5,21 @@ import { AuthGuard } from '../shared/guards/auth.guard';
 import { Resolver, Query, Mutation, Args, Int, Context } from '@nestjs/graphql';
 import { ContaComprobarValoresService } from './conta-comprobar-valores.service';
 import { ComprobarValoresEntity } from './conta-comprobar-valores.entity';
-import { ComprobarValoresInput, ComprobarValoresQueryResponse, ComprobarValorQueryResponse } from './conta-comprobar-valores.model';
+import { ComprobarValoresInput } from './conta-comprobar-valores.model';
 import { UseGuards } from '@nestjs/common';
 
 @Resolver(() => ComprobarValoresEntity)
 export class ContaComprobarValoresResolver {
   constructor(private readonly contaComprobarValoresService: ContaComprobarValoresService) {}
 
-  @Query(() => ComprobarValoresQueryResponse)
+  @Query(() => [ComprobarValoresEntity])
   @UseGuards(new AuthGuard())
-  async getAllComprobarValores(@Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios): Promise<ComprobarValoresQueryResponse> {
+  async getAllComprobarValores(@Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios): Promise<ComprobarValoresEntity[]> {
     return this.contaComprobarValoresService.findAll(user);
   }
 
-  @Query(() => ComprobarValorQueryResponse)
-  async getComprobarValorById(@Args('id', { type: () => Int }) id: number): Promise<ComprobarValorQueryResponse> {
+  @Query(() => ComprobarValoresEntity)
+  async getComprobarValorById(@Args('id', { type: () => Int }) id: number): Promise<ComprobarValoresEntity> {
     return this.contaComprobarValoresService.findOne(id);
   }
 
