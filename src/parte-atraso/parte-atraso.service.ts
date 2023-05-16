@@ -56,22 +56,22 @@ export class ParteAtrasoService {
             AtrasoEmp: 0,
           };
 
-          const atrasoRest = results[0].data?.find((f: any) => f.IdUnidad === unidad.IdUnidad);
+          const atrasoRest = results[0].find((f: any) => f.IdUnidad === unidad.IdUnidad);
           if (atrasoRest) {
             parteUnidad.AtrasoRest = atrasoRest.Atraso;
           }
 
-          const atrasoDWH = results[1].data?.find((f: any) => f.IdUnidad === unidad.IdUnidad);
+          const atrasoDWH = results[1].find((f: any) => f.IdUnidad === unidad.IdUnidad);
           if (atrasoDWH) {
             parteUnidad.AtrasoDWH = atrasoDWH.Atraso;
           }
 
-          const atrasoDist = results[2].data?.find((f: any) => f.IdUnidad === unidad.IdUnidad);
+          const atrasoDist = results[2].find((f: any) => f.IdUnidad === unidad.IdUnidad);
           if (atrasoDist) {
             parteUnidad.AtrasoDist = atrasoDist.Atraso;
           }
 
-          const atrasoEmp = results[3].data?.find((f: any) => f.IdUnidad === unidad.IdUnidad);
+          const atrasoEmp = results[3].find((f: any) => f.IdUnidad === unidad.IdUnidad);
           if (atrasoEmp) {
             parteUnidad.AtrasoEmp = atrasoEmp.Atraso;
           }

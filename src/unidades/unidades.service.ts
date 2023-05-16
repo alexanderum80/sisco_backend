@@ -95,7 +95,13 @@ export class UnidadesService {
     try {
       return new Promise<any>(resolve => {
         this.unidadesRepository
-          .find({ where: [{ IdComplejo: idSubdivision }, { IdUnidad: idSubdivision }], relations: { Division: true } })
+          .find({
+            where: [
+              { IdComplejo: idSubdivision, Abierta: true },
+              { IdUnidad: idSubdivision, Abierta: true },
+            ],
+            relations: { Division: true },
+          })
           // this.dataSource
           //   .query(
           //     `Select U.*, D.Division from Unidades AS U INNER JOIN Divisiones AS D ON D.Id_Division = U.Id_Division
@@ -125,7 +131,7 @@ export class UnidadesService {
     try {
       return new Promise<any>(resolve => {
         this.unidadesRepository
-          .find({ where: { IdDivision: idDivision }, relations: { Division: true } })
+          .find({ where: { IdDivision: idDivision, Abierta: true }, relations: { Division: true } })
           // this.dataSource
           //   .query(
           //     `Select U.*, D.Division from Unidades AS U INNER JOIN Divisiones AS D ON D.Id_Division = U.Id_Division
