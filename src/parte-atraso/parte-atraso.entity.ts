@@ -15,16 +15,16 @@ export class ParteAtrasoEntity {
   Division: string;
 
   @Field()
-  AtrasoRest: number;
+  AtrasoRest: string;
 
   @Field()
-  AtrasoDWH: number;
+  AtrasoDWH: string;
 
   @Field()
-  AtrasoDist: number;
+  AtrasoDist: string;
 
   @Field()
-  AtrasoEmp: number;
+  AtrasoEmp: string;
 }
 
 @ObjectType()

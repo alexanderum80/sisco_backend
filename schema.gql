@@ -330,10 +330,10 @@ type ParteAtrasoEntity {
   Unidad: String!
   IdDivision: Float!
   Division: String!
-  AtrasoRest: Float!
-  AtrasoDWH: Float!
-  AtrasoDist: Float!
-  AtrasoEmp: Float!
+  AtrasoRest: String!
+  AtrasoDWH: String!
+  AtrasoDist: String!
+  AtrasoEmp: String!
 }
 
 type DatosIdGamEntity {

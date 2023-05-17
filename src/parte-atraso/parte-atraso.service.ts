@@ -50,10 +50,10 @@ export class ParteAtrasoService {
             Unidad: unidad.IdUnidad + '-' + unidad.Nombre,
             IdDivision: unidad.IdDivision,
             Division: unidad.IdDivision + '-' + unidad.Division.Division,
-            AtrasoRest: 0,
-            AtrasoDWH: 0,
-            AtrasoDist: 0,
-            AtrasoEmp: 0,
+            AtrasoRest: '0',
+            AtrasoDWH: '0',
+            AtrasoDist: '0',
+            AtrasoEmp: '0',
           };
 
           const atrasoRest = results[0].find((f: any) => f.IdUnidad === unidad.IdUnidad);
