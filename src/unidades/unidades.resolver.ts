@@ -1,5 +1,5 @@
 import { DEFAULT_GRAPHQL_CONTEXT } from './../shared/models/jwt.model';
-import { Usuarios } from './../usuarios/usuarios.entity';
+import { UsuariosEntity } from './../usuarios/usuarios.entity';
 import { UnidadesService } from './unidades.service';
 import { CentrosView, UnidadesEntity } from './unidades.entity';
 import { Args, Context, Int, Query, Resolver } from '@nestjs/graphql';
@@ -18,7 +18,7 @@ export class UnidadesResolver {
 
   @Query(() => [CentrosView])
   @UseGuards(new AuthGuard())
-  async getAllUnidadesByUsuario(@Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios): Promise<CentrosView[]> {
+  async getAllUnidadesByUsuario(@Context(DEFAULT_GRAPHQL_CONTEXT) user: UsuariosEntity): Promise<CentrosView[]> {
     return this._unidadesService.getAllUnidades(user);
   }
 

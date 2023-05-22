@@ -3,7 +3,7 @@ import { GraphQLErrorOptions } from 'graphql';
 import { GraphQLError } from 'graphql';
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { UsuariosQueryResponse, UsuarioInput, ETipoUsuarios, UsuarioQueryResponse, UsuarioInfo } from './usuarios.model';
-import { Usuarios } from './usuarios.entity';
+import { UsuariosEntity } from './usuarios.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
@@ -12,9 +12,9 @@ import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class UsuariosService {
-  constructor(@InjectDataSource() private readonly dataSource: DataSource, @InjectRepository(Usuarios) private readonly usuariosRepository: Repository<Usuarios>) {}
+  constructor(@InjectDataSource() private readonly dataSource: DataSource, @InjectRepository(UsuariosEntity) private readonly usuariosRepository: Repository<UsuariosEntity>) {}
 
-  async authenticate(usuario: string, passw: string): Promise<Usuarios> {
+  async authenticate(usuario: string, passw: string): Promise<UsuariosEntity> {
     try {
       const usuarioInfo = { ...UsuarioInfo };
 
@@ -28,7 +28,7 @@ export class UsuariosService {
         }
       }
 
-      return new Promise<Usuarios>((resolve, reject) => {
+      return new Promise<UsuariosEntity>((resolve, reject) => {
         this.usuariosRepository
           .findOne({ where: { Usuario: usuario }, relations: ['TipoUsuario', 'Division'] })
           .then(async response => {
@@ -69,7 +69,7 @@ export class UsuariosService {
     }
   }
 
-  async refreshToken(token): Promise<Usuarios> {
+  async refreshToken(token): Promise<UsuariosEntity> {
     try {
       let decryptedToken;
 
@@ -92,7 +92,7 @@ export class UsuariosService {
       decryptedToken.Token = await this.createToken(decryptedToken);
       decryptedToken.RefreshToken = await this.createRefreshToken(decryptedToken);
 
-      return new Promise<Usuarios>(resolve => {
+      return new Promise<UsuariosEntity>(resolve => {
         resolve(decryptedToken);
       });
     } catch (err) {
@@ -100,7 +100,7 @@ export class UsuariosService {
     }
   }
 
-  private createToken(userInfo: Usuarios) {
+  private createToken(userInfo: UsuariosEntity) {
     return jwt.sign(
       userInfo,
       SECRET_KEY,
@@ -108,7 +108,7 @@ export class UsuariosService {
     );
   }
 
-  private createRefreshToken(userInfo: Usuarios) {
+  private createRefreshToken(userInfo: UsuariosEntity) {
     return jwt.sign(
       userInfo,
       SECRET_REFRESH,
@@ -120,7 +120,7 @@ export class UsuariosService {
     try {
       return new Promise<UsuariosQueryResponse>(resolve => {
         this.usuariosRepository
-          .find({ relations: ['TipoUsuario', 'Division'] })
+          .find({ relations: ['TipoUsuario', 'Division'], order: { IdUsuario: 'ASC' } })
           .then(result => {
             resolve({
               success: true,
@@ -210,7 +210,7 @@ export class UsuariosService {
       return new Promise<MutationResponse>(resolve => {
         this.dataSource
           .createQueryBuilder()
-          .update(Usuarios)
+          .update(UsuariosEntity)
           .set({ Contrasena: encryptedPassw, CambiarContrasena: false })
           .where('IdUsuario = :id', { id: idUsuario })
           .execute()

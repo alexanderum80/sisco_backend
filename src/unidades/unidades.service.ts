@@ -1,4 +1,4 @@
-import { Usuarios } from './../usuarios/usuarios.entity';
+import { UsuariosEntity } from './../usuarios/usuarios.entity';
 import { UsuariosService } from './../usuarios/usuarios.service';
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
@@ -13,7 +13,7 @@ export class UnidadesService {
     private _usuariosSvc: UsuariosService,
   ) {}
 
-  async getAllUnidades(user?: Usuarios): Promise<CentrosView[]> {
+  async getAllUnidades(user?: UsuariosEntity): Promise<CentrosView[]> {
     try {
       let _condition = {};
 

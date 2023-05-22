@@ -5,7 +5,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 't
 
 @ObjectType()
 @Entity('usuarios')
-export class Usuarios {
+export class UsuariosEntity {
   @Field()
   @PrimaryGeneratedColumn({ name: 'id_usuario' })
   IdUsuario: number;

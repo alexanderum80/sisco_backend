@@ -2,7 +2,7 @@ import { ExpresionesResumenEntity } from './../conta-expresiones/conta-expresion
 import { ContaOperadoresEntity as OperadoresEntity } from './../conta-operadores/conta-operadores.entity';
 import { CentrosView } from './../unidades/unidades.entity';
 import { MutationResponse } from './../shared/models/mutation.response.model';
-import { Usuarios } from './../usuarios/usuarios.entity';
+import { UsuariosEntity } from './../usuarios/usuarios.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ComprobarValoresEntity } from './conta-comprobar-valores.entity';
@@ -13,7 +13,7 @@ import { ComprobarValoresInput } from './conta-comprobar-valores.model';
 export class ContaComprobarValoresService {
   constructor(@InjectRepository(ComprobarValoresEntity) private readonly comprobarValoresEntity: Repository<ComprobarValoresEntity>) {}
 
-  async findAll(user: Usuarios): Promise<ComprobarValoresEntity[]> {
+  async findAll(user: UsuariosEntity): Promise<ComprobarValoresEntity[]> {
     try {
       const { IdDivision } = user;
 
@@ -64,7 +64,7 @@ export class ContaComprobarValoresService {
     }
   }
 
-  async create(user: Usuarios, comprobarValoresInput: ComprobarValoresInput): Promise<MutationResponse> {
+  async create(user: UsuariosEntity, comprobarValoresInput: ComprobarValoresInput): Promise<MutationResponse> {
     try {
       const { IdDivision } = user;
 

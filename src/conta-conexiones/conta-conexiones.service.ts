@@ -1,5 +1,5 @@
 import { DEFAULT_POSTGRES_CONNECTION_STRING } from './../conexiones/conexiones.model';
-import { Usuarios } from './../usuarios/usuarios.entity';
+import { UsuariosEntity } from './../usuarios/usuarios.entity';
 import { UsuariosService } from './../usuarios/usuarios.service';
 import { cloneDeep } from 'lodash';
 import { MutationResponse } from './../shared/models/mutation.response.model';
@@ -13,7 +13,7 @@ import { DataSource, Repository } from 'typeorm';
 export class ContaConexionesService {
   constructor(@InjectRepository(ContaConexionesEntity) private readonly conexionesRespository: Repository<ContaConexionesEntity>, private _usuariosSvc: UsuariosService) {}
 
-  async findAll(user: Usuarios): Promise<ContaConexionesEntity[]> {
+  async findAll(user: UsuariosEntity): Promise<ContaConexionesEntity[]> {
     try {
       const { IdDivision, IdTipoUsuario } = user;
 

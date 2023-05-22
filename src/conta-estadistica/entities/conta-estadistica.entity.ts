@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { PrimaryColumn, ViewColumn, ViewEntity } from 'typeorm';
 import { ObjectType, Field, Int } from '@nestjs/graphql';
 
 @ObjectType()
@@ -50,61 +50,63 @@ export class ContaEstadisticaView {
 }
 
 @ObjectType()
-@Entity('Conta_Estadistica')
-export class ContaEstadisticaEntity {
-  @Column()
+@ViewEntity('v_conta_estadistica')
+export class ContaEstadisticaParteView {
   @Field()
+  @ViewColumn({ name: 'division' })
   Division: string;
 
-  @PrimaryColumn()
   @Field()
+  @ViewColumn({ name: 'centro' })
+  @PrimaryColumn({ name: 'centro' })
   Centro: string;
 
-  @PrimaryColumn()
   @Field(() => Boolean)
+  @ViewColumn({ name: 'consolidado' })
+  @PrimaryColumn({ name: 'consolidado' })
   Consolidado: boolean;
 
-  @Column()
   @Field(() => Int)
-  Annio: number;
+  @ViewColumn({ name: 'anno' })
+  Anno: number;
 
-  @Column()
   @Field(() => Int)
+  @ViewColumn({ name: 'periodo' })
   Periodo: number;
 
-  @Column()
   @Field(() => Date, { nullable: true })
+  @ViewColumn({ name: 'fecha_actualizacion' })
   FechaActualizacion?: Date;
 
-  @Column()
   @Field(() => Date, { nullable: true })
+  @ViewColumn({ name: 'fecha_inicio' })
   FechaInicio?: Date;
 
-  @Column()
   @Field(() => Date, { nullable: true })
+  @ViewColumn({ name: 'fecha_fin' })
   FechaFin?: Date;
 
-  @Column()
   @Field(() => Int)
+  @ViewColumn({ name: 'comprobantes' })
   Comprobantes: number;
 
-  @Column()
   @Field(() => Int)
+  @ViewColumn({ name: 'traspasados' })
   Traspasados: number;
 
-  @Column()
   @Field(() => Int)
+  @ViewColumn({ name: 'sin_traspasar' })
   SinTraspasar: number;
 
-  @Column()
   @Field(() => Int)
+  @ViewColumn({ name: 'inconclusos' })
   Inconclusos: number;
 
-  @Column()
   @Field(() => Int)
+  @ViewColumn({ name: 'anulados' })
   Anulados: number;
 
-  @Column({ default: 0 })
-  @Field(() => Int)
-  Conexion: number;
+  @Field()
+  @ViewColumn({ name: 'conexion' })
+  Conexion: string;
 }

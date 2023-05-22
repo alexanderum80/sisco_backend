@@ -1,4 +1,4 @@
-import { Usuarios } from './../usuarios/usuarios.entity';
+import { UsuariosEntity } from './../usuarios/usuarios.entity';
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { ExpresionesResumenEntity, ExpresionesDetalleEntity } from './conta-expresiones.entity';
 import { Injectable } from '@nestjs/common';
@@ -15,7 +15,7 @@ export class ContaExpresionesService {
     @InjectRepository(ExpresionesDetalleEntity) private readonly contaExpresionDetalleRepository: Repository<ExpresionesDetalleEntity>,
   ) {}
 
-  async create(user: Usuarios, expresionInput: ContaExpresionInput): Promise<MutationResponse> {
+  async create(user: UsuariosEntity, expresionInput: ContaExpresionInput): Promise<MutationResponse> {
     try {
       const { ExpresionResumen, ExpresionesDetalle } = expresionInput;
       delete ExpresionResumen.IdExpresion;
@@ -80,7 +80,7 @@ export class ContaExpresionesService {
   }
 
   // Expresiones Resumen
-  async findAllResumen(user: Usuarios): Promise<ExpresionesResumenEntity[]> {
+  async findAllResumen(user: UsuariosEntity): Promise<ExpresionesResumenEntity[]> {
     try {
       const { IdDivision } = user;
 

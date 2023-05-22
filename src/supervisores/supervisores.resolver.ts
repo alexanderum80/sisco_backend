@@ -1,5 +1,5 @@
 import { DEFAULT_GRAPHQL_CONTEXT } from './../shared/models/jwt.model';
-import { Usuarios } from './../usuarios/usuarios.entity';
+import { UsuariosEntity } from './../usuarios/usuarios.entity';
 import { SupervisoresQueryResponse, SupervisorQueryResponse, SupervisorInput } from './supervisores.model';
 import { SupervisoresService } from './supervisores.service';
 import { Supervisor } from './supervisores.entity';
@@ -13,7 +13,7 @@ export class SupervisoresResolver {
 
   @Query(() => SupervisoresQueryResponse)
   @UseGuards(new AuthGuard())
-  async getAllSupervisores(@Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios): Promise<SupervisoresQueryResponse> {
+  async getAllSupervisores(@Context(DEFAULT_GRAPHQL_CONTEXT) user: UsuariosEntity): Promise<SupervisoresQueryResponse> {
     return this._supervisorService.findAll(user);
   }
 

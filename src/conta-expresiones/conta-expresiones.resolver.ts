@@ -1,5 +1,5 @@
 import { DEFAULT_GRAPHQL_CONTEXT } from './../shared/models/jwt.model';
-import { Usuarios } from './../usuarios/usuarios.entity';
+import { UsuariosEntity } from './../usuarios/usuarios.entity';
 import { AuthGuard } from '../shared/guards/auth.guard';
 import { ExpresionesResumenEntity, ExpresionesDetalleEntity } from './conta-expresiones.entity';
 import { Args, Int, Mutation, Query, Resolver, Context } from '@nestjs/graphql';
@@ -14,7 +14,7 @@ export class ContaExpresionesResumenResolver {
 
   @Query(() => [ExpresionesResumenEntity])
   @UseGuards(new AuthGuard())
-  async getAllExpresionesResumen(@Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios): Promise<ExpresionesResumenEntity[]> {
+  async getAllExpresionesResumen(@Context(DEFAULT_GRAPHQL_CONTEXT) user: UsuariosEntity): Promise<ExpresionesResumenEntity[]> {
     return this.expresionesSvc.findAllResumen(user);
   }
 
@@ -26,7 +26,7 @@ export class ContaExpresionesResumenResolver {
   @Mutation(() => MutationResponse)
   @UseGuards(new AuthGuard())
   async createExpresion(
-    @Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios,
+    @Context(DEFAULT_GRAPHQL_CONTEXT) user: UsuariosEntity,
     @Args({ name: 'expresionInput', type: () => ContaExpresionInput }) expresionInput: ContaExpresionInput,
   ): Promise<MutationResponse> {
     return this.expresionesSvc.create(user, expresionInput);

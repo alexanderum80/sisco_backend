@@ -1,5 +1,5 @@
 import { DEFAULT_GRAPHQL_CONTEXT } from './../shared/models/jwt.model';
-import { Usuarios } from './../usuarios/usuarios.entity';
+import { UsuariosEntity } from './../usuarios/usuarios.entity';
 import { DivisionesService } from './divisiones.service';
 import { DivisionesEntity } from './divisiones.entity';
 import { Resolver, Query, Args, Int, Context } from '@nestjs/graphql';
@@ -18,7 +18,7 @@ export class DivisionesResolver {
 
   @Query(() => [DivisionesEntity])
   @UseGuards(new AuthGuard())
-  async getAllDivisionesByUsuario(@Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios): Promise<DivisionesEntity[]> {
+  async getAllDivisionesByUsuario(@Context(DEFAULT_GRAPHQL_CONTEXT) user: UsuariosEntity): Promise<DivisionesEntity[]> {
     return this._divisionesService.getAllDivisiones(user);
   }
 

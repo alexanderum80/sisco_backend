@@ -1,5 +1,5 @@
 import { ETipoUsuarios } from './../usuarios/usuarios.model';
-import { Usuarios } from './../usuarios/usuarios.entity';
+import { UsuariosEntity } from './../usuarios/usuarios.entity';
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { ContaNoUsarEnCuentasQueryResponse, ContaNoUsarEnCuentaQueryResponse, ContaNoUsarEnCuentaInput } from './conta-no-usar-en-cuenta.model';
 import { ContaNoUsarEnCuentaEntity } from './conta-no-usar-en-cuenta.entity';
@@ -11,7 +11,7 @@ import { Repository } from 'typeorm';
 export class ContaNoUsarEnCuentasService {
   constructor(@InjectRepository(ContaNoUsarEnCuentaEntity) private readonly noUsarEnCuentaEntity: Repository<ContaNoUsarEnCuentaEntity>) {}
 
-  async findAll(user: Usuarios): Promise<ContaNoUsarEnCuentasQueryResponse> {
+  async findAll(user: UsuariosEntity): Promise<ContaNoUsarEnCuentasQueryResponse> {
     try {
       const { IdDivision } = user;
 
@@ -55,7 +55,7 @@ export class ContaNoUsarEnCuentasService {
     }
   }
 
-  async create(user: Usuarios, noUsarEnCuentaInput: ContaNoUsarEnCuentaInput): Promise<MutationResponse> {
+  async create(user: UsuariosEntity, noUsarEnCuentaInput: ContaNoUsarEnCuentaInput): Promise<MutationResponse> {
     try {
       delete noUsarEnCuentaInput.Id;
 

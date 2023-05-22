@@ -1,4 +1,4 @@
-import { Usuarios } from './../usuarios/usuarios.entity';
+import { UsuariosEntity } from './../usuarios/usuarios.entity';
 import { UsuariosService } from './../usuarios/usuarios.service';
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { SupervisoresQueryResponse, SupervisorQueryResponse, SupervisorInput } from './supervisores.model';
@@ -11,7 +11,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 export class SupervisoresService {
   constructor(@InjectRepository(Supervisor) private readonly supervisorRepository: Repository<Supervisor>, private _usuariosSvc: UsuariosService) {}
 
-  async findAll(user: Usuarios): Promise<SupervisoresQueryResponse> {
+  async findAll(user: UsuariosEntity): Promise<SupervisoresQueryResponse> {
     try {
       const { IdDivision, IdTipoUsuario } = user;
 

@@ -1,9 +1,9 @@
-import { Usuarios } from './usuarios.entity';
+import { UsuariosEntity } from './usuarios.entity';
 import { ObjectType, Field, InputType } from '@nestjs/graphql';
 import { MultipleQueryResponse } from '../shared/models/query.response.model';
 import { SingleQueryResponse } from '../shared/models/query.response.model';
 
-export const UsuarioInfo: Usuarios = {
+export const UsuarioInfo: UsuariosEntity = {
   IdUsuario: 0,
   Usuario: '',
   IdTipoUsuario: 1,
@@ -28,10 +28,10 @@ export enum ETipoUsuarios {
 }
 
 @ObjectType()
-export class UsuarioQueryResponse extends SingleQueryResponse(Usuarios) {}
+export class UsuarioQueryResponse extends SingleQueryResponse(UsuariosEntity) {}
 
 @ObjectType()
-export class UsuariosQueryResponse extends MultipleQueryResponse(Usuarios) {}
+export class UsuariosQueryResponse extends MultipleQueryResponse(UsuariosEntity) {}
 
 // Input Type
 @InputType()

@@ -2,21 +2,21 @@ import { MutationResponse } from './../shared/models/mutation.response.model';
 import { UsuariosQueryResponse, UsuarioInput, UsuarioQueryResponse } from './usuarios.model';
 import { UsuariosService } from './usuarios.service';
 import { Resolver, Query, Args, Int, Mutation } from '@nestjs/graphql';
-import { Usuarios } from './usuarios.entity';
+import { UsuariosEntity } from './usuarios.entity';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../shared/guards/auth.guard';
 
-@Resolver(() => Usuarios)
+@Resolver(() => UsuariosEntity)
 export class UsuariosResolver {
   constructor(protected readonly _usuariosService: UsuariosService) {}
 
-  @Query(() => Usuarios)
-  async authenticateUsuario(@Args('usuario') usuario: string, @Args('passw') passw: string): Promise<Usuarios> {
+  @Query(() => UsuariosEntity)
+  async authenticateUsuario(@Args('usuario') usuario: string, @Args('passw') passw: string): Promise<UsuariosEntity> {
     return this._usuariosService.authenticate(usuario, passw);
   }
 
-  @Query(() => Usuarios)
-  async refreshToken(@Args('token') token: string): Promise<Usuarios> {
+  @Query(() => UsuariosEntity)
+  async refreshToken(@Args('token') token: string): Promise<UsuariosEntity> {
     return this._usuariosService.refreshToken(token);
   }
 
@@ -54,7 +54,7 @@ export class UsuariosResolver {
   }
 
   @Mutation(() => MutationResponse)
-  @UseGuards(new AuthGuard())
+  // @UseGuards(new AuthGuard())
   async createUsuario(@Args('usuarioInfo') usuarioInfo: UsuarioInput): Promise<MutationResponse> {
     return this._usuariosService.create(usuarioInfo);
   }

@@ -1,6 +1,6 @@
 import { DEFAULT_GRAPHQL_CONTEXT } from './../shared/models/jwt.model';
 import { MutationResponse } from './../shared/models/mutation.response.model';
-import { Usuarios } from './../usuarios/usuarios.entity';
+import { UsuariosEntity } from './../usuarios/usuarios.entity';
 import { AuthGuard } from '../shared/guards/auth.guard';
 import { Resolver, Query, Mutation, Args, Int, Context } from '@nestjs/graphql';
 import { ContaComprobarValoresService } from './conta-comprobar-valores.service';
@@ -14,7 +14,7 @@ export class ContaComprobarValoresResolver {
 
   @Query(() => [ComprobarValoresEntity])
   @UseGuards(new AuthGuard())
-  async getAllComprobarValores(@Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios): Promise<ComprobarValoresEntity[]> {
+  async getAllComprobarValores(@Context(DEFAULT_GRAPHQL_CONTEXT) user: UsuariosEntity): Promise<ComprobarValoresEntity[]> {
     return this.contaComprobarValoresService.findAll(user);
   }
 
@@ -25,7 +25,10 @@ export class ContaComprobarValoresResolver {
 
   @Mutation(() => MutationResponse)
   @UseGuards(new AuthGuard())
-  async createComprobarValor(@Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios, @Args('comprobarValorInput') comprobarValorInput: ComprobarValoresInput): Promise<MutationResponse> {
+  async createComprobarValor(
+    @Context(DEFAULT_GRAPHQL_CONTEXT) user: UsuariosEntity,
+    @Args('comprobarValorInput') comprobarValorInput: ComprobarValoresInput,
+  ): Promise<MutationResponse> {
     return this.contaComprobarValoresService.create(user, comprobarValorInput);
   }
 

@@ -1,6 +1,6 @@
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { ETipoUsuarios } from './../usuarios/usuarios.model';
-import { Usuarios } from './../usuarios/usuarios.entity';
+import { UsuariosEntity } from './../usuarios/usuarios.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -11,7 +11,7 @@ import { ContaComprobarExpresionesInput } from './conta-comprobar-expresiones.mo
 export class ContaComprobarExpresionesService {
   constructor(@InjectRepository(ContaComprobarExpresionesEntity) private readonly comprobarExpresionesRepository: Repository<ContaComprobarExpresionesEntity>) {}
 
-  async findAll(user: Usuarios): Promise<ContaComprobarExpresionesEntity[]> {
+  async findAll(user: UsuariosEntity): Promise<ContaComprobarExpresionesEntity[]> {
     try {
       const { IdDivision } = user;
 
@@ -49,7 +49,7 @@ export class ContaComprobarExpresionesService {
     }
   }
 
-  async create(user: Usuarios, comprobarExpresionInput: ContaComprobarExpresionesInput): Promise<MutationResponse> {
+  async create(user: UsuariosEntity, comprobarExpresionInput: ContaComprobarExpresionesInput): Promise<MutationResponse> {
     try {
       const { IdDivision, IdTipoUsuario } = user;
 

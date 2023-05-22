@@ -42,7 +42,7 @@ type TipoUsuarios {
   TipoUsuario: String!
 }
 
-type Usuarios {
+type UsuariosEntity {
   IdUsuario: Float!
   Usuario: String!
   Contrasena: String!
@@ -57,13 +57,13 @@ type Usuarios {
 
 type UsuarioQueryResponse {
   success: Boolean!
-  data: Usuarios
+  data: UsuariosEntity
   error: String
 }
 
 type UsuariosQueryResponse {
   success: Boolean!
-  data: [Usuarios!]
+  data: [UsuariosEntity!]
   error: String
 }
 
@@ -685,6 +685,23 @@ type ContaEstadisticaView {
   Anulados: Int!
 }
 
+type ContaEstadisticaParteView {
+  Division: String!
+  Centro: String!
+  Consolidado: Boolean!
+  Anno: Int!
+  Periodo: Int!
+  FechaActualizacion: DateTime
+  FechaInicio: DateTime
+  FechaFin: DateTime
+  Comprobantes: Int!
+  Traspasados: Int!
+  SinTraspasar: Int!
+  Inconclusos: Int!
+  Anulados: Int!
+  Conexion: String!
+}
+
 type ContaInformeCtasCobrarPagarView {
   Division: String!
   Organismo: String!
@@ -740,8 +757,8 @@ type ConciliaExternaDatosConciliacionEntity {
 }
 
 type Query {
-  authenticateUsuario(usuario: String!, passw: String!): Usuarios!
-  refreshToken(token: String!): Usuarios!
+  authenticateUsuario(usuario: String!, passw: String!): UsuariosEntity!
+  refreshToken(token: String!): UsuariosEntity!
   getAllUsuarios: UsuariosQueryResponse!
   getUsuariosByIdDivision(idDivision: Int!): UsuariosQueryResponse!
   getUsuarioById(id: Int!): UsuarioQueryResponse!
@@ -807,6 +824,7 @@ type Query {
   conciliaAFT(conciliaAftInput: ConciliaAftInput!): ConciliaAftData!
   conciliaUH(conciliaUhInput: ConciliaUhInput!): [ConciliaUH!]!
   contaEstadistica(contaEstadisticaInput: ContaEstadisticaInput!): [ContaEstadisticaView!]!
+  contaEstadisticaParte: [ContaEstadisticaParteView!]!
   conciliaInternaConta(conciliaInternaContaInput: ConciliaInternaContaInput!): [ConciliaInternaConta!]!
   getAllClaseCuenta: [ClaseCuentaEntity!]!
   getClaseCuentaById(id: Int!): ClaseCuentaEntity!

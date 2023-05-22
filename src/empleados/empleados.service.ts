@@ -1,4 +1,4 @@
-import { Usuarios } from './../usuarios/usuarios.entity';
+import { UsuariosEntity } from './../usuarios/usuarios.entity';
 import { UsuariosService } from './../usuarios/usuarios.service';
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { Empleado } from './empleados.entity';
@@ -11,7 +11,7 @@ import { Repository } from 'typeorm';
 export class EmpleadosService {
   constructor(@InjectRepository(Empleado) private readonly empleadoRepository: Repository<Empleado>, private _usuariosSvc: UsuariosService) {}
 
-  async findAll(user: Usuarios): Promise<EmpleadosQueryResponse> {
+  async findAll(user: UsuariosEntity): Promise<EmpleadosQueryResponse> {
     try {
       const { IdDivision, IdTipoUsuario } = user;
 

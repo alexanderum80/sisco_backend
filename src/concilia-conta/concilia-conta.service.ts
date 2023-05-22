@@ -1,7 +1,7 @@
 import { LogsService } from './../logs/logs.service';
 import { ContaConexionesEntity } from './../conta-conexiones/conta-conexiones.entity';
 import { toNumber } from 'lodash';
-import { Usuarios } from './../usuarios/usuarios.entity';
+import { UsuariosEntity } from './../usuarios/usuarios.entity';
 import { ETipoClasificadorCuenta } from './../clasificador-cuenta/clasificador-cuenta.model';
 import { ClasificadorCuentaService } from './../clasificador-cuenta/clasificador-cuenta.service';
 import { ContaConexionesService } from './../conta-conexiones/conta-conexiones.service';
@@ -43,7 +43,7 @@ export class ConciliaContaService {
     private _logsSvc: LogsService,
   ) {}
 
-  async conciliaContabilidad(user: Usuarios, conciliaContaInput: ConciliaContaInput): Promise<ConciliaContabilidadQueryResponse> {
+  async conciliaContabilidad(user: UsuariosEntity, conciliaContaInput: ConciliaContaInput): Promise<ConciliaContabilidadQueryResponse> {
     try {
       const { IdDivision } = user;
       const { idCentro, periodo, annio, tipoCentro, tipoEntidad } = conciliaContaInput;
@@ -97,14 +97,7 @@ export class ConciliaContaService {
           });
       });
     } catch (err: any) {
-      return {
-        ReporteClasificador: [],
-        ReporteConsultas: [],
-        ReporteExpresiones: [],
-        ReporteValores: [],
-        CuadreSistemas: [],
-        Informacion: [],
-      };
+      return Promise.reject(err.message || err);
     }
   }
 
@@ -280,8 +273,9 @@ export class ConciliaContaService {
       .query('SELECT * from Conta_Saldo_Acumulado ($1::int, $2::bool, $3::int, $4::int, $5::numeric, $6::numeric)', [idUnidad, cons, annio, periodo, _saldoDebito, _saldoCredito])
       .then(result => {
         if (toNumber(result[0].dif_debito) !== 0 || toNumber(result[0].dif_credito) !== 0) {
-          const _error = `Los Saldos Acumulados entre el Rodas y SISCO hasta el período ${periodo - 1} no coinciden.
-                    <br>Concilie el período anterior, y después concilie el actual.<br>No se continuará con la Conciliación.`;
+          const _error = `Los Saldos Acumulados entre el Rodas y SISCO hasta el período ${
+            periodo - 1
+          } no coinciden.<br>Concilie el período anterior, y después concilie el actual.<br>No se continuará con la Conciliación.`;
 
           throw new Error(_error);
         }
@@ -492,7 +486,7 @@ export class ConciliaContaService {
     });
   }
 
-  async iniciarSaldos(user: Usuarios, iniciarSaldosInput: IniciarSaldosInput): Promise<boolean> {
+  async iniciarSaldos(user: UsuariosEntity, iniciarSaldosInput: IniciarSaldosInput): Promise<boolean> {
     try {
       const { idCentro, consolidado, annio } = iniciarSaldosInput;
 
@@ -518,7 +512,7 @@ export class ConciliaContaService {
     }
   }
 
-  async arreglaClasificadorCuenta(user: Usuarios, idUnidad: number, tipoUnidad: string, annio: string): Promise<boolean> {
+  async arreglaClasificadorCuenta(user: UsuariosEntity, idUnidad: number, tipoUnidad: string, annio: string): Promise<boolean> {
     try {
       // verificar si se ha definido la conexión al Rodas
       const _conexionConta = await this._contaConexionesService.findByIdUnidad(idUnidad, tipoUnidad === '2').catch(err => {
