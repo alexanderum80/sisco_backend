@@ -1,4 +1,4 @@
-import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
 export class IConciliaReporteClasificador {
@@ -246,49 +246,49 @@ export class ConciliaContabilidadQueryResponse {
   Informacion: IConciliaInformacionContabilidad[];
 }
 
-@InputType()
-export class ConciliaContaInput {
-  @Field()
-  idCentro: number;
+@ObjectType()
+export class IChequeoCentroVsConsolidado {
+  @Field({ name: 'Centro' })
+  centro: string;
 
-  @Field()
-  periodo: number;
+  @Field({ name: 'Unidad' })
+  unidad: string;
 
-  @Field()
-  annio: number;
-
-  @Field()
-  tipoCentro: number;
-
-  @Field()
-  tipoEntidad: number;
-}
-
-@InputType()
-export class IniciarSaldosInput {
-  @Field()
-  idCentro: number;
-
-  @Field()
+  @Field({ name: 'Consolidado' })
   consolidado: boolean;
 
-  @Field()
-  annio: number;
-}
-
-@InputType()
-export class ChequearCentrosInput {
-  @Field()
-  idCentro: number;
-
-  @Field()
-  annio: number;
-
-  @Field()
+  @Field({ name: 'Periodo' })
   periodo: number;
 
-  @Field(() => [Int])
-  centrosAChequear: number[];
+  @Field({ name: 'IdConsulta' })
+  id_consulta: string;
+
+  @Field({ name: 'Consulta' })
+  consulta: string;
+
+  @Field({ name: 'Cuenta', nullable: true })
+  cuenta?: string;
+
+  @Field({ name: 'SubCuenta', nullable: true })
+  subcuenta?: string;
+
+  @Field({ name: 'Analisis1', nullable: true })
+  analisis_1?: string;
+
+  @Field({ name: 'Analisis2', nullable: true })
+  analisis_2?: string;
+
+  @Field({ name: 'Analisis3', nullable: true })
+  analisis_3?: string;
+
+  @Field({ name: 'Analisis4', nullable: true })
+  analisis_4?: string;
+
+  @Field({ name: 'Analisis5', nullable: true })
+  analisis_5?: string;
+
+  @Field({ name: 'Total' })
+  total: number;
 }
 
 // utilitarios para el rodas

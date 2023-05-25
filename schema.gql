@@ -245,12 +245,6 @@ type IConciliaInformacionContabilidad {
   Saldo: Float!
 }
 
-type ConciliaContaQueryResponse {
-  success: Boolean!
-  data: String
-  error: String
-}
-
 type ConciliaContabilidadQueryResponse {
   ReporteClasificador: [IConciliaReporteClasificador!]!
   ReporteConsultas: [IConciliaReporteConsulta!]!
@@ -258,6 +252,23 @@ type ConciliaContabilidadQueryResponse {
   ReporteValores: [IConciliaReporteValores!]!
   CuadreSistemas: [IConciliaCuadreSistemas!]!
   Informacion: [IConciliaInformacionContabilidad!]!
+}
+
+type IChequeoCentroVsConsolidado {
+  Centro: String!
+  Unidad: String!
+  Consolidado: Boolean!
+  Periodo: Float!
+  IdConsulta: String!
+  Consulta: String!
+  Cuenta: String
+  SubCuenta: String
+  Analisis1: String
+  Analisis2: String
+  Analisis3: String
+  Analisis4: String
+  Analisis5: String
+  Total: Float!
 }
 
 type ConciliaDWH {
@@ -777,6 +788,7 @@ type Query {
   getAllCargos: CargosQueryResponse!
   conciliaDWH(conciliaDWHInput: ConciliaDWHInput!): [ConciliaDWH!]!
   conciliaContabilidad(conciliaContaInput: ConciliaContaInput!): ConciliaContabilidadQueryResponse!
+  chequearCentros(chequearCentrosInput: ChequearCentrosInput!): [IChequeoCentroVsConsolidado!]!
   getAllClasificadorCuentas(tipo: Int): [ClasificadorCuentaRealEntity!]!
   getClasificadorCuenta(cuenta: String!, subcuenta: String!, tipo: Int!): ClasificadorCuentaRealEntity!
   getCuentasAgrupadas: [CuentasAgrupadas!]!
@@ -861,6 +873,13 @@ input ConciliaContaInput {
   tipoEntidad: Float!
 }
 
+input ChequearCentrosInput {
+  idCentro: Float!
+  annio: Float!
+  periodo: Float!
+  centrosAChequear: [Int!]!
+}
+
 input ConciliaOperacionesDWHInput {
   FechaInicial: String!
   FechaFinal: String!
@@ -921,7 +940,6 @@ type Mutation {
   deleteContaConexion(IDs: [Int!]!): MutationResponse!
   updateDWhConexion(dwhConexionInput: DWHConexionesInput!): MutationResponse!
   iniciarSaldos(iniciarSaldosInput: IniciarSaldosInput!): Boolean!
-  chequearCentros(chequearCentrosInput: ChequearCentrosInput!): ConciliaContaQueryResponse!
   arreglaClasificadorCuenta(idUnidad: Int!, tipoUnidad: String!, annio: String!): Boolean!
   saveClasificadorCuenta(clasificadorInfo: ClasificadorCuentaRealInput!): MutationResponse!
   deleteClasificadorCuenta(cuenta: String!, subcuenta: String!, tipo: Int!): MutationResponse!
@@ -1003,13 +1021,6 @@ input IniciarSaldosInput {
   idCentro: Float!
   consolidado: Boolean!
   annio: Float!
-}
-
-input ChequearCentrosInput {
-  idCentro: Float!
-  annio: Float!
-  periodo: Float!
-  centrosAChequear: [Int!]!
 }
 
 input ClasificadorCuentaRealInput {

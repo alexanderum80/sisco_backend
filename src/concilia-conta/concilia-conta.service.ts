@@ -11,17 +11,11 @@ import {
   queryAsientoRodas,
   queryRangoAsientosMesRodas,
   querySaldosAcumuladosRodas,
-  ConciliaContaInput,
   queryClasificadorCuentasRodas,
   ConciliaContabilidadQueryResponse,
   queryReporteConsultas,
-  ConciliaContaQueryResponse,
   queryReporteExpresiones,
   queryReporteValores,
-  IniciarSaldosInput,
-  ChequearCentrosInput,
-  // queryInsertClasificadorRodas,
-  // queryInsertCriterioConsolidacionRodas,
   queryUpdateCriterioClasificadorRodas,
   queryUpdateClasificadorRodas,
   queryObligacionesRodas,
@@ -30,7 +24,9 @@ import {
   IConciliaReporteValores,
   IConciliaCuadreSistemas,
   IConciliaInformacionContabilidad,
+  IChequeoCentroVsConsolidado,
 } from './concilia-conta.model';
+import { ConciliaContaInput, IniciarSaldosInput, ChequearCentrosInput } from './dto/concilia-conta.input';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
@@ -53,8 +49,6 @@ export class ConciliaContaService {
       const _conexionConta = await this._contaConexionesService.findByIdUnidad(idCentro, tipoCentro === 2).catch(err => {
         throw new Error(err);
       });
-
-      // _conexionConta.BaseDatos = `r4_${_conexionConta.BaseDatos.toLowerCase()}`;
 
       // conecto al Conta del Centro
       const _contaConexionCentro: DataSource = await this._contaConexionesService.conexionRodas(_conexionConta);
@@ -689,7 +683,7 @@ export class ConciliaContaService {
     });
   }
 
-  async chequearCentro(chequearCentrosInput: ChequearCentrosInput): Promise<ConciliaContaQueryResponse> {
+  async chequearCentro(chequearCentrosInput: ChequearCentrosInput): Promise<IChequeoCentroVsConsolidado[]> {
     try {
       const { idCentro, annio, periodo, centrosAChequear } = chequearCentrosInput;
 
@@ -698,23 +692,23 @@ export class ConciliaContaService {
       for (let index = 0; index < centrosAChequear.length; index++) {
         const centroChe = centrosAChequear[index];
 
-        await this.dataSource.query(`EXEC dbo.InsertChequeoCentroVsConsolidado @0, @1, @2, @3, @4`, [idCentro, cons, annio, periodo, centroChe]).catch(err => {
+        await this.dataSource.query(`CALL conta_insert_chequeo_centro_vs_consolidado ($1, $2, $3, $4, $5)`, [idCentro, cons, annio, periodo, centroChe]).catch(err => {
           throw new Error(err.message || err);
         });
       }
 
-      return new Promise<ConciliaContaQueryResponse>(resolve => {
+      return new Promise<IChequeoCentroVsConsolidado[]>((resolve, reject) => {
         this.dataSource
-          .query(`EXEC dbo.p_ChequeoCentro @0`, [`Centro = ${idCentro} AND Periodo = ${periodo} AND Unidad IN (${centrosAChequear.join(', ')})`])
+          .query(`select * from conta_chequeo_centro ($1, $2, $3, $4)`, [idCentro, annio, periodo, centrosAChequear.join(', ')])
           .then(result => {
-            resolve({ success: true, data: JSON.stringify(result) });
+            resolve(result);
           })
           .catch(err => {
-            resolve({ success: false, error: err.message ? err.message : err });
+            reject(err.message || err);
           });
       });
     } catch (err: any) {
-      return { success: false, error: err.message ? err.message : err };
+      return Promise.reject(err.message || err);
     }
   }
 }

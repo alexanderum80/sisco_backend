@@ -1,7 +1,8 @@
 import { DEFAULT_GRAPHQL_CONTEXT } from './../shared/models/jwt.model';
 import { UsuariosEntity } from './../usuarios/usuarios.entity';
 import { AuthGuard } from '../shared/guards/auth.guard';
-import { ConciliaContaInput, ConciliaContabilidadQueryResponse, IniciarSaldosInput, ChequearCentrosInput, ConciliaContaQueryResponse } from './concilia-conta.model';
+import { ConciliaContabilidadQueryResponse, IChequeoCentroVsConsolidado } from './concilia-conta.model';
+import { ConciliaContaInput, IniciarSaldosInput, ChequearCentrosInput } from './dto/concilia-conta.input';
 import { ConciliaContaService } from './concilia-conta.service';
 import { Args, Context, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
@@ -28,9 +29,11 @@ export class ConciliaContaResolver {
     return this.conciliaContaSvc.iniciarSaldos(user, iniciarSaldosInput);
   }
 
-  @Mutation(() => ConciliaContaQueryResponse)
+  @Query(() => [IChequeoCentroVsConsolidado])
   @UseGuards(new AuthGuard())
-  async chequearCentros(@Args({ name: 'chequearCentrosInput', type: () => ChequearCentrosInput }) chequearCentrosInput: ChequearCentrosInput): Promise<ConciliaContaQueryResponse> {
+  async chequearCentros(
+    @Args({ name: 'chequearCentrosInput', type: () => ChequearCentrosInput }) chequearCentrosInput: ChequearCentrosInput,
+  ): Promise<IChequeoCentroVsConsolidado[]> {
     return this.conciliaContaSvc.chequearCentro(chequearCentrosInput);
   }
 
