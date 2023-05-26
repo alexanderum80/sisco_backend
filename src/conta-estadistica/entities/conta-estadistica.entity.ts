@@ -53,12 +53,20 @@ export class ContaEstadisticaView {
 @ViewEntity('v_conta_estadistica')
 export class ContaEstadisticaParteView {
   @Field()
+  @ViewColumn({ name: 'id_division' })
+  IdDivision: number;
+
+  @Field()
   @ViewColumn({ name: 'division' })
   Division: string;
 
   @Field()
+  @ViewColumn({ name: 'id_centro' })
+  @PrimaryColumn({ name: 'id_centro' })
+  IdCentro: number;
+
+  @Field()
   @ViewColumn({ name: 'centro' })
-  @PrimaryColumn({ name: 'centro' })
   Centro: string;
 
   @Field(() => Boolean)

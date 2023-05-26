@@ -11,7 +11,7 @@ export class DivisionesResolver {
   constructor(private _divisionesService: DivisionesService) {}
 
   @Query(() => [DivisionesEntity])
-  @UseGuards(new AuthGuard())
+  // @UseGuards(new AuthGuard())
   async getAllDivisiones(): Promise<DivisionesEntity[]> {
     return this._divisionesService.getAllDivisiones();
   }

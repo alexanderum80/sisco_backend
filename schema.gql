@@ -697,7 +697,9 @@ type ContaEstadisticaView {
 }
 
 type ContaEstadisticaParteView {
+  IdDivision: Float!
   Division: String!
+  IdCentro: Float!
   Centro: String!
   Consolidado: Boolean!
   Anno: Int!
