@@ -21,29 +21,26 @@ export class ConciliaUhService {
       const { idCentro, annio, periodo } = conciliaUhInput;
 
       // verificar si se ha definido la conexión al Rodas
-      const _conexionRodasQuery = await this._contaConexionesSvc.findByIdUnidad(idCentro, false);
-      const _conexionConta = _conexionRodasQuery.data;
+      const _conexionConta = await this._contaConexionesSvc.findByIdUnidad(idCentro, false).catch(err => {
+        throw new Error(err);
+      });
       // _conexionConta.BaseDatos = `r4_${_conexionConta.BaseDatos.toLowerCase()}`;
 
+      // importo los datos de los Utiles
+      await this._importarDatosUH(idCentro, annio, periodo, _conexionConta).catch(err => {
+        throw new Error(err);
+      });
+
+      // importo los datos de la contabilidad
+      this._importarDatosRodas(annio, periodo, idCentro, 0, _conexionConta).catch(err => {
+        throw new Error(err);
+      });
+
       return new Promise<ConciliaUH[]>((resolve, reject) => {
-        // importo los datos de los Utiles
-        this._importarDatosUH(idCentro, annio, periodo, _conexionConta)
-          .then(() => {
-            // importo los datos de la contabilidad
-            this._importarDatosRodas(annio, periodo, idCentro, 0, _conexionConta)
-              .then(() => {
-                // calculo la conciliacion
-                this._calculaConciliacion(idCentro, annio, periodo)
-                  .then(res => {
-                    resolve(res);
-                  })
-                  .catch(err => {
-                    reject(err.message || err);
-                  });
-              })
-              .catch(err => {
-                reject(err.message || err);
-              });
+        // calculo la conciliacion
+        this._calculaConciliacion(idCentro, annio, periodo)
+          .then(res => {
+            resolve(res);
           })
           .catch(err => {
             reject(err.message || err);
@@ -58,29 +55,19 @@ export class ConciliaUhService {
     // try {
     const mbConnection = await this._contaConexionesSvc.conexionRodas(conexionRodas);
 
-    return new Promise<void>((resolve, reject) => {
-      // importo las Categorias
-      this._importarCategoriaUH(idCentro, anno, mbConnection)
-        .then(() => {
-          // importo los Productos
-          this._importarProductosUH(idCentro, anno, mbConnection)
-            .then(() => {
-              // importo los UH
-              this._importarUH(idCentro, anno, periodo, mbConnection)
-                .then(() => {
-                  resolve();
-                })
-                .catch(err => {
-                  reject(err.message || err);
-                });
-            })
-            .catch(err => {
-              reject(err.message || err);
-            });
-        })
-        .catch(err => {
-          reject(err.message || err);
-        });
+    // importo las Categorias
+    await this._importarCategoriaUH(idCentro, anno, mbConnection).catch(err => {
+      throw new Error(err);
+    });
+
+    // importo los Productos
+    await this._importarProductosUH(idCentro, anno, mbConnection).catch(err => {
+      throw new Error(err);
+    });
+
+    // importo los UH
+    await this._importarInventarioUH(idCentro, anno, periodo, mbConnection).catch(err => {
+      throw new Error(err);
     });
   }
 
@@ -88,12 +75,10 @@ export class ConciliaUhService {
     return new Promise<void>((resolve, reject) => {
       conexionRodas
         .query(queryUhCategorias.replace(/@anno/gi, anno.toString()))
-        .then(async res => {
-          if (res.length) {
-            const _categoria = this._xmlSvc.jsonToXML('Categoria', res);
-
+        .then(async _categoria => {
+          if (_categoria.length) {
             await this.dataSource
-              .query(`EXEC dbo.pUH_ImportCategoriaXML @0, @1`, [_categoria, idCentro])
+              .query(`CALL UH_Import_Categoria ($1::json, $2::int)`, [JSON.stringify(_categoria), idCentro])
               .then(() => {
                 resolve();
               })
@@ -114,12 +99,10 @@ export class ConciliaUhService {
     return new Promise<void>((resolve, reject) => {
       conexionRodas
         .query(queryUhProductos.replace(/@anno/gi, anno.toString()))
-        .then(async res => {
-          if (res.length) {
-            const _productos = this._xmlSvc.jsonToXML('Producto', res);
-
+        .then(async _productos => {
+          if (_productos.length) {
             await this.dataSource
-              .query(`EXEC dbo.pUH_ImportProductosXML @0, @1`, [_productos, idCentro])
+              .query(`CALL UH_Import_Productos ($1::json, $2::int)`, [JSON.stringify(_productos), idCentro])
               .then(() => {
                 resolve();
               })
@@ -136,7 +119,7 @@ export class ConciliaUhService {
     });
   }
 
-  private async _importarUH(idCentro: number, anno: number, periodo: number, conexionRodas: DataSource): Promise<void> {
+  private async _importarInventarioUH(idCentro: number, anno: number, periodo: number, conexionRodas: DataSource): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       conexionRodas
         .query(
@@ -145,13 +128,11 @@ export class ConciliaUhService {
             .replace(/@anno/gi, anno.toString())
             .replace(/@periodo/gi, periodo.toString()),
         )
-        .then(res => {
-          if (res.length) {
-            const _uh = this._xmlSvc.jsonToXML('UH', res);
-
+        .then(_uh => {
+          if (_uh.length) {
             // inserto los MB
             this.dataSource
-              .query(`EXEC dbo.pUH_ImportUtilesXML @0, @1, @2`, [_uh, idCentro, periodo])
+              .query(`CALL UH_Import_inventario ($1::json, $2::int, $3::int)`, [JSON.stringify(_uh), idCentro, periodo])
               .then(() => {
                 resolve();
               })
@@ -169,7 +150,7 @@ export class ConciliaUhService {
   }
 
   private async _importarDatosRodas(annio: number, periodo: number, idUnidad: number, tipoCentro: number, contaConexion: ContaConexionesEntity): Promise<boolean> {
-    const cons = tipoCentro === 1 ? '1' : '0';
+    const cons = tipoCentro === 1;
 
     return new Promise<boolean>(resolve => {
       // me conecto al Rodas del Centro
@@ -195,7 +176,7 @@ export class ConciliaUhService {
   private _calculaConciliacion(idCentro: number, annio: number, periodo: number): Promise<ConciliaUH[]> {
     return new Promise<ConciliaUH[]>((resolve, reject) => {
       this.dataSource
-        .query(`EXEC pUH_CalculaConciliacion @0, @1, @2`, [idCentro, annio, periodo])
+        .query(`select * from UH_Calcula_Conciliacion ($1::int, $2::int, $3::int)`, [idCentro, annio, periodo])
         .then(res => {
           resolve(res);
         })

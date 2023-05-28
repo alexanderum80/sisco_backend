@@ -1,5 +1,5 @@
 import { DEFAULT_GRAPHQL_CONTEXT } from './../shared/models/jwt.model';
-import { Usuarios } from './../usuarios/usuarios.entity';
+import { UsuariosEntity } from './../usuarios/usuarios.entity';
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { EmpleadosQueryResponse, EmpleadoQueryResponse, EmpleadoInput } from './empleados.model';
 import { EmpleadosService } from './empleados.service';
@@ -14,7 +14,7 @@ export class EmpleadosResolver {
 
   @Query(() => EmpleadosQueryResponse)
   @UseGuards(new AuthGuard())
-  async getAllEmpleados(@Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios): Promise<EmpleadosQueryResponse> {
+  async getAllEmpleados(@Context(DEFAULT_GRAPHQL_CONTEXT) user: UsuariosEntity): Promise<EmpleadosQueryResponse> {
     return this._empleadosService.findAll(user);
   }
 

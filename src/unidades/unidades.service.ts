@@ -1,16 +1,19 @@
-import { Usuarios } from './../usuarios/usuarios.entity';
+import { UsuariosEntity } from './../usuarios/usuarios.entity';
 import { UsuariosService } from './../usuarios/usuarios.service';
-import { AllUnidadesQueryResponse, AllUnidadQueryResponse } from './unidades.model';
 import { Injectable } from '@nestjs/common';
-import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
-import { CentrosView } from './unidades.entity';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
+import { CentrosView, UnidadesEntity } from './unidades.entity';
 
 @Injectable()
 export class UnidadesService {
-  constructor(@InjectDataSource() private readonly dataSource: DataSource, private _usuariosSvc: UsuariosService) {}
+  constructor(
+    @InjectDataSource() private readonly dataSource: DataSource,
+    @InjectRepository(UnidadesEntity) private readonly unidadesRepository: Repository<UnidadesEntity>,
+    private _usuariosSvc: UsuariosService,
+  ) {}
 
-  async getAllUnidades(user?: Usuarios): Promise<AllUnidadesQueryResponse> {
+  async getAllUnidades(user?: UsuariosEntity): Promise<CentrosView[]> {
     try {
       let _condition = {};
 
@@ -22,105 +25,90 @@ export class UnidadesService {
         }
       }
 
-      return new Promise<AllUnidadesQueryResponse>(resolve => {
+      return new Promise<CentrosView[]>((resolve, reject) => {
         this.dataSource.manager
-          .find(CentrosView, { where: _condition })
+          .find(CentrosView, { where: _condition, order: { IdUnidad: 1 } })
           .then(result => {
-            resolve({
-              success: true,
-              data: result,
-            });
+            resolve(result);
           })
           .catch(err => {
-            resolve({ success: false, error: err.message ? err.message : err });
+            reject(err.message || err);
           });
       });
     } catch (err: any) {
-      return {
-        success: false,
-        error: err,
-      };
+      return Promise.reject(err.message || err);
     }
   }
 
-  async getUnidadById(IdUnidad: number): Promise<AllUnidadQueryResponse> {
+  async getUnidadById(IdUnidad: number): Promise<CentrosView> {
     try {
-      return new Promise<AllUnidadQueryResponse>(resolve => {
+      return new Promise<CentrosView>((resolve, reject) => {
         this.dataSource.manager
           .findOne(CentrosView, { where: { IdUnidad } })
           .then(result => {
-            resolve({
-              success: true,
-              data: result,
-            });
+            resolve(result);
           })
           .catch(err => {
-            resolve({ success: false, error: err.message ? err.message : err });
+            reject(err.message || err);
           });
       });
     } catch (err: any) {
-      return {
-        success: false,
-        error: err,
-      };
+      return Promise.reject(err.message || err);
     }
   }
 
-  async getUnidadesByIdSubdivision(IdSubdivision: number): Promise<AllUnidadesQueryResponse> {
+  async getUnidadesByIdSubdivision(IdSubdivision: number): Promise<CentrosView[]> {
     try {
-      return new Promise<AllUnidadesQueryResponse>(resolve => {
+      return new Promise<CentrosView[]>((resolve, reject) => {
         this.dataSource.manager
           .find(CentrosView, { where: { IdSubdivision } })
           .then(result => {
-            resolve({
-              success: true,
-              data: result,
-            });
+            resolve(result);
           })
           .catch(err => {
-            resolve({ success: false, error: err.message ? err.message : err });
+            reject(err.message || err);
           });
       });
     } catch (err: any) {
-      return {
-        success: false,
-        error: err,
-      };
+      return Promise.reject(err.message || err);
     }
   }
 
-  async getUnidadesByIdDivision(IdDivision: number): Promise<AllUnidadesQueryResponse> {
+  async getUnidadesByIdDivision(IdDivision: number): Promise<CentrosView[]> {
     try {
-      return new Promise<AllUnidadesQueryResponse>(resolve => {
+      return new Promise<CentrosView[]>((resolve, reject) => {
         this.dataSource.manager
           .find(CentrosView, { where: { IdDivision } })
           .then(result => {
-            resolve({
-              success: true,
-              data: result,
-            });
+            resolve(result);
           })
           .catch(err => {
-            resolve({ success: false, error: err.message ? err.message : err });
+            reject(err.message || err);
           });
       });
     } catch (err: any) {
-      return {
-        success: false,
-        error: err,
-      };
+      return Promise.reject(err.message || err);
     }
   }
 
   async getUnidadesAbiertasByIdSubdivision(idSubdivision: number): Promise<any> {
     try {
       return new Promise<any>(resolve => {
-        this.dataSource
-          .query(
-            `Select U.*, D.Division from Unidades AS U INNER JOIN dbo.Divisiones AS D ON D.IdDivision = U.IdDivision
-                        WHERE (case isnull(IdComplejo,0) when 0 THEN IdUnidad else IdComplejo end) = ${idSubdivision}
-                        AND Abierta = 1 order by Idunidad`,
-          )
+        this.unidadesRepository
+          .find({
+            where: [
+              { IdComplejo: idSubdivision, Abierta: true },
+              { IdUnidad: idSubdivision, Abierta: true },
+            ],
+            relations: { Division: true },
+          })
+          // this.dataSource
+          //   .query(
+          //     `Select U.*, D.Division from Unidades AS U INNER JOIN Divisiones AS D ON D.Id_Division = U.Id_Division
+          //       WHERE (case COALESCE(Id_Complejo, 0) when 0 THEN Id_Unidad else Id_Complejo end) = ${idSubdivision}
+          //       AND Abierta = true
+          //       order by Id_unidad`,
+          //   )
           .then(result => {
             resolve({
               success: true,
@@ -142,12 +130,15 @@ export class UnidadesService {
   async getUnidadesAbiertasByIdDivision(idDivision: number): Promise<any> {
     try {
       return new Promise<any>(resolve => {
-        this.dataSource
-          .query(
-            `Select U.*, D.Division from Unidades AS U INNER JOIN dbo.Divisiones AS D ON D.IdDivision = U.IdDivision
-                        WHERE U.IdDivision = ${idDivision}
-                        AND Abierta = 1 order by Idunidad`,
-          )
+        this.unidadesRepository
+          .find({ where: { IdDivision: idDivision, Abierta: true }, relations: { Division: true } })
+          // this.dataSource
+          //   .query(
+          //     `Select U.*, D.Division from Unidades AS U INNER JOIN Divisiones AS D ON D.Id_Division = U.Id_Division
+          //       WHERE U.Id_Division = ${idDivision}
+          //       AND Abierta = true
+          //       order by Id_unidad`,
+          //   )
           .then(result => {
             resolve({
               success: true,

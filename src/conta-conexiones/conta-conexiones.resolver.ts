@@ -1,10 +1,10 @@
 import { DEFAULT_GRAPHQL_CONTEXT } from './../shared/models/jwt.model';
-import { Usuarios } from './../usuarios/usuarios.entity';
+import { UsuariosEntity } from './../usuarios/usuarios.entity';
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { ContaConexionesService } from './conta-conexiones.service';
 import { ContaConexionesEntity } from './conta-conexiones.entity';
 import { Args, Mutation, Query, Resolver, Int, Context } from '@nestjs/graphql';
-import { ContaConexionQueryResponse, ContaConexionesQueryResponse, ContaConexionInput, EntidadesRodas } from './conta-conexiones.model';
+import { ContaConexionInput, EntidadesRodas } from './conta-conexiones.model';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../shared/guards/auth.guard';
 
@@ -12,15 +12,15 @@ import { AuthGuard } from '../shared/guards/auth.guard';
 export class ContaConexionesResolver {
   constructor(private _contaConexionesService: ContaConexionesService) {}
 
-  @Query(() => ContaConexionesQueryResponse)
+  @Query(() => [ContaConexionesEntity])
   @UseGuards(new AuthGuard())
-  async getAllContaConexiones(@Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios): Promise<ContaConexionesQueryResponse> {
+  async getAllContaConexiones(@Context(DEFAULT_GRAPHQL_CONTEXT) user: UsuariosEntity): Promise<ContaConexionesEntity[]> {
     return this._contaConexionesService.findAll(user);
   }
 
-  @Query(() => ContaConexionQueryResponse)
+  @Query(() => ContaConexionesEntity)
   @UseGuards(new AuthGuard())
-  async getContaConexionById(@Args({ name: 'id', type: () => Int }) id: number): Promise<ContaConexionQueryResponse> {
+  async getContaConexionById(@Args({ name: 'id', type: () => Int }) id: number): Promise<ContaConexionesEntity> {
     return this._contaConexionesService.findOne(id);
   }
 

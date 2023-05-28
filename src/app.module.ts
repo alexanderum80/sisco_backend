@@ -28,7 +28,6 @@ import { ClasificadorCuentaModule } from './clasificador-cuenta/clasificador-cue
 import { ConciliaExtContabilidadModule } from './concilia-externa-contabilidad/concilia-externa-contabilidad.module';
 import { TipoEntidadesModule } from './tipo-entidades/tipo-entidades.module';
 import { EpigrafesModule } from './epigrafes/epigrafes.module';
-import { CuentaEntidadModule } from './cuenta-entidad/cuenta-entidad.module';
 import { ElementosGastosModule } from './elementos-gastos/elementos-gastos.module';
 import { ClasificadorEntidadesModule } from './clasificador-entidades/clasificador-entidades.module';
 import { ContaExpresionesModule } from './conta-expresiones/conta-expresiones.module';
@@ -68,26 +67,15 @@ import { LogsModule } from './logs/logs.module';
       },
     }),
     TypeOrmModule.forRoot({
-      type: 'mssql',
+      type: 'postgres',
       host: DATASOURCE.HOST_NAME,
       username: DATASOURCE.USER_NAME,
       password: DATASOURCE.PASSWORD,
       database: DATASOURCE.DATABASE_NAME,
-      connectionTimeout: parseInt(DATASOURCE.CONNECTION_TIMEOUT),
-      requestTimeout: parseInt(DATASOURCE.REQUEST_TIMEOUT),
+      connectTimeoutMS: parseInt(DATASOURCE.CONNECTION_TIMEOUT),
+      maxQueryExecutionTime: parseInt(DATASOURCE.REQUEST_TIMEOUT),
       entities: ['**/*.entity.js'],
       synchronize: false,
-      pool: {
-        max: 200,
-        idleTimeoutMillis: 60000,
-      },
-      options: {
-        appName: 'SISCO',
-        enableArithAbort: true,
-        cryptoCredentialsDetails: {
-          minVersion: 'TLSv1',
-        },
-      },
     }),
 
     SharedModule,
@@ -109,7 +97,6 @@ import { LogsModule } from './logs/logs.module';
     ConciliaExtContabilidadModule,
     TipoEntidadesModule,
     EpigrafesModule,
-    CuentaEntidadModule,
     ElementosGastosModule,
     ClasificadorEntidadesModule,
     ContaExpresionesModule,

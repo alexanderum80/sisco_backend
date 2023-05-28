@@ -2,22 +2,22 @@ import { ExpresionesResumenEntity } from './../conta-expresiones/conta-expresion
 import { ContaOperadoresEntity as OperadoresEntity } from './../conta-operadores/conta-operadores.entity';
 import { CentrosView } from './../unidades/unidades.entity';
 import { MutationResponse } from './../shared/models/mutation.response.model';
-import { Usuarios } from './../usuarios/usuarios.entity';
+import { UsuariosEntity } from './../usuarios/usuarios.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ComprobarValoresEntity } from './conta-comprobar-valores.entity';
 import { Repository } from 'typeorm';
-import { ComprobarValoresInput, ComprobarValoresQueryResponse, ComprobarValorQueryResponse } from './conta-comprobar-valores.model';
+import { ComprobarValoresInput } from './conta-comprobar-valores.model';
 
 @Injectable()
 export class ContaComprobarValoresService {
   constructor(@InjectRepository(ComprobarValoresEntity) private readonly comprobarValoresEntity: Repository<ComprobarValoresEntity>) {}
 
-  async findAll(user: Usuarios): Promise<ComprobarValoresQueryResponse> {
+  async findAll(user: UsuariosEntity): Promise<ComprobarValoresEntity[]> {
     try {
       const { IdDivision } = user;
 
-      return new Promise<ComprobarValoresQueryResponse>(resolve => {
+      return new Promise<ComprobarValoresEntity[]>((resolve, reject) => {
         this.comprobarValoresEntity
           .createQueryBuilder('v')
           .select('v.Id', 'Id')
@@ -36,41 +36,35 @@ export class ContaComprobarValoresService {
           .where('v.IdDivision = :idDivision', { idDivision: IdDivision })
           .execute()
           .then(result => {
-            resolve({
-              success: true,
-              data: result,
-            });
+            resolve(result);
           })
           .catch(err => {
-            resolve({ success: false, error: err.message ? err.message : err });
+            reject(err.message || err);
           });
       });
     } catch (err: any) {
-      return { success: false, error: err.message ? err.message : err };
+      return Promise.reject(err.message || err);
     }
   }
 
-  async findOne(id: number): Promise<ComprobarValorQueryResponse> {
+  async findOne(id: number): Promise<ComprobarValoresEntity> {
     try {
-      return new Promise<ComprobarValorQueryResponse>(resolve => {
+      return new Promise<ComprobarValoresEntity>((resolve, reject) => {
         this.comprobarValoresEntity
           .findOne({ where: [{ Id: id }] })
           .then(result => {
-            resolve({
-              success: true,
-              data: result,
-            });
+            resolve(result);
           })
           .catch(err => {
-            resolve({ success: false, error: err.message ? err.message : err });
+            reject(err.message || err);
           });
       });
     } catch (err: any) {
-      return { success: false, error: err.message ? err.message : err };
+      return Promise.reject(err.message || err);
     }
   }
 
-  async create(user: Usuarios, comprobarValoresInput: ComprobarValoresInput): Promise<MutationResponse> {
+  async create(user: UsuariosEntity, comprobarValoresInput: ComprobarValoresInput): Promise<MutationResponse> {
     try {
       const { IdDivision } = user;
 

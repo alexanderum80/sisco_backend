@@ -2,11 +2,13 @@ import { ESTADISTICA_QUERY } from './conta-estadistica.model';
 import { ContaConexionesService } from './../conta-conexiones/conta-conexiones.service';
 import { ContaEstadisticaInput } from './dto/conta-estadistica.input';
 import { Injectable } from '@nestjs/common';
-import { ContaEstadisticaView } from './entities/conta-estadistica.entity';
+import { ContaEstadisticaParteView, ContaEstadisticaView } from './entities/conta-estadistica.entity';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class ContaEstadisticaService {
-  constructor(private readonly contaConexionesSvc: ContaConexionesService) {}
+  constructor(@InjectDataSource() private readonly dataSource: DataSource, private readonly contaConexionesSvc: ContaConexionesService) {}
 
   async findAll(contaEstadisticaInput: ContaEstadisticaInput): Promise<ContaEstadisticaView[]> {
     try {
@@ -57,6 +59,23 @@ export class ContaEstadisticaService {
 
       return new Promise<ContaEstadisticaView[]>(resolve => {
         resolve(contaEstadisticas);
+      });
+    } catch (err) {
+      return Promise.reject(err.message || err);
+    }
+  }
+
+  async findAllParte(): Promise<ContaEstadisticaParteView[]> {
+    try {
+      return new Promise<ContaEstadisticaParteView[]>((resolve, reject) => {
+        this.dataSource.manager
+          .find(ContaEstadisticaParteView)
+          .then(res => {
+            resolve(res);
+          })
+          .catch(err => {
+            reject(err.message || err);
+          });
       });
     } catch (err) {
       return Promise.reject(err.message || err);

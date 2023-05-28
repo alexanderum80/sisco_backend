@@ -2,21 +2,21 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { ObjectType, Field, Int } from '@nestjs/graphql';
 
 @ObjectType()
-@Entity('Conta_ClaseCuenta')
+@Entity('conta_clase_cuenta')
 export class ClaseCuentaEntity {
   @Field(() => Int)
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ name: 'id' })
   ID: number;
 
   @Field()
-  @Column()
+  @Column({ name: 'id_clase' })
   IdClase: string;
 
   @Field()
-  @Column()
+  @Column({ name: 'id_grupo' })
   IdGrupo: string;
 
   @Field()
-  @Column()
+  @Column({ name: 'clase' })
   Clase: string;
 }

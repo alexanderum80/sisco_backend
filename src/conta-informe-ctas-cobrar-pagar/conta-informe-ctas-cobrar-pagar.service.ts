@@ -11,7 +11,7 @@ export class ContaInformeCtasCobrarPagarService {
     try {
       return new Promise<ContaInformeCtasCobrarPagarView[]>((resolve, reject) => {
         this.dataSource
-          .query('EXEC pConta_InformeCuentasPorCobrarPagar @0, @1, @2', [idDivision, annio, periodo])
+          .query('select * from conta_informe_cuentas_por_cobrar_pagar ($1, $2, $3)', [idDivision, annio, periodo])
           .then(res => {
             resolve(res);
           })

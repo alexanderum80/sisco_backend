@@ -1,5 +1,5 @@
 import { DEFAULT_GRAPHQL_CONTEXT } from './../shared/models/jwt.model';
-import { Usuarios } from './../usuarios/usuarios.entity';
+import { UsuariosEntity } from './../usuarios/usuarios.entity';
 import { AuthGuard } from '../shared/guards/auth.guard';
 import { MutationResponse } from './../shared/models/mutation.response.model';
 import { ContaNoUsarEnCuentasService } from './conta-no-usar-en-cuentas.service';
@@ -13,7 +13,7 @@ export class ContaNoUsarEnCuentasResolver {
 
   @Query(() => ContaNoUsarEnCuentasQueryResponse)
   @UseGuards(new AuthGuard())
-  async getAllNoUsarEnCuenta(@Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios): Promise<ContaNoUsarEnCuentasQueryResponse> {
+  async getAllNoUsarEnCuenta(@Context(DEFAULT_GRAPHQL_CONTEXT) user: UsuariosEntity): Promise<ContaNoUsarEnCuentasQueryResponse> {
     return this._noUsarEnCuentaSvc.findAll(user);
   }
 
@@ -26,7 +26,7 @@ export class ContaNoUsarEnCuentasResolver {
   @Mutation(() => MutationResponse)
   @UseGuards(new AuthGuard())
   async createNoUsarEnCuenta(
-    @Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios,
+    @Context(DEFAULT_GRAPHQL_CONTEXT) user: UsuariosEntity,
     @Args({ name: 'noUsarEnCuentaInput', type: () => ContaNoUsarEnCuentaInput }) noUsarEnCuentaInput: ContaNoUsarEnCuentaInput,
   ): Promise<MutationResponse> {
     return this._noUsarEnCuentaSvc.create(user, noUsarEnCuentaInput);

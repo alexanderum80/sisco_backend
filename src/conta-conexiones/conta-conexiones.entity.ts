@@ -4,43 +4,43 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @ObjectType()
-@Entity({ name: 'Conta_Conexiones' })
+@Entity({ name: 'conta_conexiones' })
 export class ContaConexionesEntity {
   @Field()
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ name: 'id' })
   Id: number;
 
   @Field()
-  @Column()
+  @Column({ name: 'id_unidad' })
   IdUnidad: number;
 
   @Field(() => CentrosView)
   @ManyToOne(() => CentrosView, centros => centros.IdUnidad)
-  @JoinColumn({ name: 'IdUnidad', referencedColumnName: 'IdUnidad' })
-  Unidad: CentrosView;
+  @JoinColumn({ name: 'id_unidad', referencedColumnName: 'IdUnidad' })
+  Unidad?: CentrosView;
 
   @Field()
-  @Column()
+  @Column({ name: 'consolidado' })
   Consolidado: boolean;
 
   @Field()
-  @Column()
+  @Column({ name: 'id_division' })
   IdDivision: number;
 
   @Field(() => DivisionesEntity)
   @ManyToOne(() => DivisionesEntity, divisiones => divisiones.IdDivision)
-  @JoinColumn({ name: 'IdDivision', referencedColumnName: 'IdDivision' })
+  @JoinColumn({ name: 'id_division', referencedColumnName: 'IdDivision' })
   Division: DivisionesEntity;
 
   @Field({ nullable: true })
-  @Column()
+  @Column({ name: 'ip_rodas' })
   IpRodas: string;
 
   @Field({ nullable: true })
-  @Column()
+  @Column({ name: 'base_datos' })
   BaseDatos: string;
 
   @Field({ nullable: true })
-  @Column('datetime')
+  @Column('timestamp', { name: 'fecha_actualizacion' })
   FechaActualizacion?: Date;
 }

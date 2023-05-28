@@ -1,11 +1,9 @@
 import { DEFAULT_POSTGRES_CONNECTION_STRING } from './../conexiones/conexiones.model';
-import { Usuarios } from './../usuarios/usuarios.entity';
+import { UsuariosEntity } from './../usuarios/usuarios.entity';
 import { UsuariosService } from './../usuarios/usuarios.service';
-import { UnidadesService } from './../unidades/unidades.service';
 import { cloneDeep } from 'lodash';
 import { MutationResponse } from './../shared/models/mutation.response.model';
-import { CryptoService } from '../shared/services/crypto/crypto.service';
-import { ContaConexionQueryResponse, ContaConexionesQueryResponse, ContaConexionInput, EntidadesRodas } from './conta-conexiones.model';
+import { ContaConexionInput, EntidadesRodas } from './conta-conexiones.model';
 import { ContaConexionesEntity } from './conta-conexiones.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -13,14 +11,9 @@ import { DataSource, Repository } from 'typeorm';
 
 @Injectable()
 export class ContaConexionesService {
-  constructor(
-    @InjectRepository(ContaConexionesEntity) private readonly conexionesRespository: Repository<ContaConexionesEntity>,
-    private _cryptoService: CryptoService,
-    private _unidadesSvc: UnidadesService,
-    private _usuariosSvc: UsuariosService,
-  ) {}
+  constructor(@InjectRepository(ContaConexionesEntity) private readonly conexionesRespository: Repository<ContaConexionesEntity>, private _usuariosSvc: UsuariosService) {}
 
-  async findAll(user: Usuarios): Promise<ContaConexionesQueryResponse> {
+  async findAll(user: UsuariosEntity): Promise<ContaConexionesEntity[]> {
     try {
       const { IdDivision, IdTipoUsuario } = user;
 
@@ -30,7 +23,7 @@ export class ContaConexionesService {
         _condition = [{ IdDivision: IdDivision }, { IdDivision: '101' }];
       }
 
-      return new Promise<ContaConexionesQueryResponse>(resolve => {
+      return new Promise<ContaConexionesEntity[]>((resolve, reject) => {
         this.conexionesRespository
           .find({
             where: _condition,
@@ -40,50 +33,41 @@ export class ContaConexionesService {
             },
           })
           .then(result => {
-            resolve({
-              success: true,
-              data: result,
-            });
+            resolve(result);
           })
           .catch(err => {
-            resolve({ success: false, error: err.message ? err.message : err });
+            reject(err.message || err);
           });
       });
     } catch (err: any) {
-      return { success: false, error: err.message ? err.message : err };
+      return Promise.reject(err.message || err);
     }
   }
 
-  async findOne(id: number): Promise<ContaConexionQueryResponse> {
+  async findOne(id: number): Promise<ContaConexionesEntity> {
     try {
-      return new Promise<ContaConexionQueryResponse>(resolve => {
+      return new Promise<ContaConexionesEntity>((resolve, reject) => {
         this.conexionesRespository
           .findOne({ where: [{ Id: id }] })
           .then(result => {
-            resolve({
-              success: true,
-              data: result,
-            });
+            resolve(result);
           })
           .catch(err => {
-            resolve({ success: false, error: err.message ? err.message : err });
+            reject(err.message || err);
           });
       });
     } catch (err: any) {
-      return { success: false, error: err.message ? err.message : err };
+      return Promise.reject(err.message || err);
     }
   }
 
-  async findByIdUnidad(idUnidad: number, consolidado: boolean): Promise<ContaConexionQueryResponse> {
-    return new Promise<ContaConexionQueryResponse>((resolve, reject) => {
+  async findByIdUnidad(idUnidad: number, consolidado: boolean): Promise<ContaConexionesEntity> {
+    return new Promise<ContaConexionesEntity>((resolve, reject) => {
       this.conexionesRespository
         .findOne({ where: [{ IdUnidad: idUnidad, Consolidado: consolidado }] })
         .then(result => {
           if (result) {
-            resolve({
-              success: true,
-              data: result,
-            });
+            resolve(result);
           } else {
             reject(`No se ha definido la conexión al Rodas del Centro: ${idUnidad}`);
           }

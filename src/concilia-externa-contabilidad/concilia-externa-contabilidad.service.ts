@@ -44,7 +44,7 @@ export class ConciliaExtContabilidadService {
     try {
       return new Promise<ConcExtContabilidad>((resolve, reject) => {
         this.dataSource
-          .query('EXEC pConcExt_ConciliacionContabilidad @0, @1, @2, @3, @4, @5', [annio, mes, division, unidad, divisionOD, unidadOD])
+          .query('select * from concext_conciliacion_contabilidad ($1, $2, $3, $4, $5, $6)', [annio, mes, division, unidad, divisionOD, unidadOD])
           .then(result => {
             resolve(result);
           })
@@ -88,7 +88,7 @@ export class ConciliaExtContabilidadService {
 
     return new Promise<ActaConciliacion[]>((resolve, reject) => {
       this.dataSource
-        .query('EXEC pConcExt_ActaConciliacion @0, @1, @2, @3', [annio, mes, unidad, unidadOD])
+        .query('select * from concext_acta_conciliacion ($1, $2, $3, $4)', [annio, mes, unidad, unidadOD])
         .then(result => {
           resolve(result);
         })
@@ -153,9 +153,9 @@ export class ConciliaExtContabilidadService {
   async getDeudasResumen(annio: number, mes: number): Promise<ViewConciliaExtContabilidadResumen[]> {
     try {
       return new Promise<ViewConciliaExtContabilidadResumen[]>((resolve, reject) => {
-        const _query = `SELECT * FROM dbo.vConcExt_ConciliaContabilidadResumen
-          WHERE Annio = ${annio} AND Mes = ${mes}
-          ORDER BY DivisionEmisor, DivisionReceptor`;
+        const _query = `SELECT * FROM v_concext_concilia_contabilidad_resumen
+          WHERE Anno = ${annio} AND Mes = ${mes}
+          ORDER BY Division_Emisor, Division_Receptor`;
 
         this.dataSource
           .query(_query)
@@ -175,7 +175,7 @@ export class ConciliaExtContabilidadService {
     try {
       return new Promise<ViewConciliaExtContabilidadDeudasPorEdades[]>((resolve, reject) => {
         this.dataSource
-          .query('EXEC pConcExt_DeudasPorEdades @0, @1', [annio, mes])
+          .query('select * from public.concext_deudas_por_edades ($1, $2)', [annio, mes])
           .then(result => {
             resolve(result);
           })

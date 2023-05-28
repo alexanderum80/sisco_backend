@@ -2,42 +2,42 @@ import { ObjectType, Field } from '@nestjs/graphql';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @ObjectType()
-@Entity('ConcExt_ConciliaEntreUnidades')
+@Entity('concext_concilia_entre_unidades')
 export class ConciliaExternaEntreUnidadesEntity {
   @Field()
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ name: 'id' })
   ID: number;
 
   @Field()
-  @Column()
+  @Column({ name: 'anno' })
   Annio: number;
 
   @Field()
-  @Column()
+  @Column({ name: 'mes' })
   Mes: number;
 
   @Field()
-  @Column()
+  @Column({ name: 'id_unidad' })
   IdUnidad: number;
 
   @Field()
-  @Column()
+  @Column({ name: 'id_unidad_od' })
   IdUnidadOD: number;
 
   @Field({ nullable: true })
-  @Column()
+  @Column({ name: 'id_usuario_emisor' })
   IdUsuarioEmisor?: number;
 
   @Field({ nullable: true })
-  @Column()
+  @Column({ name: 'id_usuario_receptor' })
   IdUsuarioReceptor?: number;
 
   @Field({ nullable: true })
-  @Column()
+  @Column({ name: 'id_usuario_supervisor' })
   IdUsuarioSupervisor?: number;
 
   @Field({ nullable: true })
-  @Column()
+  @Column({ name: 'nota' })
   Nota?: string;
 }
 

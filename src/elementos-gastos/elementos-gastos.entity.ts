@@ -2,29 +2,29 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @ObjectType()
-@Entity('Conta_Egastos')
-export class ContaElementosGastos {
+@Entity('conta_egastos')
+export class ContaElementosGastosEntity {
   @Field()
-  @PrimaryColumn()
+  @PrimaryColumn({ name: 'egasto' })
   Egasto: string;
 
   @Field()
-  @Column()
+  @Column({ name: 'descripcion' })
   Descripcion: string;
 
   @Field()
-  @Column()
+  @Column({ name: 'uso_contenido' })
   UsoContenido: string;
 
   @Field()
-  @Column()
+  @Column({ name: 'tipo_entidad' })
   TipoEntidad: string;
 
   @Field()
-  @Column()
+  @Column({ name: 'cuenta_asociada' })
   CuentaAsociada: string;
 
   @Field()
-  @Column()
+  @Column({ name: 'id_epigrafe' })
   IdEpigrafe: number;
 }

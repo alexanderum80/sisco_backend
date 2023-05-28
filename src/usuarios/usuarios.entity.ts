@@ -4,40 +4,40 @@ import { ObjectType, Field } from '@nestjs/graphql';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 
 @ObjectType()
-@Entity()
-export class Usuarios {
+@Entity('usuarios')
+export class UsuariosEntity {
   @Field()
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ name: 'id_usuario' })
   IdUsuario: number;
 
   @Field()
-  @Column()
+  @Column({ name: 'usuario' })
   Usuario: string;
 
   @Field()
-  @Column()
+  @Column({ name: 'contrasena' })
   Contrasena?: string;
 
   @Field()
-  @Column()
+  @Column({ name: 'id_tipo_usuario' })
   IdTipoUsuario: number;
 
   @Field(() => TipoUsuarios)
   @ManyToOne(() => TipoUsuarios, tipoUsuarios => tipoUsuarios.IdTipo)
-  @JoinColumn({ name: 'IdTipoUsuario', referencedColumnName: 'IdTipo' })
+  @JoinColumn({ name: 'id_tipo_usuario', referencedColumnName: 'IdTipo' })
   TipoUsuario?: TipoUsuarios;
 
   @Field()
-  @Column()
+  @Column({ name: 'cambiar_contrasena' })
   CambiarContrasena: boolean;
 
   @Field()
-  @Column()
+  @Column({ name: 'id_division' })
   IdDivision: number;
 
   @Field(() => DivisionesEntity)
   @ManyToOne(() => DivisionesEntity, divisiones => divisiones.IdDivision)
-  @JoinColumn({ name: 'IdDivision', referencedColumnName: 'IdDivision' })
+  @JoinColumn({ name: 'id_division', referencedColumnName: 'IdDivision' })
   Division?: DivisionesEntity;
 
   @Field()

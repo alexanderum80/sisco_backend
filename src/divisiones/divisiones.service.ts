@@ -1,4 +1,4 @@
-import { Usuarios } from './../usuarios/usuarios.entity';
+import { UsuariosEntity } from './../usuarios/usuarios.entity';
 import { UsuariosService } from './../usuarios/usuarios.service';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,7 +9,7 @@ import { Repository } from 'typeorm';
 export class DivisionesService {
   constructor(@InjectRepository(DivisionesEntity) private readonly divisionesRepository: Repository<DivisionesEntity>, private _usuariosSvc: UsuariosService) {}
 
-  async getAllDivisiones(user?: Usuarios): Promise<DivisionesEntity[]> {
+  async getAllDivisiones(user?: UsuariosEntity): Promise<DivisionesEntity[]> {
     try {
       let criteria = {};
 

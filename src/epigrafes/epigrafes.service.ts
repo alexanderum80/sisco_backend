@@ -1,57 +1,51 @@
 import { MutationResponse } from './../shared/models/mutation.response.model';
-import { EpigrafesQueryResponse, EpigrafeQueryResponse, EpigrafeInput } from './epigrafes.model';
-import { ContaEpigrafes } from './epigrafes.entity';
+import { EpigrafeInput } from './epigrafes.model';
+import { ContaEpigrafesEntity } from './epigrafes.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class EpigrafesService {
-  constructor(@InjectRepository(ContaEpigrafes) private readonly epigrafeRepository: Repository<ContaEpigrafes>) {}
+  constructor(@InjectRepository(ContaEpigrafesEntity) private readonly epigrafeRepository: Repository<ContaEpigrafesEntity>) {}
 
-  async getAllEpigrafes(): Promise<EpigrafesQueryResponse> {
+  async getAllEpigrafes(): Promise<ContaEpigrafesEntity[]> {
     try {
-      return new Promise<EpigrafesQueryResponse>(resolve => {
+      return new Promise<ContaEpigrafesEntity[]>((resolve, reject) => {
         this.epigrafeRepository
           .find()
           .then(result => {
-            resolve({
-              success: true,
-              data: result,
-            });
+            resolve(result);
           })
           .catch(err => {
-            resolve({ success: false, error: err.message ? err.message : err });
+            reject(err.message || err);
           });
       });
     } catch (err: any) {
-      return { success: false, error: err.message ? err.message : err };
+      return Promise.reject(err.message || err);
     }
   }
 
-  async getEpigrafeById(id: number): Promise<EpigrafeQueryResponse> {
+  async getEpigrafeById(id: number): Promise<ContaEpigrafesEntity> {
     try {
-      return new Promise<EpigrafeQueryResponse>(resolve => {
+      return new Promise<ContaEpigrafesEntity>((resolve, reject) => {
         this.epigrafeRepository
-          .findOne({ where: [{ IdEpigafre: id }] })
+          .findOne({ where: [{ IdEpigrafe: id }] })
           .then(result => {
-            resolve({
-              success: true,
-              data: result,
-            });
+            resolve(result);
           })
           .catch(err => {
-            resolve({ success: false, error: err.message ? err.message : err });
+            reject(err.message || err);
           });
       });
     } catch (err: any) {
-      return { success: false, error: err.message ? err.message : err };
+      return Promise.reject(err.message || err);
     }
   }
 
   async createEpigrafe(epigrafeInfo: EpigrafeInput): Promise<MutationResponse> {
     try {
-      delete epigrafeInfo.IdEpigafre;
+      delete epigrafeInfo.IdEpigrafe;
 
       return new Promise<MutationResponse>(resolve => {
         this.epigrafeRepository

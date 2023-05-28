@@ -42,7 +42,7 @@ type TipoUsuarios {
   TipoUsuario: String!
 }
 
-type Usuarios {
+type UsuariosEntity {
   IdUsuario: Float!
   Usuario: String!
   Contrasena: String!
@@ -57,25 +57,14 @@ type Usuarios {
 
 type UsuarioQueryResponse {
   success: Boolean!
-  data: Usuarios
+  data: UsuariosEntity
   error: String
 }
 
 type UsuariosQueryResponse {
   success: Boolean!
-  data: [Usuarios!]
+  data: [UsuariosEntity!]
   error: String
-}
-
-type Unidades {
-  IdUnidad: Float!
-  Nombre: String
-  IdComplejo: Float
-  IdSubdivision: Float
-  IdDivision: Float
-  Provincia: String
-  Tipo: Float
-  Abierta: Boolean
 }
 
 type CentrosView {
@@ -85,12 +74,6 @@ type CentrosView {
   Subdivision: String!
   IdDivision: Float!
   Division: String!
-}
-
-type AllUnidadesQueryResponse {
-  success: Boolean!
-  data: [CentrosView!]
-  error: String
 }
 
 type ContaConexionesEntity {
@@ -120,18 +103,6 @@ type ConexionesQueryResponse {
   error: String
 }
 
-type ContaConexionQueryResponse {
-  success: Boolean!
-  data: ContaConexionesEntity
-  error: String
-}
-
-type ContaConexionesQueryResponse {
-  success: Boolean!
-  data: [ContaConexionesEntity!]
-  error: String
-}
-
 type EntidadesRodas {
   sigla: String!
   entidad: String!
@@ -141,7 +112,6 @@ type DWHConexiones {
   IdUnidad: Float!
   ConexionRest: String
   ConexionDWH: String
-  ServidorDist: String
 }
 
 type DWHConexionQueryResponse {
@@ -159,6 +129,10 @@ type CargosQueryResponse {
   success: Boolean!
   data: [Cargos!]
   error: String
+}
+
+type CuentasAgrupadas {
+  Cuenta: String!
 }
 
 type ClasificadorCuentaRealEntity {
@@ -188,47 +162,113 @@ type ClasificadorCuentaRealEntity {
   SeUtiliza: String
 }
 
-type ClasificadorCuentaQueryResponse {
-  success: Boolean!
-  data: ClasificadorCuentaRealEntity
-  error: String
-}
-
-type ClasificadorCuentasQueryResponse {
-  success: Boolean!
-  data: [ClasificadorCuentaRealEntity!]
-  error: String
-}
-
-type CuentasAgrupadas {
+type IConciliaReporteClasificador {
   Cuenta: String!
+  SubCuenta: String!
+  Descripcion: String!
+  Crt1Clasif: String
+  Crt2Clasif: String
+  Crt3Clasif: String
+  Crt4Clasif: String
+  Crt5Clasif: String
+  NatClasif: String
+  OblClasif: Boolean
+  grupo_clasif: String
+  clase_clasif: String
+  categ_clasif: String
+  clasif_clasif: String
+  tipo_clasif: String
+  estado_clasif: String
+  Crt1Rodas: String
+  Crt2Rodas: String
+  Crt3Rodas: String
+  Crt4Rodas: String
+  Crt5Rodas: String
+  NatRodas: String
+  OblRodas: Boolean
+  grupo_rodas: String
+  clase_rodas: String
+  categ_rodas: String
+  clasif_rodas: String
+  tipo_rodas: String
+  estado_rodas: String
 }
 
-type CuentasAgrupadasQueryResponse {
-  success: Boolean!
-  data: [CuentasAgrupadas!]
-  error: String
+type IConciliaReporteConsulta {
+  Periodo: Float!
+  Centro: String!
+  IdConsulta: String!
+  Consulta: String!
+  Cuenta: String
+  SubCuenta: String
+  Analisis1: String
+  Analisis2: String
+  Analisis3: String
+  Analisis4: String
+  Analisis5: String
+  Total: Float!
+  Consolidado: Boolean!
 }
 
-type ConciliaContaQueryResponse {
-  success: Boolean!
-  data: String
-  error: String
+type IConciliaReporteExpresiones {
+  Centro: Float!
+  Consolidado: Boolean!
+  Periodo: Float!
+  Expresion: String!
+  Valor: Float!
+  Operador: String!
+  ExpresionC: String!
+  ValorC: Float!
+  Resultado: String!
 }
 
-type ConciliaContabilidad {
-  ReporteClasificador: ConciliaContaQueryResponse!
-  ReporteConsultas: ConciliaContaQueryResponse!
-  ReporteExpresiones: ConciliaContaQueryResponse!
-  ReporteValores: ConciliaContaQueryResponse!
-  CuadreSistemas: ConciliaContaQueryResponse!
-  Informacion: ConciliaContaQueryResponse!
+type IConciliaReporteValores {
+  Centro: String!
+  Periodo: Float!
+  Consolidado: Boolean!
+  Expresion: String!
+  Valor: Float!
+  Operador: String!
+  ValorRodas: Float!
+  Estado: String!
+  Division: String!
+}
+
+type IConciliaCuadreSistemas {
+  Centro: Float!
+  Sistema: String!
+  Estado: String!
+}
+
+type IConciliaInformacionContabilidad {
+  Criterio: String!
+  Saldo: Float!
 }
 
 type ConciliaContabilidadQueryResponse {
-  success: Boolean!
-  data: ConciliaContabilidad
-  error: String
+  ReporteClasificador: [IConciliaReporteClasificador!]!
+  ReporteConsultas: [IConciliaReporteConsulta!]!
+  ReporteExpresiones: [IConciliaReporteExpresiones!]!
+  ReporteValores: [IConciliaReporteValores!]!
+  CuadreSistemas: [IConciliaCuadreSistemas!]!
+  Informacion: [IConciliaInformacionContabilidad!]!
+}
+
+type IChequeoCentroVsConsolidado {
+  Centro: String!
+  Unidad: String!
+  Consolidado: Boolean!
+  Periodo: Float!
+  IdConsulta: String!
+  Consulta: String!
+  Cuenta: String
+  SubCuenta: String
+  Analisis1: String
+  Analisis2: String
+  Analisis3: String
+  Analisis4: String
+  Analisis5: String
+  Total: Float!
 }
 
 type ConciliaDWH {
@@ -252,18 +292,6 @@ type ConciliaDWH {
   Division: String!
   CuentaR: String
   Nota: String
-}
-
-type ParteAtrasosQueryResponse {
-  success: Boolean!
-  data: String
-  error: String
-}
-
-type DatosIdGAMQueryResponse {
-  success: Boolean!
-  data: String
-  error: String
 }
 
 type Empleado {
@@ -308,6 +336,29 @@ type SupervisoresQueryResponse {
   error: String
 }
 
+type ParteAtrasoEntity {
+  IdUnidad: Float!
+  Unidad: String!
+  IdDivision: Float!
+  Division: String!
+  AtrasoRest: String!
+  AtrasoDWH: String!
+  AtrasoDist: String!
+  AtrasoEmp: String!
+}
+
+type DatosIdGamEntity {
+  IdUnidad: Float!
+  Unidad: String!
+  Ano: Float!
+  Mes: Float!
+  Fecha: String!
+  Version: String!
+  UltimaCircular: String!
+  PeriodoRestaurado: String!
+  vUtilnet: String!
+}
+
 type ConciliacionOperacionesDWH {
   Documento: String!
   Emisor: String!
@@ -325,21 +376,15 @@ type ConciliacionOperacionesDWHQueryResponse {
   error: String
 }
 
-type Subdivisiones {
+type SubdivisionesEntity {
   IdSubdivision: Float!
   Subdivision: String!
   IdDivision: Float!
 }
 
-type SubdivisionesQueryResponse {
-  success: Boolean!
-  data: [Subdivisiones!]
-  error: String
-}
-
 type ConcExtContabilidad {
   Id: Float!
-  Annio: String!
+  Anno: String!
   Mes: Float!
   CuentaE: String!
   SubCuentaE: String!
@@ -363,7 +408,7 @@ type ConcExtContabilidad {
 
 type ViewConciliaExtContabilidad {
   Id: Float!
-  Annio: String!
+  Anno: String!
   Mes: Float!
   Tipo: String!
   CuentaEmisor: String!
@@ -379,7 +424,7 @@ type ViewConciliaExtContabilidad {
   ValorEmisor: Float!
   FechaRecepcion: String
   ValorReceptor: Float!
-  DiferenciaDias: Float!
+  DiferenciaDias: Float
   DiferenciaImporte: Float!
   Recibido: Boolean!
 }
@@ -400,7 +445,7 @@ type ConciliaExternaContabilidadEntity {
 }
 
 type ViewConciliaExtContabilidadResumen {
-  Annio: Float!
+  Anno: Float!
   Mes: Float!
   DivisionEmisor: String!
   ValorEmisor: Float!
@@ -411,7 +456,7 @@ type ViewConciliaExtContabilidadResumen {
 
 type ViewConciliaExtContabilidadDeudasPorEdades {
   TipoOperacion: String!
-  Annio: Float!
+  Anno: Float!
   Mes: Float!
   IdDivision: Float!
   Division: String!
@@ -441,24 +486,12 @@ type ContaTipoentidadQueryResponse {
   error: String
 }
 
-type ContaEpigrafes {
-  IdEpigafre: Float!
+type ContaEpigrafesEntity {
+  IdEpigrafe: Float!
   Epigrafe: String!
 }
 
-type EpigrafesQueryResponse {
-  success: Boolean!
-  data: [ContaEpigrafes!]
-  error: String
-}
-
-type EpigrafeQueryResponse {
-  success: Boolean!
-  data: ContaEpigrafes
-  error: String
-}
-
-type ContaElementosGastos {
+type ContaElementosGastosEntity {
   Egasto: String!
   Descripcion: String!
   UsoContenido: String!
@@ -467,37 +500,13 @@ type ContaElementosGastos {
   IdEpigrafe: Float!
 }
 
-type ElementosGastosQueryResponse {
-  success: Boolean!
-  data: [ContaElementosGastos!]
-  error: String
-}
-
-type ElementoGastoQueryResponse {
-  success: Boolean!
-  data: ContaElementosGastos
-  error: String
-}
-
-type ClasificarEntidades {
+type ClasificarEntidadesEntity {
   IdUnidad: Float!
   Unidad: String
   IdTipoEntidad: Float!
   TipoEntidad: String!
   Division: String!
   SubDivision: String!
-}
-
-type ClasificadorEntidadesQueryResponse {
-  success: Boolean!
-  data: [ClasificarEntidades!]
-  error: String
-}
-
-type ClasificadorEntidadQueryResponse {
-  success: Boolean!
-  data: ClasificarEntidades
-  error: String
 }
 
 type ExpresionesResumenEntity {
@@ -511,7 +520,7 @@ type ExpresionesResumenEntity {
 }
 
 type ExpresionesDetalleEntity {
-  id: Float!
+  Id: Float!
   IdExpresion: Float!
   Centro: String
   Cta: String
@@ -522,41 +531,12 @@ type ExpresionesDetalleEntity {
   Signo: String!
   PorCiento: Float!
   TipoValor: Float!
-}
-
-type ContaExpresionResumenQueryResponse {
-  success: Boolean!
-  data: ExpresionesResumenEntity
-  error: String
-}
-
-type ContaExpresionDetalleQueryResponse {
-  success: Boolean!
-  data: ExpresionesDetalleEntity
-  error: String
-}
-
-type ContaExpresionesResumenQueryResponse {
-  success: Boolean!
-  data: [ExpresionesResumenEntity!]
-  error: String
-}
-
-type ContaExpresionesDetalleQueryResponse {
-  success: Boolean!
-  data: [ExpresionesDetalleEntity!]
-  error: String
+  TipoValorDesc: String
 }
 
 type ContaTipoValorExpresionesEntity {
   IdTipoValor: Float!
   Valor: String!
-}
-
-type ContaTipoValorExpresionesQueryResponse {
-  success: Boolean!
-  data: [ContaTipoValorExpresionesEntity!]
-  error: String
 }
 
 type ContaOperadoresEntity {
@@ -577,18 +557,6 @@ type ContaComprobarExpresionesEntity {
   Expresion: ExpresionesResumenEntity!
   ExpresionC: ExpresionesResumenEntity!
   Operador: ContaOperadoresEntity!
-}
-
-type ContaComprobarExpresionesQueryResponse {
-  success: Boolean!
-  data: [ContaComprobarExpresionesEntity!]
-  error: String
-}
-
-type ContaComprobarExpresionQueryResponse {
-  success: Boolean!
-  data: ContaComprobarExpresionesEntity
-  error: String
 }
 
 type ContaOperadoresQueryResponse {
@@ -649,18 +617,6 @@ type ComprobarValoresEntity {
   Activo: Boolean!
 }
 
-type ComprobarValoresQueryResponse {
-  success: Boolean!
-  data: [ComprobarValoresEntity!]
-  error: String
-}
-
-type ComprobarValorQueryResponse {
-  success: Boolean!
-  data: ComprobarValoresEntity
-  error: String
-}
-
 type CajaConfiguracionEntity {
   IdCaja: Int!
   IP: String!
@@ -712,11 +668,11 @@ type ConciliaUH {
   Periodo: Float!
   Cuenta: String!
   SubCuenta: String!
-  Analisis1: String!
-  Analisis2: String!
-  Analisis3: String!
-  Analisis4: String!
-  Analisis5: String!
+  Analisis1: String
+  Analisis2: String
+  Analisis3: String
+  Analisis4: String
+  Analisis5: String
   SaldoUH: Float!
   SaldoRodas: Float!
   Diferencia: Float!
@@ -738,6 +694,25 @@ type ContaEstadisticaView {
   SinTraspasar: Int!
   Inconclusos: Int!
   Anulados: Int!
+}
+
+type ContaEstadisticaParteView {
+  IdDivision: Float!
+  Division: String!
+  IdCentro: Float!
+  Centro: String!
+  Consolidado: Boolean!
+  Anno: Int!
+  Periodo: Int!
+  FechaActualizacion: DateTime
+  FechaInicio: DateTime
+  FechaFin: DateTime
+  Comprobantes: Int!
+  Traspasados: Int!
+  SinTraspasar: Int!
+  Inconclusos: Int!
+  Anulados: Int!
+  Conexion: String!
 }
 
 type ContaInformeCtasCobrarPagarView {
@@ -795,8 +770,8 @@ type ConciliaExternaDatosConciliacionEntity {
 }
 
 type Query {
-  authenticateUsuario(usuario: String!, passw: String!): Usuarios!
-  refreshToken(token: String!): Usuarios!
+  authenticateUsuario(usuario: String!, passw: String!): UsuariosEntity!
+  refreshToken(token: String!): UsuariosEntity!
   getAllUsuarios: UsuariosQueryResponse!
   getUsuariosByIdDivision(idDivision: Int!): UsuariosQueryResponse!
   getUsuarioById(id: Int!): UsuarioQueryResponse!
@@ -804,64 +779,66 @@ type Query {
   getAllDivisiones: [DivisionesEntity!]!
   getAllDivisionesByUsuario: [DivisionesEntity!]!
   getDivisionById(id: Int!): [DivisionesEntity!]!
-  getAllContaConexiones: ContaConexionesQueryResponse!
-  getContaConexionById(id: Int!): ContaConexionQueryResponse!
+  getAllContaConexiones: [ContaConexionesEntity!]!
+  getContaConexionById(id: Int!): ContaConexionesEntity!
   entidadesRodas(ip: String!): [EntidadesRodas!]!
-  getAllUnidades: AllUnidadesQueryResponse!
-  getAllUnidadesByUsuario: AllUnidadesQueryResponse!
-  getUnidadesByIdSubdivision(idSubdivision: Int!): AllUnidadesQueryResponse!
-  getUnidadesByIdDivision(idDivision: Int!): AllUnidadesQueryResponse!
+  getAllUnidades: [CentrosView!]!
+  getAllUnidadesByUsuario: [CentrosView!]!
+  getUnidadesByIdSubdivision(idSubdivision: Int!): [CentrosView!]!
+  getUnidadesByIdDivision(idDivision: Int!): [CentrosView!]!
   getDWHConexion(idDivision: Int!): DWHConexionQueryResponse!
   getAllCargos: CargosQueryResponse!
   conciliaDWH(conciliaDWHInput: ConciliaDWHInput!): [ConciliaDWH!]!
   conciliaContabilidad(conciliaContaInput: ConciliaContaInput!): ConciliaContabilidadQueryResponse!
-  getAllClasificadorCuentas(tipo: Int): ClasificadorCuentasQueryResponse!
-  getClasificadorCuenta(cuenta: String!, subcuenta: String!, tipo: Int!): ClasificadorCuentaQueryResponse!
-  getCuentasAgrupadas: CuentasAgrupadasQueryResponse!
+  chequearCentros(chequearCentrosInput: ChequearCentrosInput!): [IChequeoCentroVsConsolidado!]!
+  getAllClasificadorCuentas(tipo: Int): [ClasificadorCuentaRealEntity!]!
+  getClasificadorCuenta(cuenta: String!, subcuenta: String!, tipo: Int!): ClasificadorCuentaRealEntity!
+  getCuentasAgrupadas: [CuentasAgrupadas!]!
   getAllEmpleados: EmpleadosQueryResponse!
   getEmpleadosByIdDivision(idDivision: Int!): EmpleadosQueryResponse!
   getEmpleadoById(id: Int!): EmpleadoQueryResponse!
   getAllSupervisores: SupervisoresQueryResponse!
   getSupervisoresByIdDivision(idDivision: Int!): SupervisoresQueryResponse!
   getSupervisorById(id: Int!): SupervisorQueryResponse!
-  parteAtrasos(idDivision: Int!): ParteAtrasosQueryResponse!
-  datosIdGAM(idDivision: Int!): DatosIdGAMQueryResponse!
+  parteAtrasos(idDivision: Int!): [ParteAtrasoEntity!]!
+  datosIdGAM(idDivision: Int!): [DatosIdGamEntity!]!
   getDataBases(ip: String!, ususario: String!, password: String!): ConexionesQueryResponse!
   conciliaInternaDWH(conciliaInternaDWHInput: ConciliaOperacionesDWHInput!): ConciliacionOperacionesDWHQueryResponse!
-  getAllSubdivisiones: SubdivisionesQueryResponse!
-  getSubdivisionesByIdDivision(idDivision: Int!): SubdivisionesQueryResponse!
+  getAllSubdivisiones: [SubdivisionesEntity!]!
+  getSubdivisionesByIdDivision(idDivision: Int!): [SubdivisionesEntity!]!
   getConciliacionExternaContab(conciliaExternaInput: ConciliaExternaContabilidadInput!): ConciliaExternaContabilidadEntity!
   getConciliacionExternaContabResumen(annio: Int!, mes: Int!): [ViewConciliaExtContabilidadResumen!]!
   getConciliacionExternaContabDeudasPorEdades(annio: Int!, mes: Int!): [ViewConciliaExtContabilidadDeudasPorEdades!]!
   getDiferenciasEnConciliacion(annio: Int!, mes: Int!): [ConcExtContabilidad!]!
   getAllTipoEntidades: ContaTipoentidadesQueryResponse!
   getTipoEntidadById(id: Int!): ContaTipoentidadQueryResponse!
-  getAllEpigrafes: EpigrafesQueryResponse!
-  getEpigrafeById(id: Int!): EpigrafeQueryResponse!
-  getAllElementosGastos: ElementosGastosQueryResponse!
-  getElementoGastoById(id: String!): ElementoGastoQueryResponse!
-  getAllClasificadorEntidades: ClasificadorEntidadesQueryResponse!
-  getClasificadorEntidad(idUnidad: Int!): ClasificadorEntidadQueryResponse!
-  getAllExpresionesResumen: ContaExpresionesResumenQueryResponse!
-  getExpresionResumenById(id: Int!): ContaExpresionResumenQueryResponse!
-  getAllExpresionesDetalle: ContaExpresionesDetalleQueryResponse!
-  getExpresionesDetalleByIdResumen(idResumen: Int!): ContaExpresionesDetalleQueryResponse!
-  getExpresionDetalleById(id: Int!): ContaExpresionDetalleQueryResponse!
-  getAllContaTipoValorExpresiones: ContaTipoValorExpresionesQueryResponse!
-  getAllComprobarExpresiones: ContaComprobarExpresionesQueryResponse!
-  getComprobarExpresionById(id: Int!): ContaComprobarExpresionQueryResponse!
+  getAllEpigrafes: [ContaEpigrafesEntity!]!
+  getEpigrafeById(id: Int!): ContaEpigrafesEntity!
+  getAllElementosGastos: [ContaElementosGastosEntity!]!
+  getElementoGastoById(id: String!): ContaElementosGastosEntity!
+  getAllClasificadorEntidades: [ClasificarEntidadesEntity!]!
+  getClasificadorEntidad(idUnidad: Int!): ClasificarEntidadesEntity!
+  getAllExpresionesResumen: [ExpresionesResumenEntity!]!
+  getExpresionResumenById(id: Int!): ExpresionesResumenEntity!
+  getAllExpresionesDetalle: [ExpresionesDetalleEntity!]!
+  getExpresionesDetalleByIdResumen(idResumen: Int!): [ExpresionesDetalleEntity!]!
+  getExpresionDetalleById(id: Int!): ExpresionesDetalleEntity!
+  getAllContaTipoValorExpresiones: [ContaTipoValorExpresionesEntity!]!
+  getAllComprobarExpresiones: [ContaComprobarExpresionesEntity!]!
+  getComprobarExpresionById(id: Int!): ContaComprobarExpresionesEntity!
   getAllOperadores: ContaOperadoresQueryResponse!
   getAllNoUsarEnCuenta: ContaNoUsarEnCuentasQueryResponse!
   getNoUsarEnCuentaById(id: Int!): ContaNoUsarEnCuentaQueryResponse!
   getAllTipoUsuarios: TipoUsuariosQueryResponse!
   getTipoUsuarios(id: Int!): TipoUsuarioQueryResponse!
-  getAllComprobarValores: ComprobarValoresQueryResponse!
-  getComprobarValorById(id: Int!): ComprobarValorQueryResponse!
+  getAllComprobarValores: [ComprobarValoresEntity!]!
+  getComprobarValorById(id: Int!): ComprobarValoresEntity!
   getCajasConfiguracion: [CajaConfiguracionEntity!]!
   getCajaConfiguracion(id: Int!): CajaConfiguracionEntity!
   conciliaAFT(conciliaAftInput: ConciliaAftInput!): ConciliaAftData!
   conciliaUH(conciliaUhInput: ConciliaUhInput!): [ConciliaUH!]!
   contaEstadistica(contaEstadisticaInput: ContaEstadisticaInput!): [ContaEstadisticaView!]!
+  contaEstadisticaParte: [ContaEstadisticaParteView!]!
   conciliaInternaConta(conciliaInternaContaInput: ConciliaInternaContaInput!): [ConciliaInternaConta!]!
   getAllClaseCuenta: [ClaseCuentaEntity!]!
   getClaseCuentaById(id: Int!): ClaseCuentaEntity!
@@ -896,6 +873,13 @@ input ConciliaContaInput {
   annio: Float!
   tipoCentro: Float!
   tipoEntidad: Float!
+}
+
+input ChequearCentrosInput {
+  idCentro: Float!
+  annio: Float!
+  periodo: Float!
+  centrosAChequear: [Int!]!
 }
 
 input ConciliaOperacionesDWHInput {
@@ -958,7 +942,6 @@ type Mutation {
   deleteContaConexion(IDs: [Int!]!): MutationResponse!
   updateDWhConexion(dwhConexionInput: DWHConexionesInput!): MutationResponse!
   iniciarSaldos(iniciarSaldosInput: IniciarSaldosInput!): Boolean!
-  chequearCentros(chequearCentrosInput: ChequearCentrosInput!): ConciliaContaQueryResponse!
   arreglaClasificadorCuenta(idUnidad: Int!, tipoUnidad: String!, annio: String!): Boolean!
   saveClasificadorCuenta(clasificadorInfo: ClasificadorCuentaRealInput!): MutationResponse!
   deleteClasificadorCuenta(cuenta: String!, subcuenta: String!, tipo: Int!): MutationResponse!
@@ -972,9 +955,9 @@ type Mutation {
   createTipoEntidad(tipoEntidadInfo: TipoEntidadInput!): MutationResponse!
   updateTipoEntidad(tipoEntidadInfo: TipoEntidadInput!): MutationResponse!
   deleteTipoEntidad(IDs: [Int!]!): MutationResponse!
-  createEpigrafe(epigrafeInfo: EpigrafeInput!): EpigrafeQueryResponse!
-  updateEpigrafe(epigrafeInfo: EpigrafeInput!): EpigrafeQueryResponse!
-  deleteEpigrafe(IDs: [Int!]!): EpigrafeQueryResponse!
+  createEpigrafe(epigrafeInfo: EpigrafeInput!): MutationResponse!
+  updateEpigrafe(epigrafeInfo: EpigrafeInput!): MutationResponse!
+  deleteEpigrafe(IDs: [Int!]!): MutationResponse!
   saveElementoGasto(elementoGastoInfo: ElementoGastoInput!): MutationResponse!
   deleteElementoGasto(id: String!): MutationResponse!
   createClasificadorEntidad(clasificadorEntidadInfo: ClasificadorEntidadInput!): MutationResponse!
@@ -1042,13 +1025,6 @@ input IniciarSaldosInput {
   annio: Float!
 }
 
-input ChequearCentrosInput {
-  idCentro: Float!
-  annio: Float!
-  periodo: Float!
-  centrosAChequear: [Int!]!
-}
-
 input ClasificadorCuentaRealInput {
   TipoClasificador: Float!
   Cuenta: String!
@@ -1102,7 +1078,7 @@ input TipoEntidadInput {
 }
 
 input EpigrafeInput {
-  IdEpigafre: Float!
+  IdEpigrafe: Float!
   Epigrafe: String!
 }
 

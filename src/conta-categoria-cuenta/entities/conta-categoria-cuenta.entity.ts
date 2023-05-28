@@ -2,17 +2,17 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 import { ObjectType, Field, Int } from '@nestjs/graphql';
 
 @ObjectType()
-@Entity('Conta_CategoriaCuenta')
+@Entity('conta_categoria_cuenta')
 export class CategoriaCuentaEntity {
   @Field()
-  @PrimaryColumn()
+  @PrimaryColumn({ name: 'id_categoria' })
   IdCategoria: string;
 
   @Field(() => Int)
-  @Column()
+  @Column({ name: 'id_clase' })
   IdClase: number;
 
   @Field()
-  @Column()
+  @Column({ name: 'categoria' })
   Categoria: string;
 }

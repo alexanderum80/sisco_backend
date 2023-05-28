@@ -1,4 +1,6 @@
-import { EpigrafesQueryResponse, EpigrafeQueryResponse, EpigrafeInput } from './epigrafes.model';
+import { MutationResponse } from 'src/shared/models/mutation.response.model';
+import { ContaEpigrafesEntity } from './epigrafes.entity';
+import { EpigrafeInput } from './epigrafes.model';
 import { EpigrafesService } from './epigrafes.service';
 import { Args, Int, Query, Resolver, Mutation } from '@nestjs/graphql';
 
@@ -6,28 +8,28 @@ import { Args, Int, Query, Resolver, Mutation } from '@nestjs/graphql';
 export class EpigrafesResolver {
   constructor(private epigrafesSvc: EpigrafesService) {}
 
-  @Query(() => EpigrafesQueryResponse)
-  async getAllEpigrafes(): Promise<EpigrafesQueryResponse> {
+  @Query(() => [ContaEpigrafesEntity])
+  async getAllEpigrafes(): Promise<ContaEpigrafesEntity[]> {
     return this.epigrafesSvc.getAllEpigrafes();
   }
 
-  @Query(() => EpigrafeQueryResponse)
-  async getEpigrafeById(@Args({ name: 'id', type: () => Int }) id: number): Promise<EpigrafeQueryResponse> {
+  @Query(() => ContaEpigrafesEntity)
+  async getEpigrafeById(@Args({ name: 'id', type: () => Int }) id: number): Promise<ContaEpigrafesEntity> {
     return this.epigrafesSvc.getEpigrafeById(id);
   }
 
-  @Mutation(() => EpigrafeQueryResponse)
-  async createEpigrafe(@Args({ name: 'epigrafeInfo', type: () => EpigrafeInput }) epigrafeInfo: EpigrafeInput): Promise<EpigrafeQueryResponse> {
+  @Mutation(() => MutationResponse)
+  async createEpigrafe(@Args({ name: 'epigrafeInfo', type: () => EpigrafeInput }) epigrafeInfo: EpigrafeInput): Promise<MutationResponse> {
     return this.epigrafesSvc.createEpigrafe(epigrafeInfo);
   }
 
-  @Mutation(() => EpigrafeQueryResponse)
-  async updateEpigrafe(@Args({ name: 'epigrafeInfo', type: () => EpigrafeInput }) epigrafeInfo: EpigrafeInput): Promise<EpigrafeQueryResponse> {
+  @Mutation(() => MutationResponse)
+  async updateEpigrafe(@Args({ name: 'epigrafeInfo', type: () => EpigrafeInput }) epigrafeInfo: EpigrafeInput): Promise<MutationResponse> {
     return this.epigrafesSvc.updateEpigrafe(epigrafeInfo);
   }
 
-  @Mutation(() => EpigrafeQueryResponse)
-  async deleteEpigrafe(@Args({ name: 'IDs', type: () => [Int] }) IDs: number[]): Promise<EpigrafeQueryResponse> {
+  @Mutation(() => MutationResponse)
+  async deleteEpigrafe(@Args({ name: 'IDs', type: () => [Int] }) IDs: number[]): Promise<MutationResponse> {
     return this.epigrafesSvc.deleteEpigrafe(IDs);
   }
 }

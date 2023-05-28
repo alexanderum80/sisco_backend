@@ -1,37 +1,36 @@
 import { DEFAULT_GRAPHQL_CONTEXT } from './../shared/models/jwt.model';
-import { Usuarios } from './../usuarios/usuarios.entity';
-import { AllUnidadesQueryResponse } from './unidades.model';
+import { UsuariosEntity } from './../usuarios/usuarios.entity';
 import { UnidadesService } from './unidades.service';
-import { Unidades } from './unidades.entity';
+import { CentrosView, UnidadesEntity } from './unidades.entity';
 import { Args, Context, Int, Query, Resolver } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../shared/guards/auth.guard';
 
-@Resolver(() => Unidades)
+@Resolver(() => UnidadesEntity)
 export class UnidadesResolver {
   constructor(private _unidadesService: UnidadesService) {}
 
-  @Query(() => AllUnidadesQueryResponse)
+  @Query(() => [CentrosView])
   @UseGuards(new AuthGuard())
-  async getAllUnidades(): Promise<AllUnidadesQueryResponse> {
+  async getAllUnidades(): Promise<CentrosView[]> {
     return this._unidadesService.getAllUnidades();
   }
 
-  @Query(() => AllUnidadesQueryResponse)
+  @Query(() => [CentrosView])
   @UseGuards(new AuthGuard())
-  async getAllUnidadesByUsuario(@Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios): Promise<AllUnidadesQueryResponse> {
+  async getAllUnidadesByUsuario(@Context(DEFAULT_GRAPHQL_CONTEXT) user: UsuariosEntity): Promise<CentrosView[]> {
     return this._unidadesService.getAllUnidades(user);
   }
 
-  @Query(() => AllUnidadesQueryResponse)
+  @Query(() => [CentrosView])
   @UseGuards(new AuthGuard())
-  async getUnidadesByIdSubdivision(@Args({ name: 'idSubdivision', type: () => Int }) idSubdivision: number): Promise<AllUnidadesQueryResponse> {
+  async getUnidadesByIdSubdivision(@Args({ name: 'idSubdivision', type: () => Int }) idSubdivision: number): Promise<CentrosView[]> {
     return this._unidadesService.getUnidadesByIdSubdivision(idSubdivision);
   }
 
-  @Query(() => AllUnidadesQueryResponse)
+  @Query(() => [CentrosView])
   @UseGuards(new AuthGuard())
-  async getUnidadesByIdDivision(@Args({ name: 'idDivision', type: () => Int }) idDivision: number): Promise<AllUnidadesQueryResponse> {
+  async getUnidadesByIdDivision(@Args({ name: 'idDivision', type: () => Int }) idDivision: number): Promise<CentrosView[]> {
     return this._unidadesService.getUnidadesByIdDivision(idDivision);
   }
 }

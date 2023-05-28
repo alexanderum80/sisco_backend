@@ -1,67 +1,73 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, PrimaryColumn, ViewColumn, ViewEntity } from 'typeorm';
+import { DivisionesEntity } from 'src/divisiones/divisiones.entity';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, ViewColumn, ViewEntity } from 'typeorm';
 
 @ObjectType()
-@Entity()
-export class Unidades {
+@Entity('unidades')
+export class UnidadesEntity {
   @Field()
-  @PrimaryColumn()
+  @PrimaryColumn({ name: 'id_unidad' })
   IdUnidad: number;
 
   @Field({ nullable: true })
-  @Column()
+  @Column({ name: 'nombre' })
   Nombre: string;
 
   @Field({ nullable: true })
-  @Column()
+  @Column({ name: 'id_complejo' })
   IdComplejo: number;
 
   @Field({ nullable: true })
-  @Column()
+  @Column({ name: 'id_subdivision' })
   IdSubdivision: number;
 
   @Field({ nullable: true })
-  @Column()
+  @Column({ name: 'id_division' })
   IdDivision: number;
 
+  @Field(() => DivisionesEntity)
+  @ManyToOne(() => DivisionesEntity, divisiones => divisiones.IdDivision)
+  @JoinColumn({ name: 'id_division', referencedColumnName: 'IdDivision' })
+  Division?: DivisionesEntity;
+
   @Field({ nullable: true })
-  @Column('nchar', { length: 3 })
+  @Column('varchar', { name: 'provincia', length: 3 })
   Provincia: string;
 
   @Field({ nullable: true })
-  @Column()
+  @Column({ name: 'tipo' })
   Tipo: number;
 
   @Field({ nullable: true })
-  @Column()
+  @Column({ name: 'abierta' })
   Abierta: boolean;
 }
 
 @ObjectType()
-@ViewEntity('vCentros')
+@ViewEntity('v_centros')
 export class CentrosView {
   @Field()
-  @ViewColumn()
-  @PrimaryColumn()
+  @ViewColumn({ name: 'id_unidad' })
+  @PrimaryColumn({ name: 'id_unidad' })
   IdUnidad: number;
 
   @Field()
-  @ViewColumn()
+  @ViewColumn({ name: 'nombre' })
   Nombre: string;
 
   @Field()
-  @ViewColumn()
+  @ViewColumn({ name: 'id_subdivision' })
   IdSubdivision: number;
 
   @Field()
-  @ViewColumn()
+  @ViewColumn({ name: 'subdivision' })
   Subdivision: string;
 
   @Field()
-  @ViewColumn()
+  @ViewColumn({ name: 'id_division' })
   IdDivision: number;
 
   @Field()
-  @ViewColumn()
+  @ViewColumn({ name: 'division' })
   Division: string;
 }

@@ -2,21 +2,21 @@ import { Entity, Column, PrimaryColumn } from 'typeorm';
 import { ObjectType, Field, Int, Float } from '@nestjs/graphql';
 
 @ObjectType()
-@Entity('ActFijos_ClasificadorSubgrupos')
+@Entity('actfijos_clasificador_subgrupos')
 export class ActFijosClasificadorSubgrupoEntity {
   @Field(() => Int)
-  @PrimaryColumn('int')
+  @PrimaryColumn('int', { name: 'grupo' })
   Grupo: number;
 
   @Field(() => Int)
-  @PrimaryColumn('int')
+  @PrimaryColumn('int', { name: 'codigo' })
   Codigo: number;
 
   @Field()
-  @Column('nvarchar', { name: 'Descripcion', length: 64 })
+  @Column('varchar', { name: 'descripcion', length: 64 })
   Descripcion: string;
 
   @Field(() => Float)
-  @Column('float', { name: 'Tasa', precision: 18 })
+  @Column('float', { name: 'tasa', precision: 18 })
   Tasa: number;
 }

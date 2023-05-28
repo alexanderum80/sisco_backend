@@ -22,9 +22,9 @@ export class ConciliaAftService {
       const { idCentro, annio, periodo } = conciliaAftInput;
 
       // verificar si se ha definido la conexión al Rodas
-      const _conexionRodasQuery = await this._contaConexionesSvc.findByIdUnidad(idCentro, false);
-      const _conexionConta = _conexionRodasQuery.data;
-      // _conexionConta.BaseDatos = `r4_${_conexionConta.BaseDatos.toLowerCase()}`;
+      const _conexionConta = await this._contaConexionesSvc.findByIdUnidad(idCentro, false).catch(err => {
+        throw new Error(err);
+      });
 
       const _conexionMB = cloneDeep(_conexionConta);
       _conexionMB.BaseDatos = _conexionMB.BaseDatos.replace(/Conta/gi, 'MB');
@@ -180,7 +180,7 @@ export class ConciliaAftService {
   }
 
   private async _importarDatosRodas(annio: number, periodo: number, idUnidad: number, tipoCentro: number, contaConexion: ContaConexionesEntity): Promise<boolean> {
-    const cons = tipoCentro === 1 ? '1' : '0';
+    const cons = tipoCentro === 1;
 
     // me conecto al Rodas del Centro
     const rodasConnection = await this._contaConexionesSvc.conexionRodas(contaConexion);

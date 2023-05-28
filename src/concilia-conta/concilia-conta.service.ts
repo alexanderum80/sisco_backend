@@ -1,11 +1,9 @@
 import { LogsService } from './../logs/logs.service';
 import { ContaConexionesEntity } from './../conta-conexiones/conta-conexiones.entity';
 import { toNumber } from 'lodash';
-import { Usuarios } from './../usuarios/usuarios.entity';
+import { UsuariosEntity } from './../usuarios/usuarios.entity';
 import { ETipoClasificadorCuenta } from './../clasificador-cuenta/clasificador-cuenta.model';
 import { ClasificadorCuentaService } from './../clasificador-cuenta/clasificador-cuenta.service';
-import { XmlJsService } from './../shared/services/xml-js/xml-js.service';
-import { UnidadesService } from './../unidades/unidades.service';
 import { ContaConexionesService } from './../conta-conexiones/conta-conexiones.service';
 import { Injectable } from '@nestjs/common';
 import {
@@ -13,21 +11,22 @@ import {
   queryAsientoRodas,
   queryRangoAsientosMesRodas,
   querySaldosAcumuladosRodas,
-  ConciliaContaInput,
   queryClasificadorCuentasRodas,
   ConciliaContabilidadQueryResponse,
   queryReporteConsultas,
-  ConciliaContaQueryResponse,
   queryReporteExpresiones,
   queryReporteValores,
-  IniciarSaldosInput,
-  ChequearCentrosInput,
-  // queryInsertClasificadorRodas,
-  // queryInsertCriterioConsolidacionRodas,
   queryUpdateCriterioClasificadorRodas,
   queryUpdateClasificadorRodas,
   queryObligacionesRodas,
+  IConciliaReporteConsulta,
+  IConciliaReporteExpresiones,
+  IConciliaReporteValores,
+  IConciliaCuadreSistemas,
+  IConciliaInformacionContabilidad,
+  IChequeoCentroVsConsolidado,
 } from './concilia-conta.model';
+import { ConciliaContaInput, IniciarSaldosInput, ChequearCentrosInput } from './dto/concilia-conta.input';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
@@ -36,60 +35,40 @@ export class ConciliaContaService {
   constructor(
     @InjectDataSource() private readonly dataSource: DataSource,
     private _contaConexionesService: ContaConexionesService,
-    private _unidadesService: UnidadesService,
-    private _xmlJsService: XmlJsService,
     private _clasificadorCuentaSvc: ClasificadorCuentaService,
     private _logsSvc: LogsService,
   ) {}
 
-  async conciliaContabilidad(user: Usuarios, conciliaContaInput: ConciliaContaInput): Promise<ConciliaContabilidadQueryResponse> {
+  async conciliaContabilidad(user: UsuariosEntity, conciliaContaInput: ConciliaContaInput): Promise<ConciliaContabilidadQueryResponse> {
     try {
       const { IdDivision } = user;
       const { idCentro, periodo, annio, tipoCentro, tipoEntidad } = conciliaContaInput;
-      const consolidado = tipoCentro === 2 ? '1' : '0';
+      const consolidado = tipoCentro === 2;
 
       // verificar si se ha definido la conexión al Rodas
-      const _conexionRodasQuery = await this._contaConexionesService.findByIdUnidad(idCentro, tipoCentro === 2).catch(err => {
+      const _conexionConta = await this._contaConexionesService.findByIdUnidad(idCentro, tipoCentro === 2).catch(err => {
         throw new Error(err);
       });
-
-      const _conexionConta = _conexionRodasQuery.data;
-      // _conexionConta.BaseDatos = `r4_${_conexionConta.BaseDatos.toLowerCase()}`;
 
       // conecto al Conta del Centro
       const _contaConexionCentro: DataSource = await this._contaConexionesService.conexionRodas(_conexionConta);
 
       // importar y chequear el clasificador de cuentas
-      const _chequeaClasifRes = await this._importarClasificador(idCentro, tipoCentro, annio, consolidado, periodo, _contaConexionCentro);
-      if (_chequeaClasifRes.data.length) {
+      const _chequeaClasifRes = await this._importarClasificador(idCentro, tipoCentro, annio, consolidado, periodo, _contaConexionCentro).catch(err => {
+        throw new Error(err);
+      });
+
+      if (_chequeaClasifRes.length) {
         // cierro la conexión al Rodas del Centro
         if (_contaConexionCentro && _contaConexionCentro.isInitialized) _contaConexionCentro.destroy();
 
         return {
-          success: false,
-          data: {
-            ReporteClasificador: {
-              success: false,
-              data: JSON.stringify(_chequeaClasifRes.data),
-            },
-            ReporteConsultas: {
-              success: true,
-            },
-            ReporteExpresiones: {
-              success: true,
-            },
-            ReporteValores: {
-              success: true,
-            },
-            CuadreSistemas: {
-              success: true,
-            },
-            Informacion: {
-              success: true,
-            },
-          },
-          error:
-            'Usted tiene errores en el Clasificador, lo que conlleva a que no pueda terminar el análisis, ni entregar el balance a nivel superior. Vaya a la pestaña Análisis del Clasificador y Corrija estos errores.',
+          ReporteClasificador: _chequeaClasifRes,
+          ReporteConsultas: [],
+          ReporteExpresiones: [],
+          ReporteValores: [],
+          CuadreSistemas: [],
+          Informacion: [],
         };
       }
 
@@ -112,45 +91,21 @@ export class ConciliaContaService {
           });
       });
     } catch (err: any) {
-      return {
-        success: false,
-        data: {
-          ReporteClasificador: {
-            success: true,
-            data: JSON.stringify(''),
-          },
-          ReporteConsultas: {
-            success: true,
-          },
-          ReporteExpresiones: {
-            success: true,
-          },
-          ReporteValores: {
-            success: true,
-          },
-          CuadreSistemas: {
-            success: true,
-          },
-          Informacion: {
-            success: true,
-          },
-        },
-        error: err.message ? err.message : err,
-      };
+      return Promise.reject(err.message || err);
     }
   }
 
-  async _importarClasificador(idUnidad: number, tipoCentro: number, annio: number, cons: string, periodo: number, contaConexion: DataSource): Promise<any> {
+  async _importarClasificador(idUnidad: number, tipoCentro: number, annio: number, cons: boolean, periodo: number, contaConexion: DataSource): Promise<any> {
     try {
       // inserto el clasificador del Rodas
-      const _queryClasifCuentasRes = await contaConexion.query(queryClasificadorCuentasRodas.replace(/@anno/gi, annio.toString())).catch(err => {
+      const _clasifCuentas = await contaConexion.query(queryClasificadorCuentasRodas.replace(/@anno/gi, annio.toString())).catch(err => {
         throw new Error(err.message || err);
       });
 
-      let _clasifCuentasXML = this._xmlJsService.jsonToXML('Cuentas', {});
+      // let _clasifCuentasXML = this._xmlJsService.jsonToXML('Cuentas', {});
 
-      if (_queryClasifCuentasRes.length) {
-        _clasifCuentasXML = this._xmlJsService.jsonToXML('Cuentas', _queryClasifCuentasRes);
+      if (_clasifCuentas.length) {
+        //   _clasifCuentasXML = this._xmlJsService.jsonToXML('Cuentas', _clasifCuentas);
 
         let tipoClasif = '';
         switch (tipoCentro) {
@@ -167,9 +122,16 @@ export class ConciliaContaService {
 
         return new Promise<any>((resolve, reject) => {
           this.dataSource
-            .query(`EXEC dbo.pConta_ImportClasifCuentaXML @0, @1, @2, @3, @4, @5`, [_clasifCuentasXML, idUnidad, tipoClasif, cons, annio, periodo])
+            .query(`select * from Conta_Import_Clasif_Cuenta ($1::json, $2::int, $3::int, $4::bool, $5::int, $6::int)`, [
+              JSON.stringify(_clasifCuentas),
+              idUnidad,
+              tipoClasif,
+              cons,
+              annio,
+              periodo,
+            ])
             .then(result => {
-              resolve({ data: result });
+              resolve(result);
             })
             .catch(err => {
               reject(err.message ? err.message : err);
@@ -185,7 +147,7 @@ export class ConciliaContaService {
     }
   }
 
-  async importarContabilidad(idUnidad: number, annio: number, periodo: number, cons: string, contaConexion: DataSource): Promise<void> {
+  async importarContabilidad(idUnidad: number, annio: number, periodo: number, cons: boolean, contaConexion: DataSource): Promise<void> {
     try {
       // obtener el ultimo periodo importado en el SISCO
       const _queryUltimoPeriodo = queryUltimoPeriodo
@@ -198,7 +160,7 @@ export class ConciliaContaService {
 
       let _ultimoPeriodo = -1;
       if (_ultimoPeriodoRes.length) {
-        _ultimoPeriodo = toNumber(_ultimoPeriodoRes[0].Periodo);
+        _ultimoPeriodo = toNumber(_ultimoPeriodoRes[0].periodo);
       }
 
       // chequear los datos adulterados
@@ -227,7 +189,7 @@ export class ConciliaContaService {
       // cierro la conexión al Rodas del Centro
       if (contaConexion && contaConexion.isInitialized) contaConexion.destroy();
 
-      await this._updateFechaActualizacion(idUnidad, cons === '1').catch(err => {
+      await this._updateFechaActualizacion(idUnidad, cons).catch(err => {
         throw new Error(err.message || err);
       });
     } catch (err: any) {
@@ -239,11 +201,6 @@ export class ConciliaContaService {
 
   private async _chequeaDatosAdulterados(idUnidad: number, conexionRodas: DataSource): Promise<void> {
     const _queryAsientos = queryRangoAsientosMesRodas;
-
-    const _unidadRes = await this._unidadesService.getUnidadById(idUnidad);
-    if (!_unidadRes.success) {
-      throw new Error(_unidadRes.error.toString());
-    }
 
     await conexionRodas
       .query(_queryAsientos)
@@ -287,7 +244,7 @@ export class ConciliaContaService {
       });
   }
 
-  private async _chequearSaldoAcumulados(idUnidad: number, annio: number, periodo: number, cons: string, conexionRodas: DataSource): Promise<void> {
+  private async _chequearSaldoAcumulados(idUnidad: number, annio: number, periodo: number, cons: boolean, conexionRodas: DataSource): Promise<void> {
     const _querySaldosAcumRodas = querySaldosAcumuladosRodas.replace(/@anno/g, annio.toString()).replace(/@periodo/g, periodo.toString());
 
     const _querySaldoAcumRodasRes = await conexionRodas
@@ -307,11 +264,12 @@ export class ConciliaContaService {
     }
 
     await this.dataSource
-      .query('EXEC dbo.pConta_SaldoAcumulado @0, @1, @2, @3, @4, @5', [idUnidad, cons, annio, periodo, _saldoDebito, _saldoCredito])
+      .query('SELECT * from Conta_Saldo_Acumulado ($1::int, $2::bool, $3::int, $4::int, $5::numeric, $6::numeric)', [idUnidad, cons, annio, periodo, _saldoDebito, _saldoCredito])
       .then(result => {
-        if (result[0].DifDebito !== 0 || result[0].DifCredito !== 0) {
-          const _error = `Los Saldos Acumulados entre el Rodas y SISCO hasta el período ${periodo - 1} no coinciden.
-                    Concilie el período anterior, y después concilie el actual.\n\nNo se continuará con la Conciliación.`;
+        if (toNumber(result[0].dif_debito) !== 0 || toNumber(result[0].dif_credito) !== 0) {
+          const _error = `Los Saldos Acumulados entre el Rodas y SISCO hasta el período ${
+            periodo - 1
+          } no coinciden.<br>Concilie el período anterior, y después concilie el actual.<br>No se continuará con la Conciliación.`;
 
           throw new Error(_error);
         }
@@ -321,10 +279,10 @@ export class ConciliaContaService {
       });
   }
 
-  private async _importarAsientos(idUnidad: number, annio: number, periodo: number, cons: string, rodasConexion: DataSource): Promise<void> {
+  private async _importarAsientos(idUnidad: number, annio: number, periodo: number, cons: boolean, rodasConexion: DataSource): Promise<void> {
     const _queryAsientos = queryAsientoRodas.replace(/@anno/g, annio.toString()).replace(/@periodo/g, periodo.toString());
 
-    const _queryAsientosRes = await rodasConexion
+    const _asientos = await rodasConexion
       .query(_queryAsientos)
       .then(result => {
         return result;
@@ -333,19 +291,21 @@ export class ConciliaContaService {
         throw new Error(err.message || err);
       });
 
-    if (_queryAsientosRes.length) {
-      const _asientos = this._xmlJsService.jsonToXML('Asiento', _queryAsientosRes);
+    if (_asientos.length) {
+      // const _asientos = this._xmlJsService.jsonToXML('Asiento', _queryAsientosRes);
 
-      await this.dataSource.query(`EXEC dbo.pConta_ImportAsientoXML @0, @1, @2, @3, @4`, [_asientos, idUnidad, cons, annio, periodo]).catch(err => {
-        throw new Error(err.message || err);
-      });
+      await this.dataSource
+        .query(`CALL Conta_Import_Asiento ($1::json, $2::int, $3::bool, $4::int, $5::int)`, [JSON.stringify(_asientos), idUnidad, cons, annio, periodo])
+        .catch(err => {
+          throw new Error(err.message || err);
+        });
     }
   }
 
-  private async _importarObligaciones(idUnidad: number, annio: number, periodo: number, cons: string, rodasConexion: DataSource): Promise<void> {
+  private async _importarObligaciones(idUnidad: number, annio: number, periodo: number, cons: boolean, rodasConexion: DataSource): Promise<void> {
     const _queryAsientos = queryObligacionesRodas.replace(/@anno/g, annio.toString()).replace(/@periodo/g, periodo.toString());
 
-    const _queryAsientosRes = await rodasConexion
+    const _obl = await rodasConexion
       .query(_queryAsientos)
       .then(result => {
         return result;
@@ -354,12 +314,14 @@ export class ConciliaContaService {
         throw new Error(err.message || err);
       });
 
-    if (_queryAsientosRes.length) {
-      const _obl = this._xmlJsService.jsonToXML('Obligaciones', _queryAsientosRes);
+    if (_obl.length) {
+      // const _obl = this._xmlJsService.jsonToXML('Obligaciones', _queryAsientosRes);
 
-      await this.dataSource.query(`EXEC dbo.pConta_ImportObligacionesXML @0, @1, @2, @3, @4`, [_obl, idUnidad, cons, annio, periodo]).catch(err => {
-        throw new Error(err.message || err);
-      });
+      await this.dataSource
+        .query(`CALL Conta_Import_Obligaciones ($1::json, $2::int, $3::bool, $4::int, $5::int)`, [JSON.stringify(_obl), idUnidad, cons, annio, periodo])
+        .catch(err => {
+          throw new Error(err.message || err);
+        });
     }
   }
 
@@ -377,7 +339,7 @@ export class ConciliaContaService {
   }
 
   private async _calculaConciliacion(idUnidad: number, tipoClasificador: number, anio: number, periodo: number, tipoEntidad: number, idDivision: number): Promise<void> {
-    let cons = '0';
+    const cons = tipoClasificador === 2 ? true : false;
 
     switch (tipoClasificador) {
       case 0:
@@ -387,20 +349,27 @@ export class ConciliaContaService {
         tipoClasificador = 3;
         break;
       case 2:
-        cons = '1';
         tipoClasificador = 1;
         tipoEntidad = 1;
         break;
     }
 
     await this.dataSource
-      .query(`EXEC dbo.pConta_CalculaConciliacion @0, @1, @2, @3, @4, @5, @6`, [idUnidad, tipoClasificador, tipoEntidad, cons, anio, periodo, idDivision])
+      .query(`CALL Conta_Calcula_Conciliacion ($1::int, $2::int, $3::int, $4::bool, $5::int, $6::int, $7::int)`, [
+        idUnidad,
+        tipoClasificador,
+        tipoEntidad,
+        cons,
+        anio,
+        periodo,
+        idDivision,
+      ])
       .catch(err => {
         throw new Error(err.message || err);
       });
   }
 
-  private async _getReportesConciliacion(idCentro: number, consolidado: string, annio: number, periodo: number, idDivision: number): Promise<ConciliaContabilidadQueryResponse> {
+  private async _getReportesConciliacion(idCentro: number, consolidado: boolean, annio: number, periodo: number, idDivision: number): Promise<ConciliaContabilidadQueryResponse> {
     // devuelvo el resultado de la conciliación
     const _queryReporteConsultas = this._reporteConsultas(idCentro, consolidado, annio, periodo, 1);
     const _queryReporteExpresiones = this._reporteExpresiones(idCentro, consolidado, annio, periodo);
@@ -408,156 +377,118 @@ export class ConciliaContaService {
     const _queryReporteCuadreSistemas = this._reporteCuadreSistemas(idCentro, consolidado, annio, periodo);
     const _queryReporteInformacion = this._reporteInformacionContabilidad(idCentro, consolidado, annio, periodo);
 
-    return new Promise<ConciliaContabilidadQueryResponse>(resolve => {
+    return new Promise<ConciliaContabilidadQueryResponse>((resolve, reject) => {
       Promise.all([_queryReporteConsultas, _queryReporteExpresiones, _queryReporteValores, _queryReporteCuadreSistemas, _queryReporteInformacion])
         .then(result => {
           resolve({
-            success: true,
-            data: {
-              ReporteClasificador: {
-                success: true,
-                data: JSON.stringify(''),
-              },
-              ReporteConsultas: {
-                success: true,
-                data: result[0].data,
-              },
-              ReporteExpresiones: {
-                success: true,
-                data: result[1].data,
-              },
-              ReporteValores: {
-                success: true,
-                data: result[2].data,
-              },
-              CuadreSistemas: {
-                success: true,
-                data: result[3].data,
-              },
-              Informacion: {
-                success: true,
-                data: result[4].data,
-              },
-            },
+            ReporteClasificador: [],
+            ReporteConsultas: result[0],
+            ReporteExpresiones: result[1],
+            ReporteValores: result[2],
+            CuadreSistemas: result[3],
+            Informacion: result[4],
           });
         })
         .catch(err => {
-          throw new Error(err);
+          reject(err);
         });
     });
   }
 
-  private async _reporteConsultas(idUnidad: number, cons: string, annio: number, periodo: number, idConsulta: number): Promise<ConciliaContaQueryResponse> {
+  private async _reporteConsultas(idUnidad: number, cons: boolean, annio: number, periodo: number, idConsulta: number): Promise<IConciliaReporteConsulta[]> {
     const _query = queryReporteConsultas
       .replace(/@Centro/g, idUnidad.toString())
-      .replace(/@Consolidado/g, cons)
+      .replace(/@Consolidado/g, cons ? 'true' : 'false')
       .replace(/@Anio/g, annio.toString())
       .replace(/@Periodo/g, periodo.toString())
       .replace(/@IdConsulta/g, idConsulta.toString());
 
-    return new Promise<ConciliaContaQueryResponse>(resolve => {
+    return new Promise<IConciliaReporteConsulta[]>((resolve, reject) => {
       this.dataSource
         .query(_query)
         .then(result => {
-          resolve({
-            success: true,
-            data: JSON.stringify(result),
-          });
+          resolve(result);
         })
         .catch(err => {
-          resolve({ success: false, error: err.message ? err.message : err });
+          reject(err.message || err);
         });
     });
   }
 
-  private async _reporteExpresiones(idUnidad: number, cons: string, annio: number, periodo: number): Promise<ConciliaContaQueryResponse> {
+  private async _reporteExpresiones(idUnidad: number, cons: boolean, annio: number, periodo: number): Promise<IConciliaReporteExpresiones[]> {
     const _query = queryReporteExpresiones
       .replace(/@Centro/g, idUnidad.toString())
-      .replace(/@Consolidado/g, cons)
+      .replace(/@Consolidado/g, cons ? 'true' : 'false')
       .replace(/@Anio/g, annio.toString())
       .replace(/@Periodo/g, periodo.toString());
 
-    return new Promise<ConciliaContaQueryResponse>(resolve => {
+    return new Promise<IConciliaReporteExpresiones[]>((resolve, reject) => {
       this.dataSource
         .query(_query)
         .then(result => {
-          resolve({
-            success: true,
-            data: JSON.stringify(result),
-          });
+          resolve(result);
         })
         .catch(err => {
-          resolve({ success: false, error: err.message ? err.message : err });
+          reject(err.message || err);
         });
     });
   }
 
-  private async _reporteValores(idUnidad: number, cons: string, annio: number, periodo: number, idDivision: number): Promise<ConciliaContaQueryResponse> {
+  private async _reporteValores(idUnidad: number, cons: boolean, annio: number, periodo: number, idDivision: number): Promise<IConciliaReporteValores[]> {
     const _query = queryReporteValores
       .replace(/@Centro/g, idUnidad.toString())
-      .replace(/@Consolidado/g, cons)
+      .replace(/@Consolidado/g, cons ? 'true' : 'false')
       .replace(/@Anio/g, annio.toString())
       .replace(/@Periodo/g, periodo.toString())
       .replace(/@IdDivision/g, idDivision.toString());
 
-    return new Promise<ConciliaContaQueryResponse>(resolve => {
+    return new Promise<IConciliaReporteValores[]>((resolve, reject) => {
       this.dataSource
         .query(_query)
         .then(result => {
-          resolve({
-            success: true,
-            data: JSON.stringify(result),
-          });
+          resolve(result);
         })
         .catch(err => {
-          resolve({ success: false, error: err.message ? err.message : err });
+          reject(err.message || err);
         });
     });
   }
 
-  private async _reporteCuadreSistemas(idCentro: number, consolidado: string, annio: number, periodo: number): Promise<ConciliaContaQueryResponse> {
-    try {
-      return new Promise<ConciliaContaQueryResponse>(resolve => {
-        this.dataSource
-          .query(`EXEC dbo.pConta_CuadreSistemas @0, @1, @2, @3`, [idCentro, consolidado, annio, periodo])
-          .then(res => {
-            resolve({ success: true, data: JSON.stringify(res) });
-          })
-          .catch(err => {
-            return { success: false, error: err.message ? err.message : err };
-          });
-      });
-    } catch (err: any) {
-      return { success: false, error: err.message ? err.message : err };
-    }
+  private async _reporteCuadreSistemas(idCentro: number, consolidado: boolean, annio: number, periodo: number): Promise<IConciliaCuadreSistemas[]> {
+    return new Promise<IConciliaCuadreSistemas[]>((resolve, reject) => {
+      this.dataSource
+        .query(`select * from Conta_Cuadre_Sistemas ($1::int, $2::bool, $3::int, $4::int)`, [idCentro, consolidado, annio, periodo])
+        .then(res => {
+          resolve(res);
+        })
+        .catch(err => {
+          reject(err.message || err);
+        });
+    });
   }
 
-  private async _reporteInformacionContabilidad(idCentro: number, consolidado: string, annio: number, periodo: number): Promise<ConciliaContaQueryResponse> {
-    try {
-      return new Promise<ConciliaContaQueryResponse>(resolve => {
-        this.dataSource
-          .query(`EXEC dbo.pConta_InformacionContabilidad @0, @1, @2, @3`, [idCentro, consolidado, annio, periodo])
-          .then(res => {
-            resolve({ success: true, data: JSON.stringify(res) });
-          })
-          .catch(err => {
-            return { success: false, error: err.message ? err.message : err };
-          });
-      });
-    } catch (err: any) {
-      return { success: false, error: err.message ? err.message : err };
-    }
+  private async _reporteInformacionContabilidad(idCentro: number, consolidado: boolean, annio: number, periodo: number): Promise<IConciliaInformacionContabilidad[]> {
+    return new Promise<IConciliaInformacionContabilidad[]>((resolve, reject) => {
+      this.dataSource
+        .query(`select * from Conta_Informacion_Contabilidad ($1::int, $2::bool, $3::int, $4::int)`, [idCentro, consolidado, annio, periodo])
+        .then(res => {
+          resolve(res);
+        })
+        .catch(err => {
+          reject(err.message || err);
+        });
+    });
   }
 
-  async iniciarSaldos(user: Usuarios, iniciarSaldosInput: IniciarSaldosInput): Promise<boolean> {
+  async iniciarSaldos(user: UsuariosEntity, iniciarSaldosInput: IniciarSaldosInput): Promise<boolean> {
     try {
       const { idCentro, consolidado, annio } = iniciarSaldosInput;
 
       return new Promise<boolean>((resolve, reject) => {
         this.dataSource
-          .query(`EXEC dbo.pConta_InicializarDatos @0, @1, @2`, [idCentro, consolidado, annio])
-          .then(async () => {
-            await this._logsSvc
+          .query(`CALL conta_inicializar_datos ($1, $2, $3)`, [idCentro, consolidado, annio])
+          .then(() => {
+            this._logsSvc
               .insert(idCentro, consolidado, `Iniciar Saldo (${annio})`, user.Usuario)
               .then(() => {
                 resolve(true);
@@ -575,11 +506,12 @@ export class ConciliaContaService {
     }
   }
 
-  async arreglaClasificadorCuenta(user: Usuarios, idUnidad: number, tipoUnidad: string, annio: string): Promise<boolean> {
+  async arreglaClasificadorCuenta(user: UsuariosEntity, idUnidad: number, tipoUnidad: string, annio: string): Promise<boolean> {
     try {
       // verificar si se ha definido la conexión al Rodas
-      const _conexionRodasQuery = await this._contaConexionesService.findByIdUnidad(idUnidad, tipoUnidad === '2');
-      const _conexionConta = _conexionRodasQuery.data;
+      const _conexionConta = await this._contaConexionesService.findByIdUnidad(idUnidad, tipoUnidad === '2').catch(err => {
+        throw new Error(err);
+      });
 
       // _conexionConta.BaseDatos = `r4_${_conexionConta.BaseDatos.toLowerCase()}`;
 
@@ -601,7 +533,9 @@ export class ConciliaContaService {
         throw new Error(err);
       });
 
-      const bdConta = await this._contaConexionesService.conexionRodas(_conexionConta);
+      const bdConta = await this._contaConexionesService.conexionRodas(_conexionConta).catch(err => {
+        throw new Error(err);
+      });
 
       for (let index = 0; index < _clasifCuentasReal.length; index++) {
         const _clasif = _clasifCuentasReal[index];
@@ -749,7 +683,7 @@ export class ConciliaContaService {
     });
   }
 
-  async chequearCentro(chequearCentrosInput: ChequearCentrosInput): Promise<ConciliaContaQueryResponse> {
+  async chequearCentro(chequearCentrosInput: ChequearCentrosInput): Promise<IChequeoCentroVsConsolidado[]> {
     try {
       const { idCentro, annio, periodo, centrosAChequear } = chequearCentrosInput;
 
@@ -758,23 +692,23 @@ export class ConciliaContaService {
       for (let index = 0; index < centrosAChequear.length; index++) {
         const centroChe = centrosAChequear[index];
 
-        await this.dataSource.query(`EXEC dbo.InsertChequeoCentroVsConsolidado @0, @1, @2, @3, @4`, [idCentro, cons, annio, periodo, centroChe]).catch(err => {
+        await this.dataSource.query(`CALL conta_insert_chequeo_centro_vs_consolidado ($1, $2, $3, $4, $5)`, [idCentro, cons, annio, periodo, centroChe]).catch(err => {
           throw new Error(err.message || err);
         });
       }
 
-      return new Promise<ConciliaContaQueryResponse>(resolve => {
+      return new Promise<IChequeoCentroVsConsolidado[]>((resolve, reject) => {
         this.dataSource
-          .query(`EXEC dbo.p_ChequeoCentro @0`, [`Centro = ${idCentro} AND Periodo = ${periodo} AND Unidad IN (${centrosAChequear.join(', ')})`])
+          .query(`select * from conta_chequeo_centro ($1, $2, $3, $4)`, [idCentro, annio, periodo, centrosAChequear.join(', ')])
           .then(result => {
-            resolve({ success: true, data: JSON.stringify(result) });
+            resolve(result);
           })
           .catch(err => {
-            resolve({ success: false, error: err.message ? err.message : err });
+            reject(err.message || err);
           });
       });
     } catch (err: any) {
-      return { success: false, error: err.message ? err.message : err };
+      return Promise.reject(err.message || err);
     }
   }
 }

@@ -2,45 +2,45 @@ import { ObjectType, Field } from '@nestjs/graphql';
 
 @ObjectType()
 export class ConciliaInternaConta {
-  @Field()
-  Division: string;
+  @Field({ name: 'Division' })
+  division: string;
 
-  @Field()
-  Annio: string;
+  @Field({ name: 'Annio' })
+  annio: string;
 
-  @Field()
-  Periodo: string;
+  @Field({ name: 'Periodo' })
+  periodo: string;
 
-  @Field()
-  Tipo: string;
+  @Field({ name: 'Tipo' })
+  tipo: string;
 
-  @Field()
-  Emisor: string;
+  @Field({ name: 'Emisor' })
+  emisor: string;
 
-  @Field()
-  Receptor: string;
+  @Field({ name: 'Receptor' })
+  receptor: string;
 
-  @Field()
-  CuentaE: string;
+  @Field({ name: 'CuentaE' })
+  cuenta_e: string;
 
-  @Field()
-  SubCuentaE: string;
+  @Field({ name: 'SubCuentaE' })
+  subcuenta_e: string;
 
-  @Field()
-  ValorE: number;
+  @Field({ name: 'ValorE' })
+  valor_e: number;
 
-  @Field()
-  Operador: string;
+  @Field({ name: 'Operador' })
+  operador: string;
 
-  @Field()
-  CuentaR: string;
+  @Field({ name: 'CuentaR' })
+  cuenta_r: string;
 
-  @Field()
-  SubCuentaR: string;
+  @Field({ name: 'SubCuentaR' })
+  subcuenta_r: string;
 
-  @Field()
-  ValorR: number;
+  @Field({ name: 'ValorR' })
+  valor_r: number;
 
-  @Field()
-  Diferencia: number;
+  @Field({ name: 'Diferencia' })
+  diferencia: number;
 }

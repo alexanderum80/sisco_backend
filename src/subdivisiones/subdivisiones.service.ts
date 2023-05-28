@@ -1,50 +1,43 @@
-import { SubdivisionesQueryResponse } from './subdivisiones.model';
-import { Subdivisiones } from './subdivisiones.entity';
+import { SubdivisionesEntity } from './subdivisiones.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class SubdivisionesService {
-  constructor(@InjectRepository(Subdivisiones) private readonly subdivisionesRepository: Repository<Subdivisiones>) {}
+  constructor(@InjectRepository(SubdivisionesEntity) private readonly subdivisionesRepository: Repository<SubdivisionesEntity>) {}
 
-  async findAll(): Promise<SubdivisionesQueryResponse> {
+  async findAll(): Promise<SubdivisionesEntity[]> {
     try {
-      return new Promise<SubdivisionesQueryResponse>(resolve => {
+      return new Promise<SubdivisionesEntity[]>((resolve, reject) => {
         this.subdivisionesRepository
           .find()
           .then(result => {
-            resolve({
-              success: true,
-              data: result,
-            });
+            resolve(result);
           })
           .catch(err => {
-            return { success: false, error: err.message ? err.message : err };
+            reject(err.message || err);
           });
       });
     } catch (err: any) {
-      return { success: false, error: err.message ? err.message : err };
+      return Promise.reject(err.message || err);
     }
   }
 
-  async findAllByIdDivision(idDivision: number): Promise<SubdivisionesQueryResponse> {
+  async findAllByIdDivision(idDivision: number): Promise<SubdivisionesEntity[]> {
     try {
-      return new Promise<SubdivisionesQueryResponse>(resolve => {
+      return new Promise<SubdivisionesEntity[]>((resolve, reject) => {
         this.subdivisionesRepository
           .find({ where: [{ IdDivision: idDivision }] })
           .then(result => {
-            resolve({
-              success: true,
-              data: result,
-            });
+            resolve(result);
           })
           .catch(err => {
-            return { success: false, error: err.message ? err.message : err };
+            reject(err.message || err);
           });
       });
     } catch (err: any) {
-      return { success: false, error: err.message ? err.message : err };
+      return Promise.reject(err.message || err);
     }
   }
 }
