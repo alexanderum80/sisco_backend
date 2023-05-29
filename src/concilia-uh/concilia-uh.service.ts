@@ -1,6 +1,5 @@
 import { ContaConexionesEntity } from './../conta-conexiones/conta-conexiones.entity';
 import { ConciliaUhInput, ConciliaUH, queryUhCategorias, queryUhProductos, queryUh } from './concilia-uh.model';
-import { XmlJsService } from './../shared/services/xml-js/xml-js.service';
 import { ConciliaContaService } from './../concilia-conta/concilia-conta.service';
 import { ContaConexionesService } from './../conta-conexiones/conta-conexiones.service';
 import { Injectable } from '@nestjs/common';
@@ -9,12 +8,7 @@ import { DataSource } from 'typeorm';
 
 @Injectable()
 export class ConciliaUhService {
-  constructor(
-    @InjectDataSource() private readonly dataSource: DataSource,
-    private _contaConexionesSvc: ContaConexionesService,
-    private _conciliaContaSvc: ConciliaContaService,
-    private _xmlSvc: XmlJsService,
-  ) {}
+  constructor(@InjectDataSource() private readonly dataSource: DataSource, private _contaConexionesSvc: ContaConexionesService, private _conciliaContaSvc: ConciliaContaService) {}
 
   async concilia(conciliaUhInput: ConciliaUhInput): Promise<ConciliaUH[]> {
     try {
@@ -24,7 +18,6 @@ export class ConciliaUhService {
       const _conexionConta = await this._contaConexionesSvc.findByIdUnidad(idCentro, false).catch(err => {
         throw new Error(err);
       });
-      // _conexionConta.BaseDatos = `r4_${_conexionConta.BaseDatos.toLowerCase()}`;
 
       // importo los datos de los Utiles
       await this._importarDatosUH(idCentro, annio, periodo, _conexionConta).catch(err => {
@@ -32,7 +25,7 @@ export class ConciliaUhService {
       });
 
       // importo los datos de la contabilidad
-      this._importarDatosRodas(annio, periodo, idCentro, 0, _conexionConta).catch(err => {
+      await this._importarDatosRodas(annio, periodo, idCentro, 0, _conexionConta).catch(err => {
         throw new Error(err);
       });
 
@@ -137,7 +130,7 @@ export class ConciliaUhService {
                 resolve();
               })
               .catch(err => {
-                reject(err.message ? err.message : err);
+                reject(err.message || err);
               });
           } else {
             reject('No existen datos de los Útiles y Herramientas del período seleccionado. <br/>No se puede realizar la Conciliación.');
@@ -149,10 +142,10 @@ export class ConciliaUhService {
     });
   }
 
-  private async _importarDatosRodas(annio: number, periodo: number, idUnidad: number, tipoCentro: number, contaConexion: ContaConexionesEntity): Promise<boolean> {
+  private async _importarDatosRodas(annio: number, periodo: number, idUnidad: number, tipoCentro: number, contaConexion: ContaConexionesEntity): Promise<void> {
     const cons = tipoCentro === 1;
 
-    return new Promise<boolean>(resolve => {
+    return new Promise<void>((resolve, reject) => {
       // me conecto al Rodas del Centro
       this._contaConexionesSvc
         .conexionRodas(contaConexion)
@@ -161,14 +154,14 @@ export class ConciliaUhService {
           this._conciliaContaSvc
             .importarContabilidad(idUnidad, annio, periodo, cons, rodasConnection)
             .then(() => {
-              resolve(true);
+              resolve();
             })
             .catch(err => {
-              throw new Error(err.message || err);
+              reject(err.message || err);
             });
         })
         .catch(err => {
-          throw new Error(err.message || err);
+          return reject(err.message || err);
         });
     });
   }

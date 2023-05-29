@@ -29,33 +29,31 @@ export class ConciliaAftService {
       const _conexionMB = cloneDeep(_conexionConta);
       _conexionMB.BaseDatos = _conexionMB.BaseDatos.replace(/Conta/gi, 'MB');
 
+      // importo los datos de los activos
+      await this._importarDatosAF(idCentro, periodo, _conexionMB)
+        .then(res => {
+          // chequeo si hay diferencias en el clasificador CNMB
+          if ((res as DiferenciaClasificadorCNMB[]).length) {
+            return { DiferenciaClasificadorCNMB: res as DiferenciaClasificadorCNMB[] };
+          }
+        })
+        .catch(err => {
+          throw new Error(err);
+        });
+
+      // importo los datos de la contabilidad
+      await this._importarDatosRodas(annio, periodo, idCentro, 0, _conexionConta).catch(err => {
+        throw new Error(err);
+      });
+
       return new Promise<ConciliaAftData>(async (resolve, reject) => {
-        // importo los datos de los activos
-        this._importarDatosAF(idCentro, periodo, _conexionMB)
+        // calculo la conciliacion
+        this._calculaConciliacion(idCentro, annio, periodo)
           .then(res => {
-            // chequeo si hay diferencias en el clasificador CNMB
-            if ((res as DiferenciaClasificadorCNMB[]).length) {
-              resolve({ DiferenciaClasificadorCNMB: res as DiferenciaClasificadorCNMB[] });
-            } else {
-              // importo los datos de la contabilidad
-              this._importarDatosRodas(annio, periodo, idCentro, 0, _conexionConta)
-                .then(() => {
-                  // calculo la conciliacion
-                  this._calculaConciliacion(idCentro, annio, periodo)
-                    .then(res => {
-                      resolve(res);
-                    })
-                    .catch(err => {
-                      return reject(err.message || err);
-                    });
-                })
-                .catch(err => {
-                  return reject(err.message || err);
-                });
-            }
+            resolve(res);
           })
           .catch(err => {
-            reject(err.message || err);
+            return reject(err.message || err);
           });
       });
     } catch (err) {
