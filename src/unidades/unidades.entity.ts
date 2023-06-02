@@ -31,8 +31,8 @@ export class UnidadesEntity {
   Division?: DivisionesEntity;
 
   @Field({ nullable: true })
-  @Column('varchar', { name: 'provincia', length: 3 })
-  Provincia: string;
+  @Column({ name: 'provincia' })
+  Provincia: number;
 
   @Field({ nullable: true })
   @Column({ name: 'tipo' })
