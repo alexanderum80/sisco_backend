@@ -11,7 +11,7 @@ export class SubdivisionesService {
     try {
       return new Promise<SubdivisionesEntity[]>((resolve, reject) => {
         this.subdivisionesRepository
-          .find()
+          .find({ order: { IdSubdivision: 'ASC' } })
           .then(result => {
             resolve(result);
           })
@@ -28,7 +28,7 @@ export class SubdivisionesService {
     try {
       return new Promise<SubdivisionesEntity[]>((resolve, reject) => {
         this.subdivisionesRepository
-          .find({ where: [{ IdDivision: idDivision }] })
+          .find({ where: [{ IdDivision: idDivision }], order: { IdSubdivision: 'ASC' } })
           .then(result => {
             resolve(result);
           })

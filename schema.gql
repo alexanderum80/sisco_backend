@@ -645,10 +645,12 @@ type ConciliaAFT {
 
 type DiferenciaClasificadorCNMB {
   Unidad: String!
-  CNMB: String!
-  DCNMB: String!
-  TREPO: Float!
-  TREPO_UC: Float!
+  Grupo: Float!
+  Codigo: Float!
+  Descripcion: String!
+  Deprecia: Boolean!
+  TasaUC: Float!
+  Tasa: Float!
 }
 
 type ConciliaAftData {

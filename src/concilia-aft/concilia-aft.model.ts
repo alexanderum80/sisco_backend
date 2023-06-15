@@ -2,71 +2,77 @@ import { Field, InputType, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
 class ConciliaAFT {
-  @Field()
-  Division: string;
+  @Field({ name: 'Division' })
+  division: string;
 
-  @Field()
-  SubDivision: string;
+  @Field({ name: 'SubDivision' })
+  subdivision: string;
 
-  @Field()
-  Tipo: string;
+  @Field({ name: 'Tipo' })
+  tipo: string;
 
-  @Field()
-  Centro: string;
+  @Field({ name: 'Centro' })
+  centro: string;
 
-  @Field()
-  IdCentro: number;
+  @Field({ name: 'IdCentro' })
+  id_centro: number;
 
-  @Field()
-  IdUnidad: number;
+  @Field({ name: 'IdUnidad' })
+  id_unidad: number;
 
-  @Field()
-  Unidad: string;
+  @Field({ name: 'Unidad' })
+  unidad: string;
 
-  @Field()
-  Periodo: number;
+  @Field({ name: 'Periodo' })
+  periodo: number;
 
-  @Field()
-  Cta: string;
+  @Field({ name: 'Cta' })
+  cta: string;
 
-  @Field()
-  Scta: string;
+  @Field({ name: 'Scta' })
+  scta: string;
 
-  @Field()
-  An1: string;
+  @Field({ name: 'An1' })
+  an1: string;
 
-  @Field()
-  An2: string;
+  @Field({ name: 'An2' })
+  an2: string;
 
-  @Field()
-  An3: string;
+  @Field({ name: 'An3' })
+  an3: string;
 
-  @Field()
-  Saldo_AF: number;
+  @Field({ name: 'Saldo_AF' })
+  saldo_af: number;
 
-  @Field()
-  Saldo_Rodas: number;
+  @Field({ name: 'Saldo_Rodas' })
+  saldo_rodas: number;
 
-  @Field()
-  Diferencia: number;
+  @Field({ name: 'Diferencia' })
+  diferencia: number;
 }
 
 @ObjectType()
 export class DiferenciaClasificadorCNMB {
-  @Field()
-  Unidad: string;
+  @Field({ name: 'Unidad' })
+  unidad: string;
 
-  @Field()
-  CNMB: string;
+  @Field({ name: 'Grupo' })
+  grupo: number;
 
-  @Field()
-  DCNMB: string;
+  @Field({ name: 'Codigo' })
+  codigo: number;
 
-  @Field()
-  TREPO: number;
+  @Field({ name: 'Descripcion' })
+  descripcion: string;
 
-  @Field()
-  TREPO_UC: number;
+  @Field({ name: 'Deprecia' })
+  deprecia: boolean;
+
+  @Field({ name: 'TasaUC' })
+  tasa_uc: number;
+
+  @Field({ name: 'Tasa' })
+  tasa: number;
 }
 
 @ObjectType()
@@ -97,32 +103,14 @@ export const queryMbSubgrupos = `SELECT grupo, codigo, descripcion, deprecia, ta
 export const queryMbSinCuentas = `SELECT codigo FROM activos.activos 
   WHERE cuenta IS NULL OR cuenta = '' OR cuenta_depreciacion IS NULL OR cuenta_depreciacion = ''`;
 
-export const queryMb = `SELECT CASE WHEN C.cri1 = 'Y' THEN Inv.Anal1 WHEN C.cri2 = 'Y' THEN Inv.Anal2 WHEN C.cri3 = 'Y' THEN Inv.Anal3 ELSE @Centro END AS IdUnidad, Inv.periodo, Inv.Submayor, Inv.Inventa, 
-  Inv.CtaSCta, Inv.Anal1, Inv.Anal2, Inv.Anal3, 
-  Inv.CtaSCtaD, Inv.AnD1, Inv.AnD2, Inv.AnD3, Inv.CtaSctaG, Inv.AnG1, Inv.AnG2, Inv.AnG3, 
-  Inv.ValorI, Inv.Repara, Inv.UDepP, Inv.DepAc, Inv.TasaD, Inv.ALEX, Inv.Area, Inv.Revalorizacion, Inv.mbaja, Inv.malta
-  FROM (
-    SELECT MB.periodo, MB.Submayor, MB.Inventa, MB.CtaSCta, MB.Anal1, MB.Anal2, MB.Anal3, 
-      MB.CtaSCtaD, MB.AnD1, MB.AnD2, MB.AnD3, MB.CtaSctaG, MB.AnG1, MB.AnG2, MB.AnG3, 
-      MB.ValorI, MB.Repara, MB.UDepP, MB.DepAc, MB.TasaD, MB.ALEX, MB.Area, MB.Revalorizacion, MB.mbaja, MB.malta 
-    FROM dbo.Mb_periodo AS MB
-    WHERE MB.periodo = @Periodo
-    UNION ALL
-    SELECT Conf.PeríodoA AS periodo, MB.Submayor, MB.Inventa, MB.CtaSCta, MB.Anal1, MB.Anal2, MB.Anal3, 
-      MB.CtaSCtaD, MB.AnD1, MB.AnD2, MB.AnD3, MB.CtaSctaG, MB.AnG1, MB.AnG2, MB.AnG3, 
-      MB.ValorI, MB.Repara, MB.UDepP, MB.DepAc, MB.TasaD, MB.ALEX, MB.Area, MB.Revalorizacion, MB.mbaja, MB.malta 
-    FROM dbo.Mb AS MB CROSS JOIN
-    dbo.Configura AS Conf 
-    WHERE CASE  WHEN CAST(Conf.PeríodoA AS INT) = 1 THEN Conf.Ene
-            WHEN CAST(Conf.PeríodoA AS INT) = 2 THEN Conf.Feb
-            WHEN CAST(Conf.PeríodoA AS INT) = 3 THEN Conf.Mar
-            WHEN CAST(Conf.PeríodoA AS INT) = 4 THEN Conf.Abr
-            WHEN CAST(Conf.PeríodoA AS INT) = 5 THEN Conf.May
-            WHEN CAST(Conf.PeríodoA AS INT) = 6 THEN Conf.Jun
-            WHEN CAST(Conf.PeríodoA AS INT) = 7 THEN Conf.Jul
-            WHEN CAST(Conf.PeríodoA AS INT) = 8 THEN Conf.Ago
-            WHEN CAST(Conf.PeríodoA AS INT) = 9 THEN Conf.Sep
-            WHEN CAST(Conf.PeríodoA AS INT) = 10 THEN Conf.Oct
-            WHEN CAST(Conf.PeríodoA AS INT) = 11 THEN Conf.Nov
-            WHEN CAST(Conf.PeríodoA AS INT) = 12 THEN Conf.Dic END = 0 AND CAST(Conf.PeríodoA AS INT) = @Periodo
-  ) AS Inv INNER JOIN dbo.Cuentas AS C ON C.CtaSCta COLLATE SQL_Latin1_General_CP1_CI_AS = Inv.CtaSCta COLLATE SQL_Latin1_General_CP1_CI_AS`;
+export const queryMb = `select case when cta.tipo_analisis_1 = 'Y' then a.analisis_1 when cta.tipo_analisis_2 = 'Y' then a.analisis_2 when cta.tipo_analisis_3 = 'Y' then a.analisis_3 else @Centro::text end as id_unidad,
+    c.periodo, a.grupo, a.subgrupo, a.codigo, a.descripcion, a.tipo, a.valor_inicial, a.valor, a.depreciacion, a.area_responsabilidad, a.centro_costo, a.estado, a.tipo_documento_alta, a.documento_alta, a.tipo_documento_baja, a.documento_baja, 
+    a.cuenta, a.subcuenta, a.analisis_1, a.analisis_2, a.analisis_3, 
+    a.cuenta_depreciacion, a.subcuenta_depreciacion, a.analisis_1_depreciacion, a.analisis_2_depreciacion, a.analisis_3_depreciacion, 
+    a.cuenta_gasto, a.subcuenta_gasto, a.analisis_1_gasto, a.analisis_2_gasto, a.analisis_3_gasto, 
+    a.anno_fabricacion, a.subtipo, a.anno_documento, a.fecha_puesta_marcha, a.anno_baja, a.pais, a.marca, a.modelo, a.no_serie, a.combustible, 
+    a.potencia, a.tonelaje, a.nro_motor, a.nro_chapa, a.nro_chasis, a.agregados, a.ctipo_activo, a.tasa, a.nchr_marcadoreajustar, a.reajustado
+  FROM activos.activos as a inner join 
+    contabilidad.cuentas cta on a.cuenta = cta.cuenta and a.subcuenta = cta.subcuenta and cta.anno = @Anno cross join 
+    activos.configuracion c
+  where c.anno = @anno and c.periodo = @periodo;`;

@@ -1,5 +1,4 @@
-import { cloneDeep, padStart } from 'lodash';
-import { XmlJsService } from './../shared/services/xml-js/xml-js.service';
+import { cloneDeep } from 'lodash';
 import { ConciliaContaService } from './../concilia-conta/concilia-conta.service';
 import { ContaConexionesService } from './../conta-conexiones/conta-conexiones.service';
 import { ConciliaAftInput, queryMbSubgrupos, ConciliaAftData, DiferenciaClasificadorCNMB, queryMbSinCuentas, queryMb } from './concilia-aft.model';
@@ -10,12 +9,7 @@ import { ContaConexionesEntity } from './../conta-conexiones/conta-conexiones.en
 
 @Injectable()
 export class ConciliaAftService {
-  constructor(
-    @InjectDataSource() private readonly dataSource: DataSource,
-    private _contaConexionesSvc: ContaConexionesService,
-    private _conciliaContaSvc: ConciliaContaService,
-    private _xmlSvc: XmlJsService,
-  ) {}
+  constructor(@InjectDataSource() private readonly dataSource: DataSource, private _contaConexionesSvc: ContaConexionesService, private _conciliaContaSvc: ConciliaContaService) {}
 
   async concilia(conciliaAftInput: ConciliaAftInput): Promise<ConciliaAftData> {
     try {
@@ -30,16 +24,13 @@ export class ConciliaAftService {
       _conexionMB.BaseDatos = _conexionMB.BaseDatos.replace(/Conta/gi, 'MB');
 
       // importo los datos de los activos
-      await this._importarDatosAF(idCentro, periodo, _conexionMB)
-        .then(res => {
-          // chequeo si hay diferencias en el clasificador CNMB
-          if ((res as DiferenciaClasificadorCNMB[]).length) {
-            return { DiferenciaClasificadorCNMB: res as DiferenciaClasificadorCNMB[] };
-          }
-        })
-        .catch(err => {
-          throw new Error(err);
-        });
+      const _chequeaClasifSubgrupos = await this._importarDatosAF(idCentro, annio, periodo, _conexionMB).catch(err => {
+        throw new Error(err);
+      });
+
+      if ((_chequeaClasifSubgrupos as DiferenciaClasificadorCNMB[]).length) {
+        return { DiferenciaClasificadorCNMB: _chequeaClasifSubgrupos as DiferenciaClasificadorCNMB[] };
+      }
 
       // importo los datos de la contabilidad
       await this._importarDatosRodas(annio, periodo, idCentro, 0, _conexionConta).catch(err => {
@@ -61,18 +52,18 @@ export class ConciliaAftService {
     }
   }
 
-  private async _importarDatosAF(idCentro: number, periodo: number, conexionRodas: ContaConexionesEntity): Promise<void | DiferenciaClasificadorCNMB[]> {
+  private async _importarDatosAF(idCentro: number, anno: number, periodo: number, conexionRodas: ContaConexionesEntity): Promise<void | DiferenciaClasificadorCNMB[]> {
     const mbConnection = await this._contaConexionesSvc.conexionRodas(conexionRodas);
 
     return new Promise<void | DiferenciaClasificadorCNMB[]>(async (resolve, reject) => {
       // importo el clasificador Subgrupos
-      this._importarSubgruposAF(idCentro, mbConnection)
+      this._importarSubgruposAF(idCentro, anno, mbConnection)
         .then(_clasifCNMB => {
           // compruebo si hay diferencias en el caslificador CNMB
           if (_clasifCNMB.length) return resolve(_clasifCNMB);
           // importo los MB
           else
-            this._importarMbAF(idCentro, periodo, mbConnection)
+            this._importarMbAF(idCentro, anno, periodo, mbConnection)
               .then(() => {
                 resolve([]);
               })
@@ -86,16 +77,14 @@ export class ConciliaAftService {
     });
   }
 
-  private async _importarSubgruposAF(idCentro: number, conexionRodas: DataSource): Promise<DiferenciaClasificadorCNMB[]> {
+  private async _importarSubgruposAF(idCentro: number, anno: number, conexionRodas: DataSource): Promise<DiferenciaClasificadorCNMB[]> {
     return new Promise<DiferenciaClasificadorCNMB[]>((resolve, reject) => {
       conexionRodas
         .query(queryMbSubgrupos)
-        .then(async res => {
-          if (res.length) {
-            const _subgrupos = this._xmlSvc.jsonToXML('Subgrupos', res);
-
+        .then(async _subgrupos => {
+          if (_subgrupos.length) {
             this.dataSource
-              .query(`EXEC dbo.pAF_ImportSubgruposXML @0, @1`, [_subgrupos, idCentro])
+              .query(`SELECT * from public.aft_import_subgrupos($1::json, $2::int, $3::int)`, [JSON.stringify(_subgrupos), idCentro, anno])
               .then(res => {
                 resolve(res);
               })
@@ -112,13 +101,13 @@ export class ConciliaAftService {
     });
   }
 
-  private async _importarMbAF(idCentro: number, periodo: number, conexionRodas: DataSource): Promise<void> {
+  private async _importarMbAF(idCentro: number, anno: number, periodo: number, conexionRodas: DataSource): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       // chequeo si todos los MB tienen cuentas
       this._chequeaMbSinCuentas(conexionRodas)
         .then(() => {
           // importo los MB
-          this._importarMb(idCentro, periodo, conexionRodas)
+          this._importarMb(idCentro, anno, periodo, conexionRodas)
             .then(() => {
               resolve();
             })
@@ -151,16 +140,19 @@ export class ConciliaAftService {
     });
   }
 
-  private async _importarMb(idCentro: number, periodo: number, conexionRodas: DataSource): Promise<void> {
+  private async _importarMb(idCentro: number, anno: number, periodo: number, conexionRodas: DataSource): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       conexionRodas
-        .query(queryMb.replace(/@Centro/gi, idCentro.toString()).replace(/@Periodo/gi, padStart(periodo.toString(), 2, '0')))
-        .then(res => {
-          if (res.length) {
-            const _mb = this._xmlSvc.jsonToXML('MB', res);
-
+        .query(
+          queryMb
+            .replace(/@Centro/gi, idCentro.toString())
+            .replace(/@Anno/gi, anno.toString())
+            .replace(/@Periodo/gi, periodo.toString()),
+        )
+        .then(_mb => {
+          if (_mb.length) {
             this.dataSource
-              .query(`EXEC dbo.pAF_ImportMbXML @0, @1, @2`, [_mb, idCentro, periodo])
+              .query(`CALL public.aft_import_mb($1, $2, $3, $4)`, [JSON.stringify(_mb), idCentro, anno, periodo])
               .then(() => {
                 resolve();
               })
@@ -168,7 +160,7 @@ export class ConciliaAftService {
                 reject(err.message ? err.message : err);
               });
           } else {
-            reject('No existen datos de los Activos Fijos del período seleccionado. <br/>No se puede realizar la Conciliación.');
+            reject('No existen datos de los Activos Fijos en el período seleccionado. <br/>No se puede realizar la Conciliación.');
           }
         })
         .catch(err => {
@@ -199,7 +191,7 @@ export class ConciliaAftService {
   private _calculaConciliacion(idCentro: number, annio: number, periodo: number): Promise<ConciliaAftData> {
     return new Promise<ConciliaAftData>((resolve, reject) => {
       this.dataSource
-        .query(`EXEC pAF_CalculaConciliacion @0, @1, @2`, [idCentro, annio, periodo])
+        .query(`SELECT * FROM public.aft_calcula_conciliacion ($1, $2, $3)`, [idCentro, annio, periodo])
         .then(res => {
           resolve({
             ConciliaAFT: res,

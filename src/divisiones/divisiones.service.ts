@@ -23,7 +23,7 @@ export class DivisionesService {
 
       return new Promise<DivisionesEntity[]>((resolve, reject) => {
         this.divisionesRepository
-          .find({ where: criteria })
+          .find({ where: criteria, order: { IdDivision: 'ASC' } })
           .then(result => {
             resolve(result);
           })
@@ -42,6 +42,7 @@ export class DivisionesService {
         this.divisionesRepository
           .createQueryBuilder()
           .where('IdDivision NOT IN (100, 120, 124)')
+          .orderBy('IdDivision')
           .getMany()
           .then(result => {
             resolve(result);
@@ -59,7 +60,7 @@ export class DivisionesService {
     try {
       return new Promise<DivisionesEntity[]>((resolve, reject) => {
         this.divisionesRepository
-          .find({ where: [{ IdDivision: _id }] })
+          .find({ where: [{ IdDivision: _id }], order: { IdDivision: 'ASC' } })
           .then(result => {
             resolve(result);
           })

@@ -27,7 +27,7 @@ export class UnidadesService {
 
       return new Promise<CentrosView[]>((resolve, reject) => {
         this.dataSource.manager
-          .find(CentrosView, { where: _condition, order: { IdUnidad: 1 } })
+          .find(CentrosView, { where: _condition, order: { IdUnidad: 'ASC' } })
           .then(result => {
             resolve(result);
           })
@@ -44,7 +44,7 @@ export class UnidadesService {
     try {
       return new Promise<CentrosView>((resolve, reject) => {
         this.dataSource.manager
-          .findOne(CentrosView, { where: { IdUnidad } })
+          .findOne(CentrosView, { where: { IdUnidad }, order: { IdUnidad: 'ASC' } })
           .then(result => {
             resolve(result);
           })
@@ -61,7 +61,7 @@ export class UnidadesService {
     try {
       return new Promise<CentrosView[]>((resolve, reject) => {
         this.dataSource.manager
-          .find(CentrosView, { where: { IdSubdivision } })
+          .find(CentrosView, { where: { IdSubdivision }, order: { IdUnidad: 'ASC' } })
           .then(result => {
             resolve(result);
           })
@@ -78,7 +78,7 @@ export class UnidadesService {
     try {
       return new Promise<CentrosView[]>((resolve, reject) => {
         this.dataSource.manager
-          .find(CentrosView, { where: { IdDivision } })
+          .find(CentrosView, { where: { IdDivision }, order: { IdUnidad: 'ASC' } })
           .then(result => {
             resolve(result);
           })
@@ -101,6 +101,7 @@ export class UnidadesService {
               { IdUnidad: idSubdivision, Abierta: true },
             ],
             relations: { Division: true },
+            order: { IdUnidad: 'ASC' },
           })
           // this.dataSource
           //   .query(
@@ -131,7 +132,7 @@ export class UnidadesService {
     try {
       return new Promise<any>(resolve => {
         this.unidadesRepository
-          .find({ where: { IdDivision: idDivision, Abierta: true }, relations: { Division: true } })
+          .find({ where: { IdDivision: idDivision, Abierta: true }, relations: { Division: true }, order: { IdUnidad: 'ASC' } })
           // this.dataSource
           //   .query(
           //     `Select U.*, D.Division from Unidades AS U INNER JOIN Divisiones AS D ON D.Id_Division = U.Id_Division
