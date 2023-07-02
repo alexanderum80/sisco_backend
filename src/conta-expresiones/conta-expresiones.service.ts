@@ -55,10 +55,10 @@ export class ContaExpresionesService {
           throw new Error(err);
         });
 
-        const borrarExpresionDetalle = differenceBy(originalExpresionDetalle, ExpresionesDetalle, 'id');
+        const borrarExpresionDetalle = differenceBy(originalExpresionDetalle, ExpresionesDetalle, 'Id');
 
         if (borrarExpresionDetalle.length) {
-          const IDs = borrarExpresionDetalle.map((e: any) => e.id);
+          const IDs = borrarExpresionDetalle.map((e: ContaExpresionDetalleInput) => e.Id);
 
           await this.deleteDetalle(IDs).catch(err => {
             throw new Error(err);
@@ -219,7 +219,7 @@ export class ContaExpresionesService {
 
   async createDetalle(expresionDetalleInput: ContaExpresionDetalleInput): Promise<MutationResponse> {
     try {
-      delete expresionDetalleInput.id;
+      delete expresionDetalleInput.Id;
 
       return new Promise<MutationResponse>(resolve => {
         this.contaExpresionDetalleRepository

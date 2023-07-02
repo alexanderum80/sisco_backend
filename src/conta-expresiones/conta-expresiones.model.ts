@@ -27,7 +27,7 @@ export class ContaExpresionResumenInput {
 @InputType()
 export class ContaExpresionDetalleInput {
   @Field({ nullable: true })
-  id?: number;
+  Id?: number;
 
   @Field()
   IdExpresion: number;

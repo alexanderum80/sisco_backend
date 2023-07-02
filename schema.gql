@@ -1114,7 +1114,7 @@ input ContaExpresionResumenInput {
 }
 
 input ContaExpresionDetalleInput {
-  id: Float
+  Id: Float
   IdExpresion: Float!
   Centro: String
   Cta: String
