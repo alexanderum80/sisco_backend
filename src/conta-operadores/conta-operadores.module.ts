@@ -6,6 +6,6 @@ import { ContaOperadoresService } from './conta-operadores.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([ContaOperadoresEntity])],
-  providers: [ContaOperadoresResolver, ContaOperadoresService]
+  providers: [ContaOperadoresResolver, ContaOperadoresService],
 })
 export class ContaOperadoresModule {}

@@ -1,144 +1,99 @@
 import { ObjectType, Field, InputType } from '@nestjs/graphql';
 
 @ObjectType()
-export class RodasDWHQueryResponse {
-    @Field()
-    success: boolean;
-
-    @Field({ nullable: true })
-    data?: string;
-
-    @Field(() => String, { nullable: true })
-    error?: string;
-}
-
-@ObjectType()
 export class ConciliaDWH {
-    @Field()
-    Tipo: string;
+  @Field({ name: 'Tipo' })
+  tipo: string;
 
-    @Field()
-    IdCentro: number;
+  @Field({ name: 'IdCentro' })
+  id_centro: number;
 
-    @Field()
-    IdUnidad: string;
+  @Field({ name: 'Centro' })
+  centro: string;
 
-    @Field()
-    Unidad: string;
+  @Field({ name: 'IdUnidad' })
+  id_unidad: string;
 
-    @Field()
-    IdPiso: string;
+  @Field({ name: 'Unidad' })
+  unidad: string;
 
-    @Field({ nullable: true })
-    Almacen?: string;
+  @Field({ name: 'IdPiso' })
+  id_piso: string;
 
-    @Field({ nullable: true })
-    Cuenta?: string;
+  @Field({ name: 'Almacen', nullable: true })
+  almacen?: string;
 
-    @Field()
-    Periodo: string;
+  @Field({ name: 'Cuenta', nullable: true })
+  cuenta?: string;
 
-    @Field()
-    SaldoGolden: number;
+  @Field({ name: 'Periodo' })
+  periodo: string;
 
-    @Field()
-    SaldoRestaurador: number;
+  @Field({ name: 'SaldoGolden' })
+  saldo_golden: number;
 
-    @Field()
-    DifGoldenRest: number;
+  @Field({ name: 'SaldoRestaurador' })
+  saldo_restaurador: number;
 
-    @Field()
-    SaldoDistribuidor: number;
+  @Field({ name: 'DifGoldenRest' })
+  dif_golden_rest: number;
 
-    @Field()
-    DifGoldenDist: number;
+  @Field({ name: 'SaldoDistribuidor' })
+  saldo_distribuidor: number;
 
-    @Field()
-    SaldoRodas: number;
+  @Field({ name: 'DifGoldenDist' })
+  dif_golden_dist: number;
 
-    @Field()
-    DifGoldenRodas: number;
+  @Field({ name: 'SaldoRodas' })
+  saldo_rodas: number;
 
-    @Field()
-    IdDivision: number;
+  @Field({ name: 'DifGoldenRodas' })
+  dif_golden_rodas: number;
 
-    @Field()
-    Division: string;
+  @Field({ name: 'IdDivision' })
+  id_division: number;
 
-    @Field({ nullable: true })
-    CuentaR?: string;
+  @Field({ name: 'Division' })
+  division: string;
 
-    @Field({ nullable: true })
-    Nota?: string;
-}
+  @Field({ name: 'CuentaR', nullable: true })
+  cuenta_r?: string;
 
-@ObjectType()
-export class ConciliaDWHQueryResponse {
-    @Field()
-    success: boolean;
-
-    @Field(() => [ConciliaDWH], { nullable: true })
-    data?: ConciliaDWH[];
-
-    @Field(() => String, { nullable: true })
-    error?: string;
-}
-
-@ObjectType()
-export class ParteAtrasosQueryResponse {
-    @Field()
-    success: boolean;
-
-    @Field({ nullable: true })
-    data?: string;
-
-    @Field(() => String, { nullable: true })
-    error?: string;
-}
-
-@ObjectType()
-export class DatosIdGAMQueryResponse {
-    @Field()
-    success: boolean;
-
-    @Field({ nullable: true })
-    data?: string;
-
-    @Field(() => String, { nullable: true })
-    error?: string;
+  @Field({ name: 'Nota', nullable: true })
+  nota?: string;
 }
 
 @InputType()
 export class ConciliaDWHInput {
-    @Field()
-    idDivision: number;
+  @Field()
+  idDivision: number;
 
-    @Field()
-    idCentro: number;
+  @Field()
+  idCentro: number;
 
-    @Field()
-    periodo: number;
+  @Field()
+  periodo: number;
 
-    @Field()
-    annio: number;
+  @Field()
+  annio: number;
 
-    @Field()
-    tipoCentro: number;
+  @Field()
+  tipoCentro: number;
 
-    @Field()
-    ventasAcumuladas: boolean;
+  @Field()
+  ventasAcumuladas: boolean;
 }
 
-export const queryInventarioDWH = `SELECT @Centro as IdCentro, GAM.IdGerencia as IdUnidad, CASE WHEN @Cons = 1 THEN 0 ELSE EP.IdPiso END AS IdPiso, GAM.Mes as Periodo,
-    ROUND(SUM(EP.Saldo * EP.PCosto) + SUM(EP.Merma * EP.PCostoMerma) + SUM(EP.MermaOrigen * EP.PCostoMermaOrigen) + SUM(EP.Consignacion * EP.PCostoConsignacion) + SUM(EP.Insumo * EP.PCostoInsumo) + SUM(EP.Inversiones * EP.PCostoInversiones), 2) AS Saldo
+export const queryInventarioDWH = `SELECT @Centro as id_centro, GAM.IdGerencia as id_unidad, CASE WHEN @Cons = 1 THEN 0 ELSE EP.IdPiso END AS id_piso, GAM.Mes as periodo,
+    ROUND(SUM(EP.Saldo * EP.PCosto) + SUM(EP.Merma * EP.PCostoMerma) + SUM(EP.MermaOrigen * EP.PCostoMermaOrigen) + SUM(EP.Consignacion * EP.PCostoConsignacion) + SUM(EP.Insumo * EP.PCostoInsumo) + SUM(EP.Inversiones * EP.PCostoInversiones), 2) AS saldo
     FROM            ExistenciasP AS EP INNER JOIN
     Gerencia_Ano_Mes AS GAM ON GAM.IdGAM = EP.IdGAM INNER JOIN
     UnidadesComerciales.dbo.Almacenes AS A ON GAM.IdGerencia = A.IdUnidad AND A.IdAlmacen = EP.IdPiso
-    WHERE        (GAM.Ano = ISNULL(@Anio, GAM.Ano)) AND (GAM.Mes = ISNULL(@Mes, GAM.Mes)) AND (GAM.IdGerencia = CASE WHEN @Unidad = 100 THEN GAM.IdGerencia ELSE @Unidad END) AND A.Consignacion = 0
+    WHERE        (GAM.Ano = ISNULL(@Anio, GAM.Ano)) AND (GAM.Mes = ISNULL(@Mes, GAM.Mes)) AND (GAM.IdGerencia = CASE WHEN @Unidad = 100 THEN GAM.IdGerencia ELSE @Unidad END) AND A.Consignacion = 0 AND (SELECT TOP 1 CONVERT(INT, Valor) FROM ConvertSplitStringToTable(A.EContable, '-')) >= 100 
     GROUP BY GAM.IdGerencia, CASE WHEN @Cons = 1 THEN 0 ELSE EP.IdPiso END, GAM.Mes
     ORDER BY GAM.IdGerencia`;
 
-export const queryVentasDWH = `SELECT @Centro as IdCentro, vt.IdGerencia as IdUnidad, CASE WHEN @Cons = 1 THEN 0 ELSE vt.IdPiso END AS IdPiso, @Mes AS Periodo, SUM(VT.Ventas) AS Saldo
+export const queryVentasDWH = `SELECT @Centro as id_centro, vt.IdGerencia as id_unidad, CASE WHEN @Cons = 1 THEN 0 ELSE vt.IdPiso END AS id_piso, @Mes AS periodo, SUM(VT.Ventas) AS saldo
     FROM    (
         -- VENTAS
         SELECT     IdGerencia, V.IdPiso AS IdPiso, G.Mes, MIN(U.Division) AS Div, ROUND(SUM(V.ImporteVenta), 2) AS Ventas

@@ -3,366 +3,352 @@ import { DivisionesService } from './../divisiones/divisiones.service';
 import { ConciliaContaService } from './../concilia-conta/concilia-conta.service';
 import { ContaConexionesService } from './../conta-conexiones/conta-conexiones.service';
 import { DWHConexiones } from './../dwh-conexiones/dwh-conexiones.entity';
-import { Unidades } from './../unidades/unidades.entity';
+import { UnidadesEntity } from './../unidades/unidades.entity';
 import { DwhConexionesService } from './../dwh-conexiones/dwh-conexiones.service';
 import { UnidadesService } from './../unidades/unidades.service';
-import { ConciliaDWHInput, queryInventarioDWH, queryVentasDWH } from './concilia-dwh.model';
-import { MutationResponse } from './../shared/models/mutation.response.model';
+import { ConciliaDWH, ConciliaDWHInput, queryInventarioDWH, queryVentasDWH } from './concilia-dwh.model';
 import { Injectable } from '@nestjs/common';
-import { UnidadesQueryResponse } from './../unidades/unidades.model';
 import { DataSource } from 'typeorm';
 import { ContaConexionesEntity } from './../conta-conexiones/conta-conexiones.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
 
 @Injectable()
 export class ConciliaDwhService {
-    constructor(
-        @InjectDataSource() private readonly dataSource: DataSource,
-        private _unidadesService: UnidadesService,
-        private _dwhConexionesService: DwhConexionesService,
-        private _contaConexionesService: ContaConexionesService,
-        private _conciliaContaService: ConciliaContaService,
-        private _divisionesService: DivisionesService,
-        private _xmlSvc: XmlJsService,
-    ) {}
+  constructor(
+    @InjectDataSource() private readonly dataSource: DataSource,
+    private _unidadesService: UnidadesService,
+    private _dwhConexionesService: DwhConexionesService,
+    private _contaConexionesService: ContaConexionesService,
+    private _conciliaContaService: ConciliaContaService,
+    private _divisionesService: DivisionesService,
+    private _xmlSvc: XmlJsService,
+  ) {}
 
-    async conciliaDWH(conciliaDWHInput: ConciliaDWHInput): Promise<any> {
-        try {
-            const { idDivision, idCentro, annio, periodo, tipoCentro, ventasAcumuladas } = conciliaDWHInput;
+  async conciliaDWH(conciliaDWHInput: ConciliaDWHInput): Promise<ConciliaDWH[]> {
+    try {
+      const { idDivision, idCentro, annio, periodo, tipoCentro, ventasAcumuladas } = conciliaDWHInput;
 
-            // obtener listado de las divisiones
-            const _divisionesQuery =
-                idCentro === 100 && tipoCentro === 1 ? await this._divisionesService.getDivisionesActivas() : await this._divisionesService.getDivisionById(idDivision);
-            if (!_divisionesQuery.success) {
-                return { success: false, error: _divisionesQuery.error };
-            }
-            const _divisiones = _divisionesQuery.data;
-
-            for (let i = 0; i < _divisiones.length; i++) {
-                const divisionInfo = _divisiones[i];
-
-                // verificar si se ha definido la conexion al DWH
-                const _conexionDWHQuery = await this._dwhConexionesService.DWHConexion(divisionInfo.IdDivision);
-                if (!_conexionDWHQuery.success) {
-                    return { success: false, error: _conexionDWHQuery.error + ' No se pudo obtener la Conexión al DWH de la División ' + divisionInfo.IdDivision };
-                }
-                if (!_conexionDWHQuery.data) {
-                    return { success: false, error: `No se ha definido ninguna conexión de la División ${divisionInfo.IdDivision} a los DWH.` };
-                }
-                const _conexionDWH = _conexionDWHQuery.data;
-                if (_conexionDWH.ConexionDWH === '') {
-                    return { success: false, error: `No se ha definido la conexión al DWH de la División ${divisionInfo.IdDivision}.` };
-                }
-                if (_conexionDWH.ConexionRest === '') {
-                    return { success: false, error: `No se ha definido la conexión al DWH de Restaura de la División ${divisionInfo.IdDivision}.` };
-                }
-
-                // verificar si se ha definido la conexión al Rodas
-                const _conexionRodasQuery = await this._contaConexionesService.findByIdUnidad(tipoCentro === 0 ? idCentro : divisionInfo.IdDivision, tipoCentro === 1);
-                const _conexionRodas = _conexionRodasQuery.data;
-                _conexionRodas.BaseDatos = _conexionRodas.BaseDatos.substring(0, _conexionRodas.BaseDatos.length - 4) + annio.toString();
-
-                // obtener listados de las unidades subordinadas
-                let _unidadesQuery: UnidadesQueryResponse;
-                switch (tipoCentro) {
-                    case 0:
-                        _unidadesQuery = await this._unidadesService.getUnidadesAbiertasByIdSubdivision(idCentro);
-                        break;
-                    case 1:
-                        _unidadesQuery = await this._unidadesService.getUnidadesAbiertasByIdDivision(idCentro);
-                        break;
-                }
-                if (!_unidadesQuery.success) {
-                    return { success: false, error: _unidadesQuery.error };
-                }
-                const _unidades = _unidadesQuery.data;
-
-                // importar datos del DWH
-                const _importarDatosDWH = await this._importarDatosDWH(idCentro, annio, periodo, tipoCentro, ventasAcumuladas, _unidades, _conexionDWH);
-                if (!_importarDatosDWH.success) {
-                    return { success: false, error: _importarDatosDWH.error };
-                }
-
-                // importar datos del Rodas
-                const _importarDatosRodas = await this._importarDatosRodas(annio, periodo, idCentro, tipoCentro, _conexionRodas);
-                if (!_importarDatosRodas.success) {
-                    return { success: false, error: _importarDatosRodas.error };
-                }
-            }
-
-            // // obtener la información con los resultados de la conciliación
-            // const _queryRodasDWHInventarioVentas = this._rodasDWHInventarioVentas(idCentro, tipoCentro, periodo);
-            // const _queryRodasDWHAlmacenes = this._rodasDWHAlmacenes(idCentro, tipoCentro, periodo);
-            // const _queryRodasDWHNota = this._rodasDWHNota(idCentro, annio, periodo);
-
-            return new Promise<any>(resolve => {
-                // calculo la conciliacion
-                this._calculaConciliacion(idCentro, annio, periodo, tipoCentro, ventasAcumuladas)
-                    // Promise.all([_queryRodasDWHInventarioVentas, _queryRodasDWHAlmacenes, _queryRodasDWHNota])
-                    .then(results => {
-                        resolve({
-                            success: true,
-                            data: results,
-                        });
-                    })
-                    .catch(err => {
-                        resolve({ success: false, error: err.message ? err.message : err });
-                    });
+      // obtener listado de las divisiones
+      const _divisiones =
+        idCentro === 100 && tipoCentro === 1
+          ? await this._divisionesService.getDivisionesActivas().catch(err => {
+              throw new Error(err);
+            })
+          : await this._divisionesService.getDivisionById(idDivision).catch(err => {
+              throw new Error(err);
             });
-        } catch (err: any) {
-            return { success: false, error: err.message ? err.message : err };
+
+      for (let i = 0; i < _divisiones.length; i++) {
+        const divisionInfo = _divisiones[i];
+
+        // verificar si se ha definido la conexion al DWH
+        const _conexionDWHQuery = await this._dwhConexionesService.DWHConexion(divisionInfo.IdDivision);
+        if (!_conexionDWHQuery.success) {
+          throw new Error(_conexionDWHQuery.error + ' No se pudo obtener la Conexión al DWH de la División ' + divisionInfo.IdDivision);
         }
-    }
-
-    private async _importarDatosDWH(
-        idCentro: number,
-        annio: number,
-        mes: number,
-        tipoCentro: number,
-        ventasAcumuladas: boolean,
-        unidades: Unidades[],
-        dwhConexiones: DWHConexiones,
-    ): Promise<MutationResponse> {
-        let dwhConnectionDivision: DataSource;
-        let dwhConnectionRestaurador: DataSource;
-        let dwhConnectionEmpresa: DataSource;
-        try {
-            dwhConnectionDivision = await (await this._dwhConexionesService.conexionDWH(dwhConexiones.ConexionDWH.toString())).initialize();
-            dwhConnectionRestaurador = await (await this._dwhConexionesService.conexionDWH(dwhConexiones.ConexionRest.toString())).initialize();
-            dwhConnectionEmpresa = await (await this._dwhConexionesService.conexionRestEmpresa()).initialize();
-
-            for (let index = 0; index < unidades.length; index++) {
-                const unidadInfo = unidades[index];
-
-                // importo los almacenes
-                let _importarAlmacenesRes = await this._importarAlmacenesDWH(unidadInfo.IdUnidad, dwhConnectionDivision);
-                if (!_importarAlmacenesRes.success) {
-                    throw new Error(_importarAlmacenesRes.error + ' No se pudo importar Almacenes de la Unidad ' + unidadInfo.IdUnidad);
-                }
-
-                // importo el inventario
-                let _importarInventarioRes = await this._importarInventarioDWH(idCentro, annio, mes, unidadInfo, tipoCentro, dwhConnectionDivision);
-                if (!_importarInventarioRes.success) {
-                    throw new Error(_importarInventarioRes.error + ' No se pudo importar Inventario DWH de la Unidad ' + unidadInfo.IdUnidad);
-                }
-
-                _importarInventarioRes = await this._importarInventarioDWH(idCentro, annio, mes, unidadInfo, tipoCentro, dwhConnectionRestaurador, true);
-                if (!_importarInventarioRes.success) {
-                    throw new Error(_importarInventarioRes.error + ' No se pudo importar Inventario DWH de la Unidad ' + unidadInfo.IdUnidad);
-                }
-
-                // importo las ventas
-                let _importarVentasRes = await this._importarVentasDWH(idCentro, annio, mes, unidadInfo, tipoCentro, ventasAcumuladas, dwhConnectionDivision);
-                if (!_importarVentasRes.success) {
-                    throw new Error(_importarVentasRes.error + ' No se pudo importar Ventas DWH de la Unidad ' + unidadInfo.IdUnidad);
-                }
-
-                _importarVentasRes = await this._importarVentasDWH(idCentro, annio, mes, unidadInfo, tipoCentro, ventasAcumuladas, dwhConnectionRestaurador, true);
-                if (!_importarVentasRes.success) {
-                    throw new Error(_importarVentasRes.error + ' No se pudo importar Ventas DWH de la Unidad ' + unidadInfo.IdUnidad);
-                }
-
-                // importo de la Empresa
-                _importarAlmacenesRes = await this._importarAlmacenesDWH(unidadInfo.IdUnidad, dwhConnectionEmpresa, true);
-                if (!_importarAlmacenesRes.success) {
-                    throw new Error(_importarAlmacenesRes.error + ' No se pudo importar Almacenes DWH de la Unidad ' + unidadInfo.IdUnidad);
-                }
-
-                _importarInventarioRes = await this._importarInventarioDWH(idCentro, annio, mes, unidadInfo, tipoCentro, dwhConnectionEmpresa, false, true);
-                if (!_importarInventarioRes.success) {
-                    throw new Error(_importarInventarioRes.error + ' No se pudo importar Inventario DWH Empresa de la Unidad ' + unidadInfo.IdUnidad);
-                }
-
-                _importarVentasRes = await this._importarVentasDWH(idCentro, annio, mes, unidadInfo, tipoCentro, ventasAcumuladas, dwhConnectionEmpresa, false, true);
-                if (!_importarVentasRes.success) {
-                    throw new Error(_importarVentasRes.error + ' No se pudo importar Ventas DWH Empresa de la Unidad ' + unidadInfo.IdUnidad);
-                }
-            }
-
-            // if (dwhConnectionDivision && dwhConnectionDivision.isInitialized) dwhConnectionDivision.destroy();
-            // if (dwhConnectionDivision && dwhConnectionRestaurador.isInitialized) dwhConnectionRestaurador.destroy();
-            // if (dwhConnectionDivision && dwhConnectionEmpresa.isInitialized) dwhConnectionEmpresa.destroy();
-
-            return new Promise<MutationResponse>(resolve => {
-                resolve({ success: true });
-            });
-        } catch (err: any) {
-            return { success: false, error: err.message ? err.message : err };
+        if (!_conexionDWHQuery.data) {
+          throw new Error(`No se ha definido ninguna conexión de la División ${divisionInfo.IdDivision} a los DWH.`);
         }
-    }
-
-    private async _importarAlmacenesDWH(idUnidad: number, dataSource: DataSource, isDistribuidor = false): Promise<MutationResponse> {
-        try {
-            return new Promise<MutationResponse>(resolve => {
-                dataSource
-                    .query(
-                        `SELECT IdGerenciaIdAlmacen, IdUnidad, Almacen, ISNULL(IdPiso, 0) AS IdPiso, ISNULL(EContable, '') AS EContable, ISNULL(EContableMN, '') AS EContableMN, ISNULL(Abierto, 0) AS Abierto, ISNULL(Exhibicion, 0) AS Exhibicion,
-                ISNULL(Interno, 0) AS Interno, ISNULL(Merma, 0) AS Merma, ISNULL(Gastronomia, 0) AS Gastronomia, ISNULL(Insumo, 0) AS Insumo, ISNULL(Inversiones, 0) AS Inversiones, ISNULL(Boutique, 0) AS Boutique,
-                ISNULL(MermaOrigen, 0) AS MermaOrigen, ISNULL(Consignacion, 0) AS Consignacion, ISNULL(Emergente, 0) AS Emergente, ISNULL(ReservaDiv, 0) AS ReservaDiv, ISNULL(ReservaNac, 0) AS ReservaNac,
-                ISNULL(DespachoDiv, 0) AS DespachoDiv, ISNULL(OrigenReplica, 0) AS OrigenReplica, ISNULL(DestinoReplica, 0) AS DestinoReplica, ISNULL(CapacidadFrio, 0) AS CapacidadFrio, ISNULL(Ociosos, 0) AS Ociosos,
-                ISNULL(LentoMov, 0) AS LentoMov, ISNULL(MercanciaVenta, 0) AS MercanciaVenta
-                FROM            UnidadesComerciales.dbo.Almacenes
-                WHERE        (IdUnidad = ${idUnidad})`,
-                    )
-                    .then(async result => {
-                        if (result) {
-                            const _almacenes = this._xmlSvc.jsonToXML('Almacenes', result);
-
-                            await this.dataSource
-                                .query(`EXEC dbo.pDWH_ImportAlmacenesXML @0, @1, @2`, [_almacenes, idUnidad, isDistribuidor ? 1 : 0])
-                                .then(() => {
-                                    resolve({ success: true });
-                                })
-                                .catch(err => {
-                                    throw new Error(err.message ? err.message : err);
-                                });
-                        }
-                    })
-                    .catch(err => {
-                        return { success: false, error: err.message ? err.message : err };
-                    });
-            });
-        } catch (err: any) {
-            return { success: false, error: err.message ? err.message : err };
+        const _conexionDWH = _conexionDWHQuery.data;
+        if (_conexionDWH.ConexionDWH === '') {
+          throw new Error(`No se ha definido la conexión al DWH de la División ${divisionInfo.IdDivision}.`);
         }
-    }
-
-    private async _importarInventarioDWH(
-        idCentro: number,
-        annio: number,
-        mes: number,
-        unidadInfo: Unidades,
-        tipoCentro: number,
-        dataSource: DataSource,
-        isRestaura = false,
-        isDistribuidor = false,
-    ): Promise<MutationResponse> {
-        try {
-            const query = queryInventarioDWH
-                .replace(/@Anio/g, annio.toString())
-                .replace(/@Mes/g, mes.toString())
-                .replace(/@Centro/g, idCentro.toString())
-                .replace(/@Unidad/g, unidadInfo.IdUnidad.toString())
-                .replace(/@Cons/g, tipoCentro.toString());
-
-            return new Promise<MutationResponse>(resolve => {
-                resolve({ success: true });
-                dataSource
-                    .query(query)
-                    .then(async result => {
-                        if (result) {
-                            const _inventario = this._xmlSvc.jsonToXML('DWH', result);
-
-                            await this.dataSource
-                                .query(`EXEC dbo.pDWH_ImportInventarioXML @0, @1, @2, @3, @4, @5`, [
-                                    _inventario,
-                                    idCentro,
-                                    mes,
-                                    tipoCentro === 1,
-                                    isRestaura ? 1 : 0,
-                                    isDistribuidor ? 1 : 0,
-                                ])
-                                .then(() => {
-                                    resolve({ success: true });
-                                })
-                                .catch(err => {
-                                    throw new Error(err.message ? err.message : err);
-                                });
-                        }
-                    })
-                    .catch(err => {
-                        return { success: false, error: err.message ? err.message : err };
-                    });
-            });
-        } catch (err: any) {
-            return { success: false, error: err.message ? err.message : err };
+        if (_conexionDWH.ConexionRest === '') {
+          throw new Error(`No se ha definido la conexión al DWH de Restaura de la División ${divisionInfo.IdDivision}.`);
         }
-    }
 
-    private async _importarVentasDWH(
-        idCentro: number,
-        annio: number,
-        mes: number,
-        unidadInfo: Unidades,
-        tipoCentro: number,
-        ventasAcumuladas: boolean,
-        dataSource: DataSource,
-        isRestaura = false,
-        isDistribuidor = false,
-    ): Promise<MutationResponse> {
-        try {
-            let query = queryVentasDWH;
+        // verificar si se ha definido la conexión al Rodas
+        // verificar si se ha definido la conexión al Rodas
+        const _conexionRodas = await this._contaConexionesService.findByIdUnidad(tipoCentro === 0 ? idCentro : divisionInfo.IdDivision, tipoCentro === 1).catch(err => {
+          throw new Error(err);
+        });
+        // _conexionRodas.BaseDatos = `r4_${_conexionRodas.BaseDatos.toLowerCase()}`;
 
-            if (ventasAcumuladas) {
-                query = query.replace(/= @Mes/g, '<= @Mes');
-            }
-
-            query = query
-                .replace(/@Anio/g, annio.toString())
-                .replace(/@Mes/g, mes.toString())
-                .replace(/@Centro/g, idCentro.toString())
-                .replace(/@Unidad/g, unidadInfo.IdUnidad.toString())
-                .replace(/@Cons/g, tipoCentro.toString());
-
-            return new Promise<MutationResponse>(resolve => {
-                resolve({ success: true });
-                dataSource.query(query).then(async result => {
-                    if (result) {
-                        const _ventas = this._xmlSvc.jsonToXML('DWH', result);
-
-                        await this.dataSource
-                            .query(`EXEC dbo.pDWH_ImportVentasXML @0, @1, @2, @3, @4, @5`, [_ventas, idCentro, mes, tipoCentro === 1, isRestaura ? 1 : 0, isDistribuidor ? 1 : 0])
-                            .then(() => {
-                                resolve({ success: true });
-                            })
-                            .catch(err => {
-                                throw new Error(err.message ? err.message : err);
-                            });
-                    }
-                });
-            }).catch(err => {
-                return { success: false, error: err.message ? err.message : err };
-            });
-        } catch (err: any) {
-            return { success: false, error: err.message ? err.message : err };
+        // obtener listados de las unidades subordinadas
+        let _unidadesQuery: any;
+        switch (tipoCentro) {
+          case 0:
+            _unidadesQuery = await this._unidadesService.getUnidadesAbiertasByIdSubdivision(idCentro);
+            break;
+          case 1:
+            _unidadesQuery = await this._unidadesService.getUnidadesAbiertasByIdDivision(idCentro);
+            break;
         }
-    }
-
-    private async _importarDatosRodas(annio: number, periodo: number, idUnidad: number, tipoCentro: number, contaConexion: ContaConexionesEntity): Promise<MutationResponse> {
-        try {
-            const cons = tipoCentro === 1 ? '1' : '0';
-
-            // me conecto al Rodas del Centro
-            const rodasConnection = await this._contaConexionesService.conexionRodas(contaConexion);
-
-            // importo los asientos del rodas
-            await this._conciliaContaService.importarContabilidad(idUnidad, annio, periodo, cons, rodasConnection);
-            // if (!_importarAsientoRodas.success) {
-            //     return { success: false, error: _importarAsientoRodas.error + ' No se pudo importar Asientos del Rodas de la Unidad ' + idUnidad };
-            // }
-
-            return new Promise<MutationResponse>(resolve => {
-                if (rodasConnection.isInitialized) rodasConnection.destroy();
-                resolve({ success: true });
-            });
-        } catch (err: any) {
-            return { success: false, error: err.message ? err.message : err };
+        if (!_unidadesQuery.success) {
+          throw new Error(_unidadesQuery.error);
         }
+        const _unidades = _unidadesQuery.data;
+
+        // importar datos del DWH
+        await this._importarDatosDWH(idCentro, annio, periodo, tipoCentro, ventasAcumuladas, _unidades, _conexionDWH).catch(err => {
+          throw new Error(err);
+        });
+
+        // importar datos del Rodas
+        await this._importarDatosRodas(annio, periodo, idCentro, tipoCentro, _conexionRodas).catch(err => {
+          throw new Error(err);
+        });
+      }
+
+      return new Promise<ConciliaDWH[]>((resolve, reject) => {
+        // calculo la conciliacion
+        this._calculaConciliacion(idCentro, annio, periodo, tipoCentro, ventasAcumuladas)
+          .then(results => {
+            resolve(results);
+          })
+          .catch(err => {
+            reject(err.message || err);
+          });
+      });
+    } catch (err: any) {
+      return Promise.reject(err.message || err);
     }
+  }
 
-    private async _calculaConciliacion(idUnidad: number, annio: number, periodo: number, tipoCentro: number, ventasAcumuladas: boolean): Promise<any> {
-        const cons = tipoCentro === 1 ? '1' : '0';
+  private async _importarDatosDWH(
+    idCentro: number,
+    annio: number,
+    mes: number,
+    tipoCentro: number,
+    ventasAcumuladas: boolean,
+    unidades: UnidadesEntity[],
+    dwhConexiones: DWHConexiones,
+  ): Promise<void> {
+    let dwhConnectionDivision: DataSource;
+    let dwhConnectionRestaurador: DataSource;
+    let dwhConnectionEmpresa: DataSource;
+    try {
+      dwhConnectionDivision = await (await this._dwhConexionesService.conexionDWH(dwhConexiones.ConexionDWH.toString())).initialize();
+      dwhConnectionRestaurador = await (await this._dwhConexionesService.conexionDWH(dwhConexiones.ConexionRest.toString())).initialize();
+      dwhConnectionEmpresa = await (await this._dwhConexionesService.conexionRestEmpresa()).initialize();
 
-        return new Promise<any>((resolve, reject) => {
-            // calculo el inventario y la venta
-            this.dataSource
-                .query(`EXEC dbo.pDWH_CalculaConciliacion @0, @1, @2, @3, @4`, [cons, idUnidad, annio, periodo, ventasAcumuladas ? 1 : 0])
-                .then(res => {
-                    resolve(res);
+      // borro los datos del Golden DWH
+      await this.dataSource.query(`DELETE FROM DWH_Inventario WHERE Id_Centro = ${idCentro} AND Periodo = ${mes}`);
+      await this.dataSource.query(`DELETE FROM DWH_Ventas WHERE Id_Centro = ${idCentro} AND Periodo = ${mes}`);
+
+      // importo los datos de cada una de las unidades
+      for (let index = 0; index < unidades.length; index++) {
+        const unidadInfo = unidades[index];
+
+        // importo los almacenes de la división
+        await this._importarAlmacenesDWH(unidadInfo.IdUnidad, dwhConnectionDivision).catch(err => {
+          throw new Error(err + ' No se pudo importar Almacenes de la Unidad ' + unidadInfo.IdUnidad);
+        });
+
+        // importo el inventario de la división
+        await this._importarInventarioDWH(idCentro, annio, mes, unidadInfo.IdUnidad, tipoCentro, dwhConnectionDivision).catch(err => {
+          throw new Error(err + ' No se pudo importar Inventario DWH de la Unidad ' + unidadInfo.IdUnidad);
+        });
+
+        await this._importarInventarioDWH(idCentro, annio, mes, unidadInfo.IdUnidad, tipoCentro, dwhConnectionRestaurador, true).catch(err => {
+          throw new Error(err + ' No se pudo importar Inventario DWH de la Unidad ' + unidadInfo.IdUnidad);
+        });
+
+        // importo las ventas de la división
+        await this._importarVentasDWH(idCentro, annio, mes, unidadInfo, tipoCentro, ventasAcumuladas, dwhConnectionDivision).catch(err => {
+          throw new Error(err + ' No se pudo importar Ventas DWH de la Unidad ' + unidadInfo.IdUnidad);
+        });
+
+        await this._importarVentasDWH(idCentro, annio, mes, unidadInfo, tipoCentro, ventasAcumuladas, dwhConnectionRestaurador, true).catch(err => {
+          throw new Error(err + ' No se pudo importar Ventas DWH de la Unidad ' + unidadInfo.IdUnidad);
+        });
+
+        // importo de la Empresa
+        await this._importarAlmacenesDWH(unidadInfo.IdUnidad, dwhConnectionEmpresa, true).catch(err => {
+          throw new Error(err + ' No se pudo importar Almacenes DWH de la Unidad ' + unidadInfo.IdUnidad);
+        });
+
+        await this._importarInventarioDWH(idCentro, annio, mes, unidadInfo.IdUnidad, tipoCentro, dwhConnectionEmpresa, false, true).catch(err => {
+          throw new Error(err + ' No se pudo importar Inventario DWH Empresa de la Unidad ' + unidadInfo.IdUnidad);
+        });
+
+        await this._importarVentasDWH(idCentro, annio, mes, unidadInfo, tipoCentro, ventasAcumuladas, dwhConnectionEmpresa, false, true).catch(err => {
+          throw new Error(err + ' No se pudo importar Ventas DWH Empresa de la Unidad ' + unidadInfo.IdUnidad);
+        });
+      }
+
+      // if (dwhConnectionDivision && dwhConnectionDivision.isInitialized) dwhConnectionDivision.destroy();
+      // if (dwhConnectionDivision && dwhConnectionRestaurador.isInitialized) dwhConnectionRestaurador.destroy();
+      // if (dwhConnectionDivision && dwhConnectionEmpresa.isInitialized) dwhConnectionEmpresa.destroy();
+    } catch (err: any) {
+      throw new Error(err.message || err);
+    }
+  }
+
+  private async _importarAlmacenesDWH(idUnidad: number, dataSource: DataSource, isDistribuidor = false): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      dataSource
+        .query(
+          `SELECT IdGerenciaIdAlmacen as idgerencia_idalmacen, IdUnidad as id_unidad, Almacen as almacen, ISNULL(IdPiso, 0) AS IdPiso, ISNULL(EContable, '') AS econtable, ISNULL(EContableMN, '') AS econtable_mn, ISNULL(Abierto, 0) AS abierto, ISNULL(Exhibicion, 0) AS exhibicion,
+                  ISNULL(Interno, 0) AS interno, ISNULL(Merma, 0) AS merma, ISNULL(Gastronomia, 0) AS gastronomia, ISNULL(Insumo, 0) AS insumo, ISNULL(Inversiones, 0) AS inversiones, ISNULL(Boutique, 0) AS boutique,
+                  ISNULL(MermaOrigen, 0) AS merma_origen, ISNULL(Consignacion, 0) AS consignacion, ISNULL(Emergente, 0) AS emergente, ISNULL(ReservaDiv, 0) AS reserva_div, ISNULL(ReservaNac, 0) AS reserva_nac,
+                  ISNULL(DespachoDiv, 0) AS despacho_div, ISNULL(OrigenReplica, 0) AS origen_replica, ISNULL(DestinoReplica, 0) AS destino_replica, ISNULL(CapacidadFrio, 0) AS capacidad_frio, ISNULL(Ociosos, 0) AS ociosos,
+                  ISNULL(LentoMov, 0) AS lento_mov, ISNULL(MercanciaVenta, 0) AS mercancia_venta
+                  FROM            UnidadesComerciales.dbo.Almacenes
+                  WHERE        (IdUnidad = ${idUnidad})`,
+        )
+        .then(async result => {
+          if (result) {
+            // const _almacenes = this._xmlSvc.jsonToXML('Almacenes', result);
+
+            await this.dataSource
+              // .query(`CALL public.dwh_import_almacenes('${JSON.stringify(result)}'::json, ${idUnidad}::integer, ${isDistribuidor}::boolean)`)
+              .query(`CALL public.dwh_import_almacenes($1::json, $2::integer, $3::boolean)`, [JSON.stringify(result), idUnidad, isDistribuidor])
+              .then(() => {
+                resolve();
+              })
+              .catch(err => {
+                reject(err.message || err);
+              });
+          }
+        })
+        .catch(err => {
+          reject(err.message || err);
+        });
+    });
+  }
+
+  private async _importarInventarioDWH(
+    idCentro: number,
+    annio: number,
+    mes: number,
+    idUnidad: number,
+    tipoCentro: number,
+    dataSource: DataSource,
+    isRestaura = false,
+    isDistribuidor = false,
+  ): Promise<void> {
+    try {
+      const query = queryInventarioDWH
+        .replace(/@Anio/g, annio.toString())
+        .replace(/@Mes/g, mes.toString())
+        .replace(/@Centro/g, idCentro.toString())
+        .replace(/@Unidad/g, idUnidad.toString())
+        .replace(/@Cons/g, tipoCentro.toString());
+
+      return new Promise<void>((resolve, reject) => {
+        dataSource
+          .query(query)
+          .then(async result => {
+            if (result) {
+              // const _inventario = this._xmlSvc.jsonToXML('DWH', result);
+
+              await this.dataSource
+                .query(`CALL DWH_Import_Inventario ($1::json, $2::integer, $3::integer, $4::boolean, $5::boolean, $6::boolean)`, [
+                  JSON.stringify(result),
+                  idCentro,
+                  mes,
+                  tipoCentro === 1,
+                  isRestaura,
+                  isDistribuidor,
+                ])
+                .then(() => {
+                  resolve();
                 })
                 .catch(err => {
-                    reject(err.message ? err.message : err);
+                  reject(err.message || err);
                 });
-        });
+            }
+          })
+          .catch(err => {
+            reject(err.message || err);
+          });
+      });
+    } catch (err: any) {
+      return Promise.reject(err.message || err);
     }
+  }
+
+  private async _importarVentasDWH(
+    idCentro: number,
+    annio: number,
+    mes: number,
+    unidadInfo: UnidadesEntity,
+    tipoCentro: number,
+    ventasAcumuladas: boolean,
+    dataSource: DataSource,
+    isRestaura = false,
+    isDistribuidor = false,
+  ): Promise<void> {
+    try {
+      let query = queryVentasDWH;
+
+      if (ventasAcumuladas) {
+        query = query.replace(/= @Mes/g, '<= @Mes');
+      }
+
+      query = query
+        .replace(/@Anio/g, annio.toString())
+        .replace(/@Mes/g, mes.toString())
+        .replace(/@Centro/g, idCentro.toString())
+        .replace(/@Unidad/g, unidadInfo.IdUnidad.toString())
+        .replace(/@Cons/g, tipoCentro.toString());
+
+      return new Promise<void>((resolve, reject) => {
+        dataSource
+          .query(query)
+          .then(async result => {
+            if (result) {
+              // const _ventas = this._xmlSvc.jsonToXML('DWH', result);
+
+              await this.dataSource
+                .query(`CALL DWH_Import_Ventas ($1::json, $2::integer, $3::integer, $4::boolean, $5::boolean, $6::boolean)`, [
+                  JSON.stringify(result),
+                  idCentro,
+                  mes,
+                  tipoCentro === 1,
+                  isRestaura,
+                  isDistribuidor,
+                ])
+                .then(() => {
+                  resolve();
+                })
+                .catch(err => {
+                  reject(err.message || err);
+                });
+            }
+          })
+          .catch(err => {
+            reject(err.message || err);
+          });
+      });
+    } catch (err: any) {
+      return Promise.reject(err.message || err);
+    }
+  }
+
+  private async _importarDatosRodas(annio: number, periodo: number, idUnidad: number, tipoCentro: number, contaConexion: ContaConexionesEntity): Promise<void> {
+    try {
+      const cons = tipoCentro === 1;
+
+      // me conecto al Rodas del Centro
+      const rodasConnection = await this._contaConexionesService.conexionRodas(contaConexion);
+
+      // importo los asientos del rodas
+      await this._conciliaContaService.importarContabilidad(idUnidad, annio, periodo, cons, rodasConnection);
+      // if (!_importarAsientoRodas.success) {
+      //     return { success: false, error: _importarAsientoRodas.error + ' No se pudo importar Asientos del Rodas de la Unidad ' + idUnidad };
+      // }
+
+      if (rodasConnection.isInitialized) rodasConnection.destroy();
+    } catch (err: any) {
+      throw new Error(err.message || err);
+    }
+  }
+
+  private async _calculaConciliacion(idUnidad: number, annio: number, periodo: number, tipoCentro: number, ventasAcumuladas: boolean): Promise<ConciliaDWH[]> {
+    const cons = tipoCentro === 1;
+
+    return new Promise<ConciliaDWH[]>((resolve, reject) => {
+      // calculo el inventario y la venta
+      this.dataSource
+        .query(`SELECT * from DWH_Calcula_Conciliacion ($1, $2, $3, $4, $5)`, [cons, idUnidad, annio, periodo, ventasAcumuladas])
+        .then(res => {
+          resolve(res);
+        })
+        .catch(err => {
+          reject(err.message ? err.message : err);
+        });
+    });
+  }
 }

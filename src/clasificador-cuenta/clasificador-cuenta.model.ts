@@ -1,69 +1,88 @@
-import { MultipleQueryResponse, SingleQueryResponse } from './../shared/models/query.response.model';
-import { ClasificadorCuentaReal } from './clasificador-cuenta.entity';
 import { Field, ObjectType, InputType } from '@nestjs/graphql';
-
-@ObjectType()
-export class ClasificadorCuentaQueryResponse extends SingleQueryResponse(ClasificadorCuentaReal) {}
-
-@ObjectType()
-export class ClasificadorCuentasQueryResponse extends MultipleQueryResponse(ClasificadorCuentaReal) {}
 
 @InputType()
 export class ClasificadorCuentaRealInput {
-    @Field()
-    Cuenta: string;
+  @Field()
+  TipoClasificador: number;
 
-    @Field()
-    SubCuenta: string;
+  @Field()
+  Cuenta: string;
 
-    @Field()
-    Descripcion: string;
+  @Field()
+  SubCuenta: string;
 
-    @Field()
-    Naturaleza: string;
+  @Field()
+  Nombre: string;
 
-    @Field({ nullable: true })
-    Crit1: string;
+  @Field()
+  Naturaleza: string;
 
-    @Field({ nullable: true })
-    Crit2: string;
+  @Field({ nullable: true })
+  Tipo_Analisis_1?: string;
 
-    @Field({ nullable: true })
-    Crit3: string;
+  @Field({ nullable: true })
+  Tipo_Analisis_2?: string;
 
-    @Field()
-    Obligacion: boolean;
+  @Field({ nullable: true })
+  Tipo_Analisis_3?: string;
 
-    @Field()
-    TipoClasificador: number;
+  @Field({ nullable: true })
+  Tipo_Analisis_4?: string;
 
-    @Field({ nullable: true })
-    SeUtiliza: string;
+  @Field({ nullable: true })
+  Tipo_Analisis_5?: string;
 
-    @Field()
-    Terminal: boolean;
+  @Field({ defaultValue: false })
+  Obligacion: boolean;
 
-    @Field({ nullable: true })
-    Crit1Consolidacion: string;
+  @Field({ nullable: true })
+  Tipo_Moneda?: string;
 
-    @Field({ nullable: true })
-    Crit2Consolidacion: string;
+  @Field()
+  Grupo?: string;
 
-    @Field({ nullable: true })
-    Crit3Consolidacion: string;
+  @Field()
+  Clase?: string;
+
+  @Field()
+  Categoria?: string;
+
+  @Field()
+  Clasificacion?: string;
+
+  @Field()
+  Tipo?: string;
+
+  @Field()
+  Estado?: string;
+
+  @Field({ nullable: true })
+  Tipo_Analisis_1_Cons?: string;
+
+  @Field({ nullable: true })
+  Tipo_Analisis_2_Cons?: string;
+
+  @Field({ nullable: true })
+  Tipo_Analisis_3_Cons?: string;
+
+  @Field({ nullable: true })
+  Tipo_Analisis_4_Cons?: string;
+
+  @Field({ nullable: true })
+  Tipo_Analisis_5_Cons?: string;
+
+  @Field({ nullable: true })
+  SeUtiliza?: string;
 }
 
 @ObjectType()
 export class CuentasAgrupadas {
-    @Field()
-    Cuenta: string;
+  @Field()
+  Cuenta: string;
 }
 
-@ObjectType()
-export class CuentasAgrupadasQueryResponse extends MultipleQueryResponse(CuentasAgrupadas) {}
-
 export enum ETipoClasificadorCuenta {
-    Consolidado = 1,
-    Centro = 2,
-    Complejo = 3
+  Consolidado = 1,
+  Centro = 2,
+  Complejo = 3,
 }

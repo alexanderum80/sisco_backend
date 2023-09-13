@@ -9,7 +9,7 @@ import { DwhConexionesModule } from './../dwh-conexiones/dwh-conexiones.module';
 import { ConciliaContaModule } from './../concilia-conta/concilia-conta.module';
 
 @Module({
-    imports: [SharedModule, ContaConexionesModule, DwhConexionesModule, UnidadesModule, ConciliaContaModule, DivisionesModule],
-    providers: [ConciliaDwhService, ConciliaDwhResolver],
+  imports: [SharedModule, ContaConexionesModule, DwhConexionesModule, UnidadesModule, ConciliaContaModule, DivisionesModule],
+  providers: [ConciliaDwhService, ConciliaDwhResolver],
 })
 export class ConciliaDwhModule {}

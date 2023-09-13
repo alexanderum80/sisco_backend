@@ -2,81 +2,84 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @ObjectType()
-@Entity('Conta_ExpresionesResumen')
+@Entity('conta_expresiones_resumen')
 export class ExpresionesResumenEntity {
-    @Field()
-    @PrimaryGeneratedColumn()
-    IdExpresion: number;
+  @Field()
+  @PrimaryGeneratedColumn({ name: 'id_expresion' })
+  IdExpresion: number;
 
-    @Field()
-    @Column()
-    Expresion: string;
+  @Field()
+  @Column({ name: 'expresion' })
+  Expresion: string;
 
-    @Field({ nullable: true })
-    @Column()
-    Descripcion: string;
+  @Field({ nullable: true })
+  @Column({ name: 'descripcion' })
+  Descripcion: string;
 
-    @Field()
-    @Column()
-    Acumulado: boolean;
+  @Field()
+  @Column({ name: 'acumulado' })
+  Acumulado: boolean;
 
-    @Field()
-    @Column()
-    OperacionesInternas: boolean;
+  @Field()
+  @Column({ name: 'operaciones_internas' })
+  OperacionesInternas: boolean;
 
-    @Field()
-    @Column()
-    Centralizada: boolean;
-    
-    @Field()
-    @Column()
-    IdDivision: number;
+  @Field()
+  @Column({ name: 'centralizada' })
+  Centralizada: boolean;
+
+  @Field()
+  @Column({ name: 'id_division' })
+  IdDivision: number;
 }
 
 @ObjectType()
-@Entity('Conta_ExpresionesDetalle')
+@Entity('conta_expresiones_detalle')
 export class ExpresionesDetalleEntity {
-    @Field()
-    @PrimaryGeneratedColumn()
-    id: number;
+  @Field()
+  @PrimaryGeneratedColumn({ name: 'id' })
+  Id: number;
 
-    @Field()
-    @Column()
-    IdExpresion: number;
+  @Field()
+  @Column({ name: 'id_expresion' })
+  IdExpresion: number;
 
-    @Field({ nullable: true })
-    @Column({ type: 'nvarchar', length: 3 })
-    Centro: string;
+  @Field({ nullable: true })
+  @Column({ name: 'centro', type: 'varchar', length: 3 })
+  Centro: string;
 
-    @Field({ nullable: true })
-    @Column({ type: 'nvarchar', length: 8 })
-    Cta: string;
+  @Field({ nullable: true })
+  @Column({ name: 'cta', type: 'varchar', length: 8 })
+  Cta: string;
 
-    @Field({ nullable: true })
-    @Column({ type: 'nvarchar', length: 8 })
-    SubCta: string;
+  @Field({ nullable: true })
+  @Column({ name: 'subcta', type: 'varchar', length: 8 })
+  SubCta: string;
 
-    @Field({ nullable: true })
-    @Column({ type: 'nvarchar', length: 10 })
-    Crit1: string;
+  @Field({ nullable: true })
+  @Column({ name: 'crit1', type: 'varchar', length: 10 })
+  Crit1: string;
 
-    @Field({ nullable: true })
-    @Column({ type: 'nvarchar', length: 10 })
-    Crit2: string;
+  @Field({ nullable: true })
+  @Column({ name: 'crit2', type: 'varchar', length: 10 })
+  Crit2: string;
 
-    @Field({ nullable: true })
-    @Column({ type: 'nvarchar', length: 10 })
-    Crit3: string;
+  @Field({ nullable: true })
+  @Column({ name: 'crit3', type: 'varchar', length: 10 })
+  Crit3: string;
 
-    @Field()
-    @Column({ type: 'nvarchar', length: 1 })
-    Signo: string;
+  @Field()
+  @Column({ name: 'signo', type: 'varchar', length: 1 })
+  Signo: string;
 
-    @Field()
-    @Column()
-    PorCiento: number;
+  @Field()
+  @Column({ name: 'por_ciento' })
+  PorCiento: number;
 
-    @Field()
-    @Column()
-    TipoValor: number;
+  @Field()
+  @Column({ name: 'tipo_valor' })
+  TipoValor: number;
+
+  @Field({ nullable: true })
+  TipoValorDesc?: string;
 }

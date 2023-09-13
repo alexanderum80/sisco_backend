@@ -2,13 +2,13 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @ObjectType()
-@Entity('Conta_Operadores')
+@Entity('conta_operadores')
 export class ContaOperadoresEntity {
-    @Field()
-    @PrimaryColumn()
-    Id: string;
+  @Field()
+  @PrimaryColumn({ name: 'id' })
+  Id: string;
 
-    @Field()
-    @Column()
-    Operador: string;
+  @Field()
+  @Column({ name: 'operador' })
+  Operador: string;
 }

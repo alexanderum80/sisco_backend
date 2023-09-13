@@ -1,17 +1,15 @@
+import { ConciliacionOperacionesDWHQueryResponse, ConciliaOperacionesDWHInput } from './../shared/models/query-operaciones-dwh.model';
 import { ConciliaInternaDwhService } from './concilia-interna-dwh.service';
 import { Resolver, Query, Args } from '@nestjs/graphql';
-import { ConciliaInternaDWHInput, ConciliacionInternaDWHQueryResponse } from './concilia-interna-dwh.model';
 
 @Resolver()
 export class ConciliaInternaDwhResolver {
-    constructor(
-        private _conciliaInternaDWHSvc: ConciliaInternaDwhService
-    ) {}
+  constructor(private _conciliaOperacionesDWHSvc: ConciliaInternaDwhService) {}
 
-    @Query(() => ConciliacionInternaDWHQueryResponse)
-    async conciliaInternaDWH(
-        @Args({ name: 'conciliaInternaDWHInput', type: () => ConciliaInternaDWHInput }) conciliaInternaDWHInput: ConciliaInternaDWHInput
-    ): Promise<ConciliacionInternaDWHQueryResponse> {
-        return this._conciliaInternaDWHSvc.conciliaInternaDWH(conciliaInternaDWHInput);
-    }
+  @Query(() => ConciliacionOperacionesDWHQueryResponse)
+  async conciliaInternaDWH(
+    @Args({ name: 'conciliaInternaDWHInput', type: () => ConciliaOperacionesDWHInput }) conciliaInternaDWHInput: ConciliaOperacionesDWHInput,
+  ): Promise<ConciliacionOperacionesDWHQueryResponse> {
+    return this._conciliaOperacionesDWHSvc.conciliaInternaDWH(conciliaInternaDWHInput);
+  }
 }

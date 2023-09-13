@@ -6,6 +6,6 @@ import { CajaConfiguracionEntity } from './caja-configuracion.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([CajaConfiguracionEntity])],
-  providers: [CajaConfiguracionResolver, CajaConfiguracionService]
+  providers: [CajaConfiguracionResolver, CajaConfiguracionService],
 })
 export class CajaConfiguracionModule {}

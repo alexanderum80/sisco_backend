@@ -3,36 +3,36 @@ import { ObjectType, Field, InputType } from '@nestjs/graphql';
 
 @ObjectType()
 export class ContaTipoentidadesQueryResponse {
-    @Field()
-    success: boolean;
+  @Field()
+  success: boolean;
 
-    @Field(() => [TipoEntidades], { nullable: true })
-    data?: TipoEntidades[];
+  @Field(() => [TipoEntidades], { nullable: true })
+  data?: TipoEntidades[];
 
-    @Field({ nullable: true })
-    error?: string;
+  @Field({ nullable: true })
+  error?: string;
 }
 
 @ObjectType()
 export class ContaTipoentidadQueryResponse {
-    @Field()
-    success: boolean;
+  @Field()
+  success: boolean;
 
-    @Field(() => TipoEntidades, { nullable: true })
-    data?: TipoEntidades;
+  @Field(() => TipoEntidades, { nullable: true })
+  data?: TipoEntidades;
 
-    @Field({ nullable: true })
-    error?: string;
+  @Field({ nullable: true })
+  error?: string;
 }
 
 @InputType()
 export class TipoEntidadInput {
-    @Field()
-    Id?: number;
+  @Field()
+  Id?: number;
 
-    @Field()
-    Entidades: string;
+  @Field()
+  Entidades: string;
 
-    @Field()
-    Descripcion: string;
+  @Field()
+  Descripcion: string;
 }

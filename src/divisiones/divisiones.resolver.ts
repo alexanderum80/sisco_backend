@@ -1,24 +1,30 @@
-import { Usuarios } from './../usuarios/usuarios.entity';
-import { DivisionesQueryResponse } from './divisiones.model';
+import { DEFAULT_GRAPHQL_CONTEXT } from './../shared/models/jwt.model';
+import { UsuariosEntity } from './../usuarios/usuarios.entity';
 import { DivisionesService } from './divisiones.service';
-import { Divisiones } from './divisiones.entity';
+import { DivisionesEntity } from './divisiones.entity';
 import { Resolver, Query, Args, Int, Context } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
-import { AuthGuard, DEFAULT_GRAPHQL_CONTEXT } from '../shared/helpers/auth.guard';
+import { AuthGuard } from '../shared/guards/auth.guard';
 
-@Resolver(() => Divisiones)
+@Resolver(() => DivisionesEntity)
 export class DivisionesResolver {
-    constructor(private _divisionesService: DivisionesService) {}
+  constructor(private _divisionesService: DivisionesService) {}
 
-    @Query(() => DivisionesQueryResponse)
-    @UseGuards(new AuthGuard())
-    async getAllDivisiones(@Context(DEFAULT_GRAPHQL_CONTEXT) user: Usuarios): Promise<DivisionesQueryResponse> {
-        return this._divisionesService.getAllDivisiones(user);
-    }
+  @Query(() => [DivisionesEntity])
+  // @UseGuards(new AuthGuard())
+  async getAllDivisiones(): Promise<DivisionesEntity[]> {
+    return this._divisionesService.getAllDivisiones();
+  }
 
-    @Query(() => DivisionesQueryResponse)
-    @UseGuards(new AuthGuard())
-    async getDivisionById(@Args({ name: 'id', type: () => Int }) id: number): Promise<DivisionesQueryResponse> {
-        return this._divisionesService.getDivisionById(id);
-    }
+  @Query(() => [DivisionesEntity])
+  @UseGuards(new AuthGuard())
+  async getAllDivisionesByUsuario(@Context(DEFAULT_GRAPHQL_CONTEXT) user: UsuariosEntity): Promise<DivisionesEntity[]> {
+    return this._divisionesService.getAllDivisiones(user);
+  }
+
+  @Query(() => [DivisionesEntity])
+  @UseGuards(new AuthGuard())
+  async getDivisionById(@Args({ name: 'id', type: () => Int }) id: number): Promise<DivisionesEntity[]> {
+    return this._divisionesService.getDivisionById(id);
+  }
 }

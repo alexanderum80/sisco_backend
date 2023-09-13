@@ -3,24 +3,24 @@ import { ObjectType, Field } from '@nestjs/graphql';
 
 @ObjectType()
 export class TipoUsuariosQueryResponse {
-    @Field()
-    success: Boolean;
+  @Field()
+  success: boolean;
 
-    @Field(() => [TipoUsuarios], { nullable: true })
-    data?: TipoUsuarios[];
+  @Field(() => [TipoUsuarios], { nullable: true })
+  data?: TipoUsuarios[];
 
-    @Field(() => String, { nullable: true })
-    error?: String;
+  @Field(() => String, { nullable: true })
+  error?: string;
 }
 
 @ObjectType()
 export class TipoUsuarioQueryResponse {
-    @Field()
-    success: Boolean;
+  @Field()
+  success: boolean;
 
-    @Field(() => TipoUsuarios, { nullable: true })
-    data?: TipoUsuarios;
+  @Field(() => TipoUsuarios, { nullable: true })
+  data?: TipoUsuarios;
 
-    @Field(() => String, { nullable: true })
-    error?: String;
+  @Field(() => String, { nullable: true })
+  error?: string;
 }

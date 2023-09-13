@@ -6,7 +6,7 @@ import { ConciliaAftService } from './concilia-aft.service';
 import { ConciliaAftResolver } from './concilia-aft.resolver';
 
 @Module({
-    imports: [ConciliaContaModule, ContaConexionesModule, SharedModule],
-    providers: [ConciliaAftResolver, ConciliaAftService],
+  imports: [ConciliaContaModule, ContaConexionesModule, SharedModule],
+  providers: [ConciliaAftResolver, ConciliaAftService],
 })
 export class ConciliaAftModule {}

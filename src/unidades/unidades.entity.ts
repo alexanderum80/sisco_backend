@@ -1,66 +1,73 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, PrimaryColumn, ViewColumn, ViewEntity } from 'typeorm';
+import { DivisionesEntity } from 'src/divisiones/divisiones.entity';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, ViewColumn, ViewEntity } from 'typeorm';
 
 @ObjectType()
-@Entity()
-export class Unidades {
-    @Field()
-    @PrimaryColumn()
-    IdUnidad: number;
+@Entity('unidades')
+export class UnidadesEntity {
+  @Field()
+  @PrimaryColumn({ name: 'id_unidad' })
+  IdUnidad: number;
 
-    @Field({ nullable: true })
-    @Column()
-    Nombre: string;
+  @Field({ nullable: true })
+  @Column({ name: 'nombre' })
+  Nombre: string;
 
-    @Field({ nullable: true })
-    @Column()
-    IdComplejo: number;
+  @Field({ nullable: true })
+  @Column({ name: 'id_complejo' })
+  IdComplejo: number;
 
-    @Field({ nullable: true })
-    @Column()
-    IdSubdivision: number;
+  @Field({ nullable: true })
+  @Column({ name: 'id_subdivision' })
+  IdSubdivision: number;
 
-    @Field({ nullable: true })
-    @Column()
-    IdDivision: number;
+  @Field({ nullable: true })
+  @Column({ name: 'id_division' })
+  IdDivision: number;
 
-    @Field({ nullable: true })
-    @Column('nchar', { length: 3 })
-    Provincia: string;
+  @Field(() => DivisionesEntity)
+  @ManyToOne(() => DivisionesEntity, divisiones => divisiones.IdDivision)
+  @JoinColumn({ name: 'id_division', referencedColumnName: 'IdDivision' })
+  Division?: DivisionesEntity;
 
-    @Field({ nullable: true })
-    @Column()
-    Tipo: number;
+  @Field({ nullable: true })
+  @Column({ name: 'provincia' })
+  Provincia: number;
 
-    @Field({ nullable: true })
-    @Column()
-    Abierta: boolean;
+  @Field({ nullable: true })
+  @Column({ name: 'tipo' })
+  Tipo: number;
+
+  @Field({ nullable: true })
+  @Column({ name: 'abierta' })
+  Abierta: boolean;
 }
 
 @ObjectType()
-@ViewEntity('vCentros')
+@ViewEntity('v_centros')
 export class CentrosView {
-    @Field()
-    @ViewColumn()
-    IdUnidad: number;
+  @Field()
+  @ViewColumn({ name: 'id_unidad' })
+  @PrimaryColumn({ name: 'id_unidad' })
+  IdUnidad: number;
 
-    @Field()
-    @ViewColumn()
-    Nombre: string;
+  @Field()
+  @ViewColumn({ name: 'nombre' })
+  Nombre: string;
 
-    @Field()
-    @ViewColumn()
-    IdSubdivision: number;
+  @Field()
+  @ViewColumn({ name: 'id_subdivision' })
+  IdSubdivision: number;
 
-    @Field()
-    @ViewColumn()
-    Subdivision: string;
+  @Field()
+  @ViewColumn({ name: 'subdivision' })
+  Subdivision: string;
 
-    @Field()
-    @ViewColumn()
-    IdDivision: number;
+  @Field()
+  @ViewColumn({ name: 'id_division' })
+  IdDivision: number;
 
-    @Field()
-    @ViewColumn()
-    Division: string;
+  @Field()
+  @ViewColumn({ name: 'division' })
+  Division: string;
 }

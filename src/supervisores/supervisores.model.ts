@@ -10,15 +10,15 @@ export class SupervisoresQueryResponse extends MultipleQueryResponse(Supervisor)
 
 @InputType()
 export class SupervisorInput {
-    @Field()
-    IdSupervisor?: number;
+  @Field()
+  IdSupervisor?: number;
 
-    @Field()
-    Supervisor: string;
+  @Field()
+  Supervisor: string;
 
-    @Field()
-    IdCargo: number;
+  @Field()
+  IdCargo: number;
 
-    @Field()
-    IdDivision: number;
+  @Field()
+  IdDivision: number;
 }

@@ -6,6 +6,6 @@ import { ContaComprobarExpresionesEntity } from './conta-comprobar-expresiones.e
 
 @Module({
   imports: [TypeOrmModule.forFeature([ContaComprobarExpresionesEntity])],
-  providers: [ContaComprobarExpresionesService, ContaComprobarExpresionesResolver]
+  providers: [ContaComprobarExpresionesService, ContaComprobarExpresionesResolver],
 })
 export class ContaComprobarExpresionesModule {}

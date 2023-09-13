@@ -8,6 +8,6 @@ import { DwhConexionesService } from './dwh-conexiones.service';
 @Module({
   imports: [TypeOrmModule.forFeature([DWHConexiones]), SharedModule],
   providers: [DwhConexionesResolver, DwhConexionesService],
-  exports: [DwhConexionesService]
+  exports: [DwhConexionesService],
 })
 export class DwhConexionesModule {}

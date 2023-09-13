@@ -6,6 +6,6 @@ import { TipoEntidades } from './tipo-entidades.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([TipoEntidades])],
-  providers: [TipoEntidadesResolver, TipoEntidadesService]
+  providers: [TipoEntidadesResolver, TipoEntidadesService],
 })
 export class TipoEntidadesModule {}

@@ -2,13 +2,13 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @ObjectType()
-@Entity('Conta_TipoValorExpresiones')
+@Entity('conta_tipo_valor_expresiones')
 export class ContaTipoValorExpresionesEntity {
-    @Field()
-    @PrimaryColumn()
-    IdTipoValor: number;
+  @Field()
+  @PrimaryColumn({ name: 'id_tipo_valor' })
+  IdTipoValor: number;
 
-    @Field()
-    @Column()
-    Valor: string;
+  @Field()
+  @Column({ name: 'valor' })
+  Valor: string;
 }

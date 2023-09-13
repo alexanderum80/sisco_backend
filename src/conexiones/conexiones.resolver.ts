@@ -4,16 +4,10 @@ import { ConexionesQueryResponse } from './conexiones.model';
 
 @Resolver()
 export class ConexionesResolver {
-    constructor(
-        private _conexionesService: ConexionesService
-    ) {}
+  constructor(private _conexionesService: ConexionesService) {}
 
-    @Query(() => ConexionesQueryResponse)
-    getDataBases(
-        @Args('ip') ip: string,
-        @Args('ususario') usuario: string,
-        @Args('password') password: string
-    ): Promise<ConexionesQueryResponse> {
-        return this._conexionesService.getDataBases(ip, usuario, password);
-    }
+  @Query(() => ConexionesQueryResponse)
+  getDataBases(@Args('ip') ip: string, @Args('ususario') usuario: string, @Args('password') password: string): Promise<ConexionesQueryResponse> {
+    return this._conexionesService.getDataBases(ip, usuario, password);
+  }
 }

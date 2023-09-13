@@ -1,4 +1,3 @@
-
 export const queryParteAtrasos = `SELECT UC.IdUnidad, MIN(UC.Nombre) AS Nombre, MIN(UC.IdDivision) AS IdDivision, MIN(Divisiones.Division) AS Division,
     CASE WHEN MAX(Fecha) IS NOT NULL THEN LTrim(Str(DateDiff(day, MAX(Fecha), GetDate() -1))) ELSE 'infinito' END AS Atraso
     FROM (SELECT G.IdGAM, G.IdGerencia, g.Ano, g.Mes, g.Fecha, g.Version, G.UltimaCircular
@@ -13,4 +12,6 @@ export const queryParteAtrasos = `SELECT UC.IdUnidad, MIN(UC.Nombre) AS Nombre, 
     WHERE UC.Abierta = 1
     GROUP BY UC.IdUnidad`;
 
-export const queryDatosIdGAM = `SELECT IdGerencia AS IdUnidad, RTRIM(UC.IdUnidad) + '-' + UC.Nombre AS Unidad, Ano, Mes, Fecha, Version, UltimaCircular, PeriodoRestaurado, vUtilnet FROM dbo.Gerencia_Ano_Mes AS GAM INNER JOIN UnidadesComerciales.dbo.UnidadesComerciales AS UC ON UC.IdUnidad = GAM.IdGerencia WHERE Ano = @Annio`;
+export const queryDatosIdGAM = `SELECT IdGerencia AS IdUnidad, RTRIM(UC.IdUnidad) + '-' + UC.Nombre AS Unidad, Ano, Mes, Fecha, Version, UltimaCircular, PeriodoRestaurado, vUtilnet 
+    FROM dbo.Gerencia_Ano_Mes AS GAM INNER JOIN UnidadesComerciales.dbo.UnidadesComerciales AS UC ON UC.IdUnidad = GAM.IdGerencia 
+    WHERE Ano = @Annio`;

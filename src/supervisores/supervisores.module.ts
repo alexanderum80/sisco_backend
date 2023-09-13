@@ -7,6 +7,6 @@ import { SupervisoresService } from './supervisores.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Supervisor]), UsuariosModule],
-  providers: [SupervisoresResolver, SupervisoresService]
+  providers: [SupervisoresResolver, SupervisoresService],
 })
 export class SupervisoresModule {}

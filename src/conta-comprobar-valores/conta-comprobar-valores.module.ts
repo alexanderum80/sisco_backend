@@ -6,6 +6,6 @@ import { ComprobarValoresEntity } from './conta-comprobar-valores.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([ComprobarValoresEntity])],
-  providers: [ContaComprobarValoresResolver, ContaComprobarValoresService]
+  providers: [ContaComprobarValoresResolver, ContaComprobarValoresService],
 })
 export class ContaComprobarValoresModule {}

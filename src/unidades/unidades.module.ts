@@ -3,11 +3,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Module } from '@nestjs/common';
 import { UnidadesResolver } from './unidades.resolver';
 import { UnidadesService } from './unidades.service';
-import { Unidades } from './unidades.entity';
+import { UnidadesEntity } from './unidades.entity';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Unidades]), UsuariosModule],
-    providers: [UnidadesResolver, UnidadesService],
-    exports: [UnidadesService],
+  imports: [TypeOrmModule.forFeature([UnidadesEntity]), UsuariosModule],
+  providers: [UnidadesResolver, UnidadesService],
+  exports: [UnidadesService],
 })
 export class UnidadesModule {}

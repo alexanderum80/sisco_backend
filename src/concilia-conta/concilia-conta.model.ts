@@ -1,170 +1,367 @@
-import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
-export class ConciliaContaQueryResponse {
-    @Field()
-    success: boolean;
+export class IConciliaReporteClasificador {
+  @Field({ name: 'Cuenta' })
+  cuenta: string;
 
-    @Field({ nullable: true })
-    data?: string;
+  @Field({ name: 'SubCuenta' })
+  subcuenta: string;
 
-    @Field(() => String, { nullable: true })
-    error?: string;
+  @Field({ name: 'Descripcion' })
+  descripcion: string;
+
+  @Field({ name: 'Crt1Clasif', nullable: true })
+  crt1_clasif?: string;
+
+  @Field({ name: 'Crt2Clasif', nullable: true })
+  crt2_clasif?: string;
+
+  @Field({ name: 'Crt3Clasif', nullable: true })
+  crt3_clasif?: string;
+
+  @Field({ name: 'Crt4Clasif', nullable: true })
+  crt4_clasif?: string;
+
+  @Field({ name: 'Crt5Clasif', nullable: true })
+  crt5_clasif?: string;
+
+  @Field({ name: 'NatClasif', nullable: true })
+  nat_clasif?: string;
+
+  @Field({ name: 'OblClasif', nullable: true })
+  obl_clasif?: boolean;
+
+  @Field({ name: '', nullable: true })
+  grupo_clasif?: string;
+
+  @Field({ name: '', nullable: true })
+  clase_clasif?: string;
+
+  @Field({ name: '', nullable: true })
+  categ_clasif?: string;
+
+  @Field({ name: '', nullable: true })
+  clasif_clasif?: string;
+
+  @Field({ name: '', nullable: true })
+  tipo_clasif?: string;
+
+  @Field({ name: '', nullable: true })
+  estado_clasif?: string;
+
+  @Field({ name: 'Crt1Rodas', nullable: true })
+  crt1_rodas?: string;
+
+  @Field({ name: 'Crt2Rodas', nullable: true })
+  crt2_rodas?: string;
+
+  @Field({ name: 'Crt3Rodas', nullable: true })
+  crt3_rodas?: string;
+
+  @Field({ name: 'Crt4Rodas', nullable: true })
+  crt4_rodas?: string;
+
+  @Field({ name: 'Crt5Rodas', nullable: true })
+  crt5_rodas?: string;
+
+  @Field({ name: 'NatRodas', nullable: true })
+  nat_rodas?: string;
+
+  @Field({ name: 'OblRodas', nullable: true })
+  obl_rodas?: boolean;
+
+  @Field({ name: '', nullable: true })
+  grupo_rodas?: string;
+
+  @Field({ name: '', nullable: true })
+  clase_rodas?: string;
+
+  @Field({ name: '', nullable: true })
+  categ_rodas?: string;
+
+  @Field({ name: '', nullable: true })
+  clasif_rodas?: string;
+
+  @Field({ name: '', nullable: true })
+  tipo_rodas?: string;
+
+  @Field({ name: '', nullable: true })
+  estado_rodas?: string;
 }
 
 @ObjectType()
-export class ConciliaContabilidad {
-    @Field(() => ConciliaContaQueryResponse)
-    ReporteClasificador: ConciliaContaQueryResponse;
+export class IConciliaReporteConsulta {
+  @Field({ name: 'Periodo' })
+  periodo: number;
 
-    @Field(() => ConciliaContaQueryResponse)
-    ReporteConsultas: ConciliaContaQueryResponse;
+  @Field({ name: 'Centro' })
+  centro: string;
 
-    @Field(() => ConciliaContaQueryResponse)
-    ReporteExpresiones: ConciliaContaQueryResponse;
+  @Field({ name: 'IdConsulta' })
+  id_consulta: string;
 
-    @Field(() => ConciliaContaQueryResponse)
-    ReporteValores: ConciliaContaQueryResponse;
+  @Field({ name: 'Consulta' })
+  consulta: string;
+
+  @Field({ name: 'Cuenta', nullable: true })
+  cuenta?: string;
+
+  @Field({ name: 'SubCuenta', nullable: true })
+  subcuenta?: string;
+
+  @Field({ name: 'Analisis1', nullable: true })
+  analisis_1?: string;
+
+  @Field({ name: 'Analisis2', nullable: true })
+  analisis_2?: string;
+
+  @Field({ name: 'Analisis3', nullable: true })
+  analisis_3?: string;
+
+  @Field({ name: 'Analisis4', nullable: true })
+  analisis_4?: string;
+
+  @Field({ name: 'Analisis5', nullable: true })
+  analisis_5?: string;
+
+  @Field({ name: 'Total' })
+  total: number;
+
+  @Field({ name: 'Consolidado' })
+  consolidado: boolean;
+}
+
+@ObjectType()
+export class IConciliaReporteExpresiones {
+  @Field({ name: 'Centro' })
+  centro: number;
+
+  @Field({ name: 'Consolidado' })
+  consolidado: boolean;
+
+  @Field({ name: 'Periodo' })
+  periodo: number;
+
+  @Field({ name: 'Expresion' })
+  expresion: string;
+
+  @Field({ name: 'Valor' })
+  valor: number;
+
+  @Field({ name: 'Operador' })
+  operador: string;
+
+  @Field({ name: 'ExpresionC' })
+  expresionc: string;
+
+  @Field({ name: 'ValorC' })
+  valorc: number;
+
+  @Field({ name: 'Resultado' })
+  resultado: string;
+}
+
+@ObjectType()
+export class IConciliaReporteValores {
+  @Field({ name: 'Centro' })
+  centro: string;
+
+  @Field({ name: 'Periodo' })
+  periodo: number;
+
+  @Field({ name: 'Consolidado' })
+  consolidado: boolean;
+
+  @Field({ name: 'Expresion' })
+  expresion: string;
+
+  @Field({ name: 'Valor' })
+  valor: number;
+
+  @Field({ name: 'Operador' })
+  operador: string;
+
+  @Field({ name: 'ValorRodas' })
+  valor_rodas: number;
+
+  @Field({ name: 'Estado' })
+  estado: string;
+
+  @Field({ name: 'Division' })
+  division: string;
+}
+
+@ObjectType()
+export class IConciliaCuadreSistemas {
+  @Field({ name: 'Centro' })
+  centro: number;
+
+  @Field({ name: 'Sistema' })
+  sistema: string;
+
+  @Field({ name: 'Estado' })
+  estado: string;
+}
+
+@ObjectType()
+export class IConciliaInformacionContabilidad {
+  @Field({ name: 'Criterio' })
+  criterio: string;
+
+  @Field({ name: 'Saldo' })
+  saldo: number;
+}
+
+@ObjectType()
+export class ConciliaContaQueryResponse {
+  @Field()
+  success: boolean;
+
+  @Field({ nullable: true })
+  data?: string;
+
+  @Field(() => String, { nullable: true })
+  error?: string;
 }
 
 @ObjectType()
 export class ConciliaContabilidadQueryResponse {
-    @Field()
-    success: boolean;
+  @Field(() => [IConciliaReporteClasificador])
+  ReporteClasificador: IConciliaReporteClasificador[];
 
-    @Field(() => ConciliaContabilidad, { nullable: true })
-    data?: ConciliaContabilidad;
+  @Field(() => [IConciliaReporteConsulta])
+  ReporteConsultas: IConciliaReporteConsulta[];
 
-    @Field(() => String, { nullable: true })
-    error?: string;
+  @Field(() => [IConciliaReporteExpresiones])
+  ReporteExpresiones: IConciliaReporteExpresiones[];
+
+  @Field(() => [IConciliaReporteValores])
+  ReporteValores: IConciliaReporteValores[];
+
+  @Field(() => [IConciliaCuadreSistemas])
+  CuadreSistemas: IConciliaCuadreSistemas[];
+
+  @Field(() => [IConciliaInformacionContabilidad])
+  Informacion: IConciliaInformacionContabilidad[];
 }
 
-@InputType()
-export class ConciliaContaInput {
-    @Field()
-    idCentro: number;
+@ObjectType()
+export class IChequeoCentroVsConsolidado {
+  @Field({ name: 'Centro' })
+  centro: string;
 
-    @Field()
-    periodo: number;
+  @Field({ name: 'Unidad' })
+  unidad: string;
 
-    @Field()
-    annio: number;
+  @Field({ name: 'Consolidado' })
+  consolidado: boolean;
 
-    @Field()
-    tipoCentro: number;
+  @Field({ name: 'Periodo' })
+  periodo: number;
 
-    @Field()
-    tipoEntidad: number;
+  @Field({ name: 'IdConsulta' })
+  id_consulta: string;
+
+  @Field({ name: 'Consulta' })
+  consulta: string;
+
+  @Field({ name: 'Cuenta', nullable: true })
+  cuenta?: string;
+
+  @Field({ name: 'SubCuenta', nullable: true })
+  subcuenta?: string;
+
+  @Field({ name: 'Analisis1', nullable: true })
+  analisis_1?: string;
+
+  @Field({ name: 'Analisis2', nullable: true })
+  analisis_2?: string;
+
+  @Field({ name: 'Analisis3', nullable: true })
+  analisis_3?: string;
+
+  @Field({ name: 'Analisis4', nullable: true })
+  analisis_4?: string;
+
+  @Field({ name: 'Analisis5', nullable: true })
+  analisis_5?: string;
+
+  @Field({ name: 'Total' })
+  total: number;
 }
 
-@InputType()
-export class IniciarSaldosInput {
-    @Field()
-    idCentro: number;
+// utilitarios para el rodas
+export const queryUltimoPeriodo = `SELECT COALESCE(MAX(Periodo), -1) as Periodo 
+  FROM conta_asiento
+  WHERE Centro = @Centro and COALESCE(Consolidado, false) = @Cons and Anno = @Anio`;
 
-    @Field()
-    consolidado: boolean;
+export const queryRangoAsientosMesRodas = `SELECT periodo, min(id) as ini, max(id) as fin
+  FROM contabilidad.asientos as a inner join contabilidad.comprobantes as c on a.anno_comprobante = c.anno and 
+      a.tipo_comprobante = c.tipo and a.numero_comprobante = c.numero
+  group by periodo
+  order by periodo;`;
 
-    @Field()
-    annio: number;
-}
+export const queryClasificadorCuentasRodas = `SELECT anno, cuenta, subcuenta, nombre, naturaleza, tipo_analisis_1, tipo_analisis_2, tipo_analisis_3, tipo_analisis_4, tipo_analisis_5, 
+  obligacion, tipo_moneda, grupo, clase, categoria, clasificacion, tipo, estado
+  from contabilidad.cuentas
+  where anno = @anno
+  order by anno asc, cuenta asc, subcuenta asc`;
 
-@InputType()
-export class ChequearCentrosInput {
-    @Field()
-    idCentro: number;
+export const queryAsientoRodas = `SELECT a.anno_comprobante as anno, c.periodo, a.cuenta, a.subcuenta, coalesce(a.tipo_analisis_1, '') as tipo_analisis_1, coalesce(a.analisis_1, '') as analisis_1, coalesce(a.tipo_analisis_2, '') as tipo_analisis_2, coalesce(a.analisis_2, '') as analisis_2, coalesce(a.tipo_analisis_3, '') as tipo_analisis_3, coalesce(a.analisis_3, '') as analisis_3, coalesce(a.tipo_analisis_4, '') as tipo_analisis_4, coalesce(a.analisis_4, '') as analisis_4, coalesce(a.tipo_analisis_5, '') as tipo_analisis_5, coalesce(a.analisis_5, '') as analisis_5,
+  sum(a.debito) as debito, sum(a.credito) as credito
+  FROM contabilidad.asientos as a inner join 
+    contabilidad.comprobantes as c on a.anno_comprobante = c.anno and a.tipo_comprobante = c.tipo and a.numero_comprobante = c.numero
+  where a.anno_comprobante = @anno and c.periodo = @periodo and c.estado <> 'I' and c.tipo <> '_UH'
+  group by a.anno_comprobante, c.periodo, a.cuenta, a.subcuenta, coalesce(a.tipo_analisis_1, ''), coalesce(a.analisis_1, ''), coalesce(a.tipo_analisis_2, ''), coalesce(a.analisis_2, ''), coalesce(a.tipo_analisis_3, ''), coalesce(a.analisis_3, ''), coalesce(a.tipo_analisis_4, ''), coalesce(a.analisis_4, ''), coalesce(a.tipo_analisis_5, ''), coalesce(a.analisis_5, '');`;
 
-    @Field()
-    annio: number;
+export const queryObligacionesRodas = `SELECT a.anno_comprobante, c.periodo, a.cuenta, a.subcuenta, coalesce(a.tipo_analisis_1, '') as tipo_analisis_1, coalesce(a.analisis_1, '') as analisis_1, coalesce(a.tipo_analisis_2, '') as tipo_analisis_2, coalesce(a.analisis_2, '') as analisis_2, coalesce(a.tipo_analisis_3, '') as tipo_analisis_3, coalesce(a.analisis_3, '') as analisis_3, coalesce(a.tipo_analisis_4, '') as tipo_analisis_4, coalesce(a.analisis_4, '') as analisis_4, coalesce(a.tipo_analisis_5, '') as tipo_analisis_5, coalesce(a.analisis_5, '') as analisis_5,
+  sum(a.debito) as debito, sum(a.credito) as credito, a.documento_obligacion, min(a.fecha_documento_obligacion) as fecha_documento_obligacion
+  FROM contabilidad.asientos as a inner join 
+    contabilidad.comprobantes as c on a.anno_comprobante = c.anno and a.tipo_comprobante = c.tipo and a.numero_comprobante = c.numero inner join 
+    contabilidad.cuentas cta on cta.anno = a.anno_comprobante and cta.cuenta = a.cuenta and cta.subcuenta = a.subcuenta 
+  where a.anno_comprobante = @anno and c.periodo = @periodo and c.estado <> 'I' and cta.obligacion = true and c.tipo <> '_UH'
+  group by a.anno_comprobante, c.periodo, a.cuenta, a.subcuenta, coalesce(a.tipo_analisis_1, ''), coalesce(a.analisis_1, ''), coalesce(a.tipo_analisis_2, ''), coalesce(a.analisis_2, ''), coalesce(a.tipo_analisis_3, ''), coalesce(a.analisis_3, ''), coalesce(a.tipo_analisis_4, ''), coalesce(a.analisis_4, ''), coalesce(a.tipo_analisis_5, ''), coalesce(a.analisis_5, ''), a.documento_obligacion;`;
 
-    @Field()
-    periodo: number;
+export const querySaldosAcumuladosRodas = `SELECT COALESCE(ROUND(SUM(ROUND(a.debito, 2)), 2), 0) AS debito, COALESCE(ROUND(SUM(ROUND(a.credito, 2)), 2), 0) AS credito
+  FROM contabilidad.asientos as a inner join contabilidad.comprobantes as c on a.anno_comprobante = c.anno and 
+    a.tipo_comprobante = c.tipo and a.numero_comprobante = c.numero and c.estado <> 'I' and c.tipo <> '_UH'
+  where a.anno_comprobante = @anno and c.periodo < @periodo;`;
 
-    @Field(() => [Int])
-    centrosAChequear: number[];
-}
+// querys para los reportes de la conciliación
+export const queryReporteConsultas = `SELECT Periodo, Centro, Id_Consulta, Consulta, Cuenta, SubCuenta, Analisis_1, Analisis_2, Analisis_3, Analisis_4, Analisis_5, SUM(Total) AS Total, Consolidado
+  FROM Conta_Reporte_Consultas
+  WHERE (Consolidado = @Consolidado) AND (Centro = @Centro) AND (Anno = @Anio) AND (Periodo = @Periodo) AND (Id_Consulta = @IdConsulta)
+  GROUP BY Periodo, Centro, Id_Consulta, Consulta, Cuenta, SubCuenta, Analisis_1, Analisis_2, Analisis_3, Analisis_4, Analisis_5, Consolidado
+  order by periodo, centro, consulta, cuenta, subcuenta, analisis_1, analisis_2, analisis_3, analisis_4, analisis_5;`;
 
-export const queryUltimoPeriodo = `SELECT ISNULL(MAX(Período), -1) as Periodo FROM dbo.Conta_Asiento
-    WHERE Centro = @Centro and isnull(Consolidado, 0) = @Cons and Año = @Anio`;
+export const queryReporteExpresiones = `SELECT Centro, Consolidado, Periodo, Expresion, Valor, Operador, ExpresionC, ValorC, Resultado
+  FROM Conta_Reporte_Expresiones
+  WHERE (Centro = @Centro) AND (coalesce(Consolidado, false) = @Consolidado) AND (Anno = @Anio) AND (Periodo = @Periodo)
+  order by centro, Consolidado, Periodo, Expresion, ExpresionC;`;
 
-export const queryRangoAsientosMesRodas = `SELECT Período, MIN(Asiento) AS Ini, MAX(Asiento) AS Fin FROM dbo.Asiento GROUP BY Período ORDER BY Período`;
+export const queryReporteValores = `SELECT Centro, Periodo, Consolidado, Expresion, Valor, Operador, Valor_Rodas, Estado, Division
+  FROM Conta_Reporte_Valor 
+  WHERE (Centro = @Centro) AND (coalesce(Consolidado, false) = @Consolidado) AND (Anno = @Anio) AND (Periodo = @Periodo) AND (Division = @IdDivision);`;
 
-export const queryClasificadorCuentasRodas = `SELECT Año, Cuenta, SubCuenta, Descripción, Naturaleza, [Grupo Clase] AS Grupo_Clase, SubMayor, [Tipo de Análisis 1] AS Tipo_de_Análisis_1, [Tipo de Análisis 2] AS Tipo_de_Análisis_2, [Tipo de Análisis 3] AS Tipo_de_Análisis_3, Obligación, Terminal, Real, [Cuenta Contrapartida] AS Cuenta_Contrapartida,
-    [SubCuenta Contrapartida] AS SubCuenta_Contrapartida, [Cuenta Consolidación] AS Cuenta_Consolidación, [SubCuenta Consolidación] AS SubCuenta_Consolidación, [Tipo de Análisis 1 Consolidación] AS Tipo_de_Análisis_1_Consolidación, [Tipo de Análisis 2 Consolidación] AS Tipo_de_Análisis_2_Consolidación, [Tipo de Análisis 3 Consolidación] AS Tipo_de_Análisis_3_Consolidación,
-    [Obligación Consolidación] AS Obligación_Consolidación, [Condición Consolidación] AS Condición_Consolidación, [Cuenta Ganancia] AS Cuenta_Ganancia, [SubCuenta Ganancia] AS SubCuenta_Ganancia, [Cuenta Pérdida] AS Cuenta_Pérdida, [SubCuenta Pérdida] AS SubCuenta_Pérdida, [Moneda Extranjera] AS Moneda_Extranjera, Estado, [Cuenta Conversión] AS Cuenta_Conversión,
-    [SubCuenta Conversión] AS SubCuenta_Conversión, [Tipo de Análisis 1 Conversión] AS Tipo_de_Análisis_1_Conversión, [Tipo de Análisis 2 Conversión] AS  Tipo_de_Análisis_2_Conversión, [Tipo de Análisis 3 Conversión]  AS Tipo_de_Análisis_3_Conversión, [Obligación Conversión] AS Obligación_Conversión, [Descripción Conversión] AS Descripción_Conversión, [Naturaleza Conversión] AS Naturaleza_Conversión,
-    [Terminal Conversión] AS Terminal_Conversión, [Moneda Extranjera Conversión] AS Moneda_Extranjera_Conversión, [Análisis 1 Consolidación] AS Análisis_1_Consolidación, [Análisis 2 Consolidación] AS Análisis_2_Consolidación, [Análisis 3 Consolidación] AS Análisis_3_Consolidación, aporta_presupuesto, gasto_presupuesto, ingreso_presupuesto,
-    Resultados_presupuesto, Capital_presupuesto, MEMO
-    FROM [Clasificador de Cuentas] as [Clasificador_de_Cuentas]`;
+// query para actualizar el clasificador de cuentas en el rodas
+export const queryUpdateClasificadorRodas = `WITH updclas as (
+  UPDATE contabilidad.cuentas
+    SET anno = @Anio, cuenta = '@Cta', subcuenta = '@SubCta', nombre = '@Nombre', naturaleza = '@Nat', tipo_analisis_1 = @An1, tipo_analisis_2 = @An2, tipo_analisis_3 = @An3, tipo_analisis_4 = @An4, tipo_analisis_5 = @An5,
+      obligacion = '@Obl', grupo = '@Grupo', clase = '@Clase', categoria = '@Categ', clasificacion = '@Clasif', tipo = '@Tipo', estado = '@Estado'
+    WHERE anno = @Anio AND cuenta = '@Cta' AND subcuenta = '@SubCta'
+  RETURNING *)	
+  INSERT INTO contabilidad.cuentas(
+      anno, cuenta, subcuenta, nombre, naturaleza, tipo_analisis_1, tipo_analisis_2, tipo_analisis_3, tipo_analisis_4, tipo_analisis_5, obligacion, grupo, clase, categoria, clasificacion, tipo, estado)
+    SELECT @Anio, '@Cta', '@SubCta', '@Nombre', '@Nat', @An1, @An2, @An3, @An4, @An5, @Obl, '@Grupo', '@Clase', '@Categ', '@Clasif', '@Tipo', '@Estado' 
+    WHERE NOT EXISTS (select * from updclas)`;
 
-export const queryComprobantesRodas = `SELECT Tipo, Número, Período, RTRIM(YEAR(Fecha)) + '/' + RIGHT('00' + RTRIM(MONTH(Fecha)), 2) + '/' + RIGHT('00' + RTRIM(DAY(Fecha)), 2) AS Fecha, Descripción,
-    Estado, Usuario, RTRIM(YEAR([Ultima Actualización])) + '/' + RIGHT('00' + RTRIM(MONTH([Ultima Actualización])), 2) + '/' + RIGHT('00' + RTRIM(DAY([Ultima Actualización])), 2) AS Ultima_Actualización,
-    [Traspasado por] AS Traspasado_por, RTRIM(YEAR([Fecha Traspaso])) + '/' + RIGHT('00' + RTRIM(MONTH([Fecha Traspaso])), 2) + '/' + RIGHT('00' + RTRIM(DAY([Fecha Traspaso])), 2) AS Fecha_Traspaso,
-    Débito, Crédito, IsNull([Usuario Red], '') AS Usuario_Red, IsNull(subsistema, '') as subsistema, IsNull(siglas, '') as siglas
-    FROM Comprobantes WHERE Período = @Periodo`;
-
-export const queryAsientoRodas = `SELECT [Tipo de Comprobante] AS Tipo_de_Comprobante, [Número de Comprobante] AS Número_de_Comprobante, [Número de Documento] AS Número_de_Documento, [Período], [Asiento],
-    [Tipo de Asiento] AS Tipo_de_Asiento, [Cuenta], [SubCuenta],[Tipo de Análisis 1] AS Tipo_de_Análisis_1, [Análisis 1] AS Análisis_1, [Tipo de Análisis 2] AS Tipo_de_Análisis_2, [Análisis 2] AS Análisis_2, [Tipo de Análisis 3] AS Tipo_de_Análisis_3, [Análisis 3] AS Análisis_3,
-    [Detalle], [Naturaleza], [Débito], [Crédito], [Moneda Extranjera] AS Moneda_Extranjera, [Tipo de Moneda] AS Tipo_de_Moneda, [Tasa], [Estado], [Documento de Obligación] AS Documento_de_Obligación,
-	ISNULL(RTRIM(YEAR([Fecha])) + '/' + RIGHT('00' + RTRIM(MONTH(Fecha)), 2) + '/' + RIGHT('00' + RTRIM(DAY(Fecha)), 2), '') AS Fecha, [Saldo]
-    FROM Asiento WHERE Período = @Periodo ORDER BY Asiento`;
-
-export const queryMayorRodas = `SELECT Cuenta, SubCuenta, Período, Débito, Crédito, [Débito Acumulado] as Débito_Acumulado, [Crédito Acumulado] as Crédito_Acumulado
-    FROM Mayor where Período = @Periodo ORDER BY Período, Cuenta, SubCuenta`;
-
-export const querySaldosAcumuladosRodas = `SELECT ISNULL(ROUND(SUM(Débito), 2), 0) AS Debito, ISNULL(ROUND(SUM(Crédito), 2), 0) AS Credito
-    FROM dbo.Asiento WHERE Período < @Periodo`;
-
-export const queryReporteConsultas = `SELECT Periodo, Centro, IdConsulta, Consulta, Cuenta, SubCuenta, [Análisis 1] as Analisis1, [Análisis 2] as Analisis2, [Análisis 3] as Analisis3, SUM(Total) AS Total, Consolidado
-    FROM Conta_ReporteConsultas
-    WHERE (Consolidado = @Consolidado) AND (Centro = @Centro) AND (Periodo = @Periodo) AND (IdConsulta = @IdConsulta)
-    GROUP BY Periodo, Centro, IdConsulta, Consulta, Cuenta, SubCuenta, [Análisis 1], [Análisis 2], [Análisis 3], Consolidado`;
-
-export const queryReporteExpresiones = `SELECT Consolidado, Periodo, Tipo, Expresion, Valor, Operador, ExpresionC, ValorC, Resultado
-    FROM Conta_ReporteExpersiones
-    WHERE (Centro = @Centro) AND (ISNULL(Consolidado, 0) = @Consolidado) AND (Periodo = @Periodo)`;
-
-export const queryReporteValores = `SELECT Centro, Periodo, Consolidado, Expresion, Valor, Operador, ValorRodas, Estado, IdDivision
-    FROM Conta_ReporteValor WHERE (Centro = @Centro) AND (ISNULL(Consolidado, 0) = @Consolidado) AND (Periodo = @Periodo) AND (IdDivision = @IdDivision)`;
-
-export const queryCentrosByConsolidado = `SELECT T.Centro FROM (
-	SELECT CASE WHEN [Tipo de Análisis 1] = 'X' THEN [Análisis 1]
-				WHEN [Tipo de Análisis 2] = 'X' THEN [Análisis 2]
-				WHEN [Tipo de Análisis 3] = 'X' THEN [Análisis 3]
-				ELSE '' END AS Centro, Cuenta, ABS(SUM(Débito - Crédito)) AS Saldo
-	FROM dbo.Asiento
-	GROUP BY CASE WHEN [Tipo de Análisis 1] = 'X' THEN [Análisis 1]
-				WHEN [Tipo de Análisis 2] = 'X' THEN [Análisis 2]
-				WHEN [Tipo de Análisis 3] = 'X' THEN [Análisis 3]
-				ELSE '' END, Cuenta
-	HAVING SUM(Débito - Crédito) NOT BETWEEN -0.0001 AND 0.0001) AS T
-    GROUP BY T.Centro
-    ORDER BY T.Centro`;
-
-export const queryInsertClasificadorUnidad = `IF NOT EXISTS (SELECT * FROM dbo.[Clasificador de Cuentas] WHERE Año = @Anio AND Cuenta = '@Cta' AND SubCuenta = '@Subcta')
-    INSERT dbo.[Clasificador de Cuentas]
-            (Año, Cuenta, SubCuenta, Descripción, Naturaleza, SubMayor, 
-            [Tipo de Análisis 1], [Tipo de Análisis 2], [Tipo de Análisis 3], Obligación, Terminal, 
-            [Cuenta Consolidación], [SubCuenta Consolidación], [Tipo de Análisis 1 Consolidación], [Tipo de Análisis 2 Consolidación], [Tipo de Análisis 3 Consolidación], [Condición Consolidación], 
-            [Análisis 1 Consolidación], [Análisis 2 Consolidación], [Análisis 3 Consolidación], 
-            [Moneda Extranjera], Estado, aporta_presupuesto, gasto_presupuesto, ingreso_presupuesto, Resultados_presupuesto, Capital_presupuesto, MEMO)
-    VALUES  (@Anio, '@Cta', '@SubCta', '@Desc', '@Nat', @Subm,
-            '@An1', '@An2', '@An3', @Obl, @Term, 
-            '@Cta', '@SubCta', '@ConsTipoAn1', '@ConsTipoAn2', '@ConsTipoAn3', '@CondCons', '@ConsAn1', '@ConsAn2', '@ConsAn3', 
-            0, 'A', 0, 0, 0, 0, 0, 0)`;
-
-export const queryUpdateClasificadorUnidad = `UPDATE dbo.[Clasificador de Cuentas]
-    SET Descripción = '@Desc', Naturaleza = '@Nat', SubMayor = @Subm, 
-                [Tipo de Análisis 1] = '@An1', [Tipo de Análisis 2] = '@An2', [Tipo de Análisis 3] = '@An3', Obligación = @Obl, Terminal = @Term, 
-                [Cuenta Consolidación] = '@Cta', [SubCuenta Consolidación] = '@SubCta', [Tipo de Análisis 1 Consolidación] = '@ConsTipoAn1', [Tipo de Análisis 2 Consolidación] = '@ConsTipoAn2', [Tipo de Análisis 3 Consolidación] = '@ConsTipoAn3', 
-                [Condición Consolidación] = '@CondCons', [Análisis 1 Consolidación] = '@ConsAn1', [Análisis 2 Consolidación] = '@ConsAn2', [Análisis 3 Consolidación] = '@ConsAn2'
-    WHERE Año = @Anio AND Cuenta = '@Cta' AND SubCuenta = '@SubCta'`;
-
-export const querySwitchAuditRodas = `USE master 
-    IF (CAST(PARSENAME(CAST(SERVERPROPERTY('ProductVersion') AS SYSNAME), CASE WHEN SERVERPROPERTY('ProductVersion') IS NULL THEN 3 ELSE 4 END) AS INT) > 9) 
-    BEGIN 
-        DECLARE @query NVARCHAR(255) 
-        SET @query = 'IF EXISTS(SELECT * FROM sys.server_audits WHERE name = ''@DataBase_ServerAudit'') 
-        ALTER SERVER AUDIT [@DataBase_ServerAudit] WITH (STATE=@Accion)' 
-        EXEC(@query) 
-    END`;
+export const queryUpdateCriterioClasificadorRodas = `WITH updversus as (
+  UPDATE contabilidad.cuentas_versus
+    SET tipo_analisis_1_consolidacion = @TipoAn1Cons, analisis_1_consolidacion = @An1Cons, tipo_analisis_2_consolidacion = @TipoAn2Cons, analisis_2_consolidacion = @An2Cons, tipo_analisis_3_consolidacion = @TipoAn3Cons, analisis_3_consolidacion = @An3Cons, tipo_analisis_4_consolidacion = @TipoAn4Cons, analisis_4_consolidacion = @An4Cons, tipo_analisis_5_consolidacion = @TipoAn5Cons, analisis_5_consolidacion = @An5Cons
+    WHERE cuenta = '@Cta' AND subcuenta = '@SubCta'
+    RETURNING *
+  )
+  INSERT INTO contabilidad.cuentas_versus (modo, origen, cuenta, subcuenta, cuenta_consolidacion, subcuenta_consolidacion, tipo_analisis_1_consolidacion, analisis_1_consolidacion, tipo_analisis_2_consolidacion, analisis_2_consolidacion, tipo_analisis_3_consolidacion, analisis_3_consolidacion, tipo_analisis_4_consolidacion, analisis_4_consolidacion, tipo_analisis_5_consolidacion, analisis_5_consolidacion)
+  SELECT 'I', 'C', '@Cta', '@SubCta', '@Cta', '@SubCta', @TipoAn1Cons, @An1Cons, @TipoAn2Cons, @An2Cons, @TipoAn3Cons, @An3Cons, @TipoAn4Cons, @An4Cons, @TipoAn5Cons, @An5Cons
+    WHERE NOT EXISTS (select * FROM updversus);`;

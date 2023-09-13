@@ -1,34 +1,34 @@
-import { Divisiones } from './../divisiones/divisiones.entity';
+import { DivisionesEntity } from './../divisiones/divisiones.entity';
 import { Cargos } from './../cargos/cargos.entity';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @ObjectType()
-@Entity()
+@Entity('empleado')
 export class Empleado {
-    @Field()
-    @PrimaryGeneratedColumn()
-    IdEmpleado: number;
+  @Field()
+  @PrimaryGeneratedColumn({ name: 'id_empleado' })
+  IdEmpleado: number;
 
-    @Field()
-    @Column()
-    Empleado: string;
+  @Field()
+  @Column({ name: 'empleado' })
+  Empleado: string;
 
-    @Field()
-    @Column()
-    IdCargo: number;
+  @Field()
+  @Column({ name: 'id_cargo' })
+  IdCargo: number;
 
-    @Field(() => Cargos)
-    @ManyToOne(() => Cargos, cargos => cargos.IdCargo)
-    @JoinColumn({ name: 'IdCargo', referencedColumnName: 'IdCargo' })
-    Cargo: Cargos;
+  @Field(() => Cargos)
+  @ManyToOne(() => Cargos, cargos => cargos.IdCargo)
+  @JoinColumn({ name: 'id_cargo', referencedColumnName: 'IdCargo' })
+  Cargo: Cargos;
 
-    @Field()
-    @Column()
-    IdDivision: number;
+  @Field()
+  @Column({ name: 'id_division' })
+  IdDivision: number;
 
-    @Field(() => Divisiones)
-    @ManyToOne(() => Divisiones, divisiones => divisiones.IdDivision)
-    @JoinColumn({ name: 'IdDivision', referencedColumnName: 'IdDivision'})
-    Division: Divisiones;
+  @Field(() => DivisionesEntity)
+  @ManyToOne(() => DivisionesEntity, divisiones => divisiones.IdDivision)
+  @JoinColumn({ name: 'id_division', referencedColumnName: 'IdDivision' })
+  Division: DivisionesEntity;
 }

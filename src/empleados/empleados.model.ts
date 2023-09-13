@@ -10,15 +10,15 @@ export class EmpleadosQueryResponse extends MultipleQueryResponse(Empleado) {}
 
 @InputType()
 export class EmpleadoInput {
-    @Field()
-    IdEmpleado?: number;
+  @Field()
+  IdEmpleado?: number;
 
-    @Field()
-    Empleado: string;
+  @Field()
+  Empleado: string;
 
-    @Field()
-    IdCargo: number;
+  @Field()
+  IdCargo: number;
 
-    @Field()
-    IdDivision: number;
+  @Field()
+  IdDivision: number;
 }

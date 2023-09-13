@@ -2,19 +2,25 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @ObjectType()
-@Entity('Conta_ClasificarUnidades')
-export class ClasificarEntidades {
-    @Field()
-    @PrimaryColumn()
-    IdUnidad: number;
+@Entity('conta_clasificar_unidades')
+export class ClasificarEntidadesEntity {
+  @Field()
+  @PrimaryColumn({ name: 'id_unidad' })
+  IdUnidad: number;
 
-    @Field({ nullable: true })
-    Unidad: string
+  @Field({ nullable: true })
+  Unidad: string;
 
-    @Field()
-    @Column()
-    IdTipoEntidad: number;
+  @Field()
+  @Column({ name: 'id_tipo_entidad' })
+  IdTipoEntidad: number;
 
-    @Field()
-    TipoEntidad: string
+  @Field()
+  TipoEntidad: string;
+
+  @Field()
+  Division: string;
+
+  @Field()
+  SubDivision: string;
 }

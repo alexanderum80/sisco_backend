@@ -6,6 +6,6 @@ import { ContaNoUsarEnCuentasService } from './conta-no-usar-en-cuentas.service'
 
 @Module({
   imports: [TypeOrmModule.forFeature([ContaNoUsarEnCuentaEntity])],
-  providers: [ContaNoUsarEnCuentasResolver, ContaNoUsarEnCuentasService]
+  providers: [ContaNoUsarEnCuentasResolver, ContaNoUsarEnCuentasService],
 })
 export class ContaNoUsarEnCuentasModule {}

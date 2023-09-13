@@ -6,7 +6,7 @@ import { ConciliaUhService } from './concilia-uh.service';
 import { ConciliaUhResolver } from './concilia-uh.resolver';
 
 @Module({
-    imports: [ConciliaContaModule, ContaConexionesModule, SharedModule],
-    providers: [ConciliaUhResolver, ConciliaUhService],
+  imports: [ConciliaContaModule, ContaConexionesModule, SharedModule],
+  providers: [ConciliaUhResolver, ConciliaUhService],
 })
 export class ConciliaUhModule {}

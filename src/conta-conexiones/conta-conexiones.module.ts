@@ -8,8 +8,8 @@ import { ContaConexionesResolver } from './conta-conexiones.resolver';
 import { ContaConexionesService } from './conta-conexiones.service';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([ContaConexionesEntity]), UnidadesModule, UsuariosModule, SharedModule],
-    providers: [ContaConexionesResolver, ContaConexionesService],
-    exports: [ContaConexionesService],
+  imports: [TypeOrmModule.forFeature([ContaConexionesEntity]), UnidadesModule, UsuariosModule, SharedModule],
+  providers: [ContaConexionesResolver, ContaConexionesService],
+  exports: [ContaConexionesService],
 })
 export class ContaConexionesModule {}

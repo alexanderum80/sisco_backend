@@ -3,12 +3,12 @@ import { Field, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
 export class ContaOperadoresQueryResponse {
-    @Field()
-    success: Boolean;
+  @Field()
+  success: boolean;
 
-    @Field(() => [ContaOperadoresEntity], { nullable: true })
-    data?: ContaOperadoresEntity[];
+  @Field(() => [ContaOperadoresEntity], { nullable: true })
+  data?: ContaOperadoresEntity[];
 
-    @Field(() => String, { nullable: true })
-    error?: String;
+  @Field(() => String, { nullable: true })
+  error?: string;
 }

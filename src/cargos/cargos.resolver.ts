@@ -5,12 +5,10 @@ import { CargosQueryResponse } from './cargos.model';
 
 @Resolver(() => Cargos)
 export class CargosResolver {
-    constructor(
-        private _cargosService: CargosService
-    ) {}
+  constructor(private _cargosService: CargosService) {}
 
-    @Query(() => CargosQueryResponse)
-    async getAllCargos(): Promise<CargosQueryResponse> {
-        return this._cargosService.getAllCargos();
-    }
+  @Query(() => CargosQueryResponse)
+  async getAllCargos(): Promise<CargosQueryResponse> {
+    return this._cargosService.getAllCargos();
+  }
 }
