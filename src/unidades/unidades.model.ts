@@ -1,5 +1,5 @@
 import { MultipleQueryResponse, SingleQueryResponse } from './../shared/models/query.response.model';
-import { CentrosView, Unidades } from './unidades.entity';
+import { CentrosView, UnidadesEntity } from './unidades.entity';
 import { ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
@@ -9,7 +9,7 @@ export class AllUnidadesQueryResponse extends MultipleQueryResponse(CentrosView)
 export class AllUnidadQueryResponse extends SingleQueryResponse(CentrosView) {}
 
 @ObjectType()
-export class UnidadesQueryResponse extends MultipleQueryResponse(Unidades) {}
+export class UnidadesQueryResponse extends MultipleQueryResponse(UnidadesEntity) {}
 
 @ObjectType()
-export class UnidadQueryResponse extends SingleQueryResponse(Unidades) {}
+export class UnidadQueryResponse extends SingleQueryResponse(UnidadesEntity) {}

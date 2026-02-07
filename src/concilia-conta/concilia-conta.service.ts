@@ -375,10 +375,16 @@ export class ConciliaContaService {
     const _queryReporteExpresiones = this._reporteExpresiones(idCentro, consolidado, annio, periodo);
     const _queryReporteValores = this._reporteValores(idCentro, consolidado, annio, periodo, idDivision);
     const _queryReporteCuadreSistemas = this._reporteCuadreSistemas(idCentro, consolidado, annio, periodo);
-    const _queryReporteInformacion = this._reporteInformacionContabilidad(idCentro, consolidado, annio, periodo);
+    // const _queryReporteInformacion = this._reporteInformacionContabilidad(idCentro, consolidado, annio, periodo);
 
     return new Promise<ConciliaContabilidadQueryResponse>((resolve, reject) => {
-      Promise.all([_queryReporteConsultas, _queryReporteExpresiones, _queryReporteValores, _queryReporteCuadreSistemas, _queryReporteInformacion])
+      Promise.all([
+        _queryReporteConsultas,
+        _queryReporteExpresiones,
+        _queryReporteValores,
+        _queryReporteCuadreSistemas,
+        // _queryReporteInformacion
+      ])
         .then(result => {
           resolve({
             ReporteClasificador: [],
@@ -386,7 +392,7 @@ export class ConciliaContaService {
             ReporteExpresiones: result[1],
             ReporteValores: result[2],
             CuadreSistemas: result[3],
-            Informacion: result[4],
+            Informacion: [],
           });
         })
         .catch(err => {
