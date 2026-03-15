@@ -17,6 +17,9 @@ export class ConciliaExternaContabilidadInput {
   @Field()
   Mes: number;
 
+  @Field()
+  MesActual: boolean;
+
   @Field({ nullable: true })
   Division?: number;
 

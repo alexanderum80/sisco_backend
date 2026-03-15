@@ -809,8 +809,8 @@ type Query {
   getAllSubdivisiones: [SubdivisionesEntity!]!
   getSubdivisionesByIdDivision(idDivision: Int!): [SubdivisionesEntity!]!
   getConciliacionExternaContab(conciliaExternaInput: ConciliaExternaContabilidadInput!): ConciliaExternaContabilidadEntity!
-  getConciliacionExternaContabResumen(annio: Int!, mes: Int!): [ViewConciliaExtContabilidadResumen!]!
-  getConciliacionExternaContabDeudasPorEdades(annio: Int!, mes: Int!): [ViewConciliaExtContabilidadDeudasPorEdades!]!
+  getConciliacionExternaContabResumen(annio: Int!, mes: Int!, mesActual: Boolean!): [ViewConciliaExtContabilidadResumen!]!
+  getConciliacionExternaContabDeudasPorEdades(annio: Int!, mes: Int!, mesActual: Boolean!): [ViewConciliaExtContabilidadDeudasPorEdades!]!
   getDiferenciasEnConciliacion(annio: Int!, mes: Int!): [ConcExtContabilidad!]!
   getAllTipoEntidades: ContaTipoentidadesQueryResponse!
   getTipoEntidadById(id: Int!): ContaTipoentidadQueryResponse!
@@ -898,6 +898,7 @@ input ConciliaOperacionesDWHInput {
 input ConciliaExternaContabilidadInput {
   Annio: Float!
   Mes: Float!
+  MesActual: Boolean!
   Division: Float
   Unidad: Float!
   DivisionOD: Float

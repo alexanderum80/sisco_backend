@@ -20,16 +20,18 @@ export class ConciliaExtContabilidadResolver {
   async getConciliacionExternaContabResumen(
     @Args({ name: 'annio', type: () => Int }) annio: number,
     @Args({ name: 'mes', type: () => Int }) mes: number,
+    @Args({ name: 'mesActual', type: () => Boolean }) mesActual: boolean,
   ): Promise<ViewConciliaExtContabilidadResumen[]> {
-    return this._conciliacionContabService.getDeudasResumen(annio, mes);
+    return this._conciliacionContabService.getDeudasResumen(annio, mes, mesActual);
   }
 
   @Query(() => [ViewConciliaExtContabilidadDeudasPorEdades])
   async getConciliacionExternaContabDeudasPorEdades(
     @Args({ name: 'annio', type: () => Int }) annio: number,
     @Args({ name: 'mes', type: () => Int }) mes: number,
+    @Args({ name: 'mesActual', type: () => Boolean }) mesActual: boolean,
   ): Promise<ViewConciliaExtContabilidadDeudasPorEdades[]> {
-    return this._conciliacionContabService.getDeudasPorEdades(annio, mes);
+    return this._conciliacionContabService.getDeudasPorEdades(annio, mes, mesActual);
   }
 
   @Query(() => [ConcExtContabilidad])

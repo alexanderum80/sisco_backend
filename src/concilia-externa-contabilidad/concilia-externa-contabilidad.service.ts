@@ -17,9 +17,9 @@ export class ConciliaExtContabilidadService {
 
   async getConciliacion(conciliaExternaInput: ConciliaExternaContabilidadInput): Promise<ConciliaExternaContabilidadEntity> {
     try {
-      const { Annio, Mes, Division, Unidad, DivisionOD, UnidadOD } = conciliaExternaInput;
+      const { Annio, Mes, MesActual, Division, Unidad, DivisionOD, UnidadOD } = conciliaExternaInput;
 
-      const getConciliaContab = this.conciliacionContab(Annio, Mes, Division, Unidad, DivisionOD, UnidadOD);
+      const getConciliaContab = this.conciliacionContab(Annio, Mes, MesActual, Division, Unidad, DivisionOD, UnidadOD);
       const getActaConciliacion = this.actaConciliacion(Annio, Mes, Unidad, UnidadOD);
 
       return new Promise<ConciliaExternaContabilidadEntity>((resolve, reject) => {
@@ -40,11 +40,11 @@ export class ConciliaExtContabilidadService {
     }
   }
 
-  async conciliacionContab(annio: number, mes: number, division: number, unidad: number, divisionOD: number, unidadOD: number): Promise<ConcExtContabilidad> {
+  async conciliacionContab(annio: number, mes: number, mesActual: boolean, division: number, unidad: number, divisionOD: number, unidadOD: number): Promise<ConcExtContabilidad> {
     try {
       return new Promise<ConcExtContabilidad>((resolve, reject) => {
         this.dataSource
-          .query('select * from concext_conciliacion_contabilidad ($1, $2, $3, $4, $5, $6)', [annio, mes, division, unidad, divisionOD, unidadOD])
+          .query('select * from concext_conciliacion_contabilidad ($1, $2, $3, $4, $5, $6, $7)', [annio, mes, mesActual, division, unidad, divisionOD, unidadOD])
           .then(result => {
             resolve(result);
           })
@@ -150,15 +150,11 @@ export class ConciliaExtContabilidadService {
     }
   }
 
-  async getDeudasResumen(annio: number, mes: number): Promise<ViewConciliaExtContabilidadResumen[]> {
+  async getDeudasResumen(annio: number, mes: number, mesActual: boolean): Promise<ViewConciliaExtContabilidadResumen[]> {
     try {
       return new Promise<ViewConciliaExtContabilidadResumen[]>((resolve, reject) => {
-        const _query = `SELECT * FROM v_concext_concilia_contabilidad_resumen
-          WHERE Anno = ${annio} AND Mes = ${mes}
-          ORDER BY Division_Emisor, Division_Receptor`;
-
         this.dataSource
-          .query(_query)
+          .query('select * from concext_conciliacion_contabilidad_resumen ($1, $2, $3)', [annio, mes, mesActual])
           .then(result => {
             resolve(result);
           })
@@ -171,11 +167,11 @@ export class ConciliaExtContabilidadService {
     }
   }
 
-  async getDeudasPorEdades(annio: number, mes: number): Promise<ViewConciliaExtContabilidadDeudasPorEdades[]> {
+  async getDeudasPorEdades(annio: number, mes: number, mesActual: boolean): Promise<ViewConciliaExtContabilidadDeudasPorEdades[]> {
     try {
       return new Promise<ViewConciliaExtContabilidadDeudasPorEdades[]>((resolve, reject) => {
         this.dataSource
-          .query('select * from public.concext_deudas_por_edades ($1, $2)', [annio, mes])
+          .query('select * from public.concext_deudas_por_edades ($1, $2, $3)', [annio, mes, mesActual])
           .then(result => {
             resolve(result);
           })
