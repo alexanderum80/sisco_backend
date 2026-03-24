@@ -7,11 +7,11 @@ import { DataSource } from 'typeorm';
 export class ContaInformeCtasCobrarPagarService {
   constructor(@InjectDataSource() private readonly dataSource: DataSource) {}
 
-  async findAll(idDivision: number, annio: number, periodo: number): Promise<ContaInformeCtasCobrarPagarView[]> {
+  async findAll(idDivision: number, resumido: boolean, annio: number, periodo: number): Promise<ContaInformeCtasCobrarPagarView[]> {
     try {
       return new Promise<ContaInformeCtasCobrarPagarView[]>((resolve, reject) => {
         this.dataSource
-          .query('select * from conta_informe_cuentas_por_cobrar_pagar ($1, $2, $3)', [idDivision, annio, periodo])
+          .query('select * from conta_informe_cuentas_por_cobrar_pagar ($1, $2, $3, $4)', [idDivision, resumido, annio, periodo])
           .then(res => {
             resolve(res);
           })

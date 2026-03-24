@@ -315,6 +315,10 @@ export const queryAsientoRodas = `SELECT a.anno_comprobante as anno, c.periodo, 
   where a.anno_comprobante = @anno and c.periodo = @periodo and c.estado <> 'I' and c.tipo <> '_UH'
   group by a.anno_comprobante, c.periodo, a.cuenta, a.subcuenta, coalesce(a.tipo_analisis_1, ''), coalesce(a.analisis_1, ''), coalesce(a.tipo_analisis_2, ''), coalesce(a.analisis_2, ''), coalesce(a.tipo_analisis_3, ''), coalesce(a.analisis_3, ''), coalesce(a.tipo_analisis_4, ''), coalesce(a.analisis_4, ''), coalesce(a.tipo_analisis_5, ''), coalesce(a.analisis_5, '');`;
 
+export const queryAnalisisRodas = `SELECT @centro as centro, @consolidado as consolidado, anno, tipo, codigo, descripcion
+  FROM contabilidad.analisis
+  where anno = @anno and tipo in ('C', 'D');`;
+
 export const queryObligacionesRodas = `SELECT a.anno_comprobante, c.periodo, a.cuenta, a.subcuenta, coalesce(a.tipo_analisis_1, '') as tipo_analisis_1, coalesce(a.analisis_1, '') as analisis_1, coalesce(a.tipo_analisis_2, '') as tipo_analisis_2, coalesce(a.analisis_2, '') as analisis_2, coalesce(a.tipo_analisis_3, '') as tipo_analisis_3, coalesce(a.analisis_3, '') as analisis_3, coalesce(a.tipo_analisis_4, '') as tipo_analisis_4, coalesce(a.analisis_4, '') as analisis_4, coalesce(a.tipo_analisis_5, '') as tipo_analisis_5, coalesce(a.analisis_5, '') as analisis_5,
   sum(a.debito) as debito, sum(a.credito) as credito, a.documento_obligacion, min(a.fecha_documento_obligacion) as fecha_documento_obligacion
   FROM contabilidad.asientos as a inner join 

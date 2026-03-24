@@ -25,6 +25,7 @@ import {
   IConciliaCuadreSistemas,
   IConciliaInformacionContabilidad,
   IChequeoCentroVsConsolidado,
+  queryAnalisisRodas,
 } from './concilia-conta.model';
 import { ConciliaContaInput, IniciarSaldosInput, ChequearCentrosInput } from './dto/concilia-conta.input';
 import { InjectDataSource } from '@nestjs/typeorm';
@@ -178,6 +179,11 @@ export class ConciliaContaService {
 
       const _periodoInicial = _ultimoPeriodo < periodo ? _ultimoPeriodo : periodo;
 
+      if (idUnidad === 100 && cons === true) {
+        // importar el análisis del consolidado de la Empresa
+        await this._importarAnalisis(idUnidad, annio, cons, contaConexion);
+      }
+
       for (let per = _periodoInicial; per <= periodo; per++) {
         // importar los asientos
         await this._importarAsientos(idUnidad, annio, per, cons, contaConexion);
@@ -277,6 +283,28 @@ export class ConciliaContaService {
       .catch(err => {
         throw new Error(err.message || err);
       });
+  }
+
+  private async _importarAnalisis(idUnidad: number, annio: number, consolidado: boolean, rodasConexion: DataSource): Promise<void> {
+    const _queryAnalisis = queryAnalisisRodas
+      .replace(/@centro/g, idUnidad.toString())
+      .replace(/@anno/g, annio.toString())
+      .replace(/@consolidado/g, consolidado.toString());
+
+    const _analisis = await rodasConexion
+      .query(_queryAnalisis)
+      .then(result => {
+        return result;
+      })
+      .catch(err => {
+        throw new Error(err.message || err);
+      });
+
+    if (_analisis.length) {
+      await this.dataSource.query(`CALL Conta_Import_Analisis ($1::json, $2::int, $3::bool, $4::int)`, [JSON.stringify(_analisis), idUnidad, consolidado, annio]).catch(err => {
+        throw new Error(err.message || err);
+      });
+    }
   }
 
   private async _importarAsientos(idUnidad: number, annio: number, periodo: number, cons: boolean, rodasConexion: DataSource): Promise<void> {

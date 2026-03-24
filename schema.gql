@@ -857,7 +857,7 @@ type Query {
   getDatosConciliacionExterna(anno: Int!, mes: Int!): ConciliaExternaDatosConciliacionEntity
   getAllActFijosClasificadorSubgrupo: [ActFijosClasificadorSubgrupoEntity!]!
   getActFijosClasificadorSubgrupo(grupo: Int!, codigo: Int!): ActFijosClasificadorSubgrupoEntity!
-  contaInformeCtasCobrarPagar(idDivision: Int!, annio: Int!, periodo: Int!): [ContaInformeCtasCobrarPagarView!]!
+  contaInformeCtasCobrarPagar(idDivision: Int!, resumido: Boolean!, annio: Int!, periodo: Int!): [ContaInformeCtasCobrarPagarView!]!
 }
 
 input ConciliaDWHInput {

@@ -9,9 +9,10 @@ export class ContaInformeCtasCobrarPagarResolver {
   @Query(() => [ContaInformeCtasCobrarPagarView], { name: 'contaInformeCtasCobrarPagar' })
   async findAll(
     @Args({ name: 'idDivision', type: () => Int }) idDivision: number,
+    @Args({ name: 'resumido', type: () => Boolean }) resumido: boolean,
     @Args({ name: 'annio', type: () => Int }) annio: number,
     @Args({ name: 'periodo', type: () => Int }) periodo: number,
   ): Promise<ContaInformeCtasCobrarPagarView[]> {
-    return this.contaInformeCtasCobrarPagarService.findAll(idDivision, annio, periodo);
+    return this.contaInformeCtasCobrarPagarService.findAll(idDivision, resumido, annio, periodo);
   }
 }
